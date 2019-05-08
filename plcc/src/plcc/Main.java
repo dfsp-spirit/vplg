@@ -1502,7 +1502,7 @@ public class Main {
                         argsUsed[i] = true;
                         Settings.set("plcc_B_chain_spheres_speedup", "true");
                     }
-                    
+                   
                     if(s.equals("--include_rna"))  {
                         argsUsed[i] = true;
                         Settings.set("plcc_include_rna", "true");
@@ -10815,6 +10815,7 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
+        System.out.println("   --include-rna           : Include RNA (WIP) ");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
@@ -10842,7 +10843,6 @@ public class Main {
         System.out.println("        If you don't do this, the broken DSSP file will get this program into trouble.");
         System.out.println("       -See the config file '" + Settings.getConfigFile() + "' in your userhome to set advanced options.");
         System.out.println("       -Try 'java -jar plcc.jar <PDBID>' for a start.");
-        System.out.println("       - Parse rna ");
     }
 
     /**
