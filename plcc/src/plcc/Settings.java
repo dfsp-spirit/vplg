@@ -503,6 +503,8 @@ public class Settings {
         // graphlets
         defSet("plcc_I_number_of_graphlets", "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity.");
         
+        //rna
+        defSet("plcc_include_rna", "true", "Parse rna - wp");
 
         return(true);
     }
