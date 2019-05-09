@@ -504,10 +504,10 @@ public class Settings {
         defSet("plcc_I_number_of_graphlets", "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity.");
         
         // matrix structure search
-        defSet("plcc_S_linear_notation_type", "", "The type of linear notaion (adj or red) for matrix structure comparison.");
         defSet("plcc_S_linear_notation", "", "The linear notation of a PG for the matrix structure comparison");
-        defSet("plcc_B_start_matrix_structure_search", "false", "whether to start the matrix structure search or not");
+        defSet("plcc_S_linear_notation_type", "", "The type of linear notaion (adj or red) for matrix structure comparison.");
         defSet("plcc_S_linear_notation_graph_type", "", "alpha, beta or albe = The graph type of the PG graph of the linear notation");
+        defSet("plcc_B_start_matrix_structure_search", "false", "whether to start the matrix structure search or not");
         return(true);
     }
     
