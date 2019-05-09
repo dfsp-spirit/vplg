@@ -2238,14 +2238,13 @@ connection.close();
         ArrayList<int[]> myListArray = new ArrayList<>(); //auxiliary variable
         //Beginning of Matrix has to be computed seperated from the rest
         myArray[0] = 0; //From where does the edge come? In this case 0, because it is the first edge
-        switch (graphtype){
-            case "alpha":
-            case "beta": {// everything without the last letter
-                myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
-            }
-            case "albe": { //hier ändern
-                myArray[1] = 0 + 0; //To which node does the first edge go? Always from the startingpoint. In this case 0.
-            }
+        
+        if ("alpha".equals(graphtype) || "beta".equals(graphtype)){
+            myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
+        }
+        else { //graphtype = "albe"
+            //skip the first ellement in linnot, cause it has only information about SSEType, e.g. [e]
+            myArray[1] = 0 + Integer.parseInt(linnot[1].substring(0, linnot[1].length()-2));
         }
         
         if (myArray[1] > maxVal) {
@@ -2256,59 +2255,61 @@ connection.close();
         }
         int origin = myArray[1]; 
         
-        if (graphtype == "alpha" || graphtype == "beta") {
-            //which edge (parallel, antiparallel or mixed) is used?
-            switch (linnot[0].substring(linnot[0].length()-1)) { //last letter
-                case "m":
-                    myArray[2] = 0;
-                    break;
-                case "p":
-                    myArray[2] = 1;
-                    break;
-                case "a":
-                    myArray[2] = 2;
-                    break;
-                case "z":
-                    myArray[2] = 3;
-                    break;
-                default:
-                    break;
-            }
-        } /*else {
-            switch (linnot[0]...) { //only one letter
-                case "m":
-                    myArray[2] = 0;
-                    break;
-                case "p":
-                    myArray[2] = 1;
-                    break;
-                case "a":
-                    myArray[2] = 2;
-                    break;
-                case "z":
-                    myArray[2] = 3;
-                    break;
-                default:
-                    break;
-        }*/
+        String edgetype_substr; // alpha/beta and albe require different positions of the edgetype in the linear notation
+        if ("alpha".equals(graphtype) || "beta".equals(graphtype)) {
+            edgetype_substr = linnot[0].substring(linnot[0].length()-1); // e.g. edgetype_substr = "p" for "-1pe"
+        }
+        else { //graphtype = "albe"
+            edgetype_substr = linnot[1].substring(linnot[1].length()-2, linnot[1].length()-1); // e.g. edgetype_substr = "p" for "1p"
+        }
+        
+        //which edge (parallel, antiparallel or mixed) is used?
+        switch (edgetype_substr) {
+            case "m":
+                myArray[2] = 0;
+                break;
+            case "p":
+                myArray[2] = 1;
+                break;
+            case "a":
+                myArray[2] = 2;
+                break;
+            case "z":
+                myArray[2] = 3;
+                break;
+            default:
+                break;
+        }
         
         myListArray.add(myArray.clone());
         
+        int index_shift; //to get the right positions of the numbers in linnot
+        int start_index; //the for loop has to start at different positions, cause albe skips the first position in linnot
+        
+        if ("alpha".equals(graphtype) || "beta".equals(graphtype)) {
+            start_index = 1;
+            index_shift = 1;
+        }
+        else { //graphtype = "albe"
+            start_index = 2;
+            index_shift = 2;
+        }
+
         //iterate over the whole linnot.
-        for (int i = 1; i < linnot.length; i++) {
+        for (int i = start_index; i < linnot.length; i++) {
             myArray[0] = origin; //From where does the edge come from?
-            switch (graphtype){
-                case "alpha":
-                case "beta": {// everything except for the last letter
-                    myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-1)); //where will the edge go to?
-                }
-                case "albe": { //hier ändern
-                    myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-2));
-                }
-            }
+            myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-index_shift)); //where will the edge go to?
             origin = myArray[1];
+            
+            if ("alpha".equals(graphtype) || "beta".equals(graphtype)) {
+            edgetype_substr = linnot[i].substring(linnot[i].length()-1); // e.g. edgetype_substr = "p" for "-1pe"
+            }
+            else { //graphtype = "albe"
+                edgetype_substr = linnot[i].substring(linnot[i].length()-2, linnot[i].length()-1); // e.g. edgetype_substr = "p" for "1p"
+            }
+            
             //which edge (parallel, antiparallel or mixed) is used?
-            switch (linnot[i].substring(linnot[i].length()-1)) {
+            switch (edgetype_substr) {
                 case "m":
                     myArray[2] = 0;
                     break;
@@ -2331,8 +2332,6 @@ connection.close();
             if (myArray[1] < minVal) {
                 minVal = myArray[1];
             }
-            
-            
         }
         
         
@@ -2497,7 +2496,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    //matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "alpha")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -2737,7 +2736,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    //matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -2980,7 +2979,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    //matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -3194,7 +3193,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    //matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -8822,7 +8821,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    //matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -9128,7 +9127,7 @@ connection.close();
             for (ArrayList<String> tD : tableData) {
                 linnotSeqList.add(tD.get(3));
                 if (tD.get(2).length() > 2 && getNumVerticesFromLinnotSeq(linnotSeqList) >= 8) {
-                    //matrixList.add(parseRedOrAdjToMatrix(tD.get(2))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(2), "alpha")); //parse linnot to adjacency matrix
                     
                 }
                 linnotSeqList = new ArrayList<>();
