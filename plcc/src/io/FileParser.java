@@ -622,6 +622,11 @@ public class FileParser {
         return(true);
     }
     
+    /**
+     * Returns an array of 'words' seperated by an arbitrary amount of spaces.
+     * @param line
+     * @return
+     */
     private static String[] lineToArrayCIF(String line) {
         String tmpReturnList[] = new String[line.split(" ").length];
         String tmpLineList[];
@@ -635,9 +640,8 @@ public class FileParser {
             }
         }
         
-        // TODO aktuell viele NULL Einträge da Größe festgesetzt
-        
-        return tmpReturnList;
+        // return Array without null entries
+        return Arrays.copyOfRange(tmpReturnList, 0, counterValues);
     }
     
     /**
@@ -678,6 +682,49 @@ public class FileParser {
     }
     
     /**
+     * Checks for the presence of predefined (hard coded) column headers.
+     * @param categoryName The name of the category
+     * @param columnHeaders The column headers found in the file
+     * @return A list of all required columns that were missing
+     */
+    private static ArrayList<String> checkColumns(String categoryName, ArrayList<String> columnHeaders) {
+        // different columns are expected depending on category
+        // define them here:
+        String[] reqColumns;
+        switch (categoryName) {
+            case "_atom_site":
+                reqColumns = new String[] {"id", "type_symbol", "label_atom_id", "label_comp_id", 
+                    "label_asym_id", "Cartn_x", "Cartn_y", "Cartn_z"};
+                break;
+            default:
+                if (! Settings.getBoolean("plcc_B_no_warn")) {
+                    DP.getInstance().w("FP_CIF", "Tried to check table of category " + categoryName +
+                            " for presence of important columns, but function is not defined for that " +
+                            "category. Ignoring the check and moving on.");
+                }
+                reqColumns = new String[0];
+        }
+        
+        ArrayList<String> missingColumns = new ArrayList<>();
+
+        Boolean found;
+        for (String reqColumn : reqColumns) {
+            found = false;
+            for (String colHeader: columnHeaders) {
+                if (colHeader.equals(reqColumn)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (! found) {
+                    missingColumns.add(reqColumn);
+            }
+        }
+        
+        return missingColumns;
+    }
+    
+    /**
      * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and applies appropriate function to handle each line. 
      * @return ignore (?)
      */
@@ -691,10 +738,11 @@ public class FileParser {
         
         // variables for one loop (reset when hitting new loop)
         String tableCategory = null;
-        // Key: name of column; Val: position in list; Val -1 means warning has been printed that missing
+        // Key: name of column; Val: position in list
         //  -> if auth columns from atom_site not present they will be mapped to the PDB columns
         //     therefore always use auth columns unless you explicitly want the PDB ones
         HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
+        Boolean columnsChecked = false;
               
         // variables per (atom) line
         Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
@@ -834,12 +882,33 @@ public class FileParser {
                             
                         } else {
                             // we are in the row section (data!)
-                            // do some checks first
-                            // TODO check if all important columns are present
-                            // ESPECIALLY set auth cols to normal ones if missing
-                            // AND abort execution if important ones are missing (replaces printing of warnings
-                            //     when -1 in importantcolhead
-                            // AND warn for others, e.g. alt_id
+                            
+                            // check once if required column headers are present
+                            if (! columnsChecked) {
+                                ArrayList<String> missingCols = checkColumns(tableCategory, new ArrayList<>(colHeaderPosMap.keySet()));
+                                if (missingCols.size() > 0) {
+                                    DP.getInstance().e("FP", "Missing following columns in " + tableCategory + 
+                                            ": " + missingCols);
+                                    DP.getInstance().e("FP", " Exiting now.");
+                                    System.exit(1);
+                                }
+                                columnsChecked = true;
+                            }
+                            
+                            // if auth columns not present map them to PDB ones
+                            // pdbx_PDB_model_num not checked as no equivalent existing (just use default model 1 if not existing)
+                            String[] authCols = {"auth_atom_id", "auth_asym_id", "auth_comp_id", "auth_seq_id"};
+                            // Matching equivalents to author columns
+                            String[] pdbCols = {"label_atom_id", "label_asym_id", "label_comp_id", "label_seq_id"};
+                            for (int i = 0; i < authCols.length; i++) {
+                                if (colHeaderPosMap.get(authCols[i]) == null) {
+                                    colHeaderPosMap.put(authCols[i], colHeaderPosMap.get(pdbCols[i]));
+                                    if (! silent) {
+                                        System.out.println("   Using " + pdbCols[i] + " instead of "+ 
+                                                "missing column " + authCols[i]);
+                                    }
+                                }
+                            }
                             
                             // get data of line
                             tmpLineData = lineToArrayCIF(line);
@@ -848,7 +917,7 @@ public class FileParser {
                             // Look if model numbers are included
                             if (colHeaderPosMap.get("pdbx_PDB_model_num") != null) {
                                 tmp_modelID = tmpLineData[colHeaderPosMap.get("pdbx_PDB_model_num")];
-                                
+                               
                                 // save modelID for print later
                                 if (! s_allModelIDsFromWholePDBFile.contains(tmp_modelID)) {
                                     s_allModelIDsFromWholePDBFile.add(tmp_modelID);
@@ -1256,6 +1325,9 @@ public class FileParser {
                     // '#' seems to stand between each category, we use it to decide if loop ended
                     //     and hope it does not occur inside a loop
                     inLoop = false;
+                    colHeaderPosMap.clear();
+                    columnsChecked = false;
+                    
                 }
             }
             
