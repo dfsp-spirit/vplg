@@ -1055,14 +1055,14 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
-                    if(s.equals("--matrix-structure-comparison")) {
+                    if(s.equals("--matrix-structure-search")) {
                         if(args.length <= i+3 ) {
                             syntaxError();
                         }
-                        Settings.set("linear-notation-type", args[i+1]);                        
-                        Settings.set("linear-notation", args[i+2]);
-                        Settings.set("linear-notation-graph-type", args[i+3]);
-                        Settings.set("start matrix-structure-search", "true");
+                        Settings.set("plcc_S_linear-notation-type", args[i+1]);                        
+                        Settings.set("plcc_S_linear-notation", args[i+2]);
+                        Settings.set("plcc_S_linear-notation-graph-type", args[i+3]);
+                        Settings.set("plcc_B_start_matrix_structure_search", "true");
                         argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
                                                 
                     }
@@ -3388,7 +3388,7 @@ public class Main {
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
     public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
-
+        
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
@@ -3625,7 +3625,6 @@ public class Main {
 
 
             for(String gt : graphTypes) {
-
                 // create the protein graph for this graph type
                 //System.out.println("SSEs: " + allChainSSEs);                
 
@@ -4028,8 +4027,40 @@ public class Main {
                         //System.out.println("!!!!!!calling for path '" + filePathImg + "'.");
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
-                                                
                         
+                        //System.out.println(Settings.getBoolean("plcc_B_start_matrix_structure_search"));
+                        
+                        if (Settings.getBoolean("plcc_B_start_matrix_structure_search")) {
+                            // turn the linear notation into a matrix and search the input in this matrix
+                            
+                            PTGLNotations p = new PTGLNotations(pg);
+                            p.stfu();
+                            //p.adjverbose = true;
+                            List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults(); //generate linear notation for Protein Graph
+
+                            System.out.println("linear notation -> " + resultsPTGLNotations.get(0).redNotation);
+
+                            String gt_new = gt;
+                            //Changing graphtype, because function parseRedOrAdjToMatrix doesn't need any information about ligands
+                            switch(gt){
+                                case "alphalig":
+                                    gt_new = "alpha";
+                                case "betalig":
+                                    gt_new = "beta";
+                                case "albelig":
+                                    gt_new = "albe";
+                            }
+
+                            //System.out.println(DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new));
+                            ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); 
+                            matrix = DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new);
+                            for (ArrayList<Character> m : matrix){ //printing matrix
+                                System.out.println(m);
+                            }
+                            
+                            // TODO matrix_search(m1, m2)
+                        }
+        
                     //} else {
                     //    if( ! silent) {
                     //        System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
@@ -4176,12 +4207,7 @@ public class Main {
         //p.adjverbose = true;
         List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults();
         
-        System.out.println("hello!!!" + resultsPTGLNotations.get(0).redNotation);
-        
-        if (! resultsPTGLNotations.get(0).redNotation.isEmpty()) {
-            System.out.println(DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, "albe"));
-        }
-        
+                
         HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
         int fgMinSizeDraw = Settings.getInteger("plcc_I_min_fgraph_size_draw");
         int numFGsWithMinSize = 0;
@@ -10825,7 +10851,7 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
-        System.out.println("   --matrix-structure-comparison: starts a function that searches a small structure in linear notation in a Proteingraph");
+        System.out.println("   --matrix-structure-search: starts a function that searches a small structure in linear notation in a Proteingraph");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
