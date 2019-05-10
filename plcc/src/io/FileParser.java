@@ -19,6 +19,8 @@ import proteinstructure.Chain;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
 import proteinstructure.SSE;
+import proteinstructure.Molecule;
+import proteinstructure.RNA; //maybe delete it later??
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +66,7 @@ public class FileParser {
     static ArrayList<String> s_allModelIDsFromWholePDBFile = null;
     static ArrayList<Chain> s_chains = null;
     static ArrayList<Residue> s_residues = null;
+    static ArrayList<RNA> s_rna = null;
     static ArrayList<Atom> s_atoms = null;
     static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
@@ -101,6 +104,11 @@ public class FileParser {
     static Residue curRes = null;
     static Integer[] resIndexPDB = null;        // for a DSSP res number, holds the index of that residue in s_residues
     static Integer[] resIndexDSSP = null;       // for a PDB res number, holds the index of that residue in s_residues
+    static Integer curRNANumPDB = null;
+    static Integer curRNANumDSSP = null;
+    static RNA curRNA = null;
+    static Integer [] RNAIndexPDB = null;
+    static Integer [] RNAIndexDssp = null;
 
     
     /**
@@ -155,6 +163,7 @@ public class FileParser {
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
+        s_rna= new ArrayList <RNA>();
         
         homologuesMap = new HashMap<>();
 
@@ -191,7 +200,7 @@ public class FileParser {
         if(! FileParser.silent) {
             System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
         }
-        
+        s_rna = new ArrayList <RNA>();
         s_models = new ArrayList<Model>();
         s_chains = new ArrayList<Chain>();
         s_residues = new ArrayList<Residue>();
@@ -394,6 +403,7 @@ public class FileParser {
     public static ArrayList<Atom> getAtoms() { return(s_atoms); }
     public static ArrayList<SSE> getDsspSSEs() { return(s_dsspSSEs); }
     public static ArrayList<SSE> getPtglSSEs() { return(s_ptglSSEs); }
+    public static ArrayList<RNA> getRNA() {return (s_rna);}
 
     public static HashMap<Character, ArrayList<Integer>> getSulfurBridges() {
         return s_sulfurBridges;
@@ -476,6 +486,7 @@ public class FileParser {
             System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
+        
 
         if(! FileParser.silent) {
             System.out.println("  Creating all Ligand Residues...");
@@ -697,8 +708,8 @@ public class FileParser {
         HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
               
         // variables per (atom) line
-        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
-        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
+        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ, rnaNumPDB;
+        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode, rnaNamePDB;
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         Float oCoordXf, oCoordYf, oCoordZf;
         int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
@@ -706,12 +717,13 @@ public class FileParser {
         String[] tmpLineData;
         String tmp_modelID;
         
-        // variables for successive matching atom -> residue -> chain
+        // variables for successive matching atom -> residue -> chain  (or RNA)
         // remember them so we dont need to lookup
         Model m = null;
         Residue tmpRes = null;
         Chain tmpChain = null;
         Residue lig = null;
+        Molecule mol = null;
         
         Integer numLine = 0;
         
@@ -899,8 +911,8 @@ public class FileParser {
                             
                             // - - atom - -
                             // reset variables
-                            atomSerialNumber = resNumPDB = coordX = coordY = coordZ = null;
-                            atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = null;
+                            atomSerialNumber = resNumPDB = rnaNumPDB= coordX =  coordY = coordZ = null;
+                            atomRecordName = atomName = resNamePDB = chainID = rnaNamePDB = chemSym = altLoc = null;
                             iCode = " "; // if column does not exist or ? || . is assigned use 1 blank (compare old parser)
                             oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
                             oCoordXf = oCoordYf = oCoordZf = null;
@@ -938,12 +950,31 @@ public class FileParser {
                                 altLoc = tmpLineData[colHeaderPosMap.get("label_alt_id")];
                             }
                             
-                            // residue name
+                            // residue name or rna name 
                             resNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
                             
-                            // residue number
+                            /*if(tmpLineData[colHeaderPosMap.get("label_comp_id")].length()==3){
+                                resNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
+                            
+                            }
+                            else{
+                                rnaNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
+                            }*/
+                            
+                            // residue number or rna number 
+                            
                             // use auth_seq_id > label_seq_id (hope DSSP does so too)
+                            /*if(tmpLineData[colHeaderPosMap.get("label_comp_id")].length()==3){
+                                resNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
+                            
+                            }
+                            else{
+                                rnaNumPDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
+                            }*/
+                            
                             resNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
+                            
+                            
                             
                             // insertion code
                             // only update if column and value exist, otherwise stick to blank ""
@@ -1199,6 +1230,7 @@ public class FileParser {
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
                             a.setPdbResNum(resNumPDB);
+                            //a.setRnaNum(rnaNumPDB);
                             // we cant get the DSSP res num easily here and have to do it later (I guess)
                             // old parser seems to assign 0 here whatsoever so we just leave the default value there
                             // a.setDsspResNum(resNumDSSP);
@@ -1344,9 +1376,9 @@ public class FileParser {
      private static boolean handlePdbLineANYATOM() {
         
 
-        Integer atomSerialNumber, resNumPDB, resNumDSSP;
+        Integer atomSerialNumber, resNumPDB, resNumDSSP, rnaNumPDB;
         Integer coordX, coordY, coordZ;
-        atomSerialNumber = resNumPDB = resNumDSSP = coordX = coordY = coordZ = 0;
+        atomSerialNumber = resNumPDB = resNumDSSP = rnaNumPDB = coordX = coordY = coordZ = 0;
         String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
         atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = iCode = "";
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
