@@ -2986,7 +2986,6 @@ public class Main {
             }
             
             if( ! separateContactsByChain){  // no chainName separation active                
-                
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("plcc_B_useDB")) {
@@ -3388,7 +3387,7 @@ public class Main {
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
     public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
-        
+              
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
@@ -4037,9 +4036,9 @@ public class Main {
                             p.stfu();
                             //p.adjverbose = true;
                             List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults(); //generate linear notation for Protein Graph
-
-                            System.out.println("linear notation -> " + resultsPTGLNotations.get(0).redNotation);
-
+                            
+                            System.out.println("linear notation -> " + resultsPTGLNotations.get(0).adjNotation);
+                            
                             String gt_new = gt;
                             //Changing graphtype, because function parseRedOrAdjToMatrix doesn't need any information about ligands
                             switch(gt){
@@ -4058,7 +4057,19 @@ public class Main {
                                 System.out.println(m);
                             }
                             
-                            // TODO matrix_search(m1, m2)
+                            //change input to the pattern matrix "matrix_small" that you want to search in the protein chain matrix "matrix_big"
+                            ArrayList<ArrayList<Character>> pattern = new ArrayList<>(); 
+                            pattern = DBManager.parseRedOrAdjToMatrix(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
+                            for (ArrayList<Character> m : pattern){ //printing matrix
+                                System.out.println(m);
+                            }
+                            
+                            if (pattern.size() > matrix.size()){
+                                //Fehlermeldung einfügen
+                            }
+                            
+                            //start searching
+                            DBManager.matrix_search(pattern, matrix);
                         }
         
                     //} else {
