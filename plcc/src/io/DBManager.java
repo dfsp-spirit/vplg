@@ -2230,6 +2230,20 @@ connection.close();
     public static ArrayList<ArrayList<Character>> parseRedOrAdjToMatrix(String ln, String graphtype){
         //initial steps
         ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //stores later genererated matrix
+        
+        //do nothing, if linear notation is empty ( {}, [], () )
+        if (ln.length() <= 2){
+            return matrix;
+        }
+        //return matrix = [[x]], if linear notation contains only one entry ( [e], [h] )
+        if (ln.length() == 3){
+            ArrayList<Character> row1 = new ArrayList<>();
+            row1.add('x'); //only one nod, that is not adjacent to itself
+            matrix.add(row1);
+            
+            return matrix; 
+        }
+        
         ln = ln.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("[", "").replace("]", ""); //linnot whithout brackets
         int minVal = 0;
         int maxVal = 0;
@@ -2367,7 +2381,20 @@ connection.close();
         return matrix;
     }
     
+    /**
+     * 
+     * @param pattern
+     * @param matrix
+     * @return 
+     */
+    public static Array[] matrix_search(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
+        Array[] output_array = new Array[2]; //saves the indexes of the found pattern
         
+        
+        
+        
+        return(output_array);
+    } 
     /**
      * Determines whether at least one matrix in a list of matrices contains a Four Helix Bundle
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
