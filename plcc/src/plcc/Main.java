@@ -1059,9 +1059,9 @@ public class Main {
                         if(args.length <= i+3 ) {
                             syntaxError();
                         }
-                        Settings.set("plcc_S_linear-notation-type", args[i+1]);                        
-                        Settings.set("plcc_S_linear-notation", args[i+2]);
-                        Settings.set("plcc_S_linear-notation-graph-type", args[i+3]);
+                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
+                        Settings.set("plcc_S_linear_notation", args[i+2]);
+                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
                         Settings.set("plcc_B_start_matrix_structure_search", "true");
                         argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
                                                 
@@ -4053,23 +4053,36 @@ public class Main {
                             //System.out.println(DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new));
                             ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); 
                             matrix = DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new);
+                            
+                            System.out.println("Matrix: ");
                             for (ArrayList<Character> m : matrix){ //printing matrix
                                 System.out.println(m);
                             }
                             
                             //change input to the pattern matrix "matrix_small" that you want to search in the protein chain matrix "matrix_big"
                             ArrayList<ArrayList<Character>> pattern = new ArrayList<>(); 
+                            
+                            //System.out.println(Settings.get("plcc_S_linear_notation") + Settings.get("plcc_S_linear_notation_graph_type"));
+                            
                             pattern = DBManager.parseRedOrAdjToMatrix(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
-                            for (ArrayList<Character> m : pattern){ //printing matrix
+                            System.out.println("Pattern: ");
+                            for (ArrayList<Character> m : pattern){ //printing pattern
                                 System.out.println(m);
                             }
                             
                             if (pattern.size() > matrix.size()){
                                 //Fehlermeldung einfügen
+                            } else{
+                                //start searching
+                                int[] output_array = new int [2]; //saves the indexes in matrix, where the pattern was found
+                                output_array = DBManager.matrix_search(pattern, matrix);
+                                if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
+                                    System.out.println("Pattern found at: (" + output_array[0] + ", " + output_array[1] + ") in the matrix.");
+                                }
                             }
+                                
                             
-                            //start searching
-                            DBManager.matrix_search(pattern, matrix);
+                            
                         }
         
                     //} else {
