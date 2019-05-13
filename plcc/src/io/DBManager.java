@@ -2387,12 +2387,35 @@ connection.close();
      * @param matrix
      * @return 
      */
-    public static Array[] matrix_search(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
-        Array[] output_array = new Array[2]; //saves the indexes of the found pattern
-        
-        
-        
-        
+    public static int[] matrix_search(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
+        int[] output_array = new int[2]; //saves the indexes of the found pattern
+         
+        //go through every position in half of the matrix, where you can place the pattern without overlap
+        for (int x = 0; x <= matrix.size() - pattern.size(); x++){
+            for (int y = 0; y <= x; y++){
+                //System.out.println("x: " + x + "  y: " + y);       
+                int i;
+                int j = 0;
+                
+                //go through the pattern and try to find a match
+                outerloop:
+                for (i = 0; i < pattern.size(); i++){
+                    for (j = 0; j <= i; j++){
+                        //System.out.println("   i: " + i + "  j: " + j);
+                        if (!Objects.equals(matrix.get(x+i).get(y+j), pattern.get(i).get(j))){
+                            break outerloop;
+                        }
+                    }
+                }
+                if (i == j && j == pattern.size()){
+                    output_array[0] = x;
+                    output_array[1] = y;
+                    return(output_array);
+                }
+            }
+        }
+        //if the pattern was not found. -1 is equal to no result
+        output_array[0] = -1;
         return(output_array);
     } 
     /**
