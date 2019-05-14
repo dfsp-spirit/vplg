@@ -4035,12 +4035,12 @@ public class Main {
                             PTGLNotations p = new PTGLNotations(pg);
                             p.stfu();
                             //p.adjverbose = true;
-                            List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults(); //generate linear notation for Protein Graph
+                            List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults(); //generate linear notation for proteingraph
                             
                             System.out.println("linear notation -> " + resultsPTGLNotations.get(0).adjNotation);
                             
                             String gt_new = gt;
-                            //Changing graphtype, because function parseRedOrAdjToMatrix doesn't need any information about ligands
+                            //Changing graphtype, because the function parseRedOrAdjToMatrix doesn't need any information about ligands
                             switch(gt){
                                 case "alphalig":
                                     gt_new = "alpha";
@@ -4050,39 +4050,32 @@ public class Main {
                                     gt_new = "albe";
                             }
 
-                            //System.out.println(DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new));
-                            ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); 
+                            ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //the matrix that contains the linear notation
                             matrix = DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new);
                             
                             System.out.println("Matrix: ");
-                            for (ArrayList<Character> m : matrix){ //printing matrix
+                            for (ArrayList<Character> m : matrix){ //print matrix
                                 System.out.println(m);
                             }
                             
-                            //change input to the pattern matrix "matrix_small" that you want to search in the protein chain matrix "matrix_big"
+                            //pattern is a matrix. In it the input (linear notation) will be stored
                             ArrayList<ArrayList<Character>> pattern = new ArrayList<>(); 
-                            
-                            //System.out.println(Settings.get("plcc_S_linear_notation") + Settings.get("plcc_S_linear_notation_graph_type"));
                             
                             pattern = DBManager.parseRedOrAdjToMatrix(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
                             System.out.println("Pattern: ");
-                            for (ArrayList<Character> m : pattern){ //printing pattern
+                            for (ArrayList<Character> m : pattern){ //print pattern
                                 System.out.println(m);
                             }
                             
-                            if (pattern.size() > matrix.size()){
-                                //Fehlermeldung einfügen
-                            } else{
+                            if (pattern.size() >= matrix.size()){
                                 //start searching
                                 int[] output_array = new int [2]; //saves the indexes in matrix, where the pattern was found
                                 output_array = DBManager.matrix_search(pattern, matrix);
-                                if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
-                                    System.out.println("Pattern found at: (" + output_array[0] + ", " + output_array[1] + ") in the matrix.");
-                                }
-                            }
                                 
-                            
-                            
+                                if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
+                                    System.out.println("Pattern found in matrix at indexes (" + output_array[0] + ", " + output_array[1] + ").");
+                                } 
+                            }
                         }
         
                     //} else {
