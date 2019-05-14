@@ -2382,9 +2382,9 @@ connection.close();
     }
     
     /**
-     * 
-     * @param pattern
-     * @param matrix
+     * Searches a small matrix in a bigger one and returns the indexes of the bigger matrix, where the small one was found
+     * @param pattern two-dimenasional ArrayList that represents a linear notation of an input
+     * @param matrix two-dimensional ArrayList that represents a linear notation of a proteingraph
      * @return 
      */
     public static int[] matrix_search(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
@@ -2407,7 +2407,8 @@ connection.close();
                         }
                     }
                 }
-                if (i == j && j == pattern.size()){
+                if (i == j && j == pattern.size()){ //if a match was found
+                    //x, y are the indexes in matrix where the pattern was found
                     output_array[0] = x;
                     output_array[1] = y;
                     return(output_array);
@@ -2418,6 +2419,7 @@ connection.close();
         output_array[0] = -1;
         return(output_array);
     } 
+    
     /**
      * Determines whether at least one matrix in a list of matrices contains a Four Helix Bundle
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
