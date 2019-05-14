@@ -708,8 +708,8 @@ public class FileParser {
         HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
               
         // variables per (atom) line
-        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ, rnaNumPDB;
-        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode, rnaNamePDB;
+        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ, rnaNumPDB, molNumPDB;
+        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode, molNamePDB, PDB, rnaNamePDB;
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         Float oCoordXf, oCoordYf, oCoordZf;
         int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
@@ -717,13 +717,13 @@ public class FileParser {
         String[] tmpLineData;
         String tmp_modelID;
         
-        // variables for successive matching atom -> residue -> chain  (or RNA)
+        // variables for successive matching atom -> residue/RNA : Molecule -> chain  
         // remember them so we dont need to lookup
         Model m = null;
         Residue tmpRes = null;
         Chain tmpChain = null;
         Residue lig = null;
-        Molecule mol = null;
+        Molecule tmpMol = null;
         
         Integer numLine = 0;
         
@@ -911,8 +911,8 @@ public class FileParser {
                             
                             // - - atom - -
                             // reset variables
-                            atomSerialNumber = resNumPDB = rnaNumPDB= coordX =  coordY = coordZ = null;
-                            atomRecordName = atomName = resNamePDB = chainID = rnaNamePDB = chemSym = altLoc = null;
+                            atomSerialNumber = molNumPDB = resNumPDB = rnaNumPDB= coordX =  coordY = coordZ = null;
+                            atomRecordName = atomName = resNamePDB = molNamePDB = chainID = rnaNamePDB = chemSym = altLoc = null;
                             iCode = " "; // if column does not exist or ? || . is assigned use 1 blank (compare old parser)
                             oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
                             oCoordXf = oCoordYf = oCoordZf = null;
@@ -951,30 +951,15 @@ public class FileParser {
                             }
                             
                             // residue name or rna name 
-                            resNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
-                            
-                            /*if(tmpLineData[colHeaderPosMap.get("label_comp_id")].length()==3){
-                                resNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
-                            
-                            }
-                            else{
-                                rnaNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
-                            }*/
+                             //resNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
+                            molNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
                             
                             // residue number or rna number 
                             
                             // use auth_seq_id > label_seq_id (hope DSSP does so too)
-                            /*if(tmpLineData[colHeaderPosMap.get("label_comp_id")].length()==3){
-                                resNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
-                            
-                            }
-                            else{
-                                rnaNumPDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
-                            }*/
-                            
-                            resNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
-                            
-                            
+                            // resNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
+                            molNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
+                             
                             
                             // insertion code
                             // only update if column and value exist, otherwise stick to blank ""
@@ -1016,15 +1001,31 @@ public class FileParser {
                             // chemical symbol
                             chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
-                            Boolean isAA = isAminoacid(resNamePDB);
+                            Boolean isAA = isAminoacid(molNamePDB);
+                            
 
                             // TODO: possible to ignore alt loc atoms right now?
                             
                             // >> DNA/RNA <<
                             // ignore atm
-                            if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(resNamePDB, 3))) {
+                            //splitten !!! abfrage ob rna oder dna - ausgabe nur für rna, wenns dna ist also kein include_rna dann continue: 
+                            /*if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
+                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
+                                }
+                                continue; // do not use that atom
+                            }*/
+                            
+                            if(FileParser.isDNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
+                                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
+                                }
+                                continue; // do not use that atom
+                            }
+                            
+                            if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
+                                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                                 }
                                 continue; // do not use that atom
                             }
@@ -1033,12 +1034,14 @@ public class FileParser {
                             // update tmpRes (only if needed) 
                             //     -> enables getting DsspResNum for atom from res
                             // match res <-> chain here 
+                            //else: prüfen ob RNA- wenn ja: alles einfügen 
                             if (isAA) {
                                 if (tmpRes == null) {
-                                    tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
+                                    tmpRes = getResFromListWithErrMsg(molNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                     if (tmpRes == null) {
                                         if (isAA) {
                                             continue; // skip atom / line
+                                            // the continue statement breaks one iteration (in the loop), if a specified condiftion occurs, and continues with the next iteration in the loop
                                         }
                                     } else {
                                         tmpRes.setChain(tmpChain);
@@ -1046,8 +1049,8 @@ public class FileParser {
                                     }
                                 } else {
                                     // load new Residue into tmpRes if we approached next Residue
-                                    if (! (Objects.equals(resNumPDB, tmpRes.getPdbNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
-                                        tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
+                                    if (! (Objects.equals(molNumPDB, tmpRes.getPdbNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
+                                        tmpRes = getResFromListWithErrMsg(molNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                         if (tmpRes == null) {
                                             if (isAA) {
                                                 continue; // skip atom / line
@@ -1059,7 +1062,14 @@ public class FileParser {
                                     }
                                 }
                             } else {
-                                tmpRes = null;
+                                //tmpRes = null;
+                                
+                                if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
+                                return true;
+                                }
+                                else{
+                                    continue;
+                                }
                             }
                             // => in case of ligand tmpRes now is null!
                             
@@ -1102,7 +1112,7 @@ public class FileParser {
                                 // currently not used
                                 // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
                                 
-                                if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
+                                if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
                                     
                                     int resNumDSSP;
                                     
@@ -1250,7 +1260,7 @@ public class FileParser {
                             if (isAA) {
                                 // >> AA <<
                                 if (tmpRes == null) {
-                                    DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                                     continue;
                                 } else {
 
@@ -1376,11 +1386,11 @@ public class FileParser {
      private static boolean handlePdbLineANYATOM() {
         
 
-        Integer atomSerialNumber, resNumPDB, resNumDSSP, rnaNumPDB;
+        Integer atomSerialNumber, molNumPDB, resNumPDB, resNumDSSP, rnaNumPDB;
         Integer coordX, coordY, coordZ;
-        atomSerialNumber = resNumPDB = resNumDSSP = rnaNumPDB = coordX = coordY = coordZ = 0;
-        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
-        atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = iCode = "";
+        atomSerialNumber = molNumPDB = resNumPDB = resNumDSSP = rnaNumPDB = coordX = coordY = coordZ = 0;
+        String atomRecordName, atomName, molNamePDB, resNamePDB, chainID, chemSym, altLoc, iCode;
+        atomRecordName = atomName = molNamePDB = resNamePDB = chainID = chemSym = altLoc = iCode = "";
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         oCoordX = oCoordY = oCoordZ = 0.0;
         Float oCoordXf, oCoordYf, oCoordZf;
@@ -1392,10 +1402,10 @@ public class FileParser {
             // 11 is ignored: blank
             atomName = curLinePDB.substring(12, 16);
             altLoc = curLinePDB.substring(16, 17);
-            resNamePDB = curLinePDB.substring(17, 20);
+            molNamePDB = curLinePDB.substring(17, 20);
             // 20 is ignored: blank
             chainID = curLinePDB.substring(21, 22);
-            resNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
+            molNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
             iCode = curLinePDB.substring(26, 27);       // don't trim this!
             // 27 - 29 are ignored: blanks
             
@@ -1459,9 +1469,17 @@ public class FileParser {
         //}
 
         // Files that contain DNA or RNA are not supported atm
-        if(FileParser.isDNAorRNAresidueName(resNamePDB)) {
+        //splitten!!!! 
+        if(FileParser.isDNAresidueName(molNamePDB)) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
+                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
+            }
+            return false;
+        }
+        
+        if(FileParser.isRNAresidueName(molNamePDB)) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
             }
             return false;
         }
@@ -1496,12 +1514,12 @@ public class FileParser {
                 a.setDsspResNum(null);
             }
             else {
-                a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+                a.setDsspResNum(getDsspResNumForPdbFields(molNumPDB, chainID, iCode));
             }
         }
         else {          // HETATM
 
-            if(isIgnoredLigRes(resNamePDB)) {
+            if(isIgnoredLigRes(molNamePDB)) {
                 a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
                 // We do not need these atoms and they may lead to trouble later on, so
@@ -1518,12 +1536,14 @@ public class FileParser {
 
         // now create the new Atom        
         Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+        Molecule tmpMol = getResidueFromList(molNumPDB, chainID, iCode);
         // Note that the command above may have returned NULL, we care for that below
        
         a.setPdbAtomNum(atomSerialNumber);
         a.setAtomName(atomName);
         a.setAltLoc(altLoc);
         a.setResidue(tmpRes);
+        //a.setMolecule(tmpMol);
         a.setChainID(chainID);        
         a.setChain(getChainByPdbChainID(chainID));
         a.setPdbResNum(resNumPDB);
@@ -1575,22 +1595,27 @@ public class FileParser {
      * @param resNamePDB
      * @return whether the residue name marks a DNA / RNA residue
      */
-    public static boolean isDNAorRNAresidueName(String resNamePDB) {
+    public static boolean isRNAresidueName(String molNamePDB) {
         
         // standard ribonucleotides
-        if(resNamePDB.equals("  G") || resNamePDB.equals("  U") || resNamePDB.equals("  A") || resNamePDB.equals("  T") || resNamePDB.equals("  C") || resNamePDB.equals("  I")) {
+        if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
             return true;
         }
         
+        return false;
+    }
+    
+    
+      public static boolean isDNAresidueName(String molNamePDB) {
+        
         // standard deoxribonucleotides
-        if(resNamePDB.equals(" DG") || resNamePDB.equals(" DU") || resNamePDB.equals(" DA") || resNamePDB.equals(" DT") || resNamePDB.equals(" DC") || resNamePDB.equals(" DI")) {
+        if(molNamePDB.equals(" DG") || molNamePDB.equals(" DU") || molNamePDB.equals(" DA") || molNamePDB.equals(" DT") || molNamePDB.equals(" DC") || molNamePDB.equals(" DI")) {
             return true;
         }
         
         
         return false;
     }
-    
     /**
      * Returns true if AAName is standard aminoacid name (3-letter code).
      * @param AAName Aminoacid name, 3-letter code, capitalized
@@ -1606,7 +1631,7 @@ public class FileParser {
             return false;
         }
     }
-
+    
     
     /**
      * DEPRECATED: Gets the Residue with the requested PDB properties from the residue list, but does not support PDB insertion code. So use the function with iCode support below instead.
@@ -1648,6 +1673,8 @@ public class FileParser {
      * @param numLine current line of pdb file.
      * @return 
      */
+    
+    //ändern zu getMolFromListWithErrMsg, return tmpMol
     private static Residue getResFromListWithErrMsg(Integer resNumPDB, String chainID, String iCode, Integer atomSerialNumber, Integer numLine) {
         Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
         if (tmpRes == null) {
@@ -1666,6 +1693,8 @@ public class FileParser {
      * @param iCode the insertion code of the residue
      * @return the residue if such a residue exists, null if no such residue exists.
      */
+    
+    //getRNAFromList or getMolFromList? was sind die Eingabe Parameter??
     private static Residue getResidueFromList(Integer resNumPDB, String chainID, String iCode) {
 
         Residue tmp;
@@ -1868,6 +1897,8 @@ public class FileParser {
     @Deprecated public static Integer getDsspResNumForPdbResNum(Integer prn) {
         Integer foundDsspResNum = null;
         Integer foundPdbResNum = null;
+        //IntegerfoundDsspMolNum = null;
+        //IntegerfoundPdbMolNum=null;
         Integer resultDsspResNum = null;
         String dline = null;
         String tmpPdbResNum = null;
@@ -1934,7 +1965,7 @@ public class FileParser {
     }
     
     
-            
+    //getDsspMolNumForPdbFields        
     public static Integer getDsspResNumForPdbFields(Integer prn, String chainID, String iCode) {
         Integer foundDsspResNum = null;
         Integer foundPdbResNum = null;
@@ -2663,8 +2694,8 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         Integer atomSerialNumber, resNumPDB, resNumDSSP, lastLigandNumPDB, resIndex;
         atomSerialNumber = resNumPDB = resNumDSSP = lastLigandNumPDB = resIndex = 0;
 
-        String atomName, resNamePDB, chainID, chemSym, modelID, lastChainID, iCode;
-        atomName = resNamePDB = chainID = chemSym = modelID = lastChainID = iCode = "";
+        String atomName, resNamePDB, molNamePDB, chainID, chemSym, modelID, lastChainID, iCode;
+        atomName = molNamePDB =  resNamePDB = chainID = chemSym = modelID = lastChainID = iCode = "";
 
         String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
         lf = ln = ls = "";
