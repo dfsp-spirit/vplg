@@ -1062,14 +1062,9 @@ public class FileParser {
                                     }
                                 }
                             } else {
-                                //tmpRes = null;
+                                tmpRes = null;
                                 
-                                if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
-                                return true;
-                                }
-                                else{
-                                    continue;
-                                }
+                            
                             }
                             // => in case of ligand tmpRes now is null!
                             
@@ -1090,7 +1085,7 @@ public class FileParser {
                                 
                                 // old parser has here some outcommented code on N termini
                                 
-                                // set atom type
+                                // set atom type   --> ATOMTYPE_RNA 
                                 a.setAtomtype(Atom.ATOMTYPE_AA);
                                 
                                 // only ATOMs, not HETATMs, have a DSSP entry
