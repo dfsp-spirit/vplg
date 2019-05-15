@@ -1067,6 +1067,17 @@ public class Main {
                                                 
                     }
                     
+                    if (s.equals("--matrix-structure-search-db")){
+                        if (args.length <= i+3){
+                            syntaxError();
+                        }
+                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
+                        Settings.set("plcc_S_linear_notation", args[i+2]);
+                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
+                        Settings.set("plcc_B_start_matrix_structure_search_db", "true");
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
+                    }
+                    
                     if(s.equals("-q") || s.equals("--fg-notations")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -4076,6 +4087,10 @@ public class Main {
                                     System.out.println("Pattern found in matrix at indexes (" + output_array[0] + ", " + output_array[1] + ").");
                                 } 
                             }
+                        }
+                        
+                        if (Settings.getBoolean("plcc_B_start_matrix_structure_search_db")) {
+                            System.out.println("!!!!yaaaay");
                         }
         
                     //} else {
@@ -10868,7 +10883,8 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
-        System.out.println("   --matrix-structure-search: starts a function that searches a small structure in linear notation in a Proteingraph");
+        System.out.println("   --matrix-structure-search: search a structure in linear notation in a Proteingraph");
+        System.out.println("   --matrix-structure-search-db: search a structure in linear notation in the whole database");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
