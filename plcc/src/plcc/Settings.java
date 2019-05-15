@@ -508,6 +508,7 @@ public class Settings {
         defSet("plcc_S_linear_notation_type", "", "The type of linear notaion (adj or red) for matrix structure comparison.");
         defSet("plcc_S_linear_notation_graph_type", "", "alpha, beta or albe = The graph type of the PG graph of the linear notation");
         defSet("plcc_B_start_matrix_structure_search", "false", "whether to start the matrix structure search or not");
+        defSet("plcc_B_start_matrix_structure_search_db", "false", "whether to start the matrix structure search in the whole database or not");
         return(true);
     }
     
