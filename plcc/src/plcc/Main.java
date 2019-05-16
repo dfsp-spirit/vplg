@@ -4090,7 +4090,9 @@ public class Main {
                         }
                         
                         if (Settings.getBoolean("plcc_B_start_matrix_structure_search_db")) {
-                            System.out.println("!!!!yaaaay");
+                            
+                            System.out.println("Start searching the linear notation in the whole database");
+                            DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
                         }
         
                     //} else {
