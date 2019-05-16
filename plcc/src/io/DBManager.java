@@ -2383,7 +2383,7 @@ connection.close();
     
     /**
      * Searches a small matrix in a bigger one and returns the indexes of the bigger matrix, where the small one was found
-     * @param pattern two-dimenasional ArrayList that represents a linear notation of an input
+     * @param pattern two-dimensional ArrayList that represents a linear notation of an input
      * @param matrix two-dimensional ArrayList that represents a linear notation of a proteingraph
      * @return 
      */
@@ -2419,6 +2419,107 @@ connection.close();
         output_array[0] = -1;
         return(output_array);
     } 
+    
+    /**
+     * 
+     * @param chain_db_id
+     * @return 
+     */
+    public static HashMap<String, String> matrix_search_db(String linnot, String gt) {
+        
+        System.out.println(linnot + gt);
+        
+        //the results will be stored here: (pdbid, chain) of the protein that contains the linnot
+        HashMap<String, String> results = new HashMap<String, String>();
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;     
+        StringBuilder querySB = new StringBuilder();
+        
+        //create SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT ln.ptgl_linnot_adj ");
+        querySB.append("FROM plcc_fglinnot ln ");
+        querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+        switch (gt) {
+            case "alpha":
+                querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1) ) ");
+                break;
+            case "beta":
+                querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2) ) ");
+                break;
+            case "albe":
+                querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 3) ) ");
+                break;
+        }
+        
+        String query = querySB.toString();
+        System.out.println("query: " + query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            DBManager.initUsingDefaults(); //connect to the database server
+            
+            //dbc = DriverManager.getConnection(url, "vplg","vplg");
+           
+            statement = dbc.prepareStatement(query); //an SQL statement with "?" instead of values
+            //statement.setLong(1, chain_db_id);  //replace 1st ? in statement with chain_db_id                              
+            rs = statement.executeQuery(); //SQL Befehl ausführen
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {// hier ändern
+            DP.getInstance().e("DBManager", "chainContainsMotif_UpAndDownBarrel: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);               hier ändern
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_UpAndDownBarrel: Could not close statement and reset autocommit.");}
+        }
+        
+        //iterate over all present linnots and save them in a list
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (tD.get(0).length() > 2) {                       //hier ändern
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
+                }
+            }
+            //check if one of the foldinggraphs contains motif
+            if (matrixContainsUpAndDownBarrel(matrixList) == true) {
+                return results; //Funktion ändern
+            }
+        }
+        return results;
+    }
     
     /**
      * Determines whether at least one matrix in a list of matrices contains a Four Helix Bundle
