@@ -1022,12 +1022,13 @@ public class FileParser {
                                 }
                                 continue; // do not use that atom
                             }
-                            
-                            if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
-                                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
+                            if( ! Settings.getBoolean("plcc_B_include_rna")) {
+                                if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
+                                    }
+                                    continue; // do not use that atom
                                 }
-                                continue; // do not use that atom
                             }
                             
                             // >> AA <<
@@ -1096,6 +1097,10 @@ public class FileParser {
                                 else {
                                     // a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
                                     a.setDsspResNum(tmpRes.getDsspNum());
+                                }
+                                
+                                if(  Settings.getBoolean("plcc_B_include_rna")) {
+                                    a.setAtomtype(Atom.ATOMTYPE_RNA);
                                 }
                                 
                                 
