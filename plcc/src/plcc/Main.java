@@ -1566,6 +1566,19 @@ public class Main {
                     System.out.println("Filename now is: " + pdbFile);
             }
         }
+        
+        if(Settings.getBoolean("plcc_B_start_matrix_structure_search_db")) {
+            
+            ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+            
+            results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
+            System.out.println("yaaaay");
+            for (ArrayList<String> r : results){
+                System.out.println(r.get(0) +" " + r.get(1));
+            }
+            
+            System.exit(0);
+        }
 
         if(Settings.getBoolean("plcc_B_clustermode")) {
             if(! silent) {
@@ -4089,12 +4102,6 @@ public class Main {
                             }
                         }
                         
-                        if (Settings.getBoolean("plcc_B_start_matrix_structure_search_db")) {
-                            
-                            System.out.println("Start searching the linear notation in the whole database");
-                            DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
-                        }
-        
                     //} else {
                     //    if( ! silent) {
                     //        System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
