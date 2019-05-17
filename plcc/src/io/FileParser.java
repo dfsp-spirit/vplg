@@ -58,10 +58,9 @@ public class FileParser {
     static String pdbFile = null;
     static Integer dsspDataStartLine = null;
     static Integer lastUsedDsspNum = null;
-
     static ArrayList<String> pdbLines = null;
     static ArrayList<String> dsspLines = null;
-
+    static ArrayList <Molecule> s_molecule = null;
     static ArrayList<Model> s_models = null;
     static ArrayList<String> s_allModelIDsFromWholePDBFile = null;
     static ArrayList<Chain> s_chains = null;
@@ -164,7 +163,7 @@ public class FileParser {
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
         s_rna= new ArrayList <RNA>();
-        
+        s_molecule = new ArrayList <Molecule> ();
         homologuesMap = new HashMap<>();
 
         // resIndexPDB = new Integer[maxResidues];      // Removed because some PDB files have negative residue numbers, they break this. :/ So we
@@ -404,6 +403,7 @@ public class FileParser {
     public static ArrayList<SSE> getDsspSSEs() { return(s_dsspSSEs); }
     public static ArrayList<SSE> getPtglSSEs() { return(s_ptglSSEs); }
     public static ArrayList<RNA> getRNA() {return (s_rna);}
+    public static ArrayList<Molecule>getMolecule(){ return(s_molecule);}
 
     public static HashMap<Character, ArrayList<Integer>> getSulfurBridges() {
         return s_sulfurBridges;
@@ -735,7 +735,7 @@ public class FileParser {
         //
         // - - residues - -
         if(! FileParser.silent) {
-            System.out.println("  Creating all Residues...");
+            System.out.println("  Creating all Molecules...");
         }
         dsspDataStartLine = readDsspToData();
         // fills s_residues using AUTHCHAIN for chain ids
