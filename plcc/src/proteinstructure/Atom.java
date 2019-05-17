@@ -62,9 +62,10 @@ public class Atom implements java.io.Serializable {
         this.altLoc = altLoc;
     }
 
-    public Boolean isLigandAtom() { return(residue.getType() == 1); }
-    public Boolean isProteinAtom() { return(residue.getType() == 0); }
-    public Boolean isOtherAtom() { return(residue.getType() == 2); }
+    public Boolean isLigandAtom() { return this.type == ATOMTYPE_LIGAND; }
+    public Boolean isProteinAtom() { return this.type == ATOMTYPE_AA; }
+    public Boolean isOtherAtom() { return this.type == ATOMTYPE_IGNORED_LIGAND; }
+    public Boolean isRNA() {return this.type == ATOMTYPE_RNA;}
 
     
     
