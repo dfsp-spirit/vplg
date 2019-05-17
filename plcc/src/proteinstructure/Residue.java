@@ -10,6 +10,7 @@ package proteinstructure;
 
 // imports
 import proteinstructure.SSE;
+//import proteinstructure.Molecule;
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,6 +112,23 @@ public class Residue extends Molecule implements java.io.Serializable {
     // constructor
     public Residue() { this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); this.partOfBindingSites = new ArrayList<>(); }
 
+    public Residue(Molecule Mol) {
+        this.atoms = Mol.getAtoms();
+        this.chain = Mol.getChain();
+        this.chainID = Mol.getChainID();
+        this.modelID = Mol.getModelID();
+        this.iCode = Mol.getiCode();
+        this.centerSphereRadius = Mol.getCenterSphereRadius();
+        this.pdbNum = Mol.getPdbNum();
+        this.dsspNum = Mol.getDsspNum();
+        this.Name3 = Mol.getName3();
+        this.AAName1 = Mol.getAAName1();
+        this.sseString = Mol.getSSEString();
+        this.sse = Mol.getSSE();
+        this.sseStringDssp = Mol.getSSEStringDssp();
+        this.isPartOfDsspSse = Mol.getDsspSseState();
+    }
+    
     /**
      * Constructs a new residue with PDB residue number 'prn' and DSSP residue number 'drn'.
      * @param residueNumberPDB the PDB residue number
