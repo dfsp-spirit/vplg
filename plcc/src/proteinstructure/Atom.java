@@ -44,6 +44,7 @@ public class Atom implements java.io.Serializable {
     public static final Integer ATOMTYPE_LIGAND = 1;
     public static final Integer ATOMTYPE_IGNORED_LIGAND = 2;
     public static final Integer ATOMTYPE_IGNORED_ATOM = 3;
+    public static final Integer ATOMTYPE_RNA = 4;
 
     /**
      * Getter for PDB alternate location identifier.
