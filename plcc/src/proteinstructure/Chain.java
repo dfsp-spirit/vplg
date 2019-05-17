@@ -25,17 +25,18 @@ public class Chain implements java.io.Serializable {
     // declare class vars
     private String pdbChainID = null;                // chain ID from PDB file
     private String dsspChainID = null;               // chain ID from DSSP file
+    private ArrayList<Molecule> molecules = null;      // a list of all Molecules of the Chain
     private ArrayList<Residue> residues = null;      // a list of all Residues of the Chain
     private String macromolID = null;                // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
     private String macromolName = null;              // the macromol name from the PDB file
     private String modelID = null;
-    private Model model = null;                      // the Model of this Chain
+    private Model model = null;                                                                                                                                                                                                                             // the Model of this Chain
     private ArrayList<String> homologues = null;     // a list of homologue chains (defined by PDB COMPND)
     private final Integer[] chainCenter = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
     private Integer radiusFromCenter = null;         // distance from center to farthest non-H atom. -1 if no protein-atoms
 
     // constructor
-    public Chain(String ci) { pdbChainID = ci; residues = new ArrayList<Residue>(); }
+    public Chain(String ci) { pdbChainID = ci; molecules = new ArrayList<Molecule>(); }
 
 
     // getters
@@ -46,7 +47,7 @@ public class Chain implements java.io.Serializable {
     public String getMacromolID() { return(macromolID); }
     public String getMacromolName() { return(macromolName); }
     public Model getModel() { return(model); }
-    public ArrayList<Residue> getResidues() { return(residues); }
+    public ArrayList<Molecule> getMolecules() { return(molecules); }
     public ArrayList<String> getHomologues() { return(homologues); }
     public Integer[] getChainCenter() { return(chainCenter); }
     public Integer getRadiusFromCenter() { return(radiusFromCenter); }
@@ -67,6 +68,7 @@ public class Chain implements java.io.Serializable {
 
     // setters
     public void addResidue(Residue r) { residues.add(r); }
+    public void addMolecule(Molecule mol){molecules.add(mol);}
     public void setPdbChainID(String s) { pdbChainID = s; }
     public void setDsspChainID(String s) { dsspChainID = s; }
     public void setMacromolID(String s) { macromolID = s; }
@@ -179,8 +181,8 @@ public class Chain implements java.io.Serializable {
         Integer[] tmpCenter = new Integer[3];
         tmpCenter[0] = tmpCenter[1] = tmpCenter[2] = 0;
         int tmpAtomNumber = 0;
-        for (Residue r : residues) {
-            for (Atom a : r.getAtoms()) {
+        for (Molecule mol : molecules) {
+            for (Atom a : mol.getAtoms()) {
                 tmpCenter[0] += a.getCoordX();
                 tmpCenter[1] += a.getCoordY();
                 tmpCenter[2] += a.getCoordZ();
@@ -204,8 +206,8 @@ public class Chain implements java.io.Serializable {
             // compute radius
             int tmpBiggestDist = 0;
             int tmpCurrentDist;
-            for (Residue r : residues) {
-                for (Atom a : r.getAtoms()) {
+            for (Molecule mol : molecules) {
+                for (Atom a : mol.getAtoms()) {
                     tmpCurrentDist = a.distToPoint(chainCenter[0], chainCenter[1], chainCenter[2]);
                     // System.out.println("[DEBUG] Distance to center from atom " + a.toString() + " is " + String.valueOf(tmpCurrentDist));
                     if (tmpCurrentDist > tmpBiggestDist) {
@@ -275,8 +277,8 @@ public class Chain implements java.io.Serializable {
     }
     
     public Boolean containsAtoms() {
-        for (Residue r : this.getResidues()) {
-            for (Atom a : r.getAtoms()) {
+        for (Molecule mol : this.getMolecules()) {
+            for (Atom a : mol.getAtoms()) {
                 return true;
             }
         }
