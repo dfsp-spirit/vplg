@@ -10,7 +10,6 @@ package proteinstructure;
 
 // imports
 import proteinstructure.SSE;
-//import proteinstructure.Molecule;
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
