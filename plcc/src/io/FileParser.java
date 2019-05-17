@@ -1058,7 +1058,7 @@ public class FileParser {
                                             } 
                                         } else {
                                             tmpRes.setChain(tmpChain);
-                                            tmpChain.addResidue(tmpRes);                                            
+                                            tmpChain.addMolecule(tmpMol);                                            
                                         }
                                     }
                                 }
