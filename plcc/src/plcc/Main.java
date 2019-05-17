@@ -38,6 +38,8 @@ import proteinstructure.Residue;
 import proteinstructure.Chain;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
+import proteinstructure.Molecule;
+import proteinstructure.RNA;
 import proteinstructure.SSE;
 import algorithms.GraphMetrics;
 import algorithms.GraphPropResults;
