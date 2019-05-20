@@ -2421,15 +2421,16 @@ connection.close();
     } 
     
     /**
-     * 
-     * @param chain_db_id
+     * Searches the structure of a given linear notation in the whole PTGL database
+     * @param linnot the linear notation
+     * @param gt the graph type of the linear notation ("alpha", "beta" or "albe")
      * @return 
      */
     public static ArrayList<ArrayList<String>> matrix_search_db(String linnot, String gt) {
         
-        System.out.println("Start searching in db with: " + linnot + gt);
+        //System.out.println(linnot + gt);
         
-        //the results will be stored here: (pdbid, chain) of the protein that contains the linnot
+        //the results (proteins that contain the linnot) will be stored here: [[pdbid, chain], ...]
         ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
         
         ResultSetMetaData md;
@@ -2446,24 +2447,24 @@ connection.close();
         querySB.append("WHERE denorm_graph_type_string = ? ;");
         
         String query = querySB.toString();
-        System.out.println("SQL Statement (query): " + query);
+        //System.out.println("SQL Statement (query): " + query);
         
         try {
             DBManager.initUsingDefaults(); //connect to the database server, use if plcc_B_usedb = false
             
-            statement = dbc.prepareStatement(query); //an SQL statement with "?" instead of values
+            statement = dbc.prepareStatement(query);
             statement.setString(1, gt);
-            rs = statement.executeQuery(); //SQL Befehl ausführen
+            rs = statement.executeQuery();
             //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
                                    
-            //evaluate SQL-statement and store it in a list
+            //evaluate SQL-statement and store it in the list tableData
             while (rs.next()) {
                 rowData = new ArrayList<String>();
                 for (int i = 1; i <= count; i++) {
-                    rowData.add(rs.getString(i)); //contains the linear notations
+                    rowData.add(rs.getString(i));
                 }
                 tableData.add(rowData);
             }
@@ -2479,21 +2480,23 @@ connection.close();
             } catch(SQLException e) { DP.getInstance().w("DBManager", "matrix_search_db: Could not close statement and reset autocommit.");}
         }
         
-        //iterate over all present linnots and save them in a list
-        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        //iterate over all present linnots and save them as an adjacencymatrix in the list "matrixList"
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>();
         ArrayList<ArrayList<Character>> matrix = new ArrayList<ArrayList<Character>>(); //the adjacency matrix
-        ArrayList<ArrayList<Character>> pattern = parseRedOrAdjToMatrix(linnot, gt);
+        ArrayList<ArrayList<Character>> pattern = parseRedOrAdjToMatrix(linnot, gt); // change the input "linnot" into an adjacencymatrix
+        
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
-                if (tD.get(3).length() > 2) { //if linnot > 2
+                if (tD.get(3).length() > 2) { //tD.get(3) = linear notation
                     
                     //System.out.println("linnot: " + tD.get(2));
                     
-                    matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacency matrix
+                    matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacencymatrix
                     matrixList.add(matrix); 
                     
                     int[] output_array = new int[2]; //saves the indexes of the found pattern
                     output_array = DBManager.matrix_search(pattern, matrix);
+                    
                     if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
                         //System.out.println("Pattern found in matrix at indexes (" + output_array[0] + ", " + output_array[1] + ").");
                         ArrayList<String> pdbidAndChainOfProt = new ArrayList<String>();
