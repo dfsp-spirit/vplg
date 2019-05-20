@@ -236,6 +236,7 @@ public class Main {
         ArrayList<Chain> chains = new ArrayList<Chain>();
         List<Residue> residues = new ArrayList<Residue>();
         List<Residue> residuesWithoutLigands = new ArrayList<Residue>();
+        List<Molecule> molecules = new ArrayList<Molecule>();
         HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
@@ -2064,6 +2065,7 @@ public class Main {
         models = FileParser.getModels();    // doesn't do much anymore since only the PDB lines of model 1 are currently in there
         chains = FileParser.getChains();
         residues = FileParser.getResidues();
+        molecules = FileParser.getMolecule();
         atoms = FileParser.getAtoms();
         sulfurBridges = FileParser.getSulfurBridges();
         
@@ -10301,7 +10303,7 @@ public class Main {
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
         String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
-        ArrayList<Residue> res = c.getResidues();
+        ArrayList<Molecule> mol = c.getMolecules();
                 
         
         for (Residue r : res) {
