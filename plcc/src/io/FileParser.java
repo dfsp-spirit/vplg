@@ -1057,7 +1057,7 @@ public class FileParser {
                                                 continue; // skip atom / line
                                             } 
                                         } else {
-                                            tmpRes.setChain(tmpChain);
+                                            tmpMol.setChain(tmpChain);
                                             tmpChain.addMolecule(tmpMol);                                            
                                         }
                                     }
