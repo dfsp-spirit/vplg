@@ -1568,13 +1568,18 @@ public class Main {
         }
         
         if(Settings.getBoolean("plcc_B_start_matrix_structure_search_db")) {
+            System.out.println("Start searching the linear notation " + Settings.get("plcc_S_linear_notation") + " in the PTGL database.");
             
             ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
             
             results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
-            System.out.println("yaaaay");
-            for (ArrayList<String> r : results){
-                System.out.println(r.get(0) +" " + r.get(1));
+            
+            int count_results = results.size();
+            if (count_results > 0){
+                System.out.println("  The structure was found in " + count_results + " proteins (pdbid, chain): ");
+                for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notaion from the input
+                    System.out.println(r.get(0) + " " + r.get(1));
+                }
             }
             
             System.exit(0);
@@ -4051,17 +4056,17 @@ public class Main {
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
                         
-                        //System.out.println(Settings.getBoolean("plcc_B_start_matrix_structure_search"));
-                        
                         if (Settings.getBoolean("plcc_B_start_matrix_structure_search")) {
-                            // turn the linear notation into a matrix and search the input in this matrix
+                            // turn the linear notation into an adjacencymatrix and search it in the adjacencymatrix of the protein
                             
                             PTGLNotations p = new PTGLNotations(pg);
                             p.stfu();
                             //p.adjverbose = true;
                             List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults(); //generate linear notation for proteingraph
                             
-                            System.out.println("linear notation -> " + resultsPTGLNotations.get(0).adjNotation);
+                            if (!silent){
+                                System.out.println("          Linear notation of the folding graph: " + resultsPTGLNotations.get(0).adjNotation + " ---");
+                            }
                             
                             String gt_new = gt;
                             //Changing graphtype, because the function parseRedOrAdjToMatrix doesn't need any information about ligands
@@ -4074,30 +4079,33 @@ public class Main {
                                     gt_new = "albe";
                             }
 
-                            ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //the matrix that contains the linear notation
+                            ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //the adjacencymatrix for the linear notation
                             matrix = DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new);
                             
-                            System.out.println("Matrix: ");
+                            /*System.out.println("Matrix: ");
                             for (ArrayList<Character> m : matrix){ //print matrix
                                 System.out.println(m);
-                            }
+                            }*/
                             
-                            //pattern is a matrix. In it the input (linear notation) will be stored
+                            //save the linear notation from the input in the adjacencymatrix "pattern"
                             ArrayList<ArrayList<Character>> pattern = new ArrayList<>(); 
                             
                             pattern = DBManager.parseRedOrAdjToMatrix(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
-                            System.out.println("Pattern: ");
+                            /*System.out.println("Pattern: ");
                             for (ArrayList<Character> m : pattern){ //print pattern
                                 System.out.println(m);
-                            }
+                            }*/
                             
                             if (pattern.size() >= matrix.size()){
                                 //start searching
+                                if (!silent){
+                                System.out.println("      --- Start searching the linear notaion " + Settings.get("plcc_S_linear_notation") +" in the folding graph. ---");
+                                }
                                 int[] output_array = new int [2]; //saves the indexes in matrix, where the pattern was found
                                 output_array = DBManager.matrix_search(pattern, matrix);
                                 
-                                if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
-                                    System.out.println("Pattern found in matrix at indexes (" + output_array[0] + ", " + output_array[1] + ").");
+                                if (!silent && output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
+                                    System.out.println("     **** Linear notation found at indexes (" + output_array[0] + ", " + output_array[1] + ") of the adjaency matrix from the folding graph. ****");
                                 } 
                             }
                         }
