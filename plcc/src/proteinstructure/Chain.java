@@ -48,6 +48,7 @@ public class Chain implements java.io.Serializable {
     public String getMacromolName() { return(macromolName); }
     public Model getModel() { return(model); }
     public ArrayList<Molecule> getMolecules() { return(molecules); }
+    //public ArrayList<Molecule> getResidues() { return(residues); }
     public ArrayList<String> getHomologues() { return(homologues); }
     public Integer[] getChainCenter() { return(chainCenter); }
     public Integer getRadiusFromCenter() { return(radiusFromCenter); }
