@@ -2450,7 +2450,6 @@ connection.close();
         //System.out.println("SQL Statement (query): " + query);
         
         try {
-            DBManager.initUsingDefaults(); //connect to the database server, use if plcc_B_usedb = false
             
             statement = dbc.prepareStatement(query);
             statement.setString(1, gt);
@@ -2485,6 +2484,8 @@ connection.close();
         ArrayList<ArrayList<Character>> matrix = new ArrayList<ArrayList<Character>>(); //the adjacency matrix
         ArrayList<ArrayList<Character>> pattern = parseRedOrAdjToMatrix(linnot, gt); // change the input "linnot" into an adjacencymatrix
         
+        int[] matrixSizeCount = new int[135]; //only for checking runtime, remove later
+        
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(3).length() > 2) { //tD.get(3) = linear notation
@@ -2493,6 +2494,8 @@ connection.close();
                     
                     matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacencymatrix
                     matrixList.add(matrix); 
+                    
+                    matrixSizeCount[matrix.size()]++; //only for checking runtime, remove later
                     
                     int[] output_array = new int[2]; //saves the indexes of the found pattern
                     output_array = DBManager.matrix_search(pattern, matrix);
@@ -2507,6 +2510,11 @@ connection.close();
                 }
             }
         }
+        for (int i = 0; i < 135; i++){
+            System.out.println(i + " " + matrixSizeCount[i]);
+        }
+        
+        
         return results;
     }
     
