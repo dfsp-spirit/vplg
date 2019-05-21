@@ -48,7 +48,7 @@ public class Chain implements java.io.Serializable {
     public String getMacromolName() { return(macromolName); }
     public Model getModel() { return(model); }
     public ArrayList<Molecule> getMolecules() { return(molecules); }
-    //public ArrayList<Molecule> getResidues() { return(residues); }
+
     public ArrayList<String> getHomologues() { return(homologues); }
     public Integer[] getChainCenter() { return(chainCenter); }
     public Integer getRadiusFromCenter() { return(radiusFromCenter); }
@@ -172,6 +172,19 @@ public class Chain implements java.io.Serializable {
         
         //System.out.println("Added " + numSeps + " separators.");
         return new String[] { sbChemProp.toString(), sbSSE.toString() };
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    //public ArrayList<Residue> getResidues() { return(residues); }  //if rna ==null;
+    public String getResidue(Integer type){
+        String Moltype, rna;
+        if(Molecule.getMolType(type)){
+            return Moltype="protein";
+        }
+        return rna=null;
     }
     
     /**
