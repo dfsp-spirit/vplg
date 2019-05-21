@@ -4865,6 +4865,12 @@ public class Main {
     
     
     
+    /**
+     * Calculates all atom contacts between all chains which are in contact. Speed up for atom
+     * contact computation, especially for structures of many chains.
+     * @param chains list of chains
+     * @return ArrayList of ResContactInfo holding all the contact information
+     */
     public static ArrayList<ResContactInfo> calculateAllContactsChainSphereSpeedup(List<Chain> chains) {
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         Chain chainA, chainB;
