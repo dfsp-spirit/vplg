@@ -214,43 +214,7 @@ public class Residue extends Molecule implements java.io.Serializable {
     }
 
     
-    /**
-     * This function determines whether we need to look at the atoms to check for interchain contacts between this residue and a second one.
-     * If the center spheres don't overlap, there cannot exist any atom contacts. Also if both residues are from the same chain, there cannot
-     * exist any interchain atom contacts.
-     * @param r the other residue
-     * @return True if contact is possible, false otherwise.
-     */
-    public Boolean interchainContactPossibleWithResidue (Residue r) {
-        Integer dist = Integer.MAX_VALUE;
-        try {
-            dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
-        } catch(Exception e) {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
-            }
-            return(false);
-        }
-        Integer atomRadius;
-        if(this.isLigand() || r.isLigand()) {
-            atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
-        }
-        else {
-            atomRadius = 40; //Settings.getInteger("plcc_I_atom_radius");
-        }
-
-        Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2);
-
-        //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
-        //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
-
-        if(dist > (maxDistForContact) || ((this.isAA() || r.isAA()) && (this.getChainID().equals(r.getChainID())))) {
-            return(false);
-        }
-        else {
-            return(true);
-        }
-    }
+    
     
     
     @Override public String toString() {
