@@ -2442,7 +2442,7 @@ connection.close();
         StringBuilder querySB = new StringBuilder();
         
         //create SQL-statement to fetch the ADJ linnot of a given chain_id
-        querySB.append("SELECT denorm_pdb_id, denorm_chain_name, denorm_graph_type_string, ptgl_linnot_adj ");
+        querySB.append("SELECT denorm_pdb_id, denorm_chain_name, denorm_graph_type_string, ptgl_linnot_red ");
         querySB.append("FROM plcc_fglinnot ");
         querySB.append("WHERE denorm_graph_type_string = ? ;");
         
@@ -2484,18 +2484,31 @@ connection.close();
         ArrayList<ArrayList<Character>> matrix = new ArrayList<ArrayList<Character>>(); //the adjacency matrix
         ArrayList<ArrayList<Character>> pattern = parseRedOrAdjToMatrix(linnot, gt); // change the input "linnot" into an adjacencymatrix
         
-        int[] matrixSizeCount = new int[135]; //only for checking runtime, remove later
+        //int[] matrixSizeCount = new int[135]; //only for checking runtime, remove later
+        
+        //wieviele bifurcated und non bifurcated gibt es in Datenbank?
+        //remove later
+        //int count_bf = 0;
+        //int count_nbf = 0;
         
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(3).length() > 2) { //tD.get(3) = linear notation
+                    
+                    //only for countin bifurcated fgs, remove later
+                    /*if (tD.get(3).substring(0, 1).equals("{")){
+                        count_bf++;
+                    }
+                    else {
+                        count_nbf++;
+                    }*/
                     
                     //System.out.println("linnot: " + tD.get(2));
                     
                     matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacencymatrix
                     matrixList.add(matrix); 
                     
-                    matrixSizeCount[matrix.size()]++; //only for checking runtime, remove later
+                    //matrixSizeCount[matrix.size()]++; //only for checking runtime, remove later
                     
                     int[] output_array = new int[2]; //saves the indexes of the found pattern
                     output_array = DBManager.matrix_search(pattern, matrix);
@@ -2510,11 +2523,11 @@ connection.close();
                 }
             }
         }
-        for (int i = 0; i < 135; i++){
+        //remove later
+        /*for (int i = 0; i < 135; i++){
             System.out.println(i + " " + matrixSizeCount[i]);
-        }
-        
-        
+        }*/
+        //System.out.println("bifurcated: " + count_bf + " non-bifurcated: " + count_nbf);
         return results;
     }
     
