@@ -4882,7 +4882,8 @@ public class Main {
         int numberResTotal = 0;
         ResContactInfo rci;
         ArrayList<ResContactInfo> contactInfo = new ArrayList<>();
-        Residue res1, res2;
+        //Residue res1, res2;
+        Molecule mol1, mol2;
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             chainCounts = 2;
@@ -4909,35 +4910,35 @@ public class Main {
                 continue;
             }
             
-            int chainANumberResidues = chainA.getResidues().size();
+            int chainANumberResidues = chainA.getMolecules().size();
             numberResTotal += chainANumberResidues;
-            ArrayList<Residue> residuesA = new ArrayList<>();
-            residuesA.addAll(chainA.getResidues());
+            ArrayList<Molecule> moleculesA = new ArrayList<>();
+            moleculesA.addAll(chainA.getMolecules());
             
             // do contact check within chain
             //  -> mostly copied from calculateAllContacts
             for(int i = 0; i < chainANumberResidues; i++) {
-                res1 = residuesA.get(i);
+                mol1 = moleculesA.get(i);
                 //numResToSkip = 0L;
 
                 for(int j = i + 1; j < chainANumberResidues; j++) {
 
-                    res2 = residuesA.get(j);
+                    mol2 = moleculesA.get(j);
 
                     // DEBUG
                     if(Settings.getInteger("plcc_I_debug_level") >= 1) {
                         if(! silent) {
-                            System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                            System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
                     }                
 
                     numResContactsChecked++;
 
                     // We only need to check on atom level if the center spheres overlap
-                    if(res1.contactPossibleWithResidue(res2)) {                                        
+                    if(mol1.contactPossibleWithResidue(mol2)) {                                        
                         numResContactsPossible++;
 
-                        rci = calculateAtomContactsBetweenResidues(res1, res2);
+                        rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                         if( rci != null) {
                             // There were atoms contacts!
 
@@ -4947,7 +4948,7 @@ public class Main {
                             }
                             else {
                                 // We should ignore ligand contacts
-                                if(res1.getType().equals(1) || res2.getType().equals(1)) {
+                                if(mol1.getType().equals(1) || mol2.getType().equals(1)) {
                                     // This IS a ligand contact so ignore it
                                     numIgnoredLigandContacts++;
                                 }
@@ -4990,37 +4991,37 @@ public class Main {
             for (int l = k + 1; l < chainCounts; l++) {
                 
                 chainB = chains.get(l);
-                int chainBNumberResidues = chainB.getResidues().size();
+                int chainBNumberResidues = chainB.getMolecules().size();
 
                 // check chain overlap
                 if (chainA.contactPossibleWithChain(chainB)) {
                     
-                    ArrayList<Residue> residuesB = new ArrayList<>();
-                    residuesB.addAll(chainB.getResidues());
+                    ArrayList<Molecule> moleculesB = new ArrayList<>();
+                    moleculesB.addAll(chainB.getMolecules());
                     
                     for (int i = 0; i < chainANumberResidues; i++) {
 
-                        res1 = residuesA.get(i);
+                        mol1 = moleculesA.get(i);
                         //numResToSkip = 0L;
 
                         // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                         for (int j = 0; j < chainBNumberResidues; j++) {
 
-                            res2 = residuesB.get(j);
+                            mol2 = moleculesB.get(j);
 
                             if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                 if(! silent) {
-                                    System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                    System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                 }
                             }                
 
                             numResContactsChecked++;
 
                             // We only need to check on atom level if the center spheres overlap
-                            if (res1.contactPossibleWithResidue(res2)) {                                        
+                            if (mol1.contactPossibleWithResidue(mol2)) {                                        
                                 numResContactsPossible++;
 
-                                rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                 if (rci != null) {
                                     // There were atoms contacts!
 
@@ -5030,7 +5031,7 @@ public class Main {
                                     }
                                     else {
                                         // We should ignore ligand contacts
-                                        if (res1.getType().equals(1) || res2.getType().equals(1)) {
+                                        if (mol1.getType().equals(1) || mol2.getType().equals(1)) {
                                             // This IS a ligand contact so ignore it
                                             numIgnoredLigandContacts++;
                                             // System.out.println("  Ignored ligand contact between DSSP residues " + a.getDsspResNum() + " and " + b.getDsspResNum() + ".");
@@ -5407,7 +5408,7 @@ public class Main {
      * @param b one of the residues of the residue pair
      * @return A ResContactInfo object with information on the atom contacts between 'a' and 'b'.
      */
-    public static ResContactInfo calculateAtomContactsBetweenResidues(Residue a, Residue b) {
+    public static ResContactInfo calculateAtomContactsBetweenResidues(Molecule a, Molecule b) {
 
         
         ArrayList<Atom> atoms_a = a.getAtoms();
