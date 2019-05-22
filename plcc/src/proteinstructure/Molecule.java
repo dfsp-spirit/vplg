@@ -635,7 +635,7 @@ public class Molecule {
      * @param r the other residue
      * @return True if contact is possible, false otherwise.
      */
-    public Boolean interchainContactPossibleWithResidue (Residue r) {
+    public Boolean interchainContactPossibleWithResidue (Molecule r) {
         Integer dist = Integer.MAX_VALUE;
         try {
             dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
@@ -663,6 +663,67 @@ public class Molecule {
         }
         else {
             return(true);
+        }
+    }
+    
+    /**
+     * This function determines whether we need to look at the atoms to check for contacts betweens
+     * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
+     * @param r the other residue
+     */
+    public Boolean contactPossibleWithResidue(Molecule r) {
+
+        Integer dist = Integer.MAX_VALUE;
+        try {
+            dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
+        } catch(Exception e) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
+            }
+            return(false);
+        }
+        Integer atomRadius;
+        if(this.isLigand() || r.isLigand()) {
+            atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
+        }
+        else {
+            atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        }
+
+        Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
+        Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2) + justToBeSure;
+
+        //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
+        //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
+
+        if(dist > (maxDistForContact)) {
+            return(false);
+        }
+        else {
+            return(true);
+        }
+    }
+    
+    /**
+     * Determines the distance to another Residue, from Residue center to Residue center (C alpha atom to C alpha atom for AAs)
+     * @param r the other residue
+     * @return The center-to-center distance.
+     */
+    public Integer resCenterDistTo(Molecule r) {
+
+        Atom a = this.getCenterAtom();
+        Atom b = r.getCenterAtom();
+
+        if(a == null || b == null) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbNum + " and " + r.getPdbNum() + " lacking center atoms, assuming 100.");
+            }
+            return(100);      
+        }
+        else {
+            //DEBUG
+            //System.out.println("DEBUG: Residue C-alpha distance of " + this + " and " + r + " (C-alpha coords: " + a.getCoordString() + " / " + b.getCoordString() + ") is " + a.distToAtom(b) + ".");
+            return(a.distToAtom(b));
         }
     }
    
