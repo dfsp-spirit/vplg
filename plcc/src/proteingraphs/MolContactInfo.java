@@ -13,13 +13,14 @@ import proteinstructure.Residue;
 import java.util.Arrays;
 import plcc.Main;
 import proteinstructure.Atom;
+import proteinstructure.Molecule;
 
 
 /**
  * This class implements a residue level contact, i.e., all information required about the contact between a pair (a, b) of Residue objects.
  * @author ts
  */
-public class ResContactInfo {
+public class MolContactInfo {
 
     // declare class vars
 
@@ -94,7 +95,7 @@ public class ResContactInfo {
     // See minContactDistances and numPairContacts; index 0 is unused; index 5 + 6 are also unused because the atom is
     //  fixed for these (HB1: backbone N, HB2: backbone O)
 
-    private Residue resA, resB;
+    private Molecule resA, resB;
     private Integer dist;
     
     private ArrayList<String> atomAtomContactType;
@@ -113,7 +114,7 @@ public class ResContactInfo {
      * @param d the distance of this residue pair (residue center to residue center)
      * @param nlc the number of total ligand contacts of this residue pair 
      */    
-    public ResContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Residue a, Residue b, Integer d, Integer nlc) {
+    public MolContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Molecule a, Molecule b, Integer d, Integer nlc) {
 
         numPairContacts = npcs;
         minContactDistances = mcds;
@@ -138,7 +139,7 @@ public class ResContactInfo {
      * @param d the distance of this residue pair (residue center to residue center)
      * @param nlc the number of total ligand contacts of this residue pair 
      */    
-    public ResContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Residue a, Residue b, Integer d, Integer nlc, ArrayList<String> aact, ArrayList<Atom[]> aac) {
+    public MolContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Residue a, Residue b, Integer d, Integer nlc, ArrayList<String> aact, ArrayList<Atom[]> aac) {
 
         numPairContacts = npcs;
         minContactDistances = mcds;
@@ -160,7 +161,7 @@ public class ResContactInfo {
      * @param a the first Residue
      * @param b the second Residue
      */
-    public ResContactInfo(Residue a, Residue b) {
+    public MolContactInfo(Residue a, Residue b) {
         resA = a;
         resB = b;
         dist = a.resCenterDistTo(b);  
@@ -403,8 +404,8 @@ public class ResContactInfo {
     public ArrayList<Atom[]> getAtomAtomContacts() { return atomAtomContacts; }
     
     // DEBUG only
-    public Residue getResA() { return(resA); }
-    public Residue getResB() { return(resB); }
+    public Molecule getResA() { return(resA); }
+    public Molecule getResB() { return(resB); }
     
     /**
      * Determines whether the residue pair described by this RCI is in any contact, i.e., has contacts of any type.
