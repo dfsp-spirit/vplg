@@ -61,14 +61,14 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
              return true;
         } else {
             Molecule molA = c.getResA();
-            Residue resB = c.getResB();
-            if( ! molA.getChainID().equals(resB.getChainID())) {
+            Molecule molB = c.getResB();
+            if( ! molA.getChainID().equals(molB.getChainID())) {
                 //different chains, add contact
                 return true;
             }
             else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(molA.getPdbNum() - resB.getPdbNum());
+                int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if(seqDist < minSeqDist) {
                     return false;
                 }
@@ -89,15 +89,15 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         if(maxSeqDist <= 0) {
              return true;
         } else {
-            Residue resA = c.getResA();
-            Residue resB = c.getResB();
-            if( ! resA.getChainID().equals(resB.getChainID())) {
+            Molecule molA = c.getResA();
+            Molecule molB = c.getResB();
+            if( ! molA.getChainID().equals(molB.getChainID())) {
                 //different chains, do NOT add contact
                 return false;
             }
             else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbNum() - resB.getPdbNum());
+                int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if(seqDist > maxSeqDist) {
                     return false;
                 }
@@ -464,11 +464,11 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      */
     public final boolean addEdgeFromRCI(MolContactInfo rci) {
         if(rci.describesAnyContact()) {            
-            Residue resA = rci.getResA();
-            Residue resB = rci.getResB();
+            Molecule molA = rci.getResA();
+            Molecule molB = rci.getResB();
 
-            int indexResA = this.getVertexIndex(resA);
-            int indexResB = this.getVertexIndex(resB);
+            int indexResA = this.getVertexIndex(molA);
+            int indexResB = this.getVertexIndex(molB);
             if(indexResA >= 0 && indexResB >= 0) {
                 if(rci.describesAnyContact()) {
                     AAEdgeInfo ei = new AAEdgeInfo(rci);
@@ -485,16 +485,16 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                 sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + resA.getFancyName() + " and " + resB.getFancyName() + ".");
                 if(indexResA < 0 && indexResB < 0) {
                     sb.append(" BOTH residues not found.\n");
-                    if( (! resA.isAA()) && (! resB.isAA())) { notFoundIsorAreLigands = Boolean.TRUE; }
+                    if( (! molA.isAA()) && (! molB.isAA())) { notFoundIsorAreLigands = Boolean.TRUE; }
                 }
                 else {
                     if(indexResA < 0) {
                         sb.append(" FIRST residue not found.\n");
-                        if( ! resA.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
+                        if( ! molA.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
                     }
                     else {  // indexResA < 0
                         sb.append(" SECOND residue not found.\n");
-                        if( ! resB.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
+                        if( ! molB.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
                     }
                 }
                 if( ! notFoundIsorAreLigands) { // only warn for non-ligand residues which were not found.
