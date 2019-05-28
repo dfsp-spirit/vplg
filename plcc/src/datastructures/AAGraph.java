@@ -18,8 +18,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import plcc.Settings;
-import proteingraphs.ResContactInfo;
+import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
+import proteinstructure.Molecule;
 import tools.DP;
 
 /**
@@ -55,19 +56,19 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      * @param c the contact
      * @return whether the contact satisfies the minimal sequential residue distance rule
      */
-    private Boolean checkMinSeqDistance(Integer minSeqDist, ResContactInfo c) {
+    private Boolean checkMinSeqDistance(Integer minSeqDist, MolContactInfo c) {
         if(minSeqDist <= 0) {
              return true;
         } else {
-            Residue resA = c.getResA();
+            Molecule molA = c.getResA();
             Residue resB = c.getResB();
-            if( ! resA.getChainID().equals(resB.getChainID())) {
+            if( ! molA.getChainID().equals(resB.getChainID())) {
                 //different chains, add contact
                 return true;
             }
             else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbNum() - resB.getPdbNum());
+                int seqDist = Math.abs(molA.getPdbNum() - resB.getPdbNum());
                 if(seqDist < minSeqDist) {
                     return false;
                 }
@@ -84,7 +85,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      * @param c the contact
      * @return whether the contact satisfies the maximal sequential residue distance rule
      */
-    private Boolean checkMaxSeqDistance(Integer maxSeqDist, ResContactInfo c) {
+    private Boolean checkMaxSeqDistance(Integer maxSeqDist, MolContactInfo c) {
         if(maxSeqDist <= 0) {
              return true;
         } else {
@@ -224,7 +225,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         return avg;
     }
     
-    private Boolean contactSatisfiesRules(ResContactInfo c) {
+    private Boolean contactSatisfiesRules(MolContactInfo c) {
         Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
         Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
         Boolean minSeqDistanceCheckPassed = checkMinSeqDistance(minSeqDist, c);
@@ -235,10 +236,10 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         return allChecksPassed;
     }
     
-    /** Advanced Constructor, constructs the edges automatically from ResContactInfo list
+    /** Advanced Constructor, constructs the edges automatically from MolContactInfo list
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph */
-    public AAGraph(List<Residue> vertices, ArrayList<ResContactInfo> contacts) {
+    public AAGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
         super(vertices);
         for(int i = 0; i < contacts.size(); i++) {
             if(contactSatisfiesRules(contacts.get(i))) {
@@ -332,7 +333,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                     matrix[resAPtglAAtype][resBPtglAAtype]++;
                     matrix[resBPtglAAtype][resAPtglAAtype]++;
                     
-                    matrix[resAPtglAAtype][0]++;    // total contacts of AA type resA
+                    matrix[resAPtglAAtype][0]++;    // total contacts of AA type molA
                     matrix[resBPtglAAtype][0]++;    // total contacts of AA type resB                
                                    
                 }                
@@ -457,11 +458,11 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     }
     
     /**
-     * Automatically adds an edge from a ResContactInfo object if applicable. Note that the edge is only added if the RCI describes a contact.
-     * @param rci the ResContactInfo object, must be for 2 residues which are part of this graph
+     * Automatically adds an edge from a MolContactInfo object if applicable. Note that the edge is only added if the RCI describes a contact.
+     * @param rci the MolContactInfo object, must be for 2 residues which are part of this graph
      * @return true if the edge was added, false otherwise
      */
-    public final boolean addEdgeFromRCI(ResContactInfo rci) {
+    public final boolean addEdgeFromRCI(MolContactInfo rci) {
         if(rci.describesAnyContact()) {            
             Residue resA = rci.getResA();
             Residue resB = rci.getResB();
