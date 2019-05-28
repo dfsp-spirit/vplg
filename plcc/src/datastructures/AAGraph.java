@@ -60,7 +60,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         if(minSeqDist <= 0) {
              return true;
         } else {
-            Molecule molA = c.getResA();
+            Molecule resA = c.getResA();
             Molecule molB = c.getResB();
             if( ! molA.getChainID().equals(molB.getChainID())) {
                 //different chains, add contact
