@@ -115,7 +115,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph
      */
-    public PPIGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
+    public PPIGraph(List<Molecule> vertices, ArrayList<MolContactInfo> contacts) {
         super(vertices);
         for (int i = 0; i < contacts.size(); i++) {
             if (contactSatisfiesRules(contacts.get(i))) {
