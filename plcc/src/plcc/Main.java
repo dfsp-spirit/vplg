@@ -22,7 +22,7 @@ import io.FileParser;
 import io.DBManager;
 import proteinstructure.ProtMetaInfo;
 import proteingraphs.FoldingGraphComparator;
-import proteingraphs.ResContactInfo;
+import proteingraphs.MolContactInfo;
 import proteingraphs.ComplexGraph;
 import proteingraphs.ProtGraphs;
 import proteingraphs.SSEComparator;
@@ -135,12 +135,12 @@ public class Main {
                                             //  So only 14 of those atoms remain (but index starts at 1).
     
     /** The number of different contact types which are stored for a pair of residues. See calculateAtomContactsBetweenResidues() and
-     the ResContactInfo class for details and usage. */
+     the MolContactInfo class for details and usage. */
     public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 12;
     
     /**
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
-     * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
+     * See calculateAtomContactsBetweenResiduesAlternativeModel() and the MolContactInfo class for details and usage.
      */
     public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 41;
 
@@ -266,7 +266,7 @@ public class Main {
         String compareSSEContactsFile = "";                
 
 
-        ArrayList<ResContactInfo> cInfo;
+        ArrayList<MolContactInfo> cInfo;
         
         // init contact statistics array
         contact = new Integer[NUM_AAs][NUM_AAs][MAX_ATOMS_PER_AA][MAX_ATOMS_PER_AA];
@@ -2253,11 +2253,11 @@ public class Main {
             }
         }
         
-        ArrayList<ResContactInfo> cInfoThisChain;
+        ArrayList<MolContactInfo> cInfoThisChain;
         ProteinResults.getInstance().setPdbid(pdbid);
         
         if(separateContactsByChain) {
-            cInfoThisChain = new ArrayList<ResContactInfo>();   // will be computed separately for each chainName later
+            cInfoThisChain = new ArrayList<MolContactInfo>();   // will be computed separately for each chainName later
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
@@ -3385,7 +3385,7 @@ public class Main {
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
-    public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
+    public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<MolContactInfo> resContacts, String pdbid, String outputDir) {
 
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
@@ -4603,7 +4603,7 @@ public class Main {
      * @param pdbid the PDBID of the protein the chainName c belongs to
      * @return the resulting protein graph
      */
-    public static ProtGraph calcGraphType(String graphType, List<SSE> allChainSSEs, Chain c, List<ResContactInfo> resContacts, String pdbid) {
+    public static ProtGraph calcGraphType(String graphType, List<SSE> allChainSSEs, Chain c, List<MolContactInfo> resContacts, String pdbid) {
 
         ContactMatrix chainCM;
         Boolean silent = Settings.getBoolean("plcc_B_silent");
@@ -4780,9 +4780,9 @@ public class Main {
     /**
      * Computes residue contacts following the definition by Andreas for interfaces between chains of multi-chain proteins.
      * @param res a list of residues
-     * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
+     * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<ResContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
+    public static ArrayList<MolContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
 
         System.out.println("\n *** Calculation of interchain contacts. Still WIP! ***");
         FileParser.silent = false;
@@ -4792,8 +4792,8 @@ public class Main {
         Integer numResContactsChecked, numResContactsPossible, numResContactsImpossible;
         numResContactsChecked = numResContactsPossible = numResContactsImpossible = 0;
 
-        ResContactInfo rci;
-        ArrayList<ResContactInfo> contactInfo = new ArrayList<ResContactInfo>();
+        MolContactInfo rci;
+        ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
         
 
         for(Integer i = 0; i < rs; i++) {
@@ -4875,13 +4875,13 @@ public class Main {
     
     
     
-    public static ArrayList<ResContactInfo> calculateAllContactsChainSphereSpeedup(List<Chain> chains) {
+    public static ArrayList<MolContactInfo> calculateAllContactsChainSphereSpeedup(List<Chain> chains) {
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         Chain chainA, chainB;
         Integer chainCounts = chains.size();
         int numberResTotal = 0;
-        ResContactInfo rci;
-        ArrayList<ResContactInfo> contactInfo = new ArrayList<>();
+        MolContactInfo rci;
+        ArrayList<MolContactInfo> contactInfo = new ArrayList<>();
         //Residue res1, res2;
         Molecule mol1, mol2;
         
@@ -5106,9 +5106,9 @@ public class Main {
     /**
      * Calculates all contacts between the residues in res.
      * @param res A list of Residue objects.
-     * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
+     * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<ResContactInfo> calculateAllContacts(List<Residue> res) {
+    public static ArrayList<MolContactInfo> calculateAllContacts(List<Residue> res) {
         
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
@@ -5125,8 +5125,8 @@ public class Main {
         numResContactsChecked = numResContactsPossible = numResContactsImpossible = numCmpSkipped = 0;
 
         long numResToSkip, spaceBetweenResidues;
-        ResContactInfo rci;
-        ArrayList<ResContactInfo> contactInfo = new ArrayList<ResContactInfo>();
+        MolContactInfo rci;
+        ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
 
         Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
@@ -5240,9 +5240,9 @@ public class Main {
     /**
      * Calculates all contacts between the residues in res.
      * @param res A list of Residue objects.
-     * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
+     * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<ResContactInfo> calculateAllContactsLimitedByChain(List<Residue> res, String handledChain) {
+    public static ArrayList<MolContactInfo> calculateAllContactsLimitedByChain(List<Residue> res, String handledChain) {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
                 
@@ -5259,8 +5259,8 @@ public class Main {
         numResContactsChecked = numResContactsPossible = numResContactsImpossible = numCmpSkipped = 0;
 
         Integer numResToSkip, spaceBetweenResidues;
-        ResContactInfo rci;
-        ArrayList<ResContactInfo> contactInfo = new ArrayList<ResContactInfo>();
+        MolContactInfo rci;
+        ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
 
         Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
@@ -5406,9 +5406,9 @@ public class Main {
      * Calculates the atom contacts between the residues 'a' and 'b'.
      * @param a one of the residues of the residue pair
      * @param b one of the residues of the residue pair
-     * @return A ResContactInfo object with information on the atom contacts between 'a' and 'b'.
+     * @return A MolContactInfo object with information on the atom contacts between 'a' and 'b'.
      */
-    public static ResContactInfo calculateAtomContactsBetweenResidues(Molecule a, Molecule b) {
+    public static MolContactInfo calculateAtomContactsBetweenResidues(Molecule a, Molecule b) {
 
         
         ArrayList<Atom> atoms_a = a.getAtoms();
@@ -5417,7 +5417,7 @@ public class Main {
         Atom x, y;
         Integer dist = null;
         Integer CAdist = a.resCenterDistTo(b);
-        ResContactInfo result = null;
+        MolContactInfo result = null;
 
 
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
@@ -5463,7 +5463,7 @@ public class Main {
             // The initial value of '-1' is required for the atom index arrays because our index
             // starts at '0', but geom_neo treads a '0' in a line of <pdbid>.geo as 'no contact' because
             // it starts its index at '1'.
-            // This problem is solved by the functions in ResContactInfo: they return (our_index + 1). This
+            // This problem is solved by the functions in MolContactInfo: they return (our_index + 1). This
             // means that:
             //   1) If no contact was detected, our_index is -1 and they return 0, which means 'no contact' to geom_neo.
             //   2) If a contact was detected, our_index is converted to the geom_neo index. :)
@@ -5523,7 +5523,7 @@ public class Main {
                     
 
                     // The van der Waals radii spheres overlap, contact found.
-                    numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
+                    numPairContacts[MolContactInfo.TT]++;   // update total number of contacts for this residue pair
                     
                     // DEBUG
                     //System.out.println("DEBUG: Atom contact in distance " + dist + " between atom " + x + " and " + y + ".");
@@ -5565,48 +5565,48 @@ public class Main {
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - backbone contact
-                            numPairContacts[ResContactInfo.BB]++;
+                            numPairContacts[MolContactInfo.BB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.BB] < 0) || dist < minContactDistances[ResContactInfo.BB]) {
-                                minContactDistances[ResContactInfo.BB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BB] = j;
+                            if((minContactDistances[MolContactInfo.BB] < 0) || dist < minContactDistances[MolContactInfo.BB]) {
+                                minContactDistances[MolContactInfo.BB] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.BB] = i;
+                                contactAtomNumInResidueB[MolContactInfo.BB] = j;
                             }
 
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a chainName - backbone contact
-                            numPairContacts[ResContactInfo.CB]++;
+                            numPairContacts[MolContactInfo.CB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.CB] < 0) || dist < minContactDistances[ResContactInfo.CB]) {
-                                minContactDistances[ResContactInfo.CB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CB] = j;
+                            if((minContactDistances[MolContactInfo.CB] < 0) || dist < minContactDistances[MolContactInfo.CB]) {
+                                minContactDistances[MolContactInfo.CB] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.CB] = i;
+                                contactAtomNumInResidueB[MolContactInfo.CB] = j;
                             }
 
                         }
                         else if(i <= numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - chainName contact
-                            numPairContacts[ResContactInfo.BC]++;
+                            numPairContacts[MolContactInfo.BC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.BC] < 0) || dist < minContactDistances[ResContactInfo.BC]) {
-                                minContactDistances[ResContactInfo.BC] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BC] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BC] = j;
+                            if((minContactDistances[MolContactInfo.BC] < 0) || dist < minContactDistances[MolContactInfo.BC]) {
+                                minContactDistances[MolContactInfo.BC] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.BC] = i;
+                                contactAtomNumInResidueB[MolContactInfo.BC] = j;
                             }
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a chainName - chainName contact
-                            numPairContacts[ResContactInfo.CC]++;          // 'C' instead of 'S' for side chainName pays off
+                            numPairContacts[MolContactInfo.CC]++;          // 'C' instead of 'S' for side chainName pays off
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.CC] < 0) || dist < minContactDistances[ResContactInfo.CC]) {
-                                minContactDistances[ResContactInfo.CC] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CC] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CC] = j;
+                            if((minContactDistances[MolContactInfo.CC] < 0) || dist < minContactDistances[MolContactInfo.CC]) {
+                                minContactDistances[MolContactInfo.CC] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.CC] = i;
+                                contactAtomNumInResidueB[MolContactInfo.CC] = j;
                             }
                         }
                         else {
@@ -5618,16 +5618,16 @@ public class Main {
                         // Check for H bridges separately
                         if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
                             // H bridge from backbone atom 'N' of residue a to backbone atom 'O' of residue b.
-                            numPairContacts[ResContactInfo.HB]++;
+                            numPairContacts[MolContactInfo.HB]++;
                             // There can only be one of these so if we found it, simply update the distance.
-                            minContactDistances[ResContactInfo.HB] = dist;
+                            minContactDistances[MolContactInfo.HB] = dist;
                         }
 
                         if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
                             // H bridge from backbone atom 'O' of residue a to backbone atom 'N' of residue b.
-                            numPairContacts[ResContactInfo.BH]++;
+                            numPairContacts[MolContactInfo.BH]++;
                             // There can only be one of these so if we found it, simply update the distance.
-                            minContactDistances[ResContactInfo.BH] = dist;
+                            minContactDistances[MolContactInfo.BH] = dist;
                         }
 
                     }
@@ -5639,25 +5639,25 @@ public class Main {
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - ligand contact
-                            numPairContacts[ResContactInfo.BL]++;
+                            numPairContacts[MolContactInfo.BL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.BL] < 0) || dist < minContactDistances[ResContactInfo.BL]) {
-                                minContactDistances[ResContactInfo.BL] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BL] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BL] = j;
+                            if((minContactDistances[MolContactInfo.BL] < 0) || dist < minContactDistances[MolContactInfo.BL]) {
+                                minContactDistances[MolContactInfo.BL] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.BL] = i;
+                                contactAtomNumInResidueB[MolContactInfo.BL] = j;
                             }
 
                         }
                         else {
                             // to be precise, this is a side chainName - ligand contact
-                            numPairContacts[ResContactInfo.CL]++;
+                            numPairContacts[MolContactInfo.CL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.CL] < 0) || dist < minContactDistances[ResContactInfo.CL]) {
-                                minContactDistances[ResContactInfo.CL] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CL] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CL] = j;
+                            if((minContactDistances[MolContactInfo.CL] < 0) || dist < minContactDistances[MolContactInfo.CL]) {
+                                minContactDistances[MolContactInfo.CL] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.CL] = i;
+                                contactAtomNumInResidueB[MolContactInfo.CL] = j;
                             }
                         }
 
@@ -5669,25 +5669,25 @@ public class Main {
                         // Check the exact contact type
                         if(j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a ligand - backbone contact
-                            numPairContacts[ResContactInfo.LB]++;
+                            numPairContacts[MolContactInfo.LB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.LB] < 0) || dist < minContactDistances[ResContactInfo.LB]) {
-                                minContactDistances[ResContactInfo.LB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.LB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.LB] = j;
+                            if((minContactDistances[MolContactInfo.LB] < 0) || dist < minContactDistances[MolContactInfo.LB]) {
+                                minContactDistances[MolContactInfo.LB] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.LB] = i;
+                                contactAtomNumInResidueB[MolContactInfo.LB] = j;
                             }
 
                         }
                         else {
                             // to be precise, this is a ligand - side chainName contact
-                            numPairContacts[ResContactInfo.LC]++;
+                            numPairContacts[MolContactInfo.LC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.LC] < 0) || dist < minContactDistances[ResContactInfo.LC]) {
-                                minContactDistances[ResContactInfo.LC] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.LC] = i;
-                                contactAtomNumInResidueB[ResContactInfo.LC] = j;
+                            if((minContactDistances[MolContactInfo.LC] < 0) || dist < minContactDistances[MolContactInfo.LC]) {
+                                minContactDistances[MolContactInfo.LC] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.LC] = i;
+                                contactAtomNumInResidueB[MolContactInfo.LC] = j;
                             }
                         }
                             
@@ -5697,13 +5697,13 @@ public class Main {
                         numTotalLigContactsPair++;
 
                         // no choices here, ligands have no sub type
-                        numPairContacts[ResContactInfo.LL]++;
+                        numPairContacts[MolContactInfo.LL]++;
                         
                         // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                        if((minContactDistances[ResContactInfo.LL] < 0) || dist < minContactDistances[ResContactInfo.LL]) {
-                            minContactDistances[ResContactInfo.LL] = dist;
-                            contactAtomNumInResidueA[ResContactInfo.LL] = i;
-                            contactAtomNumInResidueB[ResContactInfo.LL] = j;
+                        if((minContactDistances[MolContactInfo.LL] < 0) || dist < minContactDistances[MolContactInfo.LL]) {
+                            minContactDistances[MolContactInfo.LL] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.LL] = i;
+                            contactAtomNumInResidueB[MolContactInfo.LL] = j;
                         }
                         
 
@@ -5722,8 +5722,8 @@ public class Main {
 
 
         // Iteration through all atoms of the two residues is done
-        if(numPairContacts[ResContactInfo.TT] > 0) {
-            result = new ResContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+        if(numPairContacts[MolContactInfo.TT] > 0) {
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
         }
         else {
             result = null;
@@ -6010,15 +6010,15 @@ public class Main {
      * The results can be integrated into the PPI detection.
      * @param a one of the residues of the residue pair
      * @param b one of the residues of the residue pair
-     * @return A ResContactInfo object with information on the pi-effects between 'a' and 'b'.
+     * @return A MolContactInfo object with information on the pi-effects between 'a' and 'b'.
      */
-    public static ResContactInfo calculatePiEffects(Residue a, Residue b) {
+    public static MolContactInfo calculatePiEffects(Residue a, Residue b) {
         
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
         
         Integer CAdist = a.resCenterDistTo(b);
-        ResContactInfo result = null;
+        MolContactInfo result = null;
         ArrayList<Atom[]> atomAtomContacts = new ArrayList<Atom[]>();
         Atom[] donorAcceptor = new Atom[2];
         ArrayList<String> atomAtomContactType = new ArrayList<String>();
@@ -6071,7 +6071,7 @@ public class Main {
             // The initial value of '-1' is required for the atom index arrays because our index
             // starts at '0', but geom_neo treads a '0' in a line of <pdbid>.geo as 'no contact' because
             // it starts its index at '1'.
-            // This problem is solved by the functions in ResContactInfo: they return (our_index + 1). This
+            // This problem is solved by the functions in MolContactInfo: they return (our_index + 1). This
             // means that:
             //   1) If no contact was detected, our_index is -1 and they return 0, which means 'no contact' to geom_neo.
             //   2) If a contact was detected, our_index is converted to the geom_neo index. :)
@@ -6125,18 +6125,18 @@ public class Main {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(0), h, six_ring) / 10);
                       
                             if ( piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.NHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.NHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                                    minContactDistances[ResContactInfo.NHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                                if (minContactDistances[MolContactInfo.NHPI] < 0 || piDist > minContactDistances[MolContactInfo.NHPI]) {
+                                    minContactDistances[MolContactInfo.NHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.NHPI] = 0; //backbone N
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.NHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.NHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.NHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6149,18 +6149,18 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(0), h, six_ring, false, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.NHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.NHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                                    minContactDistances[ResContactInfo.NHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                                if (minContactDistances[MolContactInfo.NHPI] < 0 || piDist > minContactDistances[MolContactInfo.NHPI]) {
+                                    minContactDistances[MolContactInfo.NHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.NHPI] = 0; //backbone N
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.NHPI] = 5; //CG of six_ring
                                         donorAcceptor[0] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.NHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.NHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[0] = atoms_b.get(7);
                                     }
                                 }
@@ -6173,13 +6173,13 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), h, five_ring) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.NHPI]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.NHPI]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                                        minContactDistances[ResContactInfo.NHPI] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
-                                        contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.NHPI] < 0 || piDist > minContactDistances[MolContactInfo.NHPI]) {
+                                        minContactDistances[MolContactInfo.NHPI] = piDist;
+                                        contactAtomNumInResidueA[MolContactInfo.NHPI] = 0; //backbone N
+                                        contactAtomNumInResidueB[MolContactInfo.NHPI] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New NHPI: " + atoms_a.get(0).toString() + "/" + h.toString());
                                     atomAtomContactType.add("NHPI");
@@ -6190,13 +6190,13 @@ public class Main {
 
                                 piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), h, five_ring, false, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.NHPI]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.NHPI]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                                        minContactDistances[ResContactInfo.NHPI] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
-                                        contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.NHPI] < 0 || piDist > minContactDistances[MolContactInfo.NHPI]) {
+                                        minContactDistances[MolContactInfo.NHPI] = piDist;
+                                        contactAtomNumInResidueA[MolContactInfo.NHPI] = 0; //backbone N
+                                        contactAtomNumInResidueB[MolContactInfo.NHPI] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New NHPI: " + atoms_a.get(0).toString() + "/" + h.toString());
                                     atomAtomContactType.add("NHPI");
@@ -6228,18 +6228,18 @@ public class Main {
                         if (hz.getAtomName().contains("HZ")) {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, six_ring, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CNHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CNHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                    minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
+                                if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                    minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CNHPI] = 8; //sidechain N
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }                             
@@ -6251,18 +6251,18 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CNHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CNHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                    minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
+                                if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                    minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CNHPI] = 8; //sidechain N
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6275,13 +6275,13 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.CNHPI]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.CNHPI]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                        minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                        minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[MolContactInfo.CNHPI] = 8; //sidechain N
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New CNHPI: " + atoms_a.get(8).toString() + "/" + hz.toString());
                                     atomAtomContactType.add("CNHPI");
@@ -6292,13 +6292,13 @@ public class Main {
                                 
                                 piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.CNHPI]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.CNHPI]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                        minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                        minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[MolContactInfo.CNHPI] = 8; //sidechain N
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New CNHPI: " + atoms_a.get(8).toString() + "/" + hz.toString());
                                     atomAtomContactType.add("CNHPI");
@@ -6333,18 +6333,18 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CNHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CNHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                    minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                    minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6356,18 +6356,18 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CNHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CNHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                    minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                    minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6380,13 +6380,13 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.CNHPI]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.CNHPI]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                        minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                        minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[MolContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New CNHPI: " + argN.toString() + "/" + argH.toString());
                                     atomAtomContactType.add("CNHPI");
@@ -6397,13 +6397,13 @@ public class Main {
                                 
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.CNHPI]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.CNHPI]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                        minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
-                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.CNHPI] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                        minContactDistances[MolContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[MolContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueB[MolContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New CNHPI: " + argN.toString() + "/" + argH.toString());
                                     atomAtomContactType.add("CNHPI");
@@ -6448,18 +6448,18 @@ public class Main {
                         piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring) / 10);
 
                         if ( piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.CAHPI]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.CAHPI]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
-                                minContactDistances[ResContactInfo.CAHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                            if (minContactDistances[MolContactInfo.CAHPI] < 0 || piDist > minContactDistances[MolContactInfo.CAHPI]) {
+                                minContactDistances[MolContactInfo.CAHPI] = piDist;
+                                contactAtomNumInResidueA[MolContactInfo.CAHPI] = 1; //CA
                                 if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                    contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
+                                    contactAtomNumInResidueB[MolContactInfo.CAHPI] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_b.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueB[MolContactInfo.CAHPI] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_b.get(7);
                                 }
                             }
@@ -6472,18 +6472,18 @@ public class Main {
                             piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring, false, true) / 10);
                     
                             if ( piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CAHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CAHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
-                                    minContactDistances[ResContactInfo.CAHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                                if (minContactDistances[MolContactInfo.CAHPI] < 0 || piDist > minContactDistances[MolContactInfo.CAHPI]) {
+                                    minContactDistances[MolContactInfo.CAHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CAHPI] = 1; //CA
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CAHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CAHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6496,18 +6496,18 @@ public class Main {
                     if ("TRP".equals(b.getName3())) {
                             piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring) / 10);
                             if ( piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CAHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CAHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
-                                    minContactDistances[ResContactInfo.CAHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                                if (minContactDistances[MolContactInfo.CAHPI] < 0 || piDist > minContactDistances[MolContactInfo.CAHPI]) {
+                                    minContactDistances[MolContactInfo.CAHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CAHPI] = 1; //CA
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CAHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CAHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6519,18 +6519,18 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring, false, true) / 10);
                             if ( piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CAHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CAHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
-                                    minContactDistances[ResContactInfo.CAHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                                if (minContactDistances[MolContactInfo.CAHPI] < 0 || piDist > minContactDistances[MolContactInfo.CAHPI]) {
+                                    minContactDistances[MolContactInfo.CAHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CAHPI] = 1; //CA
                                     if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CAHPI] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_b.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueB[MolContactInfo.CAHPI] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                 }
@@ -6555,18 +6555,18 @@ public class Main {
                         if (hd.getAtomName().contains("HD")) {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(6), hd, six_ring) / 10);
                         if ( piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PROCDHPI]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PROCDHPI]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
-                                minContactDistances[ResContactInfo.PROCDHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
+                            if (minContactDistances[MolContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[MolContactInfo.PROCDHPI]) {
+                                minContactDistances[MolContactInfo.PROCDHPI] = piDist;
+                                contactAtomNumInResidueA[MolContactInfo.PROCDHPI] = 6; //CD
                                 if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                    contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = 5; //CG of six_ring
+                                    contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_b.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_b.get(7);
                                 }
                             }
@@ -6578,18 +6578,18 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_a.get(6), hd, six_ring, false, true) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PROCDHPI]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PROCDHPI]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
-                                minContactDistances[ResContactInfo.PROCDHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
+                            if (minContactDistances[MolContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[MolContactInfo.PROCDHPI]) {
+                                minContactDistances[MolContactInfo.PROCDHPI] = piDist;
+                                contactAtomNumInResidueA[MolContactInfo.PROCDHPI] = 6; //CD
                                 if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                    contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = 5; //CG of six_ring
+                                    contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_b.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_b.get(7);
                                 }
                             }
@@ -6602,13 +6602,13 @@ public class Main {
                         if ("TRP".equals(b.getName3())) {
                             piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(6), hd, five_ring) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PROCDHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PROCDHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
-                                    minContactDistances[ResContactInfo.PROCDHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
-                                    contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = 5; //CG of five_ring
+                                if (minContactDistances[MolContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[MolContactInfo.PROCDHPI]) {
+                                    minContactDistances[MolContactInfo.PROCDHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.PROCDHPI] = 6; //CD
+                                    contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = 5; //CG of five_ring
                                 }
 //                                System.out.println("New PROCDHPI: " + atoms_a.get(6).toString() + "/" + hd.toString());
                                 atomAtomContactType.add("PROCDHPI");
@@ -6619,13 +6619,13 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(6), hd, five_ring, false, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PROCDHPI]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PROCDHPI]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
-                                    minContactDistances[ResContactInfo.PROCDHPI] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
-                                    contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = 5; //CG of five_ring
+                                if (minContactDistances[MolContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[MolContactInfo.PROCDHPI]) {
+                                    minContactDistances[MolContactInfo.PROCDHPI] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.PROCDHPI] = 6; //CD
+                                    contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = 5; //CG of five_ring
                                 }
 //                                System.out.println("New PROCDHPI: " + atoms_a.get(6).toString() + "/" + hd.toString());
                                 atomAtomContactType.add("PROCDHPI");
@@ -6657,18 +6657,18 @@ public class Main {
                         if (hg.getAtomName().contains("HG")) {
                     piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, six_ring) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.SHPI]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.SHPI]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
-                            minContactDistances[ResContactInfo.SHPI] = piDist;
-                            contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
+                        if (minContactDistances[MolContactInfo.SHPI] < 0 || piDist > minContactDistances[MolContactInfo.SHPI]) {
+                            minContactDistances[MolContactInfo.SHPI] = piDist;
+                            contactAtomNumInResidueA[MolContactInfo.SHPI] = 5;
                             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                contactAtomNumInResidueB[ResContactInfo.SHPI] = 5; //CG of six_ring
+                                contactAtomNumInResidueB[MolContactInfo.SHPI] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_b.get(5);
                             }
                             else {
-                                contactAtomNumInResidueB[ResContactInfo.SHPI] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueB[MolContactInfo.SHPI] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_b.get(7);
                             }
                         }
@@ -6680,18 +6680,18 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, six_ring, false, true) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.SHPI]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.SHPI]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
-                            minContactDistances[ResContactInfo.SHPI] = piDist;
-                            contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
+                        if (minContactDistances[MolContactInfo.SHPI] < 0 || piDist > minContactDistances[MolContactInfo.SHPI]) {
+                            minContactDistances[MolContactInfo.SHPI] = piDist;
+                            contactAtomNumInResidueA[MolContactInfo.SHPI] = 5;
                             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                contactAtomNumInResidueB[ResContactInfo.SHPI] = 5; //CG of six_ring
+                                contactAtomNumInResidueB[MolContactInfo.SHPI] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_b.get(5);
                             }
                             else {
-                                contactAtomNumInResidueB[ResContactInfo.SHPI] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueB[MolContactInfo.SHPI] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_b.get(7);
                             }
                         }
@@ -6704,13 +6704,13 @@ public class Main {
                     if ("TRP".equals(b.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, five_ring) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.SHPI]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.SHPI]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
-                                minContactDistances[ResContactInfo.SHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
-                                contactAtomNumInResidueB[ResContactInfo.SHPI] = 5; //CG of five_ring
+                            if (minContactDistances[MolContactInfo.SHPI] < 0 || piDist > minContactDistances[MolContactInfo.SHPI]) {
+                                minContactDistances[MolContactInfo.SHPI] = piDist;
+                                contactAtomNumInResidueA[MolContactInfo.SHPI] = 5;
+                                contactAtomNumInResidueB[MolContactInfo.SHPI] = 5; //CG of five_ring
                             }
 //                            System.out.println("New SHPI: " + atoms_a.get(5).toString() + "/" + hg.toString());
                             atomAtomContactType.add("SHPI");
@@ -6721,13 +6721,13 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, five_ring, false, true) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.SHPI]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.SHPI]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
-                                minContactDistances[ResContactInfo.SHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
-                                contactAtomNumInResidueB[ResContactInfo.SHPI] = 5; //CG of five_ring
+                            if (minContactDistances[MolContactInfo.SHPI] < 0 || piDist > minContactDistances[MolContactInfo.SHPI]) {
+                                minContactDistances[MolContactInfo.SHPI] = piDist;
+                                contactAtomNumInResidueA[MolContactInfo.SHPI] = 5;
+                                contactAtomNumInResidueB[MolContactInfo.SHPI] = 5; //CG of five_ring
                             }
 //                            System.out.println("New SHPI: " + atoms_a.get(5).toString() + "/" + hg.toString());
                             atomAtomContactType.add("SHPI");
@@ -6813,25 +6813,25 @@ public class Main {
                 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring) / 10);
                 if (piDist > 0) {
-                    numPairContacts[ResContactInfo.TT]++;
-                    numPairContacts[ResContactInfo.XOHPI]++;
+                    numPairContacts[MolContactInfo.TT]++;
+                    numPairContacts[MolContactInfo.XOHPI]++;
                     donorAcceptor = new Atom[2];
-                    if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
-                        minContactDistances[ResContactInfo.XOHPI] = piDist;
+                    if (minContactDistances[MolContactInfo.XOHPI] < 0 || piDist > minContactDistances[MolContactInfo.XOHPI]) {
+                        minContactDistances[MolContactInfo.XOHPI] = piDist;
                         if ("TYR".equals(a.getName3())) {
-                            contactAtomNumInResidueA[ResContactInfo.XOHPI] = 11;
+                            contactAtomNumInResidueA[MolContactInfo.XOHPI] = 11;
                             donorAcceptor[0] = atoms_a.get(11);
                         }
                         else {
-                            contactAtomNumInResidueA[ResContactInfo.XOHPI] = 5;
+                            contactAtomNumInResidueA[MolContactInfo.XOHPI] = 5;
                             donorAcceptor[0] = atoms_a.get(5);
                         }
                         if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                            contactAtomNumInResidueB[ResContactInfo.XOHPI] = 5; //CG of six_ring
+                            contactAtomNumInResidueB[MolContactInfo.XOHPI] = 5; //CG of six_ring
                             donorAcceptor[1] = atoms_b.get(5);
                         }
                         else {
-                            contactAtomNumInResidueB[ResContactInfo.XOHPI] = 7; //CD2 of six_ring
+                            contactAtomNumInResidueB[MolContactInfo.XOHPI] = 7; //CD2 of six_ring
                             donorAcceptor[1] = atoms_b.get(7);
                         }
                     }
@@ -6842,25 +6842,25 @@ public class Main {
 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring, false, true) / 10);
                 if (piDist > 0) {
-                    numPairContacts[ResContactInfo.TT]++;
-                    numPairContacts[ResContactInfo.XOHPI]++;
+                    numPairContacts[MolContactInfo.TT]++;
+                    numPairContacts[MolContactInfo.XOHPI]++;
                     donorAcceptor = new Atom[2];
-                    if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
-                        minContactDistances[ResContactInfo.XOHPI] = piDist;
+                    if (minContactDistances[MolContactInfo.XOHPI] < 0 || piDist > minContactDistances[MolContactInfo.XOHPI]) {
+                        minContactDistances[MolContactInfo.XOHPI] = piDist;
                         if ("TYR".equals(a.getName3())) {
-                            contactAtomNumInResidueA[ResContactInfo.XOHPI] = 11;
+                            contactAtomNumInResidueA[MolContactInfo.XOHPI] = 11;
                             donorAcceptor[0] = atoms_a.get(11);
                         }
                         else {
-                            contactAtomNumInResidueA[ResContactInfo.XOHPI] = 5;
+                            contactAtomNumInResidueA[MolContactInfo.XOHPI] = 5;
                             donorAcceptor[0] = atoms_a.get(5);
                         }
                         if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                            contactAtomNumInResidueB[ResContactInfo.XOHPI] = 5; //CG of six_ring
+                            contactAtomNumInResidueB[MolContactInfo.XOHPI] = 5; //CG of six_ring
                             donorAcceptor[1] = atoms_b.get(5);
                         }
                         else {
-                            contactAtomNumInResidueB[ResContactInfo.XOHPI] = 7; //CD2 of six_ring
+                            contactAtomNumInResidueB[MolContactInfo.XOHPI] = 7; //CD2 of six_ring
                             donorAcceptor[1] = atoms_b.get(7);
                         }
                     }
@@ -6872,20 +6872,20 @@ public class Main {
                 if ("TRP".equals(b.getName3())) {
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.XOHPI]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.XOHPI]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
-                            minContactDistances[ResContactInfo.XOHPI] = piDist;
+                        if (minContactDistances[MolContactInfo.XOHPI] < 0 || piDist > minContactDistances[MolContactInfo.XOHPI]) {
+                            minContactDistances[MolContactInfo.XOHPI] = piDist;
                             if ("TYR".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.XOHPI] = 11;
+                                contactAtomNumInResidueA[MolContactInfo.XOHPI] = 11;
                                 donorAcceptor[0] = atoms_a.get(11);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.XOHPI] = 5;
+                                contactAtomNumInResidueA[MolContactInfo.XOHPI] = 5;
                                 donorAcceptor[0] = atoms_a.get(5);
                             }
-                            contactAtomNumInResidueB[ResContactInfo.XOHPI] = 5; //CG of five_ring
+                            contactAtomNumInResidueB[MolContactInfo.XOHPI] = 5; //CG of five_ring
                         }
 //                        System.out.println("New XOHPI: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         atomAtomContactType.add("");
@@ -6895,20 +6895,20 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring, false, true) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.XOHPI]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.XOHPI]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
-                            minContactDistances[ResContactInfo.XOHPI] = piDist;
+                        if (minContactDistances[MolContactInfo.XOHPI] < 0 || piDist > minContactDistances[MolContactInfo.XOHPI]) {
+                            minContactDistances[MolContactInfo.XOHPI] = piDist;
                             if ("TYR".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.XOHPI] = 11;
+                                contactAtomNumInResidueA[MolContactInfo.XOHPI] = 11;
                                 donorAcceptor[0] = atoms_a.get(11);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.XOHPI] = 5;
+                                contactAtomNumInResidueA[MolContactInfo.XOHPI] = 5;
                                 donorAcceptor[0] = atoms_a.get(5);
                             }
-                            contactAtomNumInResidueB[ResContactInfo.XOHPI] = 5; //CG of five_ring
+                            contactAtomNumInResidueB[MolContactInfo.XOHPI] = 5; //CG of five_ring
                         }
 //                        System.out.println("New XOHPI: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         atomAtomContactType.add("");
@@ -6953,18 +6953,18 @@ public class Main {
                                     piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_b.get(5), atoms_b.get(6)) / 10);
                                 }
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CCAHCO]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CCAHCO]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CCAHCO] < 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
-                                    minContactDistances[ResContactInfo.CCAHCO] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CCAHCO] = 1; //CA
+                                if (minContactDistances[MolContactInfo.CCAHCO] < 0 || piDist > minContactDistances[MolContactInfo.CCAHCO]) {
+                                    minContactDistances[MolContactInfo.CCAHCO] = piDist;
+                                    contactAtomNumInResidueA[MolContactInfo.CCAHCO] = 1; //CA
                                     if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CCAHCO] = 7; //OE1
+                                        contactAtomNumInResidueB[MolContactInfo.CCAHCO] = 7; //OE1
                                         donorAcceptor[1] = atoms_b.get(7);
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CCAHCO] = 6; //OD1
+                                        contactAtomNumInResidueB[MolContactInfo.CCAHCO] = 6; //OD1
                                         donorAcceptor[1] = atoms_b.get(6);
                                     }
                                 }
@@ -7023,13 +7023,13 @@ public class Main {
                 
                 piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_b.get(2), atoms_b.get(3)) / 10);
                 if (piDist > 0) {
-                    numPairContacts[ResContactInfo.TT]++;
-                    numPairContacts[ResContactInfo.BCAHCO]++;
+                    numPairContacts[MolContactInfo.TT]++;
+                    numPairContacts[MolContactInfo.BCAHCO]++;
                     donorAcceptor = new Atom[2];
-                    if (minContactDistances[ResContactInfo.BCAHCO] < 0 || piDist > minContactDistances[ResContactInfo.BCAHCO]) {
-                        minContactDistances[ResContactInfo.BCAHCO] = piDist;
-                        contactAtomNumInResidueA[ResContactInfo.BCAHCO] = 1; //CA
-                        contactAtomNumInResidueB[ResContactInfo.BCAHCO] = 3; //O         
+                    if (minContactDistances[MolContactInfo.BCAHCO] < 0 || piDist > minContactDistances[MolContactInfo.BCAHCO]) {
+                        minContactDistances[MolContactInfo.BCAHCO] = piDist;
+                        contactAtomNumInResidueA[MolContactInfo.BCAHCO] = 1; //CA
+                        contactAtomNumInResidueB[MolContactInfo.BCAHCO] = 3; //O         
                     }
 //                    System.out.println("New BCAHCO: " + ca.toString() + "/" + ha.toString());
                     atomAtomContactType.add("BCAHCO");
@@ -7120,18 +7120,18 @@ public class Main {
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, six_ring) / 10);
                       
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PINH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PINH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
-                            minContactDistances[ResContactInfo.PINH] = piDist;
-                            contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
+                        if (minContactDistances[MolContactInfo.PINH] < 0 || piDist > minContactDistances[MolContactInfo.PINH]) {
+                            minContactDistances[MolContactInfo.PINH] = piDist;
+                            contactAtomNumInResidueB[MolContactInfo.PINH] = 0; //backbone N
                             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PINH] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_a.get(5);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.PINH] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PINH] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_a.get(7);
                             }
                         }
@@ -7143,18 +7143,18 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, six_ring, false, true) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PINH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PINH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
-                            minContactDistances[ResContactInfo.PINH] = piDist;
-                            contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
+                        if (minContactDistances[MolContactInfo.PINH] < 0 || piDist > minContactDistances[MolContactInfo.PINH]) {
+                            minContactDistances[MolContactInfo.PINH] = piDist;
+                            contactAtomNumInResidueB[MolContactInfo.PINH] = 0; //backbone N
                             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PINH] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_a.get(5);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.PINH] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PINH] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_a.get(7);
                             }
                         }
@@ -7167,13 +7167,13 @@ public class Main {
                     if ("TRP".equals(b.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, five_ring) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PINH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PINH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
-                                minContactDistances[ResContactInfo.PINH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
-                                contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of five_ring
+                            if (minContactDistances[MolContactInfo.PINH] < 0 || piDist > minContactDistances[MolContactInfo.PINH]) {
+                                minContactDistances[MolContactInfo.PINH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PINH] = 0; //backbone N
+                                contactAtomNumInResidueA[MolContactInfo.PINH] = 5; //CG of five_ring
                             }
 //                            System.out.println("New PINH: " + b.getAtoms().get(0).toString() + "/" + h.toString());
                             atomAtomContactType.add("PINH");
@@ -7184,13 +7184,13 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, five_ring, false, true) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PINH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PINH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
-                                minContactDistances[ResContactInfo.PINH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
-                                contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of five_ring
+                            if (minContactDistances[MolContactInfo.PINH] < 0 || piDist > minContactDistances[MolContactInfo.PINH]) {
+                                minContactDistances[MolContactInfo.PINH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PINH] = 0; //backbone N
+                                contactAtomNumInResidueA[MolContactInfo.PINH] = 5; //CG of five_ring
                             }
 //                            System.out.println("New PINH: " + b.getAtoms().get(0).toString() + "/" + h.toString());
                             atomAtomContactType.add("PINH");
@@ -7221,18 +7221,18 @@ public class Main {
                        if (hz.getAtomName().contains("HZ")) {
                            piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, six_ring, true) / 10);
                            if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PICNH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PICNH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
-                                    minContactDistances[ResContactInfo.PICNH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
+                                if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.PICNH]) {
+                                    minContactDistances[MolContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.PICNH] = 8; //sidechain N
                                     if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_a.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_a.get(7);
                                     }
                                 }
@@ -7244,18 +7244,18 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PICNH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PICNH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
-                                    minContactDistances[ResContactInfo.PICNH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
+                                if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.PICNH]) {
+                                    minContactDistances[MolContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.PICNH] = 8; //sidechain N
                                     if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_a.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_a.get(7);
                                     }
                                 }
@@ -7268,13 +7268,13 @@ public class Main {
                             if ("TRP".equals(a.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.PICNH]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.PICNH]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
-                                        minContactDistances[ResContactInfo.PICNH] = piDist;
-                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.PICNH]) {
+                                        minContactDistances[MolContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[MolContactInfo.PICNH] = 8; //sidechain N
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New PICNH: " + b.getAtoms().get(8).toString() + "/" + hz.toString());
                                     atomAtomContactType.add("PICNH");
@@ -7285,13 +7285,13 @@ public class Main {
                                 
                                 piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.PICNH]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.PICNH]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
-                                        minContactDistances[ResContactInfo.PICNH] = piDist;
-                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.PICNH]) {
+                                        minContactDistances[MolContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[MolContactInfo.PICNH] = 8; //sidechain N
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New PICNH: " + b.getAtoms().get(8).toString() + "/" + hz.toString());
                                     atomAtomContactType.add("PICNH");
@@ -7335,18 +7335,18 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PICNH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PICNH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                    minContactDistances[ResContactInfo.PICNH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                    minContactDistances[MolContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
                                     if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_a.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_a.get(7);
                                     }
                                 }
@@ -7358,18 +7358,18 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PICNH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PICNH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                    minContactDistances[ResContactInfo.PICNH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                    minContactDistances[MolContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
                                     if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of six_ring
                                         donorAcceptor[1] = atoms_a.get(5);
                                     }
                                     else {
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 7; //CD2 of six_ring
                                         donorAcceptor[1] = atoms_a.get(7);
                                     }
                                 }
@@ -7382,13 +7382,13 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.PICNH]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.PICNH]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                        minContactDistances[ResContactInfo.PICNH] = piDist;
-                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                        minContactDistances[MolContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[MolContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New PICNH: " + argN.toString() + "/" + argH.toString());
                                     atomAtomContactType.add("PICNH");
@@ -7399,13 +7399,13 @@ public class Main {
 
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.PICNH]++;
+                                    numPairContacts[MolContactInfo.TT]++;
+                                    numPairContacts[MolContactInfo.PICNH]++;
                                     donorAcceptor = new Atom[2];
-                                    if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
-                                        minContactDistances[ResContactInfo.PICNH] = piDist;
-                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
-                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
+                                    if (minContactDistances[MolContactInfo.PICNH] < 0 || piDist > minContactDistances[MolContactInfo.CNHPI]) {
+                                        minContactDistances[MolContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[MolContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueA[MolContactInfo.PICNH] = 5; //CG of five_ring
                                     }
 //                                    System.out.println("New PICNH: " + argN.toString() + "/" + argH.toString());
                                     atomAtomContactType.add("PICNH");
@@ -7449,18 +7449,18 @@ public class Main {
                     
                     piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring) / 10);
                     if ( piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PICAH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PICAH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
-                            minContactDistances[ResContactInfo.PICAH] = piDist;
-                            contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
+                        if (minContactDistances[MolContactInfo.PICAH] < 0 || piDist > minContactDistances[MolContactInfo.PICAH]) {
+                            minContactDistances[MolContactInfo.PICAH] = piDist;
+                            contactAtomNumInResidueB[MolContactInfo.PICAH] = 1; //CA
                             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.PICAH] = 5; //CG of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PICAH] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_a.get(5);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PICAH] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_a.get(7);
                             }
                         }
@@ -7473,18 +7473,18 @@ public class Main {
                         piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring, false, true) / 10);
                     
                     if ( piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PICAH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PICAH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
-                            minContactDistances[ResContactInfo.PICAH] = piDist;
-                            contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
+                        if (minContactDistances[MolContactInfo.PICAH] < 0 || piDist > minContactDistances[MolContactInfo.CAHPI]) {
+                            minContactDistances[MolContactInfo.PICAH] = piDist;
+                            contactAtomNumInResidueB[MolContactInfo.PICAH] = 1; //CA
                             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.PICAH] = 5; //CG of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PICAH] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_a.get(5);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PICAH] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_a.get(7);
                             }
                         }
@@ -7497,18 +7497,18 @@ public class Main {
                     if ("TRP".equals(a.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring) / 10);
                         if ( piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PICAH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PICAH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
-                                minContactDistances[ResContactInfo.PICAH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
+                            if (minContactDistances[MolContactInfo.PICAH] < 0 || piDist > minContactDistances[MolContactInfo.PICAH]) {
+                                minContactDistances[MolContactInfo.PICAH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PICAH] = 1; //CA
                                 if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                    contactAtomNumInResidueA[ResContactInfo.PICAH] = 5; //CG of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PICAH] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_a.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueA[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PICAH] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_a.get(7);
                                 }
                             }
@@ -7520,18 +7520,18 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring, false, true) / 10);
                         if ( piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PICAH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PICAH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
-                                minContactDistances[ResContactInfo.PICAH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
+                            if (minContactDistances[MolContactInfo.PICAH] < 0 || piDist > minContactDistances[MolContactInfo.PICAH]) {
+                                minContactDistances[MolContactInfo.PICAH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PICAH] = 1; //CA
                                 if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                    contactAtomNumInResidueA[ResContactInfo.PICAH] = 5; //CG of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PICAH] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_a.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueA[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PICAH] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_a.get(7);
                                 }
                             }
@@ -7558,18 +7558,18 @@ public class Main {
                         if (hd.getAtomName().contains("HD")) {
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(6), hd, six_ring) / 10);
                         if ( piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PIPROCDH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PIPROCDH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
-                                minContactDistances[ResContactInfo.PIPROCDH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
+                            if (minContactDistances[MolContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[MolContactInfo.PIPROCDH]) {
+                                minContactDistances[MolContactInfo.PIPROCDH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PIPROCDH] = 6; //CD
                                 if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                    contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = 5; //CG of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_a.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_a.get(7);
                                 }
                             }
@@ -7581,18 +7581,18 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(6), hd, six_ring, false, true) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PIPROCDH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PIPROCDH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
-                                minContactDistances[ResContactInfo.PIPROCDH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
+                            if (minContactDistances[MolContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[MolContactInfo.PIPROCDH]) {
+                                minContactDistances[MolContactInfo.PIPROCDH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PIPROCDH] = 6; //CD
                                 if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                    contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = 5; //CG of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = 5; //CG of six_ring
                                     donorAcceptor[1] = atoms_a.get(5);
                                 }
                                 else {
-                                    contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = 7; //CD2 of six_ring
+                                    contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = 7; //CD2 of six_ring
                                     donorAcceptor[1] = atoms_a.get(7);
                                 }
                             }
@@ -7605,13 +7605,13 @@ public class Main {
                         if ("TRP".equals(a.getName3())) {
                             piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(6), hd, five_ring) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PIPROCDH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PIPROCDH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
-                                    minContactDistances[ResContactInfo.PIPROCDH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
-                                    contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = 5; //CG of five_ring
+                                if (minContactDistances[MolContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[MolContactInfo.PIPROCDH]) {
+                                    minContactDistances[MolContactInfo.PIPROCDH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.PIPROCDH] = 6; //CD
+                                    contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = 5; //CG of five_ring
                                 }
 //                                System.out.println("New PIPROCDH: " + atoms_b.get(6).toString() + "/" + hd.toString());
                                 atomAtomContactType.add("PIPROCDH");
@@ -7622,13 +7622,13 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(6), hd, five_ring, false, true) / 10);
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.PIPROCDH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.PIPROCDH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
-                                    minContactDistances[ResContactInfo.PIPROCDH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
-                                    contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = 5; //CG of five_ring
+                                if (minContactDistances[MolContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[MolContactInfo.PIPROCDH]) {
+                                    minContactDistances[MolContactInfo.PIPROCDH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.PIPROCDH] = 6; //CD
+                                    contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = 5; //CG of five_ring
                                 }
 //                                System.out.println("New PIPROCDH: " + atoms_b.get(6).toString() + "/" + hd.toString());
                                 atomAtomContactType.add("PIPROCDH");
@@ -7661,18 +7661,18 @@ public class Main {
                             piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, six_ring) / 10);
                             
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PISH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PISH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
-                            minContactDistances[ResContactInfo.PISH] = piDist;
-                            contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
+                        if (minContactDistances[MolContactInfo.PISH] < 0 || piDist > minContactDistances[MolContactInfo.PISH]) {
+                            minContactDistances[MolContactInfo.PISH] = piDist;
+                            contactAtomNumInResidueB[MolContactInfo.PISH] = 5;
                             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.PISH] = 5; //CG of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PISH] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_a.get(5);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.PISH] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PISH] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_a.get(7);
                             }
                         }
@@ -7684,18 +7684,18 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, six_ring, false, true) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PISH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PISH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
-                            minContactDistances[ResContactInfo.PISH] = piDist;
-                            contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
+                        if (minContactDistances[MolContactInfo.PISH] < 0 || piDist > minContactDistances[MolContactInfo.PISH]) {
+                            minContactDistances[MolContactInfo.PISH] = piDist;
+                            contactAtomNumInResidueB[MolContactInfo.PISH] = 5;
                             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                                contactAtomNumInResidueA[ResContactInfo.PISH] = 5; //CG of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PISH] = 5; //CG of six_ring
                                 donorAcceptor[1] = atoms_a.get(5);
                             }
                             else {
-                                contactAtomNumInResidueA[ResContactInfo.PISH] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueA[MolContactInfo.PISH] = 7; //CD2 of six_ring
                                 donorAcceptor[1] = atoms_a.get(7);
                             }
                         }
@@ -7708,13 +7708,13 @@ public class Main {
                     if ("TRP".equals(a.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, five_ring) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PISH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PISH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
-                                minContactDistances[ResContactInfo.PISH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
-                                contactAtomNumInResidueA[ResContactInfo.PISH] = 5; //CG of five_ring
+                            if (minContactDistances[MolContactInfo.PISH] < 0 || piDist > minContactDistances[MolContactInfo.PISH]) {
+                                minContactDistances[MolContactInfo.PISH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PISH] = 5;
+                                contactAtomNumInResidueA[MolContactInfo.PISH] = 5; //CG of five_ring
                             }
 //                            System.out.println("New PISH: " + atoms_b.get(5).toString() + "/" + hg.toString());
                             atomAtomContactType.add("PISH");
@@ -7725,13 +7725,13 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, five_ring, false, true) / 10);
                         if (piDist > 0) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.PISH]++;
+                            numPairContacts[MolContactInfo.TT]++;
+                            numPairContacts[MolContactInfo.PISH]++;
                             donorAcceptor = new Atom[2];
-                            if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
-                                minContactDistances[ResContactInfo.PISH] = piDist;
-                                contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
-                                contactAtomNumInResidueA[ResContactInfo.PISH] = 5; //CG of five_ring
+                            if (minContactDistances[MolContactInfo.PISH] < 0 || piDist > minContactDistances[MolContactInfo.PISH]) {
+                                minContactDistances[MolContactInfo.PISH] = piDist;
+                                contactAtomNumInResidueB[MolContactInfo.PISH] = 5;
+                                contactAtomNumInResidueA[MolContactInfo.PISH] = 5; //CG of five_ring
                             }
 //                            System.out.println("New PISH: " + atoms_b.get(5).toString() + "/" + hg.toString());
                             atomAtomContactType.add("PISH");
@@ -7818,25 +7818,25 @@ public class Main {
                 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring) / 10);
                 if (piDist > 0) {
-                    numPairContacts[ResContactInfo.TT]++;
-                    numPairContacts[ResContactInfo.PIXOH]++;
+                    numPairContacts[MolContactInfo.TT]++;
+                    numPairContacts[MolContactInfo.PIXOH]++;
                     donorAcceptor = new Atom[2];
-                    if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
-                        minContactDistances[ResContactInfo.PIXOH] = piDist;
+                    if (minContactDistances[MolContactInfo.PIXOH] < 0 || piDist > minContactDistances[MolContactInfo.PIXOH]) {
+                        minContactDistances[MolContactInfo.PIXOH] = piDist;
                         if ("TYR".equals(b.getName3())) {
-                            contactAtomNumInResidueB[ResContactInfo.PIXOH] = 11;
+                            contactAtomNumInResidueB[MolContactInfo.PIXOH] = 11;
                             donorAcceptor[0] = atoms_b.get(11);
                         }
                         else {
-                            contactAtomNumInResidueB[ResContactInfo.PIXOH] = 5;
+                            contactAtomNumInResidueB[MolContactInfo.PIXOH] = 5;
                             donorAcceptor[0] = atoms_b.get(5);
                         }
                         if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                            contactAtomNumInResidueA[ResContactInfo.PIXOH] = 5; //CG of six_ring
+                            contactAtomNumInResidueA[MolContactInfo.PIXOH] = 5; //CG of six_ring
                             donorAcceptor[1] = atoms_a.get(5);
                         }
                         else {
-                            contactAtomNumInResidueA[ResContactInfo.PIXOH] = 7; //CD2 of six_ring
+                            contactAtomNumInResidueA[MolContactInfo.PIXOH] = 7; //CD2 of six_ring
                             donorAcceptor[1] = atoms_a.get(7);
                         }
                     }
@@ -7847,25 +7847,25 @@ public class Main {
 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring, false, true) / 10);
                 if (piDist > 0) {
-                    numPairContacts[ResContactInfo.TT]++;
-                    numPairContacts[ResContactInfo.PIXOH]++;
+                    numPairContacts[MolContactInfo.TT]++;
+                    numPairContacts[MolContactInfo.PIXOH]++;
                     donorAcceptor = new Atom[2];
-                    if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
-                        minContactDistances[ResContactInfo.PIXOH] = piDist;
+                    if (minContactDistances[MolContactInfo.PIXOH] < 0 || piDist > minContactDistances[MolContactInfo.PIXOH]) {
+                        minContactDistances[MolContactInfo.PIXOH] = piDist;
                         if ("TYR".equals(b.getName3())) {
-                            contactAtomNumInResidueB[ResContactInfo.PIXOH] = 11;
+                            contactAtomNumInResidueB[MolContactInfo.PIXOH] = 11;
                             donorAcceptor[0] = atoms_b.get(11);
                         }
                         else {
-                            contactAtomNumInResidueB[ResContactInfo.PIXOH] = 5;
+                            contactAtomNumInResidueB[MolContactInfo.PIXOH] = 5;
                             donorAcceptor[0] = atoms_b.get(5);
                         }
                         if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                            contactAtomNumInResidueA[ResContactInfo.PIXOH] = 5; //CG of six_ring
+                            contactAtomNumInResidueA[MolContactInfo.PIXOH] = 5; //CG of six_ring
                             donorAcceptor[1] = atoms_a.get(5);
                         }
                         else {
-                            contactAtomNumInResidueA[ResContactInfo.PIXOH] = 7; //CD2 of six_ring
+                            contactAtomNumInResidueA[MolContactInfo.PIXOH] = 7; //CD2 of six_ring
                             donorAcceptor[1] = atoms_a.get(7);
                         }
                     }
@@ -7877,20 +7877,20 @@ public class Main {
                 if ("TRP".equals(a.getName3())) {
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PIXOH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PIXOH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
-                            minContactDistances[ResContactInfo.PIXOH] = piDist;
+                        if (minContactDistances[MolContactInfo.PIXOH] < 0 || piDist > minContactDistances[MolContactInfo.PIXOH]) {
+                            minContactDistances[MolContactInfo.PIXOH] = piDist;
                             if ("TYR".equals(b.getName3())) {
-                                contactAtomNumInResidueB[ResContactInfo.PIXOH] = 11;
+                                contactAtomNumInResidueB[MolContactInfo.PIXOH] = 11;
                                 donorAcceptor[0] = atoms_b.get(11);
                             }
                             else {
-                                contactAtomNumInResidueB[ResContactInfo.PIXOH] = 5;
+                                contactAtomNumInResidueB[MolContactInfo.PIXOH] = 5;
                                 donorAcceptor[0] = atoms_b.get(5);
                             }
-                            contactAtomNumInResidueA[ResContactInfo.PIXOH] = 5; //CG of five_ring
+                            contactAtomNumInResidueA[MolContactInfo.PIXOH] = 5; //CG of five_ring
                         }
 //                        System.out.println("New PIXOH: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         atomAtomContactType.add("PIXOH");
@@ -7900,20 +7900,20 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring, false, true) / 10);
                     if (piDist > 0) {
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.PIXOH]++;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.PIXOH]++;
                         donorAcceptor = new Atom[2];
-                        if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
-                            minContactDistances[ResContactInfo.PIXOH] = piDist;
+                        if (minContactDistances[MolContactInfo.PIXOH] < 0 || piDist > minContactDistances[MolContactInfo.PIXOH]) {
+                            minContactDistances[MolContactInfo.PIXOH] = piDist;
                             if ("TYR".equals(b.getName3())) {
-                                contactAtomNumInResidueB[ResContactInfo.PIXOH] = 11;
+                                contactAtomNumInResidueB[MolContactInfo.PIXOH] = 11;
                                 donorAcceptor[0] = atoms_b.get(11);
                             }
                             else {
-                                contactAtomNumInResidueB[ResContactInfo.PIXOH] = 5;
+                                contactAtomNumInResidueB[MolContactInfo.PIXOH] = 5;
                                 donorAcceptor[0] = atoms_b.get(5);
                             }
-                            contactAtomNumInResidueA[ResContactInfo.PIXOH] = 5; //CG of five_ring
+                            contactAtomNumInResidueA[MolContactInfo.PIXOH] = 5; //CG of five_ring
                         }
 //                        System.out.println("New PIXOH: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         atomAtomContactType.add("PIXOH");
@@ -7959,18 +7959,18 @@ public class Main {
                                     piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_a.get(5), atoms_a.get(6)) / 10);
                                 }
                             if (piDist > 0) {
-                                numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CCOCAH]++;
+                                numPairContacts[MolContactInfo.TT]++;
+                                numPairContacts[MolContactInfo.CCOCAH]++;
                                 donorAcceptor = new Atom[2];
-                                if (minContactDistances[ResContactInfo.CCOCAH] < 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
-                                    minContactDistances[ResContactInfo.CCOCAH] = piDist;
-                                    contactAtomNumInResidueB[ResContactInfo.CCOCAH] = 1; //CA
+                                if (minContactDistances[MolContactInfo.CCOCAH] < 0 || piDist > minContactDistances[MolContactInfo.CCOCAH]) {
+                                    minContactDistances[MolContactInfo.CCOCAH] = piDist;
+                                    contactAtomNumInResidueB[MolContactInfo.CCOCAH] = 1; //CA
                                     if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
-                                        contactAtomNumInResidueA[ResContactInfo.CCOCAH] = 7; //OE1
+                                        contactAtomNumInResidueA[MolContactInfo.CCOCAH] = 7; //OE1
                                         donorAcceptor[1] = atoms_a.get(7);
                                     }
                                     else {
-                                        contactAtomNumInResidueA[ResContactInfo.CCOCAH] = 6; //OD1
+                                        contactAtomNumInResidueA[MolContactInfo.CCOCAH] = 6; //OD1
                                         donorAcceptor[1] = atoms_a.get(6);
                                     }
                                 }
@@ -8023,13 +8023,13 @@ public class Main {
                 
                     piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_a.get(2), atoms_a.get(3)) / 10);
                 if (piDist > 0) {
-                    numPairContacts[ResContactInfo.TT]++;
-                    numPairContacts[ResContactInfo.BCOCAH]++;
+                    numPairContacts[MolContactInfo.TT]++;
+                    numPairContacts[MolContactInfo.BCOCAH]++;
                     donorAcceptor = new Atom[2];
-                    if (minContactDistances[ResContactInfo.BCOCAH] < 0 || piDist > minContactDistances[ResContactInfo.BCOCAH]) {
-                        minContactDistances[ResContactInfo.BCOCAH] = piDist;
-                        contactAtomNumInResidueB[ResContactInfo.BCOCAH] = 1; //CA
-                        contactAtomNumInResidueA[ResContactInfo.BCOCAH] = 3; //O         
+                    if (minContactDistances[MolContactInfo.BCOCAH] < 0 || piDist > minContactDistances[MolContactInfo.BCOCAH]) {
+                        minContactDistances[MolContactInfo.BCOCAH] = piDist;
+                        contactAtomNumInResidueB[MolContactInfo.BCOCAH] = 1; //CA
+                        contactAtomNumInResidueA[MolContactInfo.BCOCAH] = 3; //O         
                     }
 //                    System.out.println("New BCOCAH: " + ca.toString() + "/" + ha.toString());
                     atomAtomContactType.add("BCICAH");
@@ -8066,8 +8066,8 @@ public class Main {
         }
         
          // Iteration through all atoms of the two residues is done
-        if(numPairContacts[ResContactInfo.TT] > 0) {
-            result = new ResContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+        if(numPairContacts[MolContactInfo.TT] > 0) {
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
         }
         else {
             result = null;
@@ -8082,9 +8082,9 @@ public class Main {
      * atoms that are used to detect protein-protein interactions.
      * @param a one of the residues of the residue pair
      * @param b one of the residues of the residue pair
-     * @return A ResContactInfo object with information on the atom contacts between 'a' and 'b'.
+     * @return A MolContactInfo object with information on the atom contacts between 'a' and 'b'.
      */
-    public static ResContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Residue a, Residue b) {
+    public static MolContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Residue a, Residue b) {
 
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
@@ -8092,7 +8092,7 @@ public class Main {
         Atom x, y;
         Integer dist = null;
         Integer CAdist = a.resCenterDistTo(b);
-        ResContactInfo result = null;
+        MolContactInfo result = null;
         
         ArrayList<Atom[]> atomAtomContacts = new ArrayList<Atom[]>();
         Atom[] donorAcceptor = new Atom[2];
@@ -8173,7 +8173,7 @@ public class Main {
             // The initial value of '-1' is required for the atom index arrays because our index
             // starts at '0', but geom_neo treads a '0' in a line of <pdbid>.geo as 'no contact' because
             // it starts its index at '1'.
-            // This problem is solved by the functions in ResContactInfo: they return (our_index + 1). This
+            // This problem is solved by the functions in MolContactInfo: they return (our_index + 1). This
             // means that:
             //   1) If no contact was detected, our_index is -1 and they return 0, which means 'no contact' to geom_neo.
             //   2) If a contact was detected, our_index is converted to the geom_neo index. :)
@@ -8205,8 +8205,8 @@ public class Main {
         // If that's the case, then add this contact to the statistics.
         for(ArrayList<Integer> valuePair : interchainSB.values()) {
                 if((a.getDsspNum().equals(valuePair.get(0)) && b.getDsspNum().equals(valuePair.get(1))) || (a.getDsspNum().equals(valuePair.get(1)) && b.getDsspNum().equals(valuePair.get(0)))) {
-                    numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
-                    numPairContacts[ResContactInfo.ISS]++;   // update disulfide bridge number of contacts for this residue pair
+                    numPairContacts[MolContactInfo.TT]++;   // update total number of contacts for this residue pair
+                    numPairContacts[MolContactInfo.ISS]++;   // update disulfide bridge number of contacts for this residue pair
                 }
         }
         
@@ -8255,12 +8255,12 @@ public class Main {
                             for (Atom h : a.getHydrogenAtoms()) {
                                 if (h.getAtomName().equals(" H  ")) {
                                     if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && h.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
-                                        numPairContacts[ResContactInfo.TT]++;
-                                        numPairContacts[ResContactInfo.BBHB]++;
-                                        if ((minContactDistances[ResContactInfo.BBHB] < 0) || dist < minContactDistances[ResContactInfo.BBHB]) {
-                                            minContactDistances[ResContactInfo.BBHB] = dist;
-                                            contactAtomNumInResidueA[ResContactInfo.BBHB] = i;
-                                            contactAtomNumInResidueB[ResContactInfo.BBHB] = j;
+                                        numPairContacts[MolContactInfo.TT]++;
+                                        numPairContacts[MolContactInfo.BBHB]++;
+                                        if ((minContactDistances[MolContactInfo.BBHB] < 0) || dist < minContactDistances[MolContactInfo.BBHB]) {
+                                            minContactDistances[MolContactInfo.BBHB] = dist;
+                                            contactAtomNumInResidueA[MolContactInfo.BBHB] = i;
+                                            contactAtomNumInResidueB[MolContactInfo.BBHB] = j;
                                         }
 //                                        System.out.println("New BB NHO: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BBNHO");
@@ -8279,12 +8279,12 @@ public class Main {
                             for (Atom h : b.getHydrogenAtoms()) {
                                 if (h.getAtomName().equals(" H  ")) {
                                     if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && h.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
-                                        numPairContacts[ResContactInfo.TT]++;
-                                        numPairContacts[ResContactInfo.BBBH]++;
-                                        if ((minContactDistances[ResContactInfo.BBBH] < 0) || dist < minContactDistances[ResContactInfo.BBBH]) {
-                                            minContactDistances[ResContactInfo.BBBH] = dist;
-                                            contactAtomNumInResidueA[ResContactInfo.BBBH] = i;
-                                            contactAtomNumInResidueB[ResContactInfo.BBBH] = j;
+                                        numPairContacts[MolContactInfo.TT]++;
+                                        numPairContacts[MolContactInfo.BBBH]++;
+                                        if ((minContactDistances[MolContactInfo.BBBH] < 0) || dist < minContactDistances[MolContactInfo.BBBH]) {
+                                            minContactDistances[MolContactInfo.BBBH] = dist;
+                                            contactAtomNumInResidueA[MolContactInfo.BBBH] = i;
+                                            contactAtomNumInResidueB[MolContactInfo.BBBH] = j;
                                         }
 //                                        System.out.println("New BB ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BBONH");
@@ -8311,12 +8311,12 @@ public class Main {
                                         || b.getName3().equals("GLN") && h.getAtomName().matches("HE21|HE22")
                                         || b.getName3().equals("TRP") && h.getAtomName().equals(" HE1")) {
                                     if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && h.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
-                                        numPairContacts[ResContactInfo.TT]++;
-                                        numPairContacts[ResContactInfo.BCBH]++;
-                                        if (minContactDistances[ResContactInfo.BCBH] < 0 || dist < minContactDistances[ResContactInfo.BCBH]) {
-                                            minContactDistances[ResContactInfo.BCBH] = dist;
-                                            contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
-                                            contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
+                                        numPairContacts[MolContactInfo.TT]++;
+                                        numPairContacts[MolContactInfo.BCBH]++;
+                                        if (minContactDistances[MolContactInfo.BCBH] < 0 || dist < minContactDistances[MolContactInfo.BCBH]) {
+                                            minContactDistances[MolContactInfo.BCBH] = dist;
+                                            contactAtomNumInResidueA[MolContactInfo.BCBH] = i;
+                                            contactAtomNumInResidueB[MolContactInfo.BCBH] = j;
                                         }
 //                                        System.out.println("New BS ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BSONH");
@@ -8339,12 +8339,12 @@ public class Main {
                                         || a.getName3().equals("GLN") && h.getAtomName().matches("HE21|HE22")
                                         || a.getName3().equals("TRP") && h.getAtomName().equals(" HE1")) {
                                     if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && h.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
-                                        numPairContacts[ResContactInfo.TT]++;
-                                        numPairContacts[ResContactInfo.CBHB]++;
-                                        if ((minContactDistances[ResContactInfo.CBHB] < 0) || dist < minContactDistances[ResContactInfo.CBHB]) {
-                                            minContactDistances[ResContactInfo.CBHB] = dist;
-                                            contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
-                                            contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
+                                        numPairContacts[MolContactInfo.TT]++;
+                                        numPairContacts[MolContactInfo.CBHB]++;
+                                        if ((minContactDistances[MolContactInfo.CBHB] < 0) || dist < minContactDistances[MolContactInfo.CBHB]) {
+                                            minContactDistances[MolContactInfo.CBHB] = dist;
+                                            contactAtomNumInResidueA[MolContactInfo.CBHB] = i;
+                                            contactAtomNumInResidueB[MolContactInfo.CBHB] = j;
                                         }
 //                                        System.out.println("New SB ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("SBONH");
@@ -8368,12 +8368,12 @@ public class Main {
                                         || b.getName3().equals("THR") && h.getAtomName().equals(" HG1")
                                         || b.getName3().equals("TYR") && h.getAtomName().matches(" HH ")) {
                                     if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && h.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
-                                        numPairContacts[ResContactInfo.TT]++;
-                                        numPairContacts[ResContactInfo.BCBH]++;
-                                        if ((minContactDistances[ResContactInfo.BCBH] < 0) || dist < minContactDistances[ResContactInfo.BCBH]) {
-                                            minContactDistances[ResContactInfo.BCBH] = dist;
-                                            contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
-                                            contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
+                                        numPairContacts[MolContactInfo.TT]++;
+                                        numPairContacts[MolContactInfo.BCBH]++;
+                                        if ((minContactDistances[MolContactInfo.BCBH] < 0) || dist < minContactDistances[MolContactInfo.BCBH]) {
+                                            minContactDistances[MolContactInfo.BCBH] = dist;
+                                            contactAtomNumInResidueA[MolContactInfo.BCBH] = i;
+                                            contactAtomNumInResidueB[MolContactInfo.BCBH] = j;
                                         }
 //                                        System.out.println("New BS OOH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BSOOH");
@@ -8395,12 +8395,12 @@ public class Main {
                                         || a.getName3().equals("THR") && h.getAtomName().equals(" HG1")
                                         || a.getName3().equals("TYR") && h.getAtomName().matches(" HH ")) {
                                     if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && h.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
-                                        numPairContacts[ResContactInfo.TT]++;
-                                        numPairContacts[ResContactInfo.CBHB]++;
-                                        if ((minContactDistances[ResContactInfo.CBHB] < 0) || dist < minContactDistances[ResContactInfo.CBHB]) {
-                                            minContactDistances[ResContactInfo.CBHB] = dist;
-                                            contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
-                                            contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
+                                        numPairContacts[MolContactInfo.TT]++;
+                                        numPairContacts[MolContactInfo.CBHB]++;
+                                        if ((minContactDistances[MolContactInfo.CBHB] < 0) || dist < minContactDistances[MolContactInfo.CBHB]) {
+                                            minContactDistances[MolContactInfo.CBHB] = dist;
+                                            contactAtomNumInResidueA[MolContactInfo.CBHB] = i;
+                                            contactAtomNumInResidueB[MolContactInfo.CBHB] = j;
                                         }
 //                                        System.out.println("New SB ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("SBONH");
@@ -8427,12 +8427,12 @@ public class Main {
                                     if (h.getAtomName().equals(" H  ")) {
                                         if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("ASP|ASN") && h.hbondAtomAngleBetween(y, atoms_b.get(5))
                                                 || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("GLU|GLN") && h.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.BCHB]++;
-                                            if ((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.BCHB]++;
+                                            if ((minContactDistances[MolContactInfo.BCHB] < 0) || dist < minContactDistances[MolContactInfo.BCHB]) {
+                                                minContactDistances[MolContactInfo.BCHB] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.BCHB] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.BCHB] = j;
                                             }
 //                                            System.out.println("New BS NHO: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHO");
@@ -8462,12 +8462,12 @@ public class Main {
                                         if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("ASP|ASN") && h.hbondAtomAngleBetween(x, atoms_a.get(5))
                                                 || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("GLU|GLN") && h.hbondAtomAngleBetween(x, atoms_a.get(6))) {
 
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.CBBH]++;
-                                            if ((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.CBBH]++;
+                                            if ((minContactDistances[MolContactInfo.CBBH] < 0) || dist < minContactDistances[MolContactInfo.CBBH]) {
+                                                minContactDistances[MolContactInfo.CBBH] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.CBBH] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.CBBH] = j;
                                             }
 //                                            System.out.println("New SB NHO: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHO");
@@ -8498,12 +8498,12 @@ public class Main {
                                     if (h.getAtomName().equals(" H  ")) {
                                         if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("SER|THR") && h.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))
                                                 || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("TYR") && h.hbondAtomAngleBetween(y, atoms_b.get(10))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.BCHB]++;
-                                            if ((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.BCHB]++;
+                                            if ((minContactDistances[MolContactInfo.BCHB] < 0) || dist < minContactDistances[MolContactInfo.BCHB]) {
+                                                minContactDistances[MolContactInfo.BCHB] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.BCHB] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.BCHB] = j;
                                             }
 //                                            System.out.println("New BS NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHOH");
@@ -8521,12 +8521,12 @@ public class Main {
                                             || b.getName3().equals("THR") && h.getAtomName().equals(" HG1")
                                             || b.getName3().equals("TYR") && h.getAtomName().matches(" HH ")) {
                                         if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && h.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.BCBH]++;
-                                            if ((minContactDistances[ResContactInfo.BCBH] < 0) || dist < minContactDistances[ResContactInfo.BCBH]) {
-                                                minContactDistances[ResContactInfo.BCBH] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.BCBH]++;
+                                            if ((minContactDistances[MolContactInfo.BCBH] < 0) || dist < minContactDistances[MolContactInfo.BCBH]) {
+                                                minContactDistances[MolContactInfo.BCBH] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.BCBH] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.BCBH] = j;
                                             }
 //                                            System.out.println("New BS NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHOH");
@@ -8555,12 +8555,12 @@ public class Main {
                                     if (h.getAtomName().equals(" H  ")) {
                                         if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("SER|THR") && h.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))
                                                 || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("TYR") && h.hbondAtomAngleBetween(x, atoms_a.get(10))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.CBBH]++;
-                                            if ((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.CBBH]++;
+                                            if ((minContactDistances[MolContactInfo.CBBH] < 0) || dist < minContactDistances[MolContactInfo.CBBH]) {
+                                                minContactDistances[MolContactInfo.CBBH] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.CBBH] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.CBBH] = j;
                                             }
 //                                            System.out.println("New SB NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHOH");
@@ -8578,12 +8578,12 @@ public class Main {
                                             || a.getName3().equals("THR") && h.getAtomName().equals(" HG1")
                                             || a.getName3().equals("TYR") && h.getAtomName().matches(" HH ")) {
                                         if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && h.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneCa))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.CBHB]++;
-                                            if ((minContactDistances[ResContactInfo.CBHB] < 0) || dist < minContactDistances[ResContactInfo.CBHB]) {
-                                                minContactDistances[ResContactInfo.CBHB] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.CBHB]++;
+                                            if ((minContactDistances[MolContactInfo.CBHB] < 0) || dist < minContactDistances[MolContactInfo.CBHB]) {
+                                                minContactDistances[MolContactInfo.CBHB] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.CBHB] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.CBHB] = j;
                                             }
 //                                            System.out.println("New SB NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHOH");
@@ -8624,12 +8624,12 @@ public class Main {
                                                 || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("LYS") && h.hbondAtomAngleBetween(y, atoms_b.get(7))
                                                 || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("ARG|HIS") && h.hbondAtomAngleBetween(y, atoms_b.get(8))
                                                 || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("TRP") && h.hbondAtomAngleBetween(y, atoms_b.get(9))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.BCHB]++;
-                                            if ((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.BCHB]++;
+                                            if ((minContactDistances[MolContactInfo.BCHB] < 0) || dist < minContactDistances[MolContactInfo.BCHB]) {
+                                                minContactDistances[MolContactInfo.BCHB] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.BCHB] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.BCHB] = j;
                                             }
 //                                            System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHNH");
@@ -8651,12 +8651,12 @@ public class Main {
                                             || b.getName3().equals("GLN") && h.getAtomName().matches("HE21|HE22")
                                             || b.getName3().equals("TRP") && h.getAtomName().equals(" HE1")) {
                                         if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && h.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.BCBH]++;
-                                            if ((minContactDistances[ResContactInfo.BCBH] < 0) || dist < minContactDistances[ResContactInfo.BCBH]) {
-                                                minContactDistances[ResContactInfo.BCBH] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.BCBH]++;
+                                            if ((minContactDistances[MolContactInfo.BCBH] < 0) || dist < minContactDistances[MolContactInfo.BCBH]) {
+                                                minContactDistances[MolContactInfo.BCBH] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.BCBH] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.BCBH] = j;
                                             }
 //                                            System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHNH");
@@ -8694,12 +8694,12 @@ public class Main {
                                                 || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("LYS") && h.hbondAtomAngleBetween(x, atoms_a.get(7))
                                                 || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("ARG|HIS") && h.hbondAtomAngleBetween(x, atoms_a.get(8))
                                                 || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("TRP") && h.hbondAtomAngleBetween(x, atoms_a.get(9))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.CBBH]++;
-                                            if ((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.CBBH]++;
+                                            if ((minContactDistances[MolContactInfo.CBBH] < 0) || dist < minContactDistances[MolContactInfo.CBBH]) {
+                                                minContactDistances[MolContactInfo.CBBH] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.CBBH] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.CBBH] = j;
                                             }
 //                                            System.out.println("New SB NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHNH");
@@ -8721,12 +8721,12 @@ public class Main {
                                             || a.getName3().equals("GLN") && h.getAtomName().matches("HE21|HE22")
                                             || a.getName3().equals("TRP") && h.getAtomName().equals(" HE1")) {
                                         if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && h.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneCa))) {
-                                            numPairContacts[ResContactInfo.TT]++;
-                                            numPairContacts[ResContactInfo.CBHB]++;
-                                            if ((minContactDistances[ResContactInfo.CBHB] < 0) || dist < minContactDistances[ResContactInfo.CBHB]) {
-                                                minContactDistances[ResContactInfo.CBHB] = dist;
-                                                contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
-                                                contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
+                                            numPairContacts[MolContactInfo.TT]++;
+                                            numPairContacts[MolContactInfo.CBHB]++;
+                                            if ((minContactDistances[MolContactInfo.CBHB] < 0) || dist < minContactDistances[MolContactInfo.CBHB]) {
+                                                minContactDistances[MolContactInfo.CBHB] = dist;
+                                                contactAtomNumInResidueA[MolContactInfo.CBHB] = i;
+                                                contactAtomNumInResidueB[MolContactInfo.CBHB] = j;
                                             }
 //                                            System.out.println("New SB NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHNH");
@@ -8767,12 +8767,12 @@ public class Main {
                                             
                                             if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("ASP|ASN") && h.hbondAtomAngleBetween(x, atoms_a.get(5))
                                                     || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("GLU|GLN") && h.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCBH]++;
-                                                if ((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                                    minContactDistances[ResContactInfo.CCBH] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCBH]++;
+                                                if ((minContactDistances[MolContactInfo.CCBH] < 0) || dist < minContactDistances[MolContactInfo.CCBH]) {
+                                                    minContactDistances[MolContactInfo.CCBH] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCBH] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCBH] = j;
                                                 }
 //                                                System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSONH");
@@ -8810,12 +8810,12 @@ public class Main {
                                             
                                             if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("ASP|ASN") && h.hbondAtomAngleBetween(y, atoms_b.get(5))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("GLU|GLN") && h.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCHB]++;
-                                                if ((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                                    minContactDistances[ResContactInfo.CCHB] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCHB]++;
+                                                if ((minContactDistances[MolContactInfo.CCHB] < 0) || dist < minContactDistances[MolContactInfo.CCHB]) {
+                                                    minContactDistances[MolContactInfo.CCHB] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCHB] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSONH");
@@ -8853,12 +8853,12 @@ public class Main {
                                                 || b.getName3().equals("TYR") && h.getAtomName().matches(" HH ")) {
                                             if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("ASP|ASN") && h.hbondAtomAngleBetween(x, atoms_a.get(5))
                                                     || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("GLU|GLN") && h.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCBH]++;
-                                                if ((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                                    minContactDistances[ResContactInfo.CCBH] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCBH]++;
+                                                if ((minContactDistances[MolContactInfo.CCBH] < 0) || dist < minContactDistances[MolContactInfo.CCBH]) {
+                                                    minContactDistances[MolContactInfo.CCBH] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCBH] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCBH] = j;
                                                 }
 //                                                System.out.println("New SS OOH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOOH");
@@ -8889,12 +8889,12 @@ public class Main {
                                             if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("ASP|ASN") && h.hbondAtomAngleBetween(y, atoms_b.get(5))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("GLU|GLN") && h.hbondAtomAngleBetween(y, atoms_b.get(6))) {
 
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCHB]++;
-                                                if ((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                                    minContactDistances[ResContactInfo.CCHB] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCHB]++;
+                                                if ((minContactDistances[MolContactInfo.CCHB] < 0) || dist < minContactDistances[MolContactInfo.CCHB]) {
+                                                    minContactDistances[MolContactInfo.CCHB] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCHB] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS OOH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOOH");
@@ -8940,12 +8940,12 @@ public class Main {
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("LYS") && h.hbondAtomAngleBetween(y, atoms_b.get(7))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("ARG|HIS") && h.hbondAtomAngleBetween(y, atoms_b.get(8))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("TRP") && h.hbondAtomAngleBetween(y, atoms_b.get(9))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCHB]++;
-                                                if ((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                                    minContactDistances[ResContactInfo.CCHB] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCHB]++;
+                                                if ((minContactDistances[MolContactInfo.CCHB] < 0) || dist < minContactDistances[MolContactInfo.CCHB]) {
+                                                    minContactDistances[MolContactInfo.CCHB] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCHB] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOHNH");
@@ -8981,12 +8981,12 @@ public class Main {
 
                                                 if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("SER|THR") && h.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("TYR") && h.hbondAtomAngleBetween(x, atoms_a.get(10))) {
-                                                    numPairContacts[ResContactInfo.TT]++;
-                                                    numPairContacts[ResContactInfo.CCBH]++;
-                                                    if ((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                                        minContactDistances[ResContactInfo.CCBH] = dist;
-                                                        contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                                        contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
+                                                    numPairContacts[MolContactInfo.TT]++;
+                                                    numPairContacts[MolContactInfo.CCBH]++;
+                                                    if ((minContactDistances[MolContactInfo.CCBH] < 0) || dist < minContactDistances[MolContactInfo.CCBH]) {
+                                                        minContactDistances[MolContactInfo.CCBH] = dist;
+                                                        contactAtomNumInResidueA[MolContactInfo.CCBH] = i;
+                                                        contactAtomNumInResidueB[MolContactInfo.CCBH] = j;
                                                     }
 //                                                    System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSOHNH");
@@ -9027,12 +9027,12 @@ public class Main {
 
                                             if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("SER|THR") && h.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("TYR") && h.hbondAtomAngleBetween(y, atoms_b.get(10))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCHB]++;
-                                                if ((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                                    minContactDistances[ResContactInfo.CCHB] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCHB]++;
+                                                if ((minContactDistances[MolContactInfo.CCHB] < 0) || dist < minContactDistances[MolContactInfo.CCHB]) {
+                                                    minContactDistances[MolContactInfo.CCHB] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCHB] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOHNH");
@@ -9073,12 +9073,12 @@ public class Main {
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("LYS") && h.hbondAtomAngleBetween(x, atoms_a.get(7))
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("ARG|HIS") && h.hbondAtomAngleBetween(x, atoms_a.get(8))
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("TRP") && h.hbondAtomAngleBetween(x, atoms_a.get(9))) {
-                                                    numPairContacts[ResContactInfo.TT]++;
-                                                    numPairContacts[ResContactInfo.CCBH]++;
-                                                    if ((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                                        minContactDistances[ResContactInfo.CCBH] = dist;
-                                                        contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                                        contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
+                                                    numPairContacts[MolContactInfo.TT]++;
+                                                    numPairContacts[MolContactInfo.CCBH]++;
+                                                    if ((minContactDistances[MolContactInfo.CCBH] < 0) || dist < minContactDistances[MolContactInfo.CCBH]) {
+                                                        minContactDistances[MolContactInfo.CCBH] = dist;
+                                                        contactAtomNumInResidueA[MolContactInfo.CCBH] = i;
+                                                        contactAtomNumInResidueB[MolContactInfo.CCBH] = j;
                                                     }
 //                                                    System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSOHNH");
@@ -9118,12 +9118,12 @@ public class Main {
 
                                             if (h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("SER|THR") && h.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("TYR") && h.hbondAtomAngleBetween(y, atoms_b.get(10))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCHB]++;
-                                                if ((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                                    minContactDistances[ResContactInfo.CCHB] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCHB]++;
+                                                if ((minContactDistances[MolContactInfo.CCHB] < 0) || dist < minContactDistances[MolContactInfo.CCHB]) {
+                                                    minContactDistances[MolContactInfo.CCHB] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCHB] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS OHOH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOHOH");
@@ -9156,12 +9156,12 @@ public class Main {
 
                                                 if (h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("SER|THR") && h.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("TYR") && h.hbondAtomAngleBetween(x, atoms_a.get(10))) {
-                                                    numPairContacts[ResContactInfo.TT]++;
-                                                    numPairContacts[ResContactInfo.CCBH]++;
-                                                    if ((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                                        minContactDistances[ResContactInfo.CCBH] = dist;
-                                                        contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                                        contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
+                                                    numPairContacts[MolContactInfo.TT]++;
+                                                    numPairContacts[MolContactInfo.CCBH]++;
+                                                    if ((minContactDistances[MolContactInfo.CCBH] < 0) || dist < minContactDistances[MolContactInfo.CCBH]) {
+                                                        minContactDistances[MolContactInfo.CCBH] = dist;
+                                                        contactAtomNumInResidueA[MolContactInfo.CCBH] = i;
+                                                        contactAtomNumInResidueB[MolContactInfo.CCBH] = j;
                                                     }
 //                                                    System.out.println("New SS OHOH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSOHOH");
@@ -9213,12 +9213,12 @@ public class Main {
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("LYS") && h.hbondAtomAngleBetween(y, atoms_b.get(7))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().matches("ARG|HIS") && h.hbondAtomAngleBetween(y, atoms_b.get(8))
                                                     || h.distToAtom(y) < 25 && x.hbondAtomAngleBetween(h, y) && b.getName3().equals("TRP") && h.hbondAtomAngleBetween(y, atoms_b.get(9))) {
-                                                numPairContacts[ResContactInfo.TT]++;
-                                                numPairContacts[ResContactInfo.CCHB]++;
-                                                if ((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                                    minContactDistances[ResContactInfo.CCHB] = dist;
-                                                    contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                                    contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
+                                                numPairContacts[MolContactInfo.TT]++;
+                                                numPairContacts[MolContactInfo.CCHB]++;
+                                                if ((minContactDistances[MolContactInfo.CCHB] < 0) || dist < minContactDistances[MolContactInfo.CCHB]) {
+                                                    minContactDistances[MolContactInfo.CCHB] = dist;
+                                                    contactAtomNumInResidueA[MolContactInfo.CCHB] = i;
+                                                    contactAtomNumInResidueB[MolContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS NHNH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSNHNH");
@@ -9263,12 +9263,12 @@ public class Main {
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("LYS") && h.hbondAtomAngleBetween(x, atoms_a.get(7))
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().matches("ARG|HIS") && h.hbondAtomAngleBetween(x, atoms_a.get(8))
                                                         || h.distToAtom(x) < 25 && y.hbondAtomAngleBetween(h, x) && a.getName3().equals("TRP") && h.hbondAtomAngleBetween(x, atoms_a.get(9))) {
-                                                    numPairContacts[ResContactInfo.TT]++;
-                                                    numPairContacts[ResContactInfo.CCBH]++;
-                                                    if ((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                                        minContactDistances[ResContactInfo.CCBH] = dist;
-                                                        contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                                        contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
+                                                    numPairContacts[MolContactInfo.TT]++;
+                                                    numPairContacts[MolContactInfo.CCBH]++;
+                                                    if ((minContactDistances[MolContactInfo.CCBH] < 0) || dist < minContactDistances[MolContactInfo.CCBH]) {
+                                                        minContactDistances[MolContactInfo.CCBH] = dist;
+                                                        contactAtomNumInResidueA[MolContactInfo.CCBH] = i;
+                                                        contactAtomNumInResidueB[MolContactInfo.CCBH] = j;
                                                     }
 //                                                    System.out.println("New SS NHNH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSNHNH");
@@ -9334,12 +9334,12 @@ public class Main {
                     // Determine the contact type.                    
                     if(x.isProteinAtom() && y.isProteinAtom()) {
                         // *************************** protein - protein contact *************************
-                        numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.IVDW]++;
-                        if(minContactDistances[ResContactInfo.IVDW] < 0 || dist < minContactDistances[ResContactInfo.IVDW]) {
-                            minContactDistances[ResContactInfo.IVDW] = dist;
-                            contactAtomNumInResidueA[ResContactInfo.IVDW] = i;
-                            contactAtomNumInResidueB[ResContactInfo.IVDW] = j;
+                        numPairContacts[MolContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.IVDW]++;
+                        if(minContactDistances[MolContactInfo.IVDW] < 0 || dist < minContactDistances[MolContactInfo.IVDW]) {
+                            minContactDistances[MolContactInfo.IVDW] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.IVDW] = i;
+                            contactAtomNumInResidueB[MolContactInfo.IVDW] = j;
                         }
 //                        System.out.println("New IVDW: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("IVDW");
@@ -9352,48 +9352,48 @@ public class Main {
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - backbone contact
-                            numPairContacts[ResContactInfo.BB]++;
+                            numPairContacts[MolContactInfo.BB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.BB] < 0) || dist < minContactDistances[ResContactInfo.BB]) {
-                                minContactDistances[ResContactInfo.BB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BB] = j;
+                            if((minContactDistances[MolContactInfo.BB] < 0) || dist < minContactDistances[MolContactInfo.BB]) {
+                                minContactDistances[MolContactInfo.BB] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.BB] = i;
+                                contactAtomNumInResidueB[MolContactInfo.BB] = j;
                             }
 
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a chainName - backbone contact
-                            numPairContacts[ResContactInfo.CB]++;
+                            numPairContacts[MolContactInfo.CB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.CB] < 0) || dist < minContactDistances[ResContactInfo.CB]) {
-                                minContactDistances[ResContactInfo.CB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CB] = j;
+                            if((minContactDistances[MolContactInfo.CB] < 0) || dist < minContactDistances[MolContactInfo.CB]) {
+                                minContactDistances[MolContactInfo.CB] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.CB] = i;
+                                contactAtomNumInResidueB[MolContactInfo.CB] = j;
                             }
 
                         }
                         else if(i <= numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - chainName contact
-                            numPairContacts[ResContactInfo.BC]++;
+                            numPairContacts[MolContactInfo.BC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.BC] < 0) || dist < minContactDistances[ResContactInfo.BC]) {
-                                minContactDistances[ResContactInfo.BC] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BC] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BC] = j;
+                            if((minContactDistances[MolContactInfo.BC] < 0) || dist < minContactDistances[MolContactInfo.BC]) {
+                                minContactDistances[MolContactInfo.BC] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.BC] = i;
+                                contactAtomNumInResidueB[MolContactInfo.BC] = j;
                             }
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a chainName - chainName contact
-                            numPairContacts[ResContactInfo.CC]++;          // 'C' instead of 'S' for side chainName pays off
+                            numPairContacts[MolContactInfo.CC]++;          // 'C' instead of 'S' for side chainName pays off
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.CC] < 0) || dist < minContactDistances[ResContactInfo.CC]) {
-                                minContactDistances[ResContactInfo.CC] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CC] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CC] = j;
+                            if((minContactDistances[MolContactInfo.CC] < 0) || dist < minContactDistances[MolContactInfo.CC]) {
+                                minContactDistances[MolContactInfo.CC] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.CC] = i;
+                                contactAtomNumInResidueB[MolContactInfo.CC] = j;
                             }
                         }
                         else {
@@ -9405,16 +9405,16 @@ public class Main {
                         /*
                         if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
                             // H bridge from backbone atom 'N' of residue a to backbone atom 'O' of residue b.
-                            numPairContacts[ResContactInfo.HB]++;
+                            numPairContacts[MolContactInfo.HB]++;
                             // There can only be one of these so if we found it, simply update the distance.
-                            minContactDistances[ResContactInfo.HB] = dist;
+                            minContactDistances[MolContactInfo.HB] = dist;
                         }
 
                         if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
                             // H bridge from backbone atom 'O' of residue a to backbone atom 'N' of residue b.
-                            numPairContacts[ResContactInfo.BH]++;
+                            numPairContacts[MolContactInfo.BH]++;
                             // There can only be one of these so if we found it, simply update the distance.
-                            minContactDistances[ResContactInfo.BH] = dist;
+                            minContactDistances[MolContactInfo.BH] = dist;
                         }*/
                     }
                     
@@ -9422,7 +9422,7 @@ public class Main {
                     
                     if(x.isProteinAtom() && y.isLigandAtom()) {
                         // *************************** protein - ligand contact *************************
-                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.TT]++;
                         numTotalLigContactsPair++;
 //                        System.out.println("New ProtLig: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("PROTLIG");
@@ -9434,32 +9434,32 @@ public class Main {
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - ligand contact
-                            numPairContacts[ResContactInfo.BL]++;
+                            numPairContacts[MolContactInfo.BL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.BL] < 0) || dist < minContactDistances[ResContactInfo.BL]) {
-                                minContactDistances[ResContactInfo.BL] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BL] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BL] = j;
+                            if((minContactDistances[MolContactInfo.BL] < 0) || dist < minContactDistances[MolContactInfo.BL]) {
+                                minContactDistances[MolContactInfo.BL] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.BL] = i;
+                                contactAtomNumInResidueB[MolContactInfo.BL] = j;
                             }
 
                         }
                         else {
                             // to be precise, this is a side chainName - ligand contact
-                            numPairContacts[ResContactInfo.CL]++;
+                            numPairContacts[MolContactInfo.CL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.CL] < 0) || dist < minContactDistances[ResContactInfo.CL]) {
-                                minContactDistances[ResContactInfo.CL] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CL] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CL] = j;
+                            if((minContactDistances[MolContactInfo.CL] < 0) || dist < minContactDistances[MolContactInfo.CL]) {
+                                minContactDistances[MolContactInfo.CL] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.CL] = i;
+                                contactAtomNumInResidueB[MolContactInfo.CL] = j;
                             }
                         }
 
                     }
                     else if(x.isLigandAtom() && y.isProteinAtom()) {
                         // *************************** ligand - protein contact *************************
-                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.TT]++;
                         numTotalLigContactsPair++;
 //                        System.out.println("New LigProt: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("LIGPROT");
@@ -9471,32 +9471,32 @@ public class Main {
                         // Check the exact contact type
                         if(j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a ligand - backbone contact
-                            numPairContacts[ResContactInfo.LB]++;
+                            numPairContacts[MolContactInfo.LB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.LB] < 0) || dist < minContactDistances[ResContactInfo.LB]) {
-                                minContactDistances[ResContactInfo.LB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.LB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.LB] = j;
+                            if((minContactDistances[MolContactInfo.LB] < 0) || dist < minContactDistances[MolContactInfo.LB]) {
+                                minContactDistances[MolContactInfo.LB] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.LB] = i;
+                                contactAtomNumInResidueB[MolContactInfo.LB] = j;
                             }
 
                         }
                         else {
                             // to be precise, this is a ligand - side chainName contact
-                            numPairContacts[ResContactInfo.LC]++;
+                            numPairContacts[MolContactInfo.LC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[ResContactInfo.LC] < 0) || dist < minContactDistances[ResContactInfo.LC]) {
-                                minContactDistances[ResContactInfo.LC] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.LC] = i;
-                                contactAtomNumInResidueB[ResContactInfo.LC] = j;
+                            if((minContactDistances[MolContactInfo.LC] < 0) || dist < minContactDistances[MolContactInfo.LC]) {
+                                minContactDistances[MolContactInfo.LC] = dist;
+                                contactAtomNumInResidueA[MolContactInfo.LC] = i;
+                                contactAtomNumInResidueB[MolContactInfo.LC] = j;
                             }
                         }
                             
                     }
                     else if(x.isLigandAtom() && y.isLigandAtom()) {
                         // *************************** ligand - ligand contact *************************
-                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[MolContactInfo.TT]++;
                         numTotalLigContactsPair++;
 //                        System.out.println("New LigLig: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("LIGLIG");
@@ -9506,13 +9506,13 @@ public class Main {
                         atomAtomContacts.add(donorAcceptor);
 
                         // no choices here, ligands have no sub type
-                        numPairContacts[ResContactInfo.LL]++;
+                        numPairContacts[MolContactInfo.LL]++;
                         
                         // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                        if((minContactDistances[ResContactInfo.LL] < 0) || dist < minContactDistances[ResContactInfo.LL]) {
-                            minContactDistances[ResContactInfo.LL] = dist;
-                            contactAtomNumInResidueA[ResContactInfo.LL] = i;
-                            contactAtomNumInResidueB[ResContactInfo.LL] = j;
+                        if((minContactDistances[MolContactInfo.LL] < 0) || dist < minContactDistances[MolContactInfo.LL]) {
+                            minContactDistances[MolContactInfo.LL] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.LL] = i;
+                            contactAtomNumInResidueB[MolContactInfo.LL] = j;
                         }
                         
 
@@ -9534,80 +9534,80 @@ public class Main {
             }
         }
         
-        ResContactInfo piResults = calculatePiEffects(a, b);
+        MolContactInfo piResults = calculatePiEffects(a, b);
         if(piResults != null) {
             
-             numPairContacts[ResContactInfo.TT] += piResults.getNumContactsTotal();
-             numPairContacts[ResContactInfo.NHPI] = piResults.getNumContactsNHPI();
-             numPairContacts[ResContactInfo.PINH] = piResults.getNumContactsPINH();
-             numPairContacts[ResContactInfo.CAHPI] = piResults.getNumContactsCAHPI();
-             numPairContacts[ResContactInfo.PICAH] = piResults.getNumContactsPICAH();
-             numPairContacts[ResContactInfo.CNHPI] = piResults.getNumContactsCNHPI();
-             numPairContacts[ResContactInfo.PICNH] = piResults.getNumContactsPICNH();
-             numPairContacts[ResContactInfo.SHPI] = piResults.getNumContactsSHPI();
-             numPairContacts[ResContactInfo.PISH] = piResults.getNumContactsPISH();
-             numPairContacts[ResContactInfo.XOHPI] = piResults.getNumContactsXOHPI();
-             numPairContacts[ResContactInfo.PIXOH] = piResults.getNumContactsPIXOH();
-             numPairContacts[ResContactInfo.PROCDHPI] = piResults.getNumContactsPROCDHPI();
-             numPairContacts[ResContactInfo.PIPROCDH] = piResults.getNumContactsPIPROCDH();
-             numPairContacts[ResContactInfo.CCAHCO] = piResults.getNumContactsCCACOH();
-             numPairContacts[ResContactInfo.CCOCAH] = piResults.getNumContactsCCOCAH();
-             numPairContacts[ResContactInfo.BCAHCO] = piResults.getNumContactsBCACOH();
-             numPairContacts[ResContactInfo.BCOCAH] =  piResults.getNumContactsBCOCAH();
+             numPairContacts[MolContactInfo.TT] += piResults.getNumContactsTotal();
+             numPairContacts[MolContactInfo.NHPI] = piResults.getNumContactsNHPI();
+             numPairContacts[MolContactInfo.PINH] = piResults.getNumContactsPINH();
+             numPairContacts[MolContactInfo.CAHPI] = piResults.getNumContactsCAHPI();
+             numPairContacts[MolContactInfo.PICAH] = piResults.getNumContactsPICAH();
+             numPairContacts[MolContactInfo.CNHPI] = piResults.getNumContactsCNHPI();
+             numPairContacts[MolContactInfo.PICNH] = piResults.getNumContactsPICNH();
+             numPairContacts[MolContactInfo.SHPI] = piResults.getNumContactsSHPI();
+             numPairContacts[MolContactInfo.PISH] = piResults.getNumContactsPISH();
+             numPairContacts[MolContactInfo.XOHPI] = piResults.getNumContactsXOHPI();
+             numPairContacts[MolContactInfo.PIXOH] = piResults.getNumContactsPIXOH();
+             numPairContacts[MolContactInfo.PROCDHPI] = piResults.getNumContactsPROCDHPI();
+             numPairContacts[MolContactInfo.PIPROCDH] = piResults.getNumContactsPIPROCDH();
+             numPairContacts[MolContactInfo.CCAHCO] = piResults.getNumContactsCCACOH();
+             numPairContacts[MolContactInfo.CCOCAH] = piResults.getNumContactsCCOCAH();
+             numPairContacts[MolContactInfo.BCAHCO] = piResults.getNumContactsBCACOH();
+             numPairContacts[MolContactInfo.BCOCAH] =  piResults.getNumContactsBCOCAH();
              
-             minContactDistances[ResContactInfo.NHPI] = piResults.getNHPIContactDist();
-             contactAtomNumInResidueA[ResContactInfo.NHPI] = piResults.getNHPIContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.NHPI] = piResults.getNHPIContactAtomNumB();
-             minContactDistances[ResContactInfo.PINH] = piResults.getPINHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PINH] = piResults.getPINHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PINH] = piResults.getPINHContactAtomNumB();
-             minContactDistances[ResContactInfo.CAHPI] = piResults.getCAHPIContactDist();
-             contactAtomNumInResidueA[ResContactInfo.CAHPI] = piResults.getCAHPIContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.CAHPI] = piResults.getCAHPIContactAtomNumB();
-             minContactDistances[ResContactInfo.PICAH] = piResults.getPICAHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PICAH] = piResults.getPICAHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PICAH] = piResults.getPICAHContactAtomNumB();
-             minContactDistances[ResContactInfo.CNHPI] = piResults.getCNHPIContactDist();
-             contactAtomNumInResidueA[ResContactInfo.CNHPI] = piResults.getCNHPIContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.CNHPI] = piResults.getCNHPIContactAtomNumB();
-             minContactDistances[ResContactInfo.PICNH] = piResults.getPICNHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PICNH] = piResults.getPICNHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PICNH] = piResults.getPICNHContactAtomNumB();
-             minContactDistances[ResContactInfo.SHPI] = piResults.getSHPIContactDist();
-             contactAtomNumInResidueA[ResContactInfo.SHPI] = piResults.getSHPIContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.SHPI] = piResults.getSHPIContactAtomNumB();
-             minContactDistances[ResContactInfo.PISH] = piResults.getPISHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PISH] = piResults.getPISHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PISH] = piResults.getPISHContactAtomNumB();
-             minContactDistances[ResContactInfo.XOHPI] = piResults.getXOHPIContactDist();
-             contactAtomNumInResidueA[ResContactInfo.XOHPI] = piResults.getXOHPIContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.XOHPI] = piResults.getXOHPIContactAtomNumB();
-             minContactDistances[ResContactInfo.PIXOH] = piResults.getPIXOHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PIXOH] = piResults.getPIXOHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PIXOH] = piResults.getPIXOHContactAtomNumB();
-             minContactDistances[ResContactInfo.PROCDHPI] = piResults.getPROCDHPIContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = piResults.getPROCDHPIContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PROCDHPI] = piResults.getPROCDHPIContactAtomNumB();
-             minContactDistances[ResContactInfo.PIPROCDH] = piResults.getPIPROCDHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.PIPROCDH] = piResults.getPIPROCDHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = piResults.getPIPROCDHContactAtomNumB();
-             minContactDistances[ResContactInfo.CCAHCO] = piResults.getCCAHCOContactDist();
-             contactAtomNumInResidueA[ResContactInfo.CCAHCO] = piResults.getCCAHCOContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.CCAHCO] = piResults.getCCAHCOContactAtomNumB();
-             minContactDistances[ResContactInfo.CCOCAH] = piResults.getCCOCAHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.CCOCAH] = piResults.getCCOCAHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.CCOCAH] = piResults.getCCOCAHContactAtomNumB();
-             minContactDistances[ResContactInfo.BCAHCO] = piResults.getBCAHCOContactDist();
-             contactAtomNumInResidueA[ResContactInfo.BCAHCO] = piResults.getBCAHCOContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.BCAHCO] = piResults.getBCAHCOContactAtomNumB();
-             minContactDistances[ResContactInfo.BCOCAH] = piResults.getBCOCAHContactDist();
-             contactAtomNumInResidueA[ResContactInfo.BCOCAH] = piResults.getBCOCAHContactAtomNumA();
-             contactAtomNumInResidueB[ResContactInfo.BCOCAH] = piResults.getBCOCAHContactAtomNumB();
+             minContactDistances[MolContactInfo.NHPI] = piResults.getNHPIContactDist();
+             contactAtomNumInResidueA[MolContactInfo.NHPI] = piResults.getNHPIContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.NHPI] = piResults.getNHPIContactAtomNumB();
+             minContactDistances[MolContactInfo.PINH] = piResults.getPINHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PINH] = piResults.getPINHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PINH] = piResults.getPINHContactAtomNumB();
+             minContactDistances[MolContactInfo.CAHPI] = piResults.getCAHPIContactDist();
+             contactAtomNumInResidueA[MolContactInfo.CAHPI] = piResults.getCAHPIContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.CAHPI] = piResults.getCAHPIContactAtomNumB();
+             minContactDistances[MolContactInfo.PICAH] = piResults.getPICAHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PICAH] = piResults.getPICAHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PICAH] = piResults.getPICAHContactAtomNumB();
+             minContactDistances[MolContactInfo.CNHPI] = piResults.getCNHPIContactDist();
+             contactAtomNumInResidueA[MolContactInfo.CNHPI] = piResults.getCNHPIContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.CNHPI] = piResults.getCNHPIContactAtomNumB();
+             minContactDistances[MolContactInfo.PICNH] = piResults.getPICNHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PICNH] = piResults.getPICNHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PICNH] = piResults.getPICNHContactAtomNumB();
+             minContactDistances[MolContactInfo.SHPI] = piResults.getSHPIContactDist();
+             contactAtomNumInResidueA[MolContactInfo.SHPI] = piResults.getSHPIContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.SHPI] = piResults.getSHPIContactAtomNumB();
+             minContactDistances[MolContactInfo.PISH] = piResults.getPISHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PISH] = piResults.getPISHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PISH] = piResults.getPISHContactAtomNumB();
+             minContactDistances[MolContactInfo.XOHPI] = piResults.getXOHPIContactDist();
+             contactAtomNumInResidueA[MolContactInfo.XOHPI] = piResults.getXOHPIContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.XOHPI] = piResults.getXOHPIContactAtomNumB();
+             minContactDistances[MolContactInfo.PIXOH] = piResults.getPIXOHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PIXOH] = piResults.getPIXOHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PIXOH] = piResults.getPIXOHContactAtomNumB();
+             minContactDistances[MolContactInfo.PROCDHPI] = piResults.getPROCDHPIContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PROCDHPI] = piResults.getPROCDHPIContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PROCDHPI] = piResults.getPROCDHPIContactAtomNumB();
+             minContactDistances[MolContactInfo.PIPROCDH] = piResults.getPIPROCDHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.PIPROCDH] = piResults.getPIPROCDHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.PIPROCDH] = piResults.getPIPROCDHContactAtomNumB();
+             minContactDistances[MolContactInfo.CCAHCO] = piResults.getCCAHCOContactDist();
+             contactAtomNumInResidueA[MolContactInfo.CCAHCO] = piResults.getCCAHCOContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.CCAHCO] = piResults.getCCAHCOContactAtomNumB();
+             minContactDistances[MolContactInfo.CCOCAH] = piResults.getCCOCAHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.CCOCAH] = piResults.getCCOCAHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.CCOCAH] = piResults.getCCOCAHContactAtomNumB();
+             minContactDistances[MolContactInfo.BCAHCO] = piResults.getBCAHCOContactDist();
+             contactAtomNumInResidueA[MolContactInfo.BCAHCO] = piResults.getBCAHCOContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.BCAHCO] = piResults.getBCAHCOContactAtomNumB();
+             minContactDistances[MolContactInfo.BCOCAH] = piResults.getBCOCAHContactDist();
+             contactAtomNumInResidueA[MolContactInfo.BCOCAH] = piResults.getBCOCAHContactAtomNumA();
+             contactAtomNumInResidueB[MolContactInfo.BCOCAH] = piResults.getBCOCAHContactAtomNumB();
         }
                                
         // Iteration through all atoms of the two residues is done
-        if(numPairContacts[ResContactInfo.TT] > 0) {
-            result = new ResContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, atomAtomContactType, atomAtomContacts);
+        if(numPairContacts[MolContactInfo.TT] > 0) {
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, atomAtomContactType, atomAtomContacts);
         }
         else {
             result = null;
@@ -9622,10 +9622,10 @@ public class Main {
      * Prints an overview of all contacts to STDOUT.
      * @param rciList the residue contact information to consider
      */
-    public static void showContactOverview(ArrayList<ResContactInfo> rciList) {
+    public static void showContactOverview(ArrayList<MolContactInfo> rciList) {
 
-        ArrayList<ResContactInfo> contacts = rciList;
-        ResContactInfo rci;
+        ArrayList<MolContactInfo> contacts = rciList;
+        MolContactInfo rci;
         Integer contactNum;
 
         System.out.println("  Numbr TypeA TypeB ResA# ResB# ResA ResB Dist #Cont");
@@ -9707,10 +9707,10 @@ public class Main {
      * ignored if this is 'false'). If this is true, each line will have additional fields at the
      * end which contain the ligand info.
      */
-    public static void writeContacts(ArrayList<ResContactInfo> rciList, String gf, Boolean useLigands) {
+    public static void writeContacts(ArrayList<MolContactInfo> rciList, String gf, Boolean useLigands) {
 
-        ArrayList<ResContactInfo> contacts = rciList;
-        ResContactInfo rci = null;
+        ArrayList<MolContactInfo> contacts = rciList;
+        MolContactInfo rci = null;
         Integer contactNum = 0;
         String geoFile = gf;
         FileWriter geoFW = null;
@@ -9943,13 +9943,13 @@ public class Main {
     }
 
     /** Write formated statistics to file out_file.
-     * Takes a ResContactInfo object as input that stores all the necessary information to generate output files.
-     * Two output files are generated: One with information about the different contact types, and another one 
-     * with information about the detected atom-atom contacts.
+     * Takes a MolContactInfo object as input that stores all the necessary information to generate output files.
+ Two output files are generated: One with information about the different contact types, and another one 
+ with information about the detected atom-atom contacts.
      * @param results The calculated results that should be saved.
      * @param out_file Where the files are saved.
      */
-    public static void writePPIstatistics(ArrayList<ResContactInfo> results, String out_file) {
+    public static void writePPIstatistics(ArrayList<MolContactInfo> results, String out_file) {
         
         // Initialize all different contact types
         int BBHB, BBBH, IVDW, ISS, BCHB, BCBH, CBHB, CBBH, CCHB, CCBH, BB, CB, 
@@ -9965,7 +9965,7 @@ public class Main {
         ArrayList<Atom[]> atomAtomContacts = new ArrayList<Atom[]>();
         
         // Go through the calculated results and get the important information.
-        for(ResContactInfo result : results) {
+        for(MolContactInfo result : results) {
             BBHB += result.getNumContactsBBHB();
             BBBH += result.getNumContactsBBBH();
             IVDW += result.getNumContactsIVDW();
@@ -10462,7 +10462,7 @@ public class Main {
      * @param contacts the contacts to consider
      * @param res the residues to consider
      */
-    public static Boolean writeDsspLigFile(String dsspFile, String dsspLigFile, ArrayList<ResContactInfo> contacts, ArrayList<Residue> res) {
+    public static Boolean writeDsspLigFile(String dsspFile, String dsspLigFile, ArrayList<MolContactInfo> contacts, ArrayList<Residue> res) {
         
         DP.getInstance().w("writeDsspLigFile(): This function is deprecated, use writeOrderedDsspLigFile() instead.\n");
         
@@ -10855,7 +10855,7 @@ public class Main {
      * @param contacts the contacts to consider for the script.
      * @return the script as a single string. note that the string may consist of multiple lines.
      */
-    public static String getPymolSelectionScript(ArrayList<ResContactInfo> contacts) {
+    public static String getPymolSelectionScript(ArrayList<MolContactInfo> contacts) {
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
         ArrayList<Residue> ligRes = new ArrayList<Residue>();
@@ -10864,7 +10864,7 @@ public class Main {
         String scriptProt = "";
         String scriptLig = "";
 
-        ResContactInfo c = null;
+        MolContactInfo c = null;
         // Select all residues of the protein that have ligand contacts
         
         for (Integer i = 0; i < contacts.size(); i++) {
@@ -10970,7 +10970,7 @@ public class Main {
      * @param contacts the contacts to consider for the script.
      * @return the PyMol script as a string, which may consist of more than one line.
      */
-    public static String getPymolSelectionScriptByLigand(ArrayList<ResContactInfo> contacts) {
+    public static String getPymolSelectionScriptByLigand(ArrayList<MolContactInfo> contacts) {
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
         ArrayList<Residue> ligRes = new ArrayList<Residue>();
@@ -10979,7 +10979,7 @@ public class Main {
         String scriptLig = "";
         String scriptThisLigCont = "";
 
-        ResContactInfo c = null;
+        MolContactInfo c = null;
         Residue r = null;
         // Select all residues of the protein that have ligand contacts
 
@@ -11084,7 +11084,7 @@ public class Main {
      * @param contacts the contacts to consider for this script.
      * @return true if python file could be written, otherwise false.
      */
-    public static Boolean getPymolSelectionScriptPPI (ArrayList<ResContactInfo> contacts, String pdbid) {
+    public static Boolean getPymolSelectionScriptPPI (ArrayList<MolContactInfo> contacts, String pdbid) {
         ArrayList<Residue> protRes = new ArrayList<Residue>();  // all residues of interchain protein contacts
         ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
         ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
@@ -11135,7 +11135,7 @@ public class Main {
         
         Boolean fileWriteSuccess = false;
         
-        ResContactInfo c = null;
+        MolContactInfo c = null;
         // Select all residues of the protein that have ligand contacts
         for (Integer i = 0; i < contacts.size(); i++) {
             c = contacts.get(i);
@@ -12489,7 +12489,7 @@ public class Main {
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      * @param graphType the graph type, one of the constants like SSEGraph.GRAPHTYPE_ALBE 
      */
-    public static void calculateComplexGraph(List<Chain> allChains, List<Residue> resList, List<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
+    public static void calculateComplexGraph(List<Chain> allChains, List<Residue> resList, List<MolContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
 
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
@@ -12500,7 +12500,7 @@ public class Main {
             System.out.println("Calculating complex graph (CG) of type " + graphType + ".");
         }
         
-        ArrayList<ResContactInfo> interchainContacts = new ArrayList<ResContactInfo>();
+        ArrayList<MolContactInfo> interchainContacts = new ArrayList<MolContactInfo>();
         Chain c;
         List<SSE> chainDsspSSEs = new ArrayList<SSE>();
         List<SSE> chainPtglSSEs = new ArrayList<SSE>();
@@ -12742,7 +12742,7 @@ public class Main {
             // We only want interchain contacts with a certain threshold of contacts
             if (compGraph.chainsHaveEnoughContacts(chainAint, chainBint)){
                 
-                ResContactInfo curResCon = resContacts.get(i);
+                MolContactInfo curResCon = resContacts.get(i);
                 
                 // Die Datenkrake
                 String chainAString = curResCon.getResA().getChainID().toString();
