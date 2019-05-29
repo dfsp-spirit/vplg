@@ -29,7 +29,7 @@ import tools.DP;
  * 
  * @author ts
  */
-public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
+public class AAGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraphModellingLanguageFormat {
     
     
     public static final String CHAINID_ALL_CHAINS = "ALL";
@@ -60,7 +60,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         if(minSeqDist <= 0) {
              return true;
         } else {
-            Molecule resA = c.getResA();
+            Molecule molA = c.getResA();
             Molecule molB = c.getResB();
             if( ! molA.getChainID().equals(molB.getChainID())) {
                 //different chains, add contact
@@ -482,7 +482,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             else {
                 Boolean notFoundIsorAreLigands = Boolean.FALSE;
                 StringBuilder sb = new StringBuilder();
-                sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + resA.getFancyName() + " and " + resB.getFancyName() + ".");
+                sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + molA.getFancyName() + " and " + molB.getFancyName() + ".");
                 if(indexResA < 0 && indexResB < 0) {
                     sb.append(" BOTH residues not found.\n");
                     if( (! molA.isAA()) && (! molB.isAA())) { notFoundIsorAreLigands = Boolean.TRUE; }
@@ -571,17 +571,18 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         // print all nodes
         Residue residue;
+        Molecule molecule;
         for(Integer i = 0; i < this.getNumVertices(); i++) {
-            residue = this.vertices.get(i);
+            molecule = this.vertices.get(i);
             gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
-            gmlf.append("    label \"").append(i).append("-").append(residue.getUniquePDBName()).append("\"\n");
+            gmlf.append("    label \"").append(i).append("-").append(molecule.getUniquePDBName()).append("\"\n");
+            gmlf.append("    chain \"").append(molecule.getChainID()).append("\"\n");
             gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
             gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
             gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
             gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
-            gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
-            gmlf.append("    chain \"").append(residue.getChainID()).append("\"\n");            
+            gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser            
             gmlf.append(endNode).append("\n");
         }
         
