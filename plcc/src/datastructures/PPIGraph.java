@@ -229,12 +229,16 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
             gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(molecule.getUniquePDBName()).append("\"\n");
-            gmlf.append("    residue \"").append(molecule.getName3()).append("\"\n");
-            gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
-            gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
-            gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
-            gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
-            gmlf.append("    chain \"").append(residue.getChainID()).append("\"\n");
+            gmlf.append("    chain \"").append(molecule.getChainID()).append("\"\n");
+            
+            if (molecule instanceof Residue) {
+                gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
+                gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
+                gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
+                gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
+                
+            }
+            
             gmlf.append(endNode).append("\n");
         }
 
