@@ -517,7 +517,7 @@ public class Main {
                     if(s.equals("--cluster")) {                        
                         Settings.set("plcc_B_clustermode", "true");
                         Settings.set("plcc_B_silent", "true");
-                        Settings.set("plcc_B_write_chains_file", "true");
+                        //Settings.set("plcc_B_write_chains_file", "true");
                         Settings.set("plcc_B_compute_motifs", "true");
                         Settings.set("plcc_B_complex_graphs", "true");
                         Settings.set("plcc_B_separate_contacts_by_chain", "false");
@@ -526,10 +526,18 @@ public class Main {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                         Settings.set("plcc_B_useDB", "true");
-                        Settings.set("plcc_B_AAgraph_allchainscombined", "true");
-                        Settings.set("plcc_B_AAgraph_perchain", "true");
+                        //Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        //Settings.set("plcc_B_AAgraph_perchain", "true");
                         Settings.set("plcc_B_no_warn", "true");
                         argsUsed[i] = true;
+                        
+                        //jnw_2019
+                        System.out.println("NOTE: Following settings have been excluded from ");
+                        System.out.println("  --cluster option:");
+                        System.out.println("    plcc_B_write_chains_file");
+                        System.out.println("    plcc_B_AAgraph_allchainscombined");
+                        System.out.println("    plcc_B_AAgraph_perchain");
+                        System.out.println("  Set them to true manually if you want them");
                     }
                     
                     if(s.equals("--write-chains-file")) {
