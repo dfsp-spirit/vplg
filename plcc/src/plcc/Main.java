@@ -2525,7 +2525,7 @@ public class Main {
                     if (Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
 
                         PPIGraph ppig;
-                        ppig = new PPIGraph(residues, cInfo);
+                        ppig = new PPIGraph(molecules, cInfo);
                         ppig.setPdbid(pdbid);
                         ppig.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                         // write the PPI graph to disc
