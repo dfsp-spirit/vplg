@@ -466,9 +466,22 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         if(rci.describesAnyContact()) {            
             Molecule molA = rci.getResA();
             Molecule molB = rci.getResB();
-
-            int indexResA = this.getVertexIndex(molA);
-            int indexResB = this.getVertexIndex(molB);
+            Residue resA;
+            Residue resB;
+            
+            if( !(molA instanceof Residue) || !(molB instanceof Residue)){
+                // if one is not Residue
+            DP.getInstance().w("AAGraph", "Atleast one of the molecules is an RNA and can not "
+                    + "be used for AAGraphs. Skipping that one (unwanted side effects?");
+            return false;
+            }
+            
+            else{
+                // if both Residue cast to Residue
+                  resA = (Residue) molA;
+                  resB = (Residue) molB; 
+                    int indexResA = this.getVertexIndex(molA);
+                    int indexResB = this.getVertexIndex(molB);
             if(indexResA >= 0 && indexResB >= 0) {
                 if(rci.describesAnyContact()) {
                     AAEdgeInfo ei = new AAEdgeInfo(rci);
@@ -502,6 +515,15 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                 }                
                 return false;
             }
+                    }
+            
+            
+        
+            
+            
+            
+
+            
         }
         return false;
     }
