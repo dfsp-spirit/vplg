@@ -478,10 +478,10 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             
             else{
                 // if both Residue cast to Residue
-                  resA = (Residue) molA;
+                  //resA = (Residue) molA;
                   resB = (Residue) molB; 
-                    int indexResA = this.getVertexIndex(molA);
-                    int indexResB = this.getVertexIndex(molB);
+                    int indexResA = this.getVertexIndex(resA = (Residue)molA);
+                    int indexResB = this.getVertexIndex(resB = (Residue)molB);
             if(indexResA >= 0 && indexResB >= 0) {
                 if(rci.describesAnyContact()) {
                     AAEdgeInfo ei = new AAEdgeInfo(rci);
