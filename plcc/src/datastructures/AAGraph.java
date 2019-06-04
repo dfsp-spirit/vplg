@@ -29,7 +29,7 @@ import tools.DP;
  * 
  * @author ts
  */
-public class AAGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraphModellingLanguageFormat {
+public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
     
     
     public static final String CHAINID_ALL_CHAINS = "ALL";
@@ -578,12 +578,19 @@ public class AAGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraph
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(molecule.getUniquePDBName()).append("\"\n");
             gmlf.append("    chain \"").append(molecule.getChainID()).append("\"\n");
-            gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
+            
+            if(molecule instanceof Residue){
+                residue = (Residue) molecule;
+                gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
             gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
             gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
             gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
             gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser            
+            
+            }
+            
             gmlf.append(endNode).append("\n");
+            
         }
         
         // print all edges
