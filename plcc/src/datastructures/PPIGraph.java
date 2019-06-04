@@ -222,21 +222,22 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
         gmlf.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
 
         // print all nodes
-        Residue residue;
+        Residue residue ;
         Molecule molecule;
         for (Integer i = 0; i < this.getNumVertices(); i++) {
             molecule = this.vertices.get(i);
             gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(molecule.getUniquePDBName()).append("\"\n");
-            gmlf.append("    chain \"").append(molecule.getChainID()).append("\"\n");
-            
-            if (molecule instanceof Residue) {
+            gmlf.append("    chain \"").append(molecule.getChainID()).append("\"\n"); 
+                
+            if(molecule instanceof Residue){
+                residue = (Residue) molecule;
                 gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
                 gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
                 gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
                 gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
-                
+            
             }
             
             gmlf.append(endNode).append("\n");
