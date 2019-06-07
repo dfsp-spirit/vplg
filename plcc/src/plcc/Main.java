@@ -5477,7 +5477,8 @@ public class Main {
         //  The backbone atoms should have atom names ' N  ', ' CA ', ' C  ' and ' O  ' but we don't check
         //  this atm because geom_neo doesn't do that and we want to stay compatible.
         //  Of course, all of this only makes sense for resides that are AAs, not for ligands. We care for that.
-        Integer numOfLastBackboneAtomInResidue = 4;
+        //  jnw_2019: changed to 3 b/c there are only 4 bb atoms from 0..3: N, CA, C, O
+        Integer numOfLastBackboneAtomInResidue = 3;
         Integer atomIndexOfBackboneN = 0;       // backbone nitrogen atom index
         Integer atomIndexOfBackboneO = 3;       // backbone oxygen atom index
 
