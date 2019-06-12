@@ -10304,7 +10304,7 @@ public class Main {
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
         String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
-        ArrayList<Molecule> mol = c.getMolecules();
+        ArrayList<Residue> res = c.getResidues();
                 
         
         for (Residue r : res) {
@@ -10871,32 +10871,39 @@ public class Main {
             c = contacts.get(i);
             if(c.getNumLigContactsTotal() > 0) {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
-                
+                // c getResA und c getResB -> typecast
                 // Handle resA
+                
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                    
                 if(c.getResA().isAA()) {
                     if( ! protRes.contains(c.getResA())) {
-                        protRes.add(c.getResA());
+                        protRes.add((Residue)c.getResA());
                     }
                 }
                 if(c.getResA().isLigand()) {
                     if( ! ligRes.contains(c.getResA())) {
-                        ligRes.add(c.getResA());
+                        ligRes.add((Residue)c.getResA());
                     }
                 }
 
                 // Handle resB
                 if(c.getResB().isAA()) {
                     if( ! protRes.contains(c.getResB())) {
-                        protRes.add(c.getResB());
+                        protRes.add((Residue)c.getResB());
                     }
                 }
                 if(c.getResB().isLigand()) {
                     if( ! ligRes.contains(c.getResB())) {
-                        ligRes.add(c.getResB());
+                        ligRes.add((Residue)c.getResB());
                     }
                 }
 
             }
+        }
         }
 
         // Now create the scripts...
@@ -10987,30 +10994,38 @@ public class Main {
             c = contacts.get(i);
             if(c.getNumLigContactsTotal() > 0) {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
-
-                // Handle resA
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                    // Handle resA
                 if(c.getResA().isAA()) {
                     if( ! protRes.contains(c.getResA())) {
-                        protRes.add(c.getResA());
+                        protRes.add((Residue)c.getResA());
                     }
                 }
                 if(c.getResA().isLigand()) {
                     if( ! ligRes.contains(c.getResA())) {
-                        ligRes.add(c.getResA());
+                        ligRes.add((Residue)c.getResA());
                     }
+                 
                 }
-
+                
                 // Handle resB
                 if(c.getResB().isAA()) {
                     if( ! protRes.contains(c.getResB())) {
-                        protRes.add(c.getResB());
+                        protRes.add((Residue)c.getResB());
                     }
                 }
                 if(c.getResB().isLigand()) {
                     if( ! ligRes.contains(c.getResB())) {
-                        ligRes.add(c.getResB());
+                        ligRes.add((Residue)c.getResB());
                     }
                 }
+
+               }
+
+                
 
             }
         }
@@ -11035,18 +11050,27 @@ public class Main {
                 for(Integer j = 0; j < contacts.size(); j++) {
 
                     c = contacts.get(j);
-
-                    if(c.getDsspResNumResA().equals(r.getDsspNum())) {
+                    
+                    if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                    }
+                    else{
+                        if(c.getDsspResNumResA().equals(r.getDsspNum())) {
+                        
+                        
                         // first residue A is this ligand, so the other one is the contact residue
-                        ligCont.add(c.getResB());
+                        ligCont.add((Residue)c.getResB());
                     }
                     else if(c.getDsspResNumResB().equals(r.getDsspNum())) {
                         // second residue B is this ligand, so the other one is the contact residue
-                        ligCont.add(c.getResA());
+                        ligCont.add((Residue)c.getResA());
                     }
                     else {
                         // The current ligand is not involved in this contact
+                    } 
                     }
+
+                   
                 }
 
                 
@@ -11144,55 +11168,73 @@ public class Main {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
                 
                 // Handle resA
-                if(c.getResA().isAA()) {
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                    
+                    
+                    if(c.getResA().isAA()) {
                     if( ! protRes.contains(c.getResA())) {
-                        protRes.add(c.getResA());
+                        protRes.add((Residue)c.getResA());
                     }
                 }
                 if(c.getResA().isLigand()) {
                     if( ! ligRes.contains(c.getResA())) {
-                        ligRes.add(c.getResA());
+                        ligRes.add((Residue)c.getResA());
                     }
                 }
-
-                // Handle resB
+                
+                 // Handle resB
                 if(c.getResB().isAA()) {
                     if( ! protRes.contains(c.getResB())) {
-                        protRes.add(c.getResB());
+                        protRes.add((Residue)c.getResB());
                     }
                 }
                 if(c.getResB().isLigand()) {
                     if( ! ligRes.contains(c.getResB())) {
-                        ligRes.add(c.getResB());
+                        ligRes.add((Residue)c.getResB());
                     }
                 }
-
+                }
+                
             }
             
             // Select all residues of the protein that are protein-protein contacts
-            if((c.getNumContactsBB() > 0) || (c.getNumContactsBC() > 0) || (c.getNumContactsCB() > 0)|| (c.getNumContactsCC() > 0)) {
+            
+            if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                if((c.getNumContactsBB() > 0) || (c.getNumContactsBC() > 0) || (c.getNumContactsCB() > 0)|| (c.getNumContactsCC() > 0)) {
                 if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                    protRes.add((Residue)c.getResA());
                 }
                 if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
+                    protRes.add((Residue)c.getResB());
                 }
             }
+            }
+            
             
             // Select all residues of the protein that have interchain vdW contacts
             if(c.getNumContactsIVDW() > 0) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
                 }
+                else{
+                  if(! protRes.contains(c.getResA())) {
+                    protRes.add((Residue)c.getResA());
+                }   
                 if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
+                    protRes.add((Residue)c.getResB());
                 }
                 if(! ivdwRes.contains(c.getResA())) {
-                    ivdwRes.add(c.getResA());
+                    ivdwRes.add((Residue)c.getResA());
                 }
                 if(! ivdwRes.contains(c.getResB())) {
-                    ivdwRes.add(c.getResB());
-                }
+                    ivdwRes.add((Residue)c.getResB());
+                }  
                 
                 ArrayList<Integer> tmp = new ArrayList<Integer>();
                 tmp.add(c.getPdbResNumResA());
@@ -11213,25 +11255,31 @@ public class Main {
                 atomNames.add(c.getResA().getAtoms().get(c.getIVDWContactAtomNumA() - 1).getAtomName());
                 atomNames.add(c.getResB().getAtoms().get(c.getIVDWContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesIvdw.add(atomNames);
+                }
+                 
                 
             }
             
             // Select all residues of the protein that have interchain backbone-backbone h-bridge contacts
             if(c.getNumContactsBBHB()> 0 || c.getNumContactsBBBH() > 0) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
                 }
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
-                }
-                if(! bbRes.contains(c.getResA())) {
-                    bbRes.add(c.getResA());
-                }
-                if(! bbRes.contains(c.getResB())) {
-                    bbRes.add(c.getResB());
-                }
-                
-                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                else{
+                  if(! protRes.contains(c.getResA())) {
+                    protRes.add((Residue)c.getResA());
+                    }
+                    if(! protRes.contains(c.getResB())) {
+                        protRes.add((Residue)c.getResB());
+                    }
+                    if(! bbRes.contains(c.getResA())) {
+                        bbRes.add((Residue)c.getResA());
+                    }
+                    if(! bbRes.contains(c.getResB())) {
+                        bbRes.add((Residue)c.getResB());
+                    } 
+                    
+                    ArrayList<Integer> tmp = new ArrayList<Integer>();
                 tmp.add(c.getPdbResNumResA());
                 tmp.add(c.getPdbResNumResB());
                 bondsBB.add(tmp);
@@ -11264,22 +11312,31 @@ public class Main {
                 atomNames.add(c.getResB().getAtoms().get(c.getBBBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBB.add(atomNames);
                 }
+                }
+                
+                
+                
+                
                 
             }
             
             // Select all residues of the protein that have interchain backbone-sidechain h-bridge contacts
             if(c.getNumContactsBCHB()> 0 || c.getNumContactsBCBH() > 0) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                    if(! protRes.contains(c.getResA())) {
+                    protRes.add((Residue)c.getResA());
                 }
                 if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
+                    protRes.add((Residue)c.getResB());
                 }
                 if(! bcRes.contains(c.getResA())) {
-                    bcRes.add(c.getResA());
+                    bcRes.add((Residue)c.getResA());
                 }
                 if(! bcRes.contains(c.getResB())) {
-                    bcRes.add(c.getResB());
+                    bcRes.add((Residue)c.getResB());
                 }
                 
                 ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11315,22 +11372,28 @@ public class Main {
                 atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBC.add(atomNames);
                 }
+                }
+                
                 
             }
             
             // Select all residues of the protein that have interchain sidechain-backbone h-bridge contacts
             if(c.getNumContactsCBHB()> 0 || c.getNumContactsCBBH() > 0) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                   if(! protRes.contains(c.getResA())) {
+                    protRes.add((Residue)c.getResA());
                 }
                 if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
+                    protRes.add((Residue)c.getResB());
                 }
                 if(! cbRes.contains(c.getResA())) {
-                    cbRes.add(c.getResA());
+                    cbRes.add((Residue)c.getResA());
                 }
                 if(! cbRes.contains(c.getResB())) {
-                    cbRes.add(c.getResB());
+                    cbRes.add((Residue)c.getResB());
                 }
                 
                 ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11365,23 +11428,30 @@ public class Main {
                 atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA() - 1).getAtomName());
                 atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesCB.add(atomNames);
+                } 
                 }
+                
+                
                 
             }
             
             // Select all residues of the protein that have interchain sidechain-sidechain h-bridge contacts
             if(c.getNumContactsCCHB()> 0 || c.getNumContactsCCBH() > 0) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                  if(! protRes.contains(c.getResA())) {
+                    protRes.add((Residue)c.getResA());
                 }
                 if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
+                    protRes.add((Residue)c.getResB());
                 }
                 if(! ccRes.contains(c.getResA())) {
-                    ccRes.add(c.getResA());
+                    ccRes.add((Residue)c.getResA());
                 }
                 if(! ccRes.contains(c.getResB())) {
-                    ccRes.add(c.getResB());
+                    ccRes.add((Residue)c.getResB());
                 }
                 
                 ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11416,7 +11486,9 @@ public class Main {
                 atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA() - 1).getAtomName());
                 atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesCC.add(atomNames);
+                }  
                 }
+                
                 
             }
             
