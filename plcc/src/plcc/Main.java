@@ -1063,6 +1063,7 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    
                     if(s.equals("-q") || s.equals("--fg-notations")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -1511,6 +1512,30 @@ public class Main {
                     }
                     
                     
+                    if(s.equals("--matrix-structure-search")) {
+                        if(args.length <= i+3 ) {
+                            syntaxError();
+                        }
+                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
+                        Settings.set("plcc_S_linear_notation", args[i+2]);
+                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
+                        Settings.set("plcc_B_matrix_structure_search", "true");
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
+                                                
+                    }
+                    
+                    if (s.equals("--matrix-structure-search-db")){
+                        if (args.length <= i+3){
+                            syntaxError();
+                        }
+                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
+                        Settings.set("plcc_S_linear_notation", args[i+2]);
+                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
+                        Settings.set("plcc_B_matrix_structure_search_db", "true");
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
+                    }
+                    
+                    
 
                 } //end for loop
                 checkArgsUsage(args, argsUsed); // warn if there were extra command line args we do not know
@@ -1551,7 +1576,7 @@ public class Main {
                     System.out.println("Filename now is: " + pdbFile);
             }
         }
-
+        
         if(Settings.getBoolean("plcc_B_clustermode")) {
             if(! silent) {
                 System.out.println("Cluster mode active.");
@@ -2012,6 +2037,42 @@ public class Main {
             if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("  Not using the database as requested by options.");
             }
+        }
+        
+        // **************************************    Protein structure search in the database    ******************************************
+        
+        if(Settings.getBoolean("plcc_B_matrix_structure_search_db")) {
+            System.out.println("Start searching the linear notation " + Settings.get("plcc_S_linear_notation") + " in the PTGL database.");
+            
+            ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+            
+            results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
+            
+            int count_results = results.size();
+            System.out.println("  The structure was found in " + count_results + " proteins.");
+            if (count_results > 0){
+                
+                //writing results into a text file
+                try {
+                    System.out.println("Saving all proteins (pdbid and chain) in the file 'matrix_search_db_results.lst'. ");
+                    
+                    File file_results = new File("matrix_search_db_results.lst");
+                    FileWriter writer = new FileWriter(file_results);
+                    
+                    for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notation from the input
+                        writer.write(r.get(0) + " " + r.get(1)); //write results to file
+                        writer.write(System.getProperty("line.separator")); //add a new line
+                    }
+                    writer.flush();
+                    writer.close();
+                    
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            System.out.println("Exiting now");
+            
+            System.exit(0);
         }
 
         // **************************************    here we go: parse files and get data    ******************************************
@@ -2982,7 +3043,6 @@ public class Main {
             }
             
             if( ! separateContactsByChain){  // no chainName separation active                
-                
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("plcc_B_useDB")) {
@@ -3384,7 +3444,7 @@ public class Main {
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
     public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
-
+              
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
@@ -3404,7 +3464,7 @@ public class Main {
             md = FileParser.getPDBMetaData();
         }
         
-
+        
         // check which chains belong to the same macro molecule
         Map<String, List<String>> macroMoleculesOfPDBfileToChains = new HashMap<>();    // key of the map is the MOL_ID
         Map<String, Map<String, String>> macroMolecules = new HashMap<>();   // each inner hashmap contains the properties of a macromolecule, "name" => the_name, "id" => MOL_ID, .... The outer string is the mol_ID
@@ -3418,7 +3478,7 @@ public class Main {
             if(! silent) {
                 System.out.println("  +++++ Handling chain '" + chain + "'. +++++");
             }
-
+                        
             // CIF parser for now does not parse Prot meta info
             //     -> just use default values
             ProtMetaInfo pmi;
@@ -3621,7 +3681,6 @@ public class Main {
 
 
             for(String gt : graphTypes) {
-
                 // create the protein graph for this graph type
                 //System.out.println("SSEs: " + allChainSSEs);                
 
@@ -4024,7 +4083,52 @@ public class Main {
                         //System.out.println("!!!!!!calling for path '" + filePathImg + "'.");
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
-                                                
+                        
+                        if (Settings.getBoolean("plcc_B_matrix_structure_search") && Settings.get("plcc_S_linear_notation_graph_type").equals(pg.getGraphType())){
+                            
+                            // turn the linear notation into an adjacencymatrix and search it in the adjacencymatrix of the protein
+                            
+                            PTGLNotations p = new PTGLNotations(pg);
+                            p.stfu();
+                            //p.adjverbose = true;
+                            List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults(); //generate linear notation for proteingraph
+                            
+                            if (!silent){
+                                System.out.println("          Linear notation of the folding graph: " + resultsPTGLNotations.get(0).adjNotation + " ---");
+                            }
+                            
+                            String gt_new = gt;
+                            //Changing graphtype, because the function parseRedOrAdjToMatrix doesn't need any information about ligands
+                            switch(gt){
+                                case "alphalig":
+                                    gt_new = "alpha";
+                                case "betalig":
+                                    gt_new = "beta";
+                                case "albelig":
+                                    gt_new = "albe";
+                            }
+
+                            ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //the adjacencymatrix for the linear notation
+                            matrix = DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new);
+                            
+                            //save the linear notation from the input in the adjacencymatrix "pattern"
+                            ArrayList<ArrayList<Character>> pattern = new ArrayList<>(); 
+                            
+                            pattern = DBManager.parseRedOrAdjToMatrix(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
+                            
+                            if (pattern.size() <= matrix.size()){
+                                //start searching
+                                if (!silent){
+                                    System.out.println("      --- Start searching the linear notation " + Settings.get("plcc_S_linear_notation") +" in the folding graph. ---");
+                                }
+                                int[] output_array = new int [2]; //saves the indexes in matrix, where the pattern was found
+                                output_array = DBManager.matrix_search(pattern, matrix);
+                                
+                                if (!silent && output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
+                                    System.out.println("     **** Linear notation found at indexes (" + output_array[0] + ", " + output_array[1] + ") of the adjacency matrix from the folding graph. ****");
+                                } 
+                            }
+                        }
                         
                     //} else {
                     //    if( ! silent) {
@@ -4171,8 +4275,8 @@ public class Main {
         p.stfu();
         //p.adjverbose = true;
         List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults();
-
         
+                
         HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
         int fgMinSizeDraw = Settings.getInteger("plcc_I_min_fgraph_size_draw");
         int numFGsWithMinSize = 0;
@@ -10823,6 +10927,8 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
+        System.out.println("   --matrix-structure-search <nt> <ln> <gt>: search a structure <ln> in linear notation in a Proteingraph; <nt> = type of linnot; <gt> = graphtype of linnot");
+        System.out.println("   --matrix-structure-search-db <nt> <ln> <gt>: search a structure <ln> in linear notation in the whole database; <nt> = type of linnot; <gt> = graphtype of linnot");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
