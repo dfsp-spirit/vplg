@@ -505,7 +505,7 @@ public class Settings {
         
         // matrix structure search
         defSet("plcc_S_linear_notation", "", "The linear notation of a PG for the matrix structure comparison");
-        defSet("plcc_S_linear_notation_type", "", "The type of linear notaion (adj or red) for matrix structure comparison.");
+        defSet("plcc_S_linear_notation_type", "", "The type of linear notation (adj or red) for matrix structure comparison.");
         defSet("plcc_S_linear_notation_graph_type", "", "alpha, beta or albe = The graph type of the PG graph of the linear notation");
         defSet("plcc_B_matrix_structure_search", "false", "start searching a linear notation (input) in a proteinstructure (input)");
         defSet("plcc_B_matrix_structure_search_db", "false", "start searching a linear notation (input) in the database, ignores the proteinstructure (input)");
