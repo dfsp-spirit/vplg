@@ -1055,28 +1055,6 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
-                    if(s.equals("--matrix-structure-search")) {
-                        if(args.length <= i+3 ) {
-                            syntaxError();
-                        }
-                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
-                        Settings.set("plcc_S_linear_notation", args[i+2]);
-                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
-                        Settings.set("plcc_B_start_matrix_structure_search", "true");
-                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
-                                                
-                    }
-                    
-                    if (s.equals("--matrix-structure-search-db")){
-                        if (args.length <= i+3){
-                            syntaxError();
-                        }
-                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
-                        Settings.set("plcc_S_linear_notation", args[i+2]);
-                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
-                        Settings.set("plcc_B_start_matrix_structure_search_db", "true");
-                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
-                    }
                     
                     if(s.equals("-q") || s.equals("--fg-notations")) {
                         if(args.length <= i+1 ) {
@@ -1523,6 +1501,30 @@ public class Main {
                     if(s.equals("--chain-spheres-speedup")) {
                         argsUsed[i] = true;
                         Settings.set("plcc_B_chain_spheres_speedup", "true");
+                    }
+                    
+                    
+                    if(s.equals("--matrix-structure-search")) {
+                        if(args.length <= i+3 ) {
+                            syntaxError();
+                        }
+                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
+                        Settings.set("plcc_S_linear_notation", args[i+2]);
+                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
+                        Settings.set("plcc_B_matrix_structure_search", "true");
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
+                                                
+                    }
+                    
+                    if (s.equals("--matrix-structure-search-db")){
+                        if (args.length <= i+3){
+                            syntaxError();
+                        }
+                        Settings.set("plcc_S_linear_notation_type", args[i+1]);                        
+                        Settings.set("plcc_S_linear_notation", args[i+2]);
+                        Settings.set("plcc_S_linear_notation_graph_type", args[i+3]);
+                        Settings.set("plcc_B_matrix_structure_search_db", "true");
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
                     }
                     
                     
@@ -2031,7 +2033,7 @@ public class Main {
         
         // **************************************    Protein structure search in the database    ******************************************
         
-        if(Settings.getBoolean("plcc_B_start_matrix_structure_search_db")) {
+        if(Settings.getBoolean("plcc_B_matrix_structure_search_db")) {
             System.out.println("Start searching the linear notation " + Settings.get("plcc_S_linear_notation") + " in the PTGL database.");
             
             ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
@@ -2041,15 +2043,12 @@ public class Main {
             int count_results = results.size();
             System.out.println("  The structure was found in " + count_results + " proteins.");
             if (count_results > 0){
-                /*for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notaion from the input
-                    System.out.println(r.get(0) + " " + r.get(1));
-                }*/
                 
                 //writing results into a text file
                 try {
-                    System.out.println("Saving all proteins (pdbid and chain) in file 'matrix_search_db_results.txt'. ");
+                    System.out.println("Saving all proteins (pdbid and chain) in the file 'matrix_search_db_results.lst'. ");
                     
-                    File file_results = new File("matrix_search_db_results.txt");
+                    File file_results = new File("matrix_search_db_results.lst");
                     FileWriter writer = new FileWriter(file_results);
                     
                     for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notaion from the input
@@ -2063,10 +2062,7 @@ public class Main {
                     java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
-            /*if (results.contains(Arrays.asList("1a7u", "A"))){
-                System.out.println("ABH fold of this protein was found");
-            }*/
+            System.out.println("Exit now.");
             
             System.exit(0);
         }
@@ -4080,7 +4076,8 @@ public class Main {
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
                         
-                        if (Settings.getBoolean("plcc_B_start_matrix_structure_search")) {
+                        if (Settings.getBoolean("plcc_B_matrix_structure_search") && Settings.get("plcc_S_linear_notation_graph_type").equals(pg.getGraphType())){
+                            
                             // turn the linear notation into an adjacencymatrix and search it in the adjacencymatrix of the protein
                             
                             PTGLNotations p = new PTGLNotations(pg);
@@ -4106,24 +4103,15 @@ public class Main {
                             ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //the adjacencymatrix for the linear notation
                             matrix = DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, gt_new);
                             
-                            /*System.out.println("Matrix: ");
-                            for (ArrayList<Character> m : matrix){ //print matrix
-                                System.out.println(m);
-                            }*/
-                            
                             //save the linear notation from the input in the adjacencymatrix "pattern"
                             ArrayList<ArrayList<Character>> pattern = new ArrayList<>(); 
                             
                             pattern = DBManager.parseRedOrAdjToMatrix(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
-                            /*System.out.println("Pattern: ");
-                            for (ArrayList<Character> m : pattern){ //print pattern
-                                System.out.println(m);
-                            }*/
                             
-                            if (pattern.size() >= matrix.size()){
+                            if (pattern.size() <= matrix.size()){
                                 //start searching
                                 if (!silent){
-                                System.out.println("      --- Start searching the linear notaion " + Settings.get("plcc_S_linear_notation") +" in the folding graph. ---");
+                                    System.out.println("      --- Start searching the linear notaion " + Settings.get("plcc_S_linear_notation") +" in the folding graph. ---");
                                 }
                                 int[] output_array = new int [2]; //saves the indexes in matrix, where the pattern was found
                                 output_array = DBManager.matrix_search(pattern, matrix);
@@ -10924,8 +10912,8 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
-        System.out.println("   --matrix-structure-search: search a structure in linear notation in a Proteingraph");
-        System.out.println("   --matrix-structure-search-db: search a structure in linear notation in the whole database");
+        System.out.println("   --matrix-structure-search <nt> <ln> <gt>: search a structure <ln> in linear notation in a Proteingraph; <nt> = type of linnot; <gt> = graphtype of linnot");
+        System.out.println("   --matrix-structure-search-db <nt> <ln> <gt>: search a structure <ln> in linear notation in the whole database; <nt> = type of linnot; <gt> = graphtype of linnot");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
