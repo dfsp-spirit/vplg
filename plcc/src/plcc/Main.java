@@ -2051,7 +2051,7 @@ public class Main {
                     File file_results = new File("matrix_search_db_results.lst");
                     FileWriter writer = new FileWriter(file_results);
                     
-                    for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notaion from the input
+                    for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notation from the input
                         writer.write(r.get(0) + " " + r.get(1)); //write results to file
                         writer.write(System.getProperty("line.separator")); //add a new line
                     }
@@ -2062,7 +2062,7 @@ public class Main {
                     java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            System.out.println("Exit now.");
+            System.out.println("Exiting now");
             
             System.exit(0);
         }
@@ -4111,13 +4111,13 @@ public class Main {
                             if (pattern.size() <= matrix.size()){
                                 //start searching
                                 if (!silent){
-                                    System.out.println("      --- Start searching the linear notaion " + Settings.get("plcc_S_linear_notation") +" in the folding graph. ---");
+                                    System.out.println("      --- Start searching the linear notation " + Settings.get("plcc_S_linear_notation") +" in the folding graph. ---");
                                 }
                                 int[] output_array = new int [2]; //saves the indexes in matrix, where the pattern was found
                                 output_array = DBManager.matrix_search(pattern, matrix);
                                 
                                 if (!silent && output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
-                                    System.out.println("     **** Linear notation found at indexes (" + output_array[0] + ", " + output_array[1] + ") of the adjaency matrix from the folding graph. ****");
+                                    System.out.println("     **** Linear notation found at indexes (" + output_array[0] + ", " + output_array[1] + ") of the adjacency matrix from the folding graph. ****");
                                 } 
                             }
                         }
