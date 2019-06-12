@@ -19,7 +19,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import graphdrawing.DrawTools.IMAGEFORMAT;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import static java.lang.Math.abs;
+import java.util.logging.Level;
 import plcc.Main;
 import motifs.MotifSearchTools;
 import motifs.Motifs;
@@ -2385,15 +2389,14 @@ connection.close();
      * Searches a small matrix in a bigger one and returns the indexes of the bigger matrix, where the small one was found
      * @param pattern two-dimensional ArrayList that represents a linear notation of an input
      * @param matrix two-dimensional ArrayList that represents a linear notation of a protein graph
-     * @return 
+     * @return array with the two indices where the pattern was found in the matrix. If the pattern was not found, return [-1, 0]
      */
     public static int[] matrix_search(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
         int[] output_array = new int[2]; //saves the indexes of the found pattern
          
         //go through every position in half of the matrix, where you can place the pattern without overlap
         for (int x = 0; x <= matrix.size() - pattern.size(); x++){
-            for (int y = 0; y <= x; y++){
-                //System.out.println("x: " + x + "  y: " + y);       
+            for (int y = 0; y <= x; y++){      
                 int i;
                 int j = 0;
                 
@@ -2401,7 +2404,6 @@ connection.close();
                 outerloop:
                 for (i = 0; i < pattern.size(); i++){
                     for (j = 0; j <= i; j++){
-                        //System.out.println("   i: " + i + "  j: " + j);
                         if (!Objects.equals(matrix.get(x+i).get(y+j), pattern.get(i).get(j))){
                             break outerloop;
                         }
@@ -2424,11 +2426,9 @@ connection.close();
      * Searches the structure of a given linear notation in the whole PTGL database
      * @param linnot the linear notation
      * @param gt the graph type of the linear notation ("alpha", "beta" or "albe")
-     * @return 
+     * @return a 2D ArrayList that contains all Proteins [PDBID, Chainname] in which the linnot was found
      */
     public static ArrayList<ArrayList<String>> matrix_search_db(String linnot, String gt) {
-        
-        //System.out.println(linnot + gt);
         
         //the results (proteins that contain the linnot) will be stored here: [[pdbid, chain], ...]
         ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
@@ -2442,12 +2442,11 @@ connection.close();
         StringBuilder querySB = new StringBuilder();
         
         //create SQL-statement to fetch the ADJ linnot of a given chain_id
-        querySB.append("SELECT denorm_pdb_id, denorm_chain_name, denorm_graph_type_string, ptgl_linnot_red ");
+        querySB.append("SELECT denorm_pdb_id, denorm_chain_name, denorm_graph_type_string, ptgl_linnot_red, num_sses ");
         querySB.append("FROM plcc_fglinnot ");
         querySB.append("WHERE denorm_graph_type_string = ? ;");
         
         String query = querySB.toString();
-        //System.out.println("SQL Statement (query): " + query);
         
         try {
             
@@ -2484,37 +2483,17 @@ connection.close();
         ArrayList<ArrayList<Character>> matrix = new ArrayList<ArrayList<Character>>(); //the adjacency matrix
         ArrayList<ArrayList<Character>> pattern = parseRedOrAdjToMatrix(linnot, gt); // change the input "linnot" into an adjacencymatrix
         
-        //int[] matrixSizeCount = new int[135]; //only for checking runtime, remove later
-        
-        //wieviele bifurcated und non bifurcated gibt es in Datenbank?
-        //remove later
-        //int count_bf = 0;
-        //int count_nbf = 0;
-        
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
-                if (tD.get(3).length() > 2) { //tD.get(3) = linear notation
-                    
-                    //only for countin bifurcated fgs, remove later
-                    /*if (tD.get(3).substring(0, 1).equals("{")){
-                        count_bf++;
-                    }
-                    else {
-                        count_nbf++;
-                    }*/
-                    
-                    //System.out.println("linnot: " + tD.get(2));
-                    
+                if (pattern.size() <= Integer.parseInt(tD.get(4)) && Integer.parseInt(tD.get(4)) > 1) { // tD.get(4) = number of SSEs
+                    //albe größer 3
                     matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacencymatrix
-                    matrixList.add(matrix); 
-                    
-                    //matrixSizeCount[matrix.size()]++; //only for checking runtime, remove later
+                    matrixList.add(matrix);
                     
                     int[] output_array = new int[2]; //saves the indexes of the found pattern
                     output_array = DBManager.matrix_search(pattern, matrix);
                     
                     if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
-                        //System.out.println("Pattern found in matrix at indexes (" + output_array[0] + ", " + output_array[1] + ").");
                         ArrayList<String> pdbidAndChainOfProt = new ArrayList<String>();
                         pdbidAndChainOfProt.add(tD.get(0));
                         pdbidAndChainOfProt.add(tD.get(1));
@@ -2523,11 +2502,6 @@ connection.close();
                 }
             }
         }
-        //remove later
-        /*for (int i = 0; i < 135; i++){
-            System.out.println(i + " " + matrixSizeCount[i]);
-        }*/
-        //System.out.println("bifurcated: " + count_bf + " non-bifurcated: " + count_nbf);
         return results;
     }
     
