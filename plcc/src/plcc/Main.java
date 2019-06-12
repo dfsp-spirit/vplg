@@ -10978,6 +10978,10 @@ public class Main {
      * @return the PyMol script as a string, which may consist of more than one line.
      */
     public static String getPymolSelectionScriptByLigand(ArrayList<MolContactInfo> contacts) {
+        
+        //the program assumes that we are working with object of class Molecule. 
+        //However, there are methods that just need a residue as input and/or output parameter, 
+        //so we always have to query which variables belong to which instance and do a typecast.
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
         ArrayList<Residue> ligRes = new ArrayList<Residue>();
@@ -11494,17 +11498,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain sulfur contacts
             if(c.getNumContactsISS() > 0) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add(c.getResA());
+                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    continue;
+                }
+                else{
+                   if(! protRes.contains(c.getResA())) {
+                    protRes.add((Residue)c.getResA());
                 }
                 if(! protRes.contains(c.getResB())) {
-                    protRes.add(c.getResB());
+                    protRes.add((Residue)c.getResB());
                 }
                 if(! issRes.contains(c.getResA())) {
-                    issRes.add(c.getResA());
+                    issRes.add((Residue)c.getResA());
                 }
                 if(! issRes.contains(c.getResB())) {
-                    issRes.add(c.getResB());
+                    issRes.add((Residue)c.getResB());
                 }
                 
                 ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11515,7 +11523,9 @@ public class Main {
                 ArrayList<String> chains = new ArrayList<String>();
                 chains.add(c.getResA().getChainID());
                 chains.add(c.getResB().getChainID());
-                bondsChainIss.add(chains);
+                bondsChainIss.add(chains); 
+                }
+                
             }
         }
 
