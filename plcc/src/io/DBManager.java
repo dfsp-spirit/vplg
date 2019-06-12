@@ -2486,7 +2486,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (pattern.size() <= Integer.parseInt(tD.get(4)) && Integer.parseInt(tD.get(4)) > 1) { // tD.get(4) = number of SSEs
-                    //albe größer 3
+                    
                     matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacencymatrix
                     matrixList.add(matrix);
                     
