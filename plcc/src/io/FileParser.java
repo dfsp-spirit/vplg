@@ -549,10 +549,6 @@ public class FileParser {
             r = s_residues.get(i);
             deletedAtoms = r.chooseYourAltLoc();
             
-            //if(r.getPdbResNum() == 209) {
-            //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
-            //}
-            
             if(deletedAtoms.size() > 0) {
                 numResiduesAffected++;
             }
@@ -1355,10 +1351,6 @@ public class FileParser {
         for(int i = 0; i < s_residues.size(); i++) {
             r = s_residues.get(i);
             deletedAtoms = r.chooseYourAltLoc();
-            
-            //if(r.getPdbResNum() == 209) {
-            //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
-            //}
             
             if(deletedAtoms.size() > 0) {
                 numResiduesAffected++;
