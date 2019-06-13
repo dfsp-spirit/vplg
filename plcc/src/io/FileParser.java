@@ -1139,17 +1139,21 @@ public class FileParser {
                                 // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
                                 
                                 if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
+                                                                        
+                                    // care for modified AAs (treated at first as lig) which are part of DSSP file
+                                    // and therefore also already in s_residues
+                                    lig = getResidueFromList(resNumPDB, chainID, iCode);
+                                    if (lig == null) {
+                                        // create new Residue from info, we'll have to see whether we really add it below though
+                                        lig = new Residue();
+                                    }
                                     
-                                    int resNumDSSP;
-                                    
-                                    // create new Residue from info, we'll have to see whether we really add it below though
-                                    lig = new Residue();
                                     lig.setPdbResNum(resNumPDB);
                                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                                     
                                     // assign fake DSSP Num increasing with each seen ligand
                                     ligandsTreatedNum ++;
-                                    resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
+                                    int resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
                                     
                                     lig.setDsspResNum(resNumDSSP);
                                     lig.setChainID(chainID);
@@ -1217,7 +1221,7 @@ public class FileParser {
                                         //      instead, use a range over number of atoms.
 
                                         s_residues.add(lig);
-
+                                        
                                         getChainByPdbChainID(chainID).addResidue(lig);
 
                                         // do we need this?
@@ -1327,17 +1331,16 @@ public class FileParser {
                     columnsChecked = false;
                     
                 }
-            }
-            
-            if (! (silent || FileParser.essentialOutputOnly)) {
-                System.out.println("  PDB: Found in total " + s_chains.size() + " chains.");
-            }
-            
+            } // end of reading in lines
 	} catch (IOException e) {
             System.err.println("ERROR: Could not parse PDB file.");
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
+        
+        if (! (silent || FileParser.essentialOutputOnly)) {
+            System.out.println("  PDB: Found in total " + s_chains.size() + " chains.");
+        }
         
         // alt loc treatment copy&pasted from old parser
         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
