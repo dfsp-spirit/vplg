@@ -888,23 +888,26 @@ public class FileParser {
                                     DP.getInstance().e("FP", " Exiting now.");
                                     System.exit(1);
                                 }
+                                
+                                // if auth columns not present map them to PDB ones
+                                // pdbx_PDB_model_num not checked as no equivalent existing (just use default model 1 if not existing)
+                                String[] authCols = {"auth_atom_id", "auth_asym_id", "auth_comp_id", "auth_seq_id"};
+                                // Matching equivalents to author columns
+                                String[] pdbCols = {"label_atom_id", "label_asym_id", "label_comp_id", "label_seq_id"};
+                                for (int i = 0; i < authCols.length; i++) {
+                                    if (colHeaderPosMap.get(authCols[i]) == null) {
+                                        colHeaderPosMap.put(authCols[i], colHeaderPosMap.get(pdbCols[i]));
+                                        if (! silent) {
+                                            System.out.println("   Using " + pdbCols[i] + " instead of "+ 
+                                                    "missing column " + authCols[i]);
+                                        }
+                                    }
+                                }
+                                
                                 columnsChecked = true;
                             }
                             
-                            // if auth columns not present map them to PDB ones
-                            // pdbx_PDB_model_num not checked as no equivalent existing (just use default model 1 if not existing)
-                            String[] authCols = {"auth_atom_id", "auth_asym_id", "auth_comp_id", "auth_seq_id"};
-                            // Matching equivalents to author columns
-                            String[] pdbCols = {"label_atom_id", "label_asym_id", "label_comp_id", "label_seq_id"};
-                            for (int i = 0; i < authCols.length; i++) {
-                                if (colHeaderPosMap.get(authCols[i]) == null) {
-                                    colHeaderPosMap.put(authCols[i], colHeaderPosMap.get(pdbCols[i]));
-                                    if (! silent) {
-                                        System.out.println("   Using " + pdbCols[i] + " instead of "+ 
-                                                "missing column " + authCols[i]);
-                                    }
-                                }
-                            }
+                            
                             
                             // get data of line
                             tmpLineData = lineToArrayCIF(line);
