@@ -760,7 +760,7 @@ public class FileParser {
         Integer numLine = 0;
         
         // variables for already printed warnings
-        Boolean further_model_warning_printed = false;
+        Boolean furtherModelWarningPrinted = false;
 
 
         // - - - DSSP - - -
@@ -929,9 +929,9 @@ public class FileParser {
                                 } else {
                                     // same model as before?
                                     if (! m.getModelID().equals(tmp_modelID)) {
-                                        if (! further_model_warning_printed) {
+                                        if (! furtherModelWarningPrinted) {
                                             System.out.println("   PDB: Found further models. Ignoring them.");
-                                            further_model_warning_printed = true;
+                                            furtherModelWarningPrinted = true;
                                         }
 
                                         // skip this line
