@@ -56,16 +56,26 @@ public class Chain implements java.io.Serializable {
     /**
      * Returns a list of all ligand residues in this chain.
      * @return a list of all ligand residues in this chain
+     * First checks if this molecule is empty and if this molecule is an Instance of RNA 
+     * For this method we need to convert the molecule object into a residue object 
      */
     
     
     public ArrayList<Residue> getAllLigandResidues() {
         ArrayList<Residue> ligands = new ArrayList<>();
-        for(Residue r : this.residues) {
-            if(r.isLigand()) {
-                ligands.add(r);
+        if (this.molecules.size() > 0) {
+            if ((this.molecules.get(0)) instanceof RNA) {
+                return null;
             }
         }
+        
+        Residue r;
+        
+        for(Molecule m : this.molecules) 
+            if(m.isLigand()) {
+                r = (Residue) m;
+                ligands.add(r);
+            }
         return ligands;
     }
 
@@ -90,8 +100,15 @@ public class Chain implements java.io.Serializable {
      * @return the chemical property string, 5 types system
      */
     public String getChainChemProps5StringAllResidues() {
-        StringBuilder sb = new StringBuilder();        
-        for(Residue r : this.residues) {
+        StringBuilder sb = new StringBuilder();   
+        if (this.molecules.size() > 0) {
+            if ((this.molecules.get(0)) instanceof RNA) {
+                return null;
+            }
+        }
+        Residue r;
+        for(Molecule m : this.molecules) {
+            r= (Residue) m;
             sb.append(r.getChemicalProperty5OneLetterString());            
         }        
         return sb.toString();
@@ -102,8 +119,16 @@ public class Chain implements java.io.Serializable {
      * @return the chemical property string, 3 types system
      */
     public String getChainChemProps3StringAllResidues() {
-        StringBuilder sb = new StringBuilder();        
-        for(Residue r : this.residues) {
+        StringBuilder sb = new StringBuilder();  
+        if (this.molecules.size() > 0) {
+            if ((this.molecules.get(0)) instanceof RNA) {
+                return null;
+            }
+        }
+        
+        Residue r;
+        for(Molecule m : this.molecules) {
+            r = (Residue)m;
             sb.append(r.getChemicalProperty3OneLetterString());            
         }        
         return sb.toString();
@@ -129,8 +154,15 @@ public class Chain implements java.io.Serializable {
         for(int i = 0; i < numSSETypes; i++) {
             Arrays.fill(chemPropsBySSEType[i], 0);
         }
+        if (this.molecules.size() > 0) {
+            if ((this.molecules.get(0)) instanceof RNA) {
+                return null;
+            }
+        }
         
-        for(Residue r : this.residues) {
+        Residue r;
+        for(Molecule m : this.molecules) {
+            r = (Residue )m;
             if(r.isAA()) {
                 s = r.getSSE();
                 
