@@ -1962,8 +1962,80 @@ public class Main {
                     System.exit(1);
                 }
        }
-                
+        
+        
+        // **************************************    Protein structure search in the database    ******************************************
+        
+        if(DBManager.initUsingDefaults()) {
+            if(Settings.getBoolean("plcc_B_matrix_structure_search_db")) {
+                System.out.println("Start searching the linear notation " + Settings.get("plcc_S_linear_notation") + " in the PTGL database.");
 
+                ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+
+                results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
+
+                int count_results = results.size();
+                System.out.println("  The structure was found in " + count_results + " proteins.");
+                if (count_results > 0){
+
+                    //writing results into a text file
+                    try {
+                        System.out.println("Saving all proteins (pdbid and chain) in the file 'matrix_search_db_results.lst'. ");
+
+                        File file_results = new File("matrix_search_db_results.lst");
+                        FileWriter writer = new FileWriter(file_results);
+
+                        for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notation from the input
+                            writer.write(r.get(0) + " " + r.get(1)); //write results to file
+                            writer.write(System.getProperty("line.separator")); //add a new line
+                        }
+                        writer.flush();
+                        writer.close();
+
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                System.out.println("Exiting now");
+
+                System.exit(0);
+            }
+        } else {
+            System.err.println("ERROR: Could not connect to DB, exiting.");
+            System.exit(1);
+        }
+        
+
+        // ************************************** check database connection ******************************************        
+
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            String plcc_db_name = Settings.get("plcc_S_db_name");
+            String plcc_db_host = Settings.get("plcc_S_db_host");
+            Integer plcc_db_port = Settings.getInteger("plcc_I_db_port");
+            String plcc_db_username = Settings.get("plcc_S_db_username");
+            String plcc_db_password = Settings.get("plcc_S_db_password");
+            if(! silent) {
+                System.out.println("  Checking database connection to host '" + plcc_db_host + "' on port '" + plcc_db_port + "'...");
+            }
+            if(DBManager.initUsingDefaults()) {
+                if(! silent) {
+                    System.out.println("  -> Database connection OK.");
+                }
+            }
+            else {
+                System.out.println("  -> Database connection FAILED.");
+                DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
+                Settings.set("plcc_B_useDB", "false");
+            }
+        }
+        else {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                System.out.println("  Not using the database as requested by options.");
+            }
+        }
+        
+
+        // **************************************    file checks    ******************************************
         File input_file;
         File output_dir;
         
@@ -2010,70 +2082,6 @@ public class Main {
             }
         }
 
-
-        // ************************************** check database connection ******************************************        
-
-        if(Settings.getBoolean("plcc_B_useDB")) {
-            String plcc_db_name = Settings.get("plcc_S_db_name");
-            String plcc_db_host = Settings.get("plcc_S_db_host");
-            Integer plcc_db_port = Settings.getInteger("plcc_I_db_port");
-            String plcc_db_username = Settings.get("plcc_S_db_username");
-            String plcc_db_password = Settings.get("plcc_S_db_password");
-            if(! silent) {
-                System.out.println("  Checking database connection to host '" + plcc_db_host + "' on port '" + plcc_db_port + "'...");
-            }
-            if(DBManager.initUsingDefaults()) {
-                if(! silent) {
-                    System.out.println("  -> Database connection OK.");
-                }
-            }
-            else {
-                System.out.println("  -> Database connection FAILED.");
-                DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
-                Settings.set("plcc_B_useDB", "false");
-            }
-        }
-        else {
-            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
-                System.out.println("  Not using the database as requested by options.");
-            }
-        }
-        
-        // **************************************    Protein structure search in the database    ******************************************
-        
-        if(Settings.getBoolean("plcc_B_matrix_structure_search_db")) {
-            System.out.println("Start searching the linear notation " + Settings.get("plcc_S_linear_notation") + " in the PTGL database.");
-            
-            ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
-            
-            results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
-            
-            int count_results = results.size();
-            System.out.println("  The structure was found in " + count_results + " proteins.");
-            if (count_results > 0){
-                
-                //writing results into a text file
-                try {
-                    System.out.println("Saving all proteins (pdbid and chain) in the file 'matrix_search_db_results.lst'. ");
-                    
-                    File file_results = new File("matrix_search_db_results.lst");
-                    FileWriter writer = new FileWriter(file_results);
-                    
-                    for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notation from the input
-                        writer.write(r.get(0) + " " + r.get(1)); //write results to file
-                        writer.write(System.getProperty("line.separator")); //add a new line
-                    }
-                    writer.flush();
-                    writer.close();
-                    
-                } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            System.out.println("Exiting now");
-            
-            System.exit(0);
-        }
 
         // **************************************    here we go: parse files and get data    ******************************************
         if(! silent) {
