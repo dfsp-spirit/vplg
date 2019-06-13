@@ -777,7 +777,7 @@ public class FileParser {
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
         if(s_residues.size() < 1) {
-            DP.getInstance().e("FP", "DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
+            DP.getInstance().e("FP_CIF", "DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
         
@@ -883,9 +883,9 @@ public class FileParser {
                             if (! columnsChecked) {
                                 ArrayList<String> missingCols = checkColumns(tableCategory, new ArrayList<>(colHeaderPosMap.keySet()));
                                 if (missingCols.size() > 0) {
-                                    DP.getInstance().e("FP", "Missing following columns in " + tableCategory + 
+                                    DP.getInstance().e("FP_CIF", "Missing following columns in " + tableCategory + 
                                             ": " + missingCols);
-                                    DP.getInstance().e("FP", " Exiting now.");
+                                    DP.getInstance().e("FP_CIF", " Exiting now.");
                                     System.exit(1);
                                 }
                                 
@@ -906,8 +906,6 @@ public class FileParser {
                                 
                                 columnsChecked = true;
                             }
-                            
-                            
                             
                             // get data of line
                             tmpLineData = lineToArrayCIF(line);
@@ -1054,7 +1052,7 @@ public class FileParser {
                             chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
                             Boolean isAA = isAminoacid(resNamePDB);
-
+                            
                             // TODO: possible to ignore alt loc atoms right now?
                             
                             // >> DNA/RNA <<
@@ -1078,6 +1076,7 @@ public class FileParser {
                                             continue; // skip atom / line
                                         }
                                     } else {
+                                        tmpRes.setModelID(m.getModelID());
                                         tmpRes.setChain(tmpChain);
                                         tmpChain.addResidue(tmpRes);
                                     }
@@ -1159,7 +1158,7 @@ public class FileParser {
                                     lig.setAAName1(AminoAcid.getLigandName1());
                                     lig.setChain(getChainByPdbChainID(chainID));
                                     // still just assigning default model 1
-                                    lig.setModelID("1");
+                                    lig.setModelID(m.getModelID());
                                     lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                                     
                                     
