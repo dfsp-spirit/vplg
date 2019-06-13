@@ -1966,13 +1966,24 @@ public class Main {
         
         // **************************************    Protein structure search in the database    ******************************************
         
-        if(DBManager.initUsingDefaults()) {
-            if(Settings.getBoolean("plcc_B_matrix_structure_search_db")) {
+        if(Settings.getBoolean("plcc_B_matrix_structure_search_db")) {
+            String linnotGraphType = Settings.get("plcc_S_linear_notation_graph_type");
+
+            // check input parameters first
+            String viableLinnotGraphTypes[] = new String[] {"alpha", "beta", "albe"};
+            if (! Arrays.asList(viableLinnotGraphTypes).contains(linnotGraphType)) {
+                DP.getInstance().e("Main", "Unrecognized linear notation graph type '" + linnotGraphType +
+                        "'. Allowed values: " + Arrays.toString(viableLinnotGraphTypes) + " Exiting now.");
+                System.exit(1);
+            }
+            // NOTE linnot type not checked as currently only red used 
+            
+            if(DBManager.initUsingDefaults()) {
                 System.out.println("Start searching the linear notation " + Settings.get("plcc_S_linear_notation") + " in the PTGL database.");
 
                 ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
 
-                results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), Settings.get("plcc_S_linear_notation_graph_type"));
+                results = DBManager.matrix_search_db(Settings.get("plcc_S_linear_notation"), linnotGraphType);
 
                 int count_results = results.size();
                 System.out.println("  The structure was found in " + count_results + " proteins.");
@@ -1999,10 +2010,10 @@ public class Main {
                 System.out.println("Exiting now");
 
                 System.exit(0);
+            } else {
+                System.err.println("ERROR: Could not connect to DB, exiting.");
+                System.exit(1);
             }
-        } else {
-            System.err.println("ERROR: Could not connect to DB, exiting.");
-            System.exit(1);
         }
         
 
