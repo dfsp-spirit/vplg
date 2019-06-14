@@ -1997,7 +1997,7 @@ public class Main {
                         FileWriter writer = new FileWriter(file_results);
 
                         for (ArrayList<String> r : results){ //print the results = pdbid and chain of all proteins, that contain the linear notation from the input
-                            writer.write(r.get(0) + " " + r.get(1)); //write results to file
+                            writer.write(r.get(0) + r.get(1)); //write results to file
                             writer.write(System.getProperty("line.separator")); //add a new line
                         }
                         writer.flush();
