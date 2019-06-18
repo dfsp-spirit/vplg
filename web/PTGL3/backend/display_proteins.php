@@ -8,6 +8,8 @@
  *   
  * @author Daniel Bruness <dbruness@gmail.com>
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
+ * 
+ * changed 2019 by Jan Niclas Wolf (jnw) <Wolf@bioinformatik.uni-frankfurt.de>
  */
 
 ini_set('display_errors', 0);
@@ -229,9 +231,10 @@ $recent_chain_id = "";
 foreach ($chains as $value){
     $new_chain = true;
     // check for correct format (maybe check also for correct letters/numbers..?)
-    if (!(strlen($value) == 5)) {
+    //  jnw_2019: b/c of large structures in mmCIF format up to 4-char chain IDs are allowed
+    if (!(strlen($value) <= 8)) {
             //echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
-            array_push($SHOW_ERROR_LIST, "PDB chain '" . $value . "' has a wrong PDB-ID and chain format, expected something like '7timA'.");
+            array_push($SHOW_ERROR_LIST, "PDB chain '" . $value . "' has a wrong PDB-ID and chain format, expected something like '7timA'. Up to 4 character chains are allowed.");
             continue;
     }
     // if everything is fine..
