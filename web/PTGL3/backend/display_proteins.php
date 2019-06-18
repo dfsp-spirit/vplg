@@ -9,7 +9,9 @@
  * @author Daniel Bruness <dbruness@gmail.com>
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  * 
- * changed 2019 by Jan Niclas Wolf (jnw) <Wolf@bioinformatik.uni-frankfurt.de>
+ * Changed by Jan Niclas Wolf (jnw) <Wolf@bioinformatik.uni-frankfurt.de>
+ *  2019:   - fix display of chains with IDs of > 1 char (max 4 currently)
+ *          - clearer error messages
  */
 
 ini_set('display_errors', 0);
@@ -371,7 +373,7 @@ foreach ($chains as $value){
                 $tableString .= '</li> <!-- closing inner slider element -->' . "\n";
 
             } else {
-                $tableString .= "<li><h3>No data found in the database for request protein $pdbID chain $chainName, sorry.</h3>";
+                $tableString .= "<li><h5>No data found in the database for requested protein $pdbID chain $chainName, sorry. Maybe it only contains RNA/DNA?</h5>";
             }
    
         } // end fetch chain data (images etc..)
@@ -447,7 +449,7 @@ foreach ($chains as $value){
                 }
             }
         } else {
-            $tableString .= "<div><h2>No data found in the database for request protein $pdbID chain $chainName, sorry.</h2></div>";
+            $tableString .= "<div><h5>No data found in the database for requested protein $pdbID chain $chainName, sorry. Maybe it only contains RNA/DNA?</h5></div>";
         }            
             $tableString .= '</div> <!-- end pager div, the one to select graph type -->' . "\n";
             $tableString .= '</div> <!-- end proteingraph div -->' . "\n";
