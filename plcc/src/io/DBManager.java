@@ -2391,7 +2391,7 @@ connection.close();
      * @param matrix two-dimensional ArrayList that represents a linear notation of a protein graph
      * @return array with the two indices where the pattern was found in the matrix. If the pattern was not found, return [-1, 0]
      */
-    public static int[] matrix_search(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
+    public static int[] matrixSearch(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
         int[] output_array = new int[2]; //saves the indexes of the found pattern
          
         //go through every position in half of the matrix, where you can place the pattern without overlap
@@ -2428,7 +2428,7 @@ connection.close();
      * @param gt the graph type of the linear notation ("alpha", "beta" or "albe")
      * @return a 2D ArrayList that contains all Proteins [PDBID, Chainname] in which the linnot was found
      */
-    public static ArrayList<ArrayList<String>> matrix_search_db(String linnot, String gt) {
+    public static ArrayList<ArrayList<String>> matrixSearchDb(String linnot, String gt) {
         
         //the results (proteins that contain the linnot) will be stored here: [[pdbid, chain], ...]
         ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
@@ -2468,14 +2468,14 @@ connection.close();
             }
             
         } catch (SQLException e ) {
-            DP.getInstance().e("DBManager", "matrix_search_db: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "matrixSearchDb: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
                     statement.close();
                 }
                 //dbc.setAutoCommit(true);              
-            } catch(SQLException e) { DP.getInstance().w("DBManager", "matrix_search_db: Could not close statement and reset autocommit.");}
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "matrixSearchDb: Could not close statement and reset autocommit.");}
         }
         
         //iterate over all present linnots and save them as an adjacencymatrix in the list "matrixList"
@@ -2491,7 +2491,7 @@ connection.close();
                     matrixList.add(matrix);
                     
                     int[] output_array = new int[2]; //saves the indexes of the found pattern
-                    output_array = DBManager.matrix_search(pattern, matrix);
+                    output_array = DBManager.matrixSearch(pattern, matrix);
                     
                     if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
                         ArrayList<String> pdbidAndChainOfProt = new ArrayList<String>();
