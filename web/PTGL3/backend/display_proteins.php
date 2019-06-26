@@ -261,7 +261,7 @@ foreach ($chains as $value){
                           ORDER BY graph_type"; 
 
         pg_prepare($db, "getChains", $query);		
-        $result = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));  
+        $result = pg_execute($db, "getChains", array("%".$pdbID."%", $chainName));  
       
         $tableString .= '
                         <li> <!-- start element of outer slider, a chain -->
@@ -440,7 +440,7 @@ foreach ($chains as $value){
             // counter for the data-slide-index property of the bxSlider.
             $c = 0;					
             // create thumbails for the (inner) slider. One thumb for each graphtype
-            $result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));
+            $result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", $chainName));
             while ($arr = pg_fetch_array($result_thumbs, NULL, PGSQL_ASSOC)){
                 if(isset($arr['graph_image_png']) && file_exists($IMG_ROOT_PATH.$arr['graph_image_png'])) {
                     $tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
