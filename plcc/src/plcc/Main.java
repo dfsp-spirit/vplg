@@ -1986,7 +1986,7 @@ public class Main {
                 results = DBManager.matrixSearchDB(Settings.get("plcc_S_linear_notation"), linnotGraphType);
 
                 int count_results = results.size();
-                System.out.println("  The structure was found in " + count_results + " proteins.");
+                System.out.println("  The structure was found in " + count_results + " protein chains.");
                 if (count_results > 0){
 
                     //writing results into a text file
