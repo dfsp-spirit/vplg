@@ -764,8 +764,10 @@ public class ContactMatrix {
      */
     public void calculateSSESpatialRelationMatrix(List<ResContactInfo> contList, Boolean computeAll) {
 
-        // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string, and as value a list of all contacts of that residue. This is done only once,
-        //   and saves us from sequentially iterating through the contact list to find the ones for the current residue (|R|^2) times later.
+        // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string 
+        //   (jnw_2019: more like the number of the SSE it is part of), and as value a list of all contacts 
+        //   of that residue. This is done only once, and saves us from sequentially iterating through the 
+        //   contact list to find the ones for the current residue (|R|^2) times later.
         Map<Integer, List<ResContactInfo>> rcMap = new HashMap<>();
         Integer resASSEPos, resBSSEPos;
         for(ResContactInfo rci : contList) {
@@ -781,11 +783,14 @@ public class ContactMatrix {
             }
             
             // add data
-            rcMap.get(resASSEPos).add(rci);
-            rcMap.get(resBSSEPos).add(rci);
+            // jnw_2019: only if both res are part of SSE
+            if (resASSEPos != -1 && resBSSEPos != -1) {
+                rcMap.get(resASSEPos).add(rci);
+                rcMap.get(resBSSEPos).add(rci);
+            }
         }
         
-        
+           
         SSE sseA, sseB;
         Residue resA, resB;
         sseA = sseB = null;
@@ -811,12 +816,16 @@ public class ContactMatrix {
         Boolean condition = false;
 
         //System.out.println("  Calculating spatial relations between SSEs...");
+        
 
-        for(Integer i = 0; i < this.size; i++) {
-
+        for(Integer i = 0; i < this.size - 1; i++) {
             sseA = this.sseList.get(i);
 
             for(Integer j = (i + 1); j < this.size; j++) {
+                
+                if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                        System.out.println("[DEBUG LV 4] Vertices >>" + i + "<< and >>" + j + "<<");
+                    }
 
                 sseB = this.sseList.get(j);
                 
@@ -868,7 +877,7 @@ public class ContactMatrix {
 
                         // If both residues belong to (different) SSEs *of this SSE pair (i,j)*
                         if((resASSEPos.equals(i) && resBSSEPos.equals(j)) || (resASSEPos.equals(j) && resBSSEPos.equals(i))) {
-
+                            
                             // check for new sumMax
                             tmp = usedContList.get(k).getDsspResNumResA() + usedContList.get(k).getDsspResNumResB();
                             if(tmp > sumMax) {
@@ -880,14 +889,17 @@ public class ContactMatrix {
                                 sumMin = tmp;
                             }
 
+                            if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                                System.out.println("[DEBUG LV 4] Res " + resA.getDsspResNum() + " + " + resB.getDsspResNum());
+                                System.out.println("  Sum: " + tmp);
+                            }
+                            
                             // check for new difMax
                             tmp = Math.abs(usedContList.get(k).getDsspResNumResA() - usedContList.get(k).getDsspResNumResB());
                             
-                            // The following code is wrong! We now take the absolute value (see above) instead of the smaller one!
-                            // (a - b) != (b - a), therefore always consider the smaller of these two results
-                            //if(contList.get(k).getDsspResNumResB() - contList.get(k).getDsspResNumResA() < tmp) {
-                            //    tmp = contList.get(k).getDsspResNumResB() - contList.get(k).getDsspResNumResA();
-                            //}
+                            if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                                System.out.println("  Diff: " + tmp);
+                            }
 
                             if(tmp > difMax) {
                                 difMax = tmp;
@@ -898,18 +910,23 @@ public class ContactMatrix {
                                 difMin = tmp;
                             }
 
-
+                            
 
                         }
-                        else {
-                            continue;                              
-                        }
-
                     }
-
+                    
                     //doubleDifference = (sumMax - sumMin) - (difMax - difMin);
                     doubleDifference = sumMax - sumMin - difMax + difMin;
-                    //System.out.println("DEBUG: Detected DD " + doubleDifference + " for vertices " + i + " and " + j + ".");
+                    
+                    if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                        System.out.println("[DEBUG LV 4] Final values:");
+                        System.out.println("  sumMax: " + sumMax);
+                        System.out.println("  sumMin: " + sumMin);
+                        System.out.println("  difMax: " + difMax);
+                        System.out.println("  sumMax: " + difMin);
+                        System.out.println("  Double difference: " + doubleDifference);
+                    }
+                    
                     
                     dblDif[i][j] = doubleDifference;
                     

@@ -10894,7 +10894,7 @@ public class Main {
         System.out.println("-B | --force-backbone      : add contacts of special type 'backbone' between all SSEs of a graph in sequential order (N to C terminus)");
         System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
         System.out.println("-C | --create-config       : creates a default config file if none exists yet, then exits.*");
-        System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)  [DEBUG]");
+        System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output, up to 4 currently)  [DEBUG]");
         System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
         System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
