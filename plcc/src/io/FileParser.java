@@ -161,7 +161,6 @@ public class FileParser {
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
-        s_rna= new ArrayList <RNA>();
         s_molecule = new ArrayList <Molecule> ();
         homologuesMap = new HashMap<>();
 
@@ -485,8 +484,6 @@ public class FileParser {
             System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
-        
-
         if(! FileParser.silent) {
             System.out.println("  Creating all Ligand Residues...");
         }
@@ -1006,8 +1003,7 @@ public class FileParser {
                             // TODO: possible to ignore alt loc atoms right now?
                             
                             // >> DNA/RNA <<
-                            // ignore atm
-                            //splitten !!! abfrage ob rna oder dna - ausgabe nur für rna, wenns dna ist also kein include_rna dann continue: 
+                            // ignore atm 
                             /*if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
@@ -1030,18 +1026,12 @@ public class FileParser {
                                 }
                             }
                             
-                            // >> AA <<
-                            // update tmpRes (only if needed) 
-                            //     -> enables getting DsspResNum for atom from res
-                            // match res <-> chain here 
-                            //else: prüfen ob RNA- wenn ja: alles einfügen 
                             if (isAA) {
                                 if (tmpRes == null) {
                                     tmpRes = getResFromListWithErrMsg(molNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                     if (tmpRes == null) {
                                         if (isAA) {
                                             continue; // skip atom / line
-                                            // the continue statement breaks one iteration (in the loop), if a specified condiftion occurs, and continues with the next iteration in the loop
                                         }
                                     } else {
                                         tmpRes.setChain(tmpChain);
@@ -1063,8 +1053,6 @@ public class FileParser {
                                 }
                             } else {
                                 tmpRes = null;
-                                
-                            
                             }
                             // => in case of ligand tmpRes now is null!
                             
@@ -1239,7 +1227,6 @@ public class FileParser {
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
                             a.setPdbResNum(resNumPDB);
-                            //a.setRnaNum(rnaNumPDB);
                             // we cant get the DSSP res num easily here and have to do it later (I guess)
                             // old parser seems to assign 0 here whatsoever so we just leave the default value there
                             // a.setDsspResNum(resNumDSSP);
@@ -1896,7 +1883,6 @@ public class FileParser {
     @Deprecated public static Integer getDsspResNumForPdbResNum(Integer prn) {
         Integer foundDsspResNum = null;
         Integer foundPdbResNum = null;
-        //IntegerfoundDsspMolNum = null;
         //IntegerfoundPdbMolNum=null;
         Integer resultDsspResNum = null;
         String dline = null;
@@ -1963,8 +1949,6 @@ public class FileParser {
         return(resultDsspResNum);
     }
     
-    
-    //getDsspMolNumForPdbFields        
     public static Integer getDsspResNumForPdbFields(Integer prn, String chainID, String iCode) {
         Integer foundDsspResNum = null;
         Integer foundPdbResNum = null;
