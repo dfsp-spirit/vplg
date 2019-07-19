@@ -11,7 +11,7 @@ package io;
 
 // imports
 import proteinstructure.ProtMetaInfo;
-import proteingraphs.ResContactInfo;
+import proteingraphs.MolContactInfo;
 import proteingraphs.ProtGraph;
 import proteinstructure.Model;
 import proteinstructure.Residue;
@@ -3538,7 +3538,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * @param ourContacts an ArrayList containing the contact data computed by this application
      * 
      */
-    public static void compareResContactsWithPdbidDotGeoFile(String filePath, Boolean isGeoLig, ArrayList<ResContactInfo> ourContacts) {
+    public static void compareResContactsWithPdbidDotGeoFile(String filePath, Boolean isGeoLig, ArrayList<MolContactInfo> ourContacts) {
         
         Integer radDif1, radDif2, maxRadDif, distDif, maxDistDif, sumDif, sumDifAbs, common;  // difference logging
         
@@ -3702,7 +3702,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             
             Boolean found = false;
             radDif1 = radDif2 = distDif = 0;
-            for(ResContactInfo rc : ourContacts) {
+            for(MolContactInfo rc : ourContacts) {
                 
                 //System.out.println("Comparing with our contact pair " + rc.getDsspResNumResA() + "," + rc.getDsspResNumResB() + ".");
                 
@@ -3748,7 +3748,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         // We should also check for contacts which occur in our data but not in the comparison file, i.e.,
         //  the number of plcc contacts which were not accepted by geom_neo 
         Integer dsspResA, dsspResB;
-        for(ResContactInfo rc : ourContacts) {
+        for(MolContactInfo rc : ourContacts) {
             dsspResA = rc.getDsspResNumResA();
             dsspResB = rc.getDsspResNumResB();
             
