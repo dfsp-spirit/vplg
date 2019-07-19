@@ -20,7 +20,7 @@ import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
 import proteinstructure.SSE;
 import proteinstructure.Molecule;
-import proteinstructure.RNA; //maybe delete it later??
+import proteinstructure.RNA; 
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +53,6 @@ public class FileParser {
     static String firstModelName = "1";             // the model ID that identifies the first model in a PDB file
     static String defaultModelName = firstModelName;
     static String lastAltLoc = " ";
-
     static String dsspFile = null;
     static String pdbFile = null;
     static Integer dsspDataStartLine = null;
