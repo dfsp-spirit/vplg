@@ -1374,7 +1374,7 @@ public class FileParser {
 
         Integer atomSerialNumber, molNumPDB, resNumPDB, resNumDSSP, rnaNumPDB;
         Integer coordX, coordY, coordZ;
-        atomSerialNumber = molNumPDB = resNumPDB = resNumDSSP = rnaNumPDB = coordX = coordY = coordZ = 0;
+        atomSerialNumber = molNumPDB = resNumPDB = resNumDSSP = coordX = coordY = coordZ = 0;
         String atomRecordName, atomName, molNamePDB, resNamePDB, chainID, chemSym, altLoc, iCode;
         atomRecordName = atomName = molNamePDB = resNamePDB = chainID = chemSym = altLoc = iCode = "";
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
@@ -1414,18 +1414,15 @@ public class FileParser {
             }
             else {
                 
-                
                 // PLCC style: round the coordinates
                 oCoordXf = Float.valueOf((curLinePDB.substring(30, 38)).trim()) * 10;
                 oCoordYf = Float.valueOf((curLinePDB.substring(38, 46)).trim()) * 10;
                 oCoordZf = Float.valueOf((curLinePDB.substring(46, 54)).trim()) * 10;
-   
                 coordX = Integer.valueOf(Math.round(oCoordXf));
                 coordY = Integer.valueOf(Math.round(oCoordYf));
                 coordZ = Integer.valueOf(Math.round(oCoordZf));
                 
                 // now, is has become 88
-                
                 //System.out.println("[atom#" + atomSerialNumber + "] oCoords=(" + oCoordXf + "," + oCoordYf + "," + oCoordZf + "), Coords=(" + coordX + "," + coordY + "," + coordZ + ")");
             }                        
     
@@ -1436,11 +1433,10 @@ public class FileParser {
             // 72 - 75 are ignored: segment identifier
             chemSym = curLinePDB.substring(76, 78);
             
-            
             //if(chemSym.trim().equals("H")) {
             //    System.out.println("Found hydrogen line '" + curLinePDB + "'.");
             //}
-            
+
             // 78 - 79 are ignored: atom charge
         } catch(Exception e) {
             System.err.println("ERROR: Hit ATOM/HETATM line at PDB line number " + curLineNumPDB + " but parsing the line failed (length " + curLinePDB.length() + "): '" + e.getMessage() + "'.");
@@ -1454,22 +1450,6 @@ public class FileParser {
         //    return(false);
         //}
 
-        // Files that contain DNA or RNA are not supported atm
-        //splitten!!!! 
-        if(FileParser.isDNAresidueName(molNamePDB)) {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
-            }
-            return false;
-        }
-        
-        if(FileParser.isRNAresidueName(molNamePDB)) {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
-            }
-            return false;
-        }
-
         Atom a = new Atom();
 
         // handle stuff that's different between ATOMs and HETATMs
@@ -1480,9 +1460,7 @@ public class FileParser {
                 
                 if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                     return(false);
-                }
-                
-                
+                } 
             }
 
             // the N terminus is in an ATOM line, never in a HETATM line
@@ -1543,7 +1521,6 @@ public class FileParser {
             a.setModelID(curModelID);
             a.setModel(getModelByModelID(curModelID));
         }
-
         
         if(tmpRes == null) {
             DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
@@ -1680,7 +1657,6 @@ public class FileParser {
      * @return the residue if such a residue exists, null if no such residue exists.
      */
     
-    //getRNAFromList or getMolFromList? was sind die Eingabe Parameter??
     private static Residue getResidueFromList(Integer resNumPDB, String chainID, String iCode) {
 
         Residue tmp;
