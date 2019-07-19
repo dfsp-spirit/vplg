@@ -239,6 +239,10 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
                 gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
             
             }
+            else
+                if(!(molecule instanceof Residue)){
+                    gmlf.append("    rna \"");
+                }
             
             gmlf.append(endNode).append("\n");
         }
