@@ -11332,53 +11332,50 @@ public class Main {
                 else{
                     if(! protRes.contains(c.getResA())) {
                     protRes.add((Residue)c.getResA());
-                }
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add((Residue)c.getResB());
-                }
-                if(! bcRes.contains(c.getResA())) {
-                    bcRes.add((Residue)c.getResA());
-                }
-                if(! bcRes.contains(c.getResB())) {
-                    bcRes.add((Residue)c.getResB());
-                }
-                
-                ArrayList<Integer> tmp = new ArrayList<Integer>();
-                tmp.add(c.getPdbResNumResA());
-                tmp.add(c.getPdbResNumResB());
-                bondsBC.add(tmp);
-                
-                ArrayList<String> chains = new ArrayList<String>();
-                chains.add(c.getResA().getChainID());
-                chains.add(c.getResB().getChainID());
-                bondsChainBC.add(chains);
-                
-                if(c.getNumContactsBCHB() > 0) {
-                    ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getBCHBContactAtomNumA() - 1);
-                    atoms.add(c.getBCHBContactAtomNumB() - 1);
-                    bondsBCAtoms.add(atoms);
-                
-                ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBCHBContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBCHBContactAtomNumB() - 1).getAtomName());
-                bondsAtomNamesBC.add(atomNames);
-                }
-                
-                if(c.getNumContactsBCBH() > 0) {
-                    ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getBCBHContactAtomNumA() - 1);
-                    atoms.add(c.getBCBHContactAtomNumB() - 1);
-                    bondsBCAtoms.add(atoms);
-                
-                ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBCBHContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB() - 1).getAtomName());
-                bondsAtomNamesBC.add(atomNames);
-                }
-                }
-                
-                
+                    }
+                    if(! protRes.contains(c.getResB())) {
+                        protRes.add((Residue)c.getResB());
+                    }
+                    if(! bcRes.contains(c.getResA())) {
+                        bcRes.add((Residue)c.getResA());
+                    }
+                    if(! bcRes.contains(c.getResB())) {
+                        bcRes.add((Residue)c.getResB());
+                    }
+
+                    ArrayList<Integer> tmp = new ArrayList<Integer>();
+                    tmp.add(c.getPdbResNumResA());
+                    tmp.add(c.getPdbResNumResB());
+                    bondsBC.add(tmp);
+
+                    ArrayList<String> chains = new ArrayList<String>();
+                    chains.add(c.getResA().getChainID());
+                    chains.add(c.getResB().getChainID());
+                    bondsChainBC.add(chains);
+
+                    if(c.getNumContactsBCHB() > 0) {
+                        ArrayList<Integer> atoms = new ArrayList<Integer>();
+                        atoms.add(c.getBCHBContactAtomNumA() - 1);
+                        atoms.add(c.getBCHBContactAtomNumB() - 1);
+                        bondsBCAtoms.add(atoms);
+                        ArrayList<String> atomNames = new ArrayList<String>();
+                        atomNames.add(c.getResA().getAtoms().get(c.getBCHBContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getResB().getAtoms().get(c.getBCHBContactAtomNumB() - 1).getAtomName());
+                        bondsAtomNamesBC.add(atomNames);
+
+                    }
+
+                    if(c.getNumContactsBCBH() > 0) {
+                        ArrayList<Integer> atoms = new ArrayList<Integer>();
+                        atoms.add(c.getBCBHContactAtomNumA() - 1);
+                        atoms.add(c.getBCBHContactAtomNumB() - 1);
+                        bondsBCAtoms.add(atoms);
+                        ArrayList<String> atomNames = new ArrayList<String>();
+                        atomNames.add(c.getResA().getAtoms().get(c.getBCBHContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB() - 1).getAtomName());
+                        bondsAtomNamesBC.add(atomNames);
+                    }
+                }   
             }
             
             // Select all residues of the protein that have interchain sidechain-backbone h-bridge contacts
@@ -11389,54 +11386,51 @@ public class Main {
                 else{
                    if(! protRes.contains(c.getResA())) {
                     protRes.add((Residue)c.getResA());
+                    }
+                    if(! protRes.contains(c.getResB())) {
+                        protRes.add((Residue)c.getResB());
+                    }
+                    if(! cbRes.contains(c.getResA())) {
+                        cbRes.add((Residue)c.getResA());
+                    }
+                    if(! cbRes.contains(c.getResB())) {
+                        cbRes.add((Residue)c.getResB());
+                    }
+
+                    ArrayList<Integer> tmp = new ArrayList<Integer>();
+                    tmp.add(c.getPdbResNumResA());
+                    tmp.add(c.getPdbResNumResB());
+                    bondsCB.add(tmp);
+
+                    ArrayList<String> chains = new ArrayList<String>();
+                    chains.add(c.getResA().getChainID());
+                    chains.add(c.getResB().getChainID());
+                    bondsChainCB.add(chains);
+
+                    if(c.getNumContactsCBHB() > 0) {
+                        ArrayList<Integer> atoms = new ArrayList<Integer>();
+                        atoms.add(c.getCBHBContactAtomNumA() - 1);
+                        atoms.add(c.getCBHBContactAtomNumB() - 1);
+                        bondsCBAtoms.add(atoms);
+
+                        ArrayList<String> atomNames = new ArrayList<String>();
+                        atomNames.add(c.getResA().getAtoms().get(c.getCBHBContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getResB().getAtoms().get(c.getCBHBContactAtomNumB() - 1).getAtomName());
+                        bondsAtomNamesCB.add(atomNames);
+                    }
+
+                    if(c.getNumContactsCBBH() > 0) {
+                        ArrayList<Integer> atoms = new ArrayList<Integer>();
+                        atoms.add(c.getCBBHContactAtomNumA() - 1);
+                        atoms.add(c.getCBBHContactAtomNumB() - 1);
+                        bondsCBAtoms.add(atoms);
+
+                        ArrayList<String> atomNames = new ArrayList<String>();
+                        atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB() - 1).getAtomName());
+                        bondsAtomNamesCB.add(atomNames);
+                    } 
                 }
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add((Residue)c.getResB());
-                }
-                if(! cbRes.contains(c.getResA())) {
-                    cbRes.add((Residue)c.getResA());
-                }
-                if(! cbRes.contains(c.getResB())) {
-                    cbRes.add((Residue)c.getResB());
-                }
-                
-                ArrayList<Integer> tmp = new ArrayList<Integer>();
-                tmp.add(c.getPdbResNumResA());
-                tmp.add(c.getPdbResNumResB());
-                bondsCB.add(tmp);
-                
-                ArrayList<String> chains = new ArrayList<String>();
-                chains.add(c.getResA().getChainID());
-                chains.add(c.getResB().getChainID());
-                bondsChainCB.add(chains);
-                
-                if(c.getNumContactsCBHB() > 0) {
-                    ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCBHBContactAtomNumA() - 1);
-                    atoms.add(c.getCBHBContactAtomNumB() - 1);
-                    bondsCBAtoms.add(atoms);
-                
-                ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCBHBContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCBHBContactAtomNumB() - 1).getAtomName());
-                bondsAtomNamesCB.add(atomNames);
-                }
-                
-                if(c.getNumContactsCBBH() > 0) {
-                    ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCBBHContactAtomNumA() - 1);
-                    atoms.add(c.getCBBHContactAtomNumB() - 1);
-                    bondsCBAtoms.add(atoms);
-                
-                ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB() - 1).getAtomName());
-                bondsAtomNamesCB.add(atomNames);
-                } 
-                }
-                
-                
-                
             }
             
             // Select all residues of the protein that have interchain sidechain-sidechain h-bridge contacts
@@ -11445,55 +11439,53 @@ public class Main {
                     continue;
                 }
                 else{
-                  if(! protRes.contains(c.getResA())) {
+                    if(! protRes.contains(c.getResA())) {
                     protRes.add((Residue)c.getResA());
-                }
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add((Residue)c.getResB());
-                }
-                if(! ccRes.contains(c.getResA())) {
-                    ccRes.add((Residue)c.getResA());
-                }
-                if(! ccRes.contains(c.getResB())) {
-                    ccRes.add((Residue)c.getResB());
-                }
-                
-                ArrayList<Integer> tmp = new ArrayList<Integer>();
-                tmp.add(c.getPdbResNumResA());
-                tmp.add(c.getPdbResNumResB());
-                bondsCC.add(tmp);
-                
-                ArrayList<String> chains = new ArrayList<String>();
-                chains.add(c.getResA().getChainID());
-                chains.add(c.getResB().getChainID());
-                bondsChainCC.add(chains);
-                
-                if(c.getNumContactsCCHB() > 0) {
-                    ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCCHBContactAtomNumA() - 1);
-                    atoms.add(c.getCCHBContactAtomNumB() - 1);
-                    bondsCCAtoms.add(atoms);
-                
-                ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCCHBContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCCHBContactAtomNumB() - 1).getAtomName());
-                bondsAtomNamesCC.add(atomNames);
-                }
-                
-                if(c.getNumContactsCCBH() > 0) {
-                    ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCCBHContactAtomNumA() - 1);
-                    atoms.add(c.getCCBHContactAtomNumB() - 1);
-                    bondsCCAtoms.add(atoms);
-                
-                ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB() - 1).getAtomName());
-                bondsAtomNamesCC.add(atomNames);
-                }  
-                }
-                
-                
+                    }
+                    if(! protRes.contains(c.getResB())) {
+                        protRes.add((Residue)c.getResB());
+                    }
+                    if(! ccRes.contains(c.getResA())) {
+                        ccRes.add((Residue)c.getResA());
+                    }
+                    if(! ccRes.contains(c.getResB())) {
+                        ccRes.add((Residue)c.getResB());
+                    }
+
+                    ArrayList<Integer> tmp = new ArrayList<Integer>();
+                    tmp.add(c.getPdbResNumResA());
+                    tmp.add(c.getPdbResNumResB());
+                    bondsCC.add(tmp);
+
+                    ArrayList<String> chains = new ArrayList<String>();
+                    chains.add(c.getResA().getChainID());
+                    chains.add(c.getResB().getChainID());
+                    bondsChainCC.add(chains);
+
+                    if(c.getNumContactsCCHB() > 0) {
+                        ArrayList<Integer> atoms = new ArrayList<Integer>();
+                        atoms.add(c.getCCHBContactAtomNumA() - 1);
+                        atoms.add(c.getCCHBContactAtomNumB() - 1);
+                        bondsCCAtoms.add(atoms);
+
+                        ArrayList<String> atomNames = new ArrayList<String>();
+                        atomNames.add(c.getResA().getAtoms().get(c.getCCHBContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getResB().getAtoms().get(c.getCCHBContactAtomNumB() - 1).getAtomName());
+                        bondsAtomNamesCC.add(atomNames);
+                    }
+
+                    if(c.getNumContactsCCBH() > 0) {
+                        ArrayList<Integer> atoms = new ArrayList<Integer>();
+                        atoms.add(c.getCCBHContactAtomNumA() - 1);
+                        atoms.add(c.getCCBHContactAtomNumB() - 1);
+                        bondsCCAtoms.add(atoms);
+
+                        ArrayList<String> atomNames = new ArrayList<String>();
+                        atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB() - 1).getAtomName());
+                        bondsAtomNamesCC.add(atomNames);
+                    }
+                }    
             }
             
             // Select all residues of the protein that have interchain sulfur contacts
@@ -11504,28 +11496,27 @@ public class Main {
                 else{
                    if(! protRes.contains(c.getResA())) {
                     protRes.add((Residue)c.getResA());
+                    }
+                    if(! protRes.contains(c.getResB())) {
+                        protRes.add((Residue)c.getResB());
+                    }
+                    if(! issRes.contains(c.getResA())) {
+                        issRes.add((Residue)c.getResA());
+                    }
+                    if(! issRes.contains(c.getResB())) {
+                        issRes.add((Residue)c.getResB());
+                    }
+
+                    ArrayList<Integer> tmp = new ArrayList<Integer>();
+                    tmp.add(c.getPdbResNumResA());
+                    tmp.add(c.getPdbResNumResB());
+                    bondsIss.add(tmp);
+
+                    ArrayList<String> chains = new ArrayList<String>();
+                    chains.add(c.getResA().getChainID());
+                    chains.add(c.getResB().getChainID());
+                    bondsChainIss.add(chains); 
                 }
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add((Residue)c.getResB());
-                }
-                if(! issRes.contains(c.getResA())) {
-                    issRes.add((Residue)c.getResA());
-                }
-                if(! issRes.contains(c.getResB())) {
-                    issRes.add((Residue)c.getResB());
-                }
-                
-                ArrayList<Integer> tmp = new ArrayList<Integer>();
-                tmp.add(c.getPdbResNumResA());
-                tmp.add(c.getPdbResNumResB());
-                bondsIss.add(tmp);
-                
-                ArrayList<String> chains = new ArrayList<String>();
-                chains.add(c.getResA().getChainID());
-                chains.add(c.getResB().getChainID());
-                bondsChainIss.add(chains); 
-                }
-                
             }
         }
 
