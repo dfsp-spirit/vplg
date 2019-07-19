@@ -98,6 +98,7 @@ public class ContactMatrix {
         Residue resA, resB;
         resA = resB = null;
         Molecule molA, molB;
+        molA = molB = null;
         Integer aSSEPos, bSSEPos, contNumIgnored, contNumConsidered;
         aSSEPos = bSSEPos = null;
         contNumIgnored = contNumConsidered = 0;
@@ -106,8 +107,8 @@ public class ContactMatrix {
                 
         for(Integer i = 0; i < contList.size(); i++) {
             rc = contList.get(i);
-            resA = rc.getResA();
-            resB = rc.getResB();
+            molA = rc.getResA();
+            molB = rc.getResB();
 
             // Only handle this contact if both residues belong to the chain we are interested in (or if we are interested in all chains)
             if( (resA.getChainID().equals(this.handleChain) && resB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
@@ -619,7 +620,138 @@ public class ContactMatrix {
      * is properly filled and you can call the functions to computer spatial relations between the SSEs.
      *
      */
-    public void calculateSSEContactMatrix() 
+    public void calculateSSEContactMatrix() {
+
+        //DEBUG
+        //System.out.println("Array comparison of contBC and contCB matrices follows:");
+        //for(Integer i = 0; i < contBC.length; i++) {
+        //    this.printArrayComparison(contBC, contCB, i);
+        //}
+
+
+        SSE a,b;
+        a = b = null;
+
+        for(Integer i = 0; i < this.size; i++) {
+
+            a = this.sseList.get(i);
+
+            for(Integer j = (i + 1); j < this.size; j++) {
+
+                b = this.sseList.get(j);
+
+                if(i.equals(j)) {
+                    // Of course many contacts exist, but we are not interested in contacts of an SSE with itself. ;)
+                    contSSE[i][j] = 0;
+                    contSSE[j][i] = 0;
+                }
+                else {
+
+                    // HH ----- Helix - Helix contacts
+                    if(a.isHelix() && b.isHelix()) {
+                        if( (contBC[i][j] + contCB[i][j] > 3) || (contCC[i][j] > 3) ) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    // HE ----- Helix - Sheet contacts
+                    else if( (a.isHelix() && b.isBetaStrand()) || (b.isHelix() && a.isBetaStrand())  ) {
+                        //DEBUG - NOTE: only reporting this stuff for H-E right now
+                        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+                            System.out.println("   [DEBUG LV 3] NOTE: only reporting this for H-E (see code)");
+                            System.out.println("   [DEBUG LV 3] " + a.toString());
+                            System.out.println("   [DEBUG LV 3] " + b.toString());
+                            System.out.println("    [DEBUG LV 3] #BB: " + contBB[i][j] + " #BC: " + 
+                                    contBC[i][j] + " #CB: " + contCB[i][j] + " #CC: " + contCC[i][j]);
+                        }
+                        //if( ( (contBB[i][j] > 1) && (contBC[i][j] + contCB[i][j] > 3) ) || (contCC[i][j] > 3)) {
+                        if( (contBB[i][j] > 1) || (contBC[i][j] + contCB[i][j] > 3) || (contCC[i][j] > 3)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    // HO ----- Helix - Other contacts
+                    else if( (a.isHelix() && b.isOtherSSE()) || (b.isHelix() && a.isOtherSSE())  ) {
+                        if( (contBB[i][j] >= 2) || (contBC[i][j] + contCB[i][j] >= 2) || (contCC[i][j] >= 2)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    // EE ----- Sheet - Sheet contacts
+                    else if(a.isBetaStrand() && b.isBetaStrand()) {
+                        if( (contBB[i][j] > 1) || (contBC[i][j] + contCB[i][j] > 2)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    // Sheet - Other contacts
+                    else if(a.isBetaStrand() && b.isOtherSSE() || (b.isBetaStrand() && a.isOtherSSE()) ) {
+                        if( (contBB[i][j] >= 2) || (contBC[i][j] + contCB[i][j] >= 2) || (contCC[i][j] >= 2)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    // <*> - Ligand contacts
+                    else if(a.isLigandSSE() || b.isLigandSSE()) {
+                        if( (contLB[i][j] + contBL[i][j] >= 1) || (contLC[i][j] + contCL[i][j] >= 1) || (contLL[i][j] >= 1)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    // other - Other contacts
+                    else if(a.isOtherSSE() && b.isOtherSSE()) {
+                        if( (contBB[i][j] >= 2) || (contBC[i][j] + contCB[i][j] >= 2) || (contCC[i][j] >= 2)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+                    else {
+                        DP.getInstance().w("Contact between unhandled combination of SSE types " + a.getSseType() + " and " + b.getSseType() + ", using default rules.");
+                        if( (contBB[i][j] >= 2) || (contBC[i][j] + contCB[i][j] >= 2) || (contCC[i][j] >= 2)) {
+                            contSSE[i][j] = 1;
+                            contSSE[j][i] = 1;
+                        }
+                        else {
+                            contSSE[i][j] = 0;
+                            contSSE[j][i] = 0;
+                        }
+                    }
+
+
+                }
+
+            }
+        }
+
+    }
 
 
     /**
@@ -634,22 +766,22 @@ public class ContactMatrix {
      *        slows the process down, therefore it should be set to 'false' if in doubt.
      * 
      */
-    public void calculateSSESpatialRelationMatrix(List<ResContactInfo> contList, Boolean computeAll) {
+    public void calculateSSESpatialRelationMatrix(List<MolContactInfo> contList, Boolean computeAll) {
 
         // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string, and as value a list of all contacts of that residue. This is done only once,
         //   and saves us from sequentially iterating through the contact list to find the ones for the current residue (|R|^2) times later.
-        Map<Integer, List<ResContactInfo>> rcMap = new HashMap<>();
+        Map<Integer, List<MolContactInfo>> rcMap = new HashMap<>();
         Integer resASSEPos, resBSSEPos;
-        for(ResContactInfo rci : contList) {
+        for(MolContactInfo rci : contList) {
             resASSEPos = getSSEPosOfDsspResidue(rci.getResA().getDsspNum());
             resBSSEPos = getSSEPosOfDsspResidue(rci.getResB().getDsspNum());
             
             // init lists if required
             if( ! rcMap.containsKey(resASSEPos)) {
-                rcMap.put(resASSEPos, new ArrayList<ResContactInfo>());
+                rcMap.put(resASSEPos, new ArrayList<MolContactInfo>());
             }
             if( ! rcMap.containsKey(resBSSEPos)) {
-                rcMap.put(resBSSEPos, new ArrayList<ResContactInfo>());
+                rcMap.put(resBSSEPos, new ArrayList<MolContactInfo>());
             }
             
             // add data
@@ -660,6 +792,8 @@ public class ContactMatrix {
         
         SSE sseA, sseB;
         Residue resA, resB;
+        Molecule molA, molB;
+        molA = molB = null;
         sseA = sseB = null;
         resA = resB = null;
         Integer sumMax, sumMin, difMax, difMin, tmp;
@@ -717,16 +851,16 @@ public class ContactMatrix {
                     }
 
                     // Compute the doubleDistance over all contact pairs of sseA and sseB
-                    List<ResContactInfo> contListAB = new ArrayList<>();
+                    List<MolContactInfo> contListAB = new ArrayList<>();
                     if(rcMap.containsKey(i)) { contListAB.addAll(rcMap.get(i)); }
                     if(rcMap.containsKey(j)) { contListAB.addAll(rcMap.get(j)); }
                     
-                    List<ResContactInfo> usedContList = contListAB;
+                    List<MolContactInfo> usedContList = contListAB;
                     
                     for(Integer k = 0; k < usedContList.size(); k++) {
 
-                        resA = usedContList.get(k).getResA();
-                        resB = usedContList.get(k).getResB();                                                       
+                        molA = usedContList.get(k).getResA();
+                        molB = usedContList.get(k).getResB();                                                       
 
                         // Get the SSEs
                         resASSEPos = getSSEPosOfDsspResidue(resA.getDsspNum());
