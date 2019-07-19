@@ -478,7 +478,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             
             else{
                 // if both Residue cast to Residue
-                  //resA = (Residue) molA;
+                  resA = (Residue) molA;
                   resB = (Residue) molB; 
                     int indexResA = this.getVertexIndex(resA = (Residue)molA);
                     int indexResB = this.getVertexIndex(resB = (Residue)molB);
@@ -515,15 +515,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                 }                
                 return false;
             }
-                    }
-            
-            
-        
-            
-            
-            
-
-            
+                    }       
         }
         return false;
     }
@@ -590,7 +582,6 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         gmlf.append("  is_AA_type_contact_matrix 0\n");
         gmlf.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
         
-        
         // print all nodes
         Residue residue;
         Molecule molecule;
@@ -610,9 +601,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser            
             
             }
-            
             gmlf.append(endNode).append("\n");
-            
         }
         
         // print all edges
