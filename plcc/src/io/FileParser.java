@@ -999,6 +999,14 @@ public class FileParser {
                             
                             Boolean isAA = isAminoacid(molNamePDB);
                             
+                            //private static void define_Atomtype(String molname){
+                            //if(isAA()){
+                            
+                            //return Atom.ATOMTYPE_AA;}
+                            //if(isRNA())
+                            //return Atom.ATOMTYPE_RNA;
+                            
+                            
 
                             // TODO: possible to ignore alt loc atoms right now?
                             
@@ -1017,7 +1025,7 @@ public class FileParser {
                                 }
                                 continue; // do not use that atom
                             }
-                            if( ! Settings.getBoolean("plcc_B_include_rna")) {
+                            if( ! Settings.getBoolean("plcc_B_include-rna")) {
                                 if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                         DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
@@ -1025,6 +1033,15 @@ public class FileParser {
                                     continue; // do not use that atom
                                 }
                             }
+                            
+                            //switch(atomtype){
+                            //case ATOMTYPE_AA:
+                            //a.setAtomtype(Atom.ATOMTYPE_AA);
+                            //case ATOMTYPE_LIGAND
+                            //a.setAtomtype(Atom.ATOMTYPE_LIGAND);
+                            //case ATOMTYPE_RNA:
+                            //a.setAtomtype(Atom.ATOMTYPE_RNA);
+                            //break;
                             
                             if (isAA) {
                                 if (tmpRes == null) {
@@ -1086,9 +1103,9 @@ public class FileParser {
                                     a.setDsspResNum(tmpRes.getDsspNum());
                                 }
                                 
-                                if(  Settings.getBoolean("plcc_B_include_rna")) {
+                                /*if(  Settings.getBoolean("plcc_B_include-rna")) {
                                     a.setAtomtype(Atom.ATOMTYPE_RNA);
-                                }
+                                }*/
                                 
                                 
                             } else {
@@ -1589,6 +1606,20 @@ public class FileParser {
             "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
             "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"};
         if (Arrays.asList(standardAANames).contains(AAName)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+        /**
+     * Returns true if AAName is standard aminoacid name (3-letter code).
+     * @param AAName Aminoacid name, 3-letter code, capitalized
+     * @return 
+     */
+    private static boolean isRNA(String RNAName) {
+        String[] standardAANames = {"A", "G", "C", "G"};
+        if (Arrays.asList(standardAANames).contains(RNAName)) {
             return true;
         } else {
             return false;
