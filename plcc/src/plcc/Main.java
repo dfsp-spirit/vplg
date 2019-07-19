@@ -1505,7 +1505,7 @@ public class Main {
                         Settings.set("plcc_B_chain_spheres_speedup", "true");
                     }
                    
-                    if(s.equals("--include_rna"))  {
+                    if(s.equals("--include-rna"))  {
                         argsUsed[i] = true;
                         Settings.set("plcc_include_rna", "true");
                     }
