@@ -17,7 +17,8 @@ import proteinstructure.SSE;
 import tools.DP;
 
 /**
- *
+ *This file was written by Katja Korolew. To create the Molecule superclass, the methods and parameters 
+ * were taken from the Residue class.
  * @author kk
  */
 public class Molecule {
