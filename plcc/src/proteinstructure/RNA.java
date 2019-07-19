@@ -7,7 +7,6 @@
  */
 
 package proteinstructure;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -36,9 +35,6 @@ public class RNA extends Molecule implements java.io.Serializable {
         this.sse = Mol.getSSE();
         this.sseStringDssp = Mol.getSSEStringDssp();
         this.isPartOfDsspSse = Mol.getDsspSseState();
-    }
-    
-
-   
+    }  
     
 }
