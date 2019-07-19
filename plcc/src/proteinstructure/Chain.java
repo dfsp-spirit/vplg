@@ -207,8 +207,6 @@ public class Chain implements java.io.Serializable {
         //System.out.println("Added " + numSeps + " separators.");
         return new String[] { sbChemProp.toString(), sbSSE.toString() };
     }
-    
-
     /**
      * Computes the geometrical center of all atoms and the largest distance from center to an atom (=radius).
      */
