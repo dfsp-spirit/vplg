@@ -64,6 +64,20 @@ public class Chain implements java.io.Serializable {
         }
         return ligands;
     }
+    
+    /**
+     * Returns a list of all amino acid residues in this chain.
+     * @return a list of all amino acid residues in this chain
+     */
+    public ArrayList<Residue> getAllAAResidues() {
+        ArrayList<Residue> AAResidues = new ArrayList<>();
+        for(Residue r : this.residues) {
+            if(r.isAA()) {
+                AAResidues.add(r);
+            }
+        }
+        return AAResidues;
+    }
 
     // setters
     public void addResidue(Residue r) { residues.add(r); }
