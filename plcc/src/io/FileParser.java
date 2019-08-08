@@ -1051,6 +1051,8 @@ public class FileParser {
                             // chemical symbol
                             chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
+                            // standard AAs and (some) non-standard, atm: UNK
+                            //   this prevents handling such AAs as ligand
                             Boolean isAA = isAminoacid(resNamePDB, true);
                             
                             // TODO: possible to ignore alt loc atoms right now?
@@ -1072,6 +1074,8 @@ public class FileParser {
                                 if (tmpRes == null) {
                                     tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                     if (tmpRes == null) {
+                                        DP.getInstance().w("FP_CIF", "Found atom with no matching DSSP residue in PDB line " + numLine.toString() + ". Ignoring "
+                                                + "that one.");
                                         continue; // skip atom / line
                                     } else {
                                         tmpRes.setModelID(m.getModelID());
