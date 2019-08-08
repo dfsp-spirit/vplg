@@ -1051,7 +1051,7 @@ public class FileParser {
                             // chemical symbol
                             chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
-                            Boolean isAA = isAminoacid(resNamePDB);
+                            Boolean isAA = isAminoacid(resNamePDB, true);
                             
                             // TODO: possible to ignore alt loc atoms right now?
                             
@@ -1072,9 +1072,7 @@ public class FileParser {
                                 if (tmpRes == null) {
                                     tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                     if (tmpRes == null) {
-                                        if (isAA) {
-                                            continue; // skip atom / line
-                                        }
+                                        continue; // skip atom / line
                                     } else {
                                         tmpRes.setModelID(m.getModelID());
                                         tmpRes.setChain(tmpChain);
@@ -1630,14 +1628,20 @@ public class FileParser {
     
     /**
      * Returns true if AAName is standard aminoacid name (3-letter code).
-     * @param AAName Aminoacid name, 3-letter code, capitalized
+     * @param AAName Amino acid name, 3-letter code, capitalized
+     * @param includeNonStandard allows additional to 20 standard amino acids: UNK
      * @return 
      */
-    private static boolean isAminoacid(String AAName) {
-        String[] standardAANames = {"ALA", "ARG", "ASN", "ASP", "CYS", 
+    private static boolean isAminoacid(String AAName, Boolean includeNonStandard) {
+        ArrayList<String> AANames = new ArrayList<>(Arrays.asList("ALA", "ARG", "ASN", "ASP", "CYS", 
             "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
-            "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"};
-        if (Arrays.asList(standardAANames).contains(AAName)) {
+            "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"));
+        
+        if (includeNonStandard) {
+            AANames.add("UNK");
+        }
+        
+        if (AANames.contains(AAName)) {
             return true;
         } else {
             return false;
