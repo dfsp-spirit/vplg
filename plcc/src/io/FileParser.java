@@ -3019,7 +3019,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         }
 
         if(resultChain == null) {
-            DP.getInstance().e("[FP]", "Could not find Chain '" + cID + "' in s_chains. Maybe using cif-type "
+            DP.getInstance().e("FP", "Could not find Chain '" + cID + "' in s_chains. Maybe using cif-type "
                     + "DSSP file instead of legacy type? Exiting now.");
             System.exit(1);
             return(null);   // for the IDE
