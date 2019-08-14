@@ -207,9 +207,9 @@ public class Chain implements java.io.Serializable {
         
         if (tmpAtomNumber > 0) {
         
-            chainCenter[0] = tmpCenter[0] / tmpAtomNumber;
-            chainCenter[1] = tmpCenter[1] / tmpAtomNumber;
-            chainCenter[2] = tmpCenter[2] / tmpAtomNumber;
+            chainCenter[0] = (int) (Math.round((double) tmpCenter[0] / tmpAtomNumber));
+            chainCenter[1] = (int) (Math.round((double) tmpCenter[1] / tmpAtomNumber));
+            chainCenter[2] = (int) (Math.round((double) tmpCenter[2] / tmpAtomNumber));
 
             if (Settings.getInteger("plcc_I_debug_level") > 0) {
                 System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCenter));
