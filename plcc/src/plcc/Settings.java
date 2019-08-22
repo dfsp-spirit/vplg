@@ -478,6 +478,7 @@ public class Settings {
         defSet("plcc_B_alternate_aminoacid_contact_model_with_ligands", "false", "Use alternate residue contact model including ligands by Andreas. Skips all computations except AA graphs. EXP.");
         defSet("plcc_B_quit_after_aag", "false", "Whether to quit the program after computation of amino acid graphs, prevents further work.");
         defSet("plcc_B_chain_spheres_speedup", "true", "Whether to use contact computation speedup based on comparison of chain spheres.");
+        defSet("plcc_B_centroid_method", "true", "Whether to use centroid of atoms instead if C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup.");
         
         // SSE definitions
         defSet("plcc_I_min_SSE_length", "3", "the minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)");

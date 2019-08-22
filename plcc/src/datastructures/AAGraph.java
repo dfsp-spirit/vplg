@@ -148,7 +148,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             r = this.getVertex(i);
             if(r.isAA()) {
                 name1 = r.getAAName1();
-                diam = r.getCenterSphereRadius() * 2;
+                diam = r.getSphereRadius() * 2;
                 if(maxDiameters.containsKey(name1)) {
                     if(maxDiameters.get(name1) < diam) {
                         maxDiameters.put(name1, diam);
@@ -211,7 +211,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             r = this.getVertex(i);
             if(r.isAA()) {
                 name1 = r.getAAName1();
-                diam = r.getCenterSphereRadius() * 2;
+                diam = r.getSphereRadius() * 2;
                 if(diameterSum.containsKey(name1)) {
                     diameterSum.put(name1, (diameterSum.get(name1) + diam));
                     numValues.put(name1, (numValues.get(name1) + 1));
@@ -687,7 +687,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      * @return the euclidian distance
      */
     public int getEdgeDistance(int i, int j) {
-        return this.getVertex(i).resCenterDistTo(this.getVertex(j));
+        return this.getVertex(i).resDistTo(this.getVertex(j));
     }
     
     /**

@@ -163,7 +163,7 @@ public class ResContactInfo {
     public ResContactInfo(Residue a, Residue b) {
         resA = a;
         resB = b;
-        dist = a.resCenterDistTo(b);  
+        dist = a.resDistTo(b);  
         numTotalLigContactsPair = 0;
         
         numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
@@ -211,8 +211,8 @@ public class ResContactInfo {
     public Integer getAAIDResA() { return(this.resA.getInternalAAID()); }
     public Integer getAAIDResB() { return(this.resB.getInternalAAID()); }
 
-    public Integer getCenterSphereRadiusResA() { return(this.resA.getCenterSphereRadius()); }
-    public Integer getCenterSphereRadiusResB() { return(this.resB.getCenterSphereRadius()); }
+    public Integer getCenterSphereRadiusResA() { return(this.resA.getSphereRadius()); }
+    public Integer getCenterSphereRadiusResB() { return(this.resB.getSphereRadius()); }
     public Integer getResPairDist() { return(dist); }
 
     public Integer getHB1Dist() { return(minContactDistances[HB]); }

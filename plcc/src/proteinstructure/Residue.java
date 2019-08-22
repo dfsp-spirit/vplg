@@ -72,6 +72,8 @@ public class Residue implements java.io.Serializable {
     private String ligSynonyms = null;                      // HETSYN record of PDB file (synonyms for this hetero group)
 
     private Integer centerSphereRadius = null;
+    private Integer[] centroidCoords = null;                // x,y,z coordinates of residue centroid
+    private Integer centroidSphereRadius = null;            // distance from centroid to farthest atom (= radius of sphere around centroid encompassing all atoms)
     private String sseStringDssp = "?";
     private String plccSSEType = "N";                       // not part of any PLCC SSE by default
     private String sseString = null;                        // initially the SSE column from the DSSP file, may be the empty string "" because not all residues are assigned an SSE by DSSP, gets replaced by PLCC SSE string later
@@ -390,17 +392,55 @@ public class Residue implements java.io.Serializable {
     }
     
     
+    /**
+     * Calculates the centroid of this residue (center of mass of all atoms) and saves it to class var centroidCoords.
+     */
+    private void calculateCentroid() {
+        Integer[] centroid = {0,0,0};
+        
+        for (Atom a : this.atoms) {
+            centroid[0] += a.getCoordX();
+            centroid[1] += a.getCoordY();
+            centroid[2] += a.getCoordZ();
+        }
+        
+        centroid[0] = (int) (Math.round((double) centroid[0] / this.atoms.size()));
+        centroid[1] = (int) (Math.round((double) centroid[1] / this.atoms.size()));
+        centroid[2] = (int) (Math.round((double) centroid[2] / this.atoms.size()));
+        
+        this.centroidCoords = centroid;
+    }
+    
+    
+    /**
+     * Determines the distance to another Residue, from Residue centroid to Residue centroid.
+     * @param r the other residue
+     * @return centroid-to-centroid distance
+     */
+    private Integer resCentroidDistTo(Residue r) {
+        Atom helperCentroidAtom = new Atom();
+        Integer[] thisCentroidCoordinates = this.getCentroidCoords();
+        
+        helperCentroidAtom.setCoordX(thisCentroidCoordinates[0]);
+        helperCentroidAtom.setCoordY(thisCentroidCoordinates[1]);
+        helperCentroidAtom.setCoordZ(thisCentroidCoordinates[2]);
+        
+        Integer[] rCentroidCoords = r.getCentroidCoords();
+        
+        return helperCentroidAtom.distToPoint(rCentroidCoords[0], rCentroidCoords[1], rCentroidCoords[2]);
+    }
+    
 
     /**
      * Determines the distance to another Residue, from Residue center to Residue center (C alpha atom to C alpha atom for AAs)
      * @param r the other residue
      * @return The center-to-center distance.
      */
-    public Integer resCenterDistTo(Residue r) {
+    private Integer resCenterDistTo(Residue r) {
 
         Atom a = this.getCenterAtom();
         Atom b = r.getCenterAtom();
-
+       
         if(a == null || b == null) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
@@ -413,13 +453,23 @@ public class Residue implements java.io.Serializable {
             return(a.distToAtom(b));
         }
     }
+   
+    
+    /**
+     * Determines the distance from this residue to another, depending on settings.
+     * @param r other residue
+     * @return residue-residue distance
+     */
+    public Integer resDistTo(Residue r) {
+        return (Settings.getBoolean("plcc_B_centroid_method") ? this.resCentroidDistTo(r) : this.resCenterDistTo(r));
+    }
 
 
     /**
      * Returns the radius of the collision sphere of this residue. This radius doe NOT yet include the outer hull, it is the distance from the center atom to the (non-H) atom farthest away from it.
      * @return the radius, in 1/10th Angstroem (so 20 means 2.0 A).
      */
-    public Integer getCenterSphereRadius() {
+    private Integer getCenterSphereRadius() {
 
         Atom throwAway = null;
 
@@ -440,6 +490,37 @@ public class Residue implements java.io.Serializable {
 
 
         return(this.centerSphereRadius);
+    }
+    
+    /**
+     * Calculates the sphere radius of the centroid of this residue and saves it to the class var centerSphereRadius.
+     */
+    private void calculateCentroidSphereRadius() {
+        Integer[] centroidCoordinates = this.getCentroidCoords();
+        Integer curDist, maxDist;
+        curDist = maxDist = 0;
+        for (Atom a : this.atoms) {
+            curDist = a.distToPoint(centroidCoordinates[0], centroidCoordinates[1], centroidCoordinates[2]);
+            if (curDist > maxDist) { maxDist = curDist; }
+        }
+        this.centroidSphereRadius = maxDist;
+    }
+    
+    private Integer getCentroidSphereRadius() {
+        // if called 1st time calculate sphere radius
+        if (this.centroidSphereRadius == null) {
+            this.calculateCentroidSphereRadius();
+        }
+        return this.centroidSphereRadius;
+    }
+    
+    
+    /**
+     * Returns the sphere radius of this residue depending on the settings.
+     * @return sphere radius as 10th of Angström
+     */
+    public Integer getSphereRadius() {
+        return (Settings.getBoolean("plcc_B_centroid_method")) ? getCentroidSphereRadius() : getCenterSphereRadius();
     }
 
 
@@ -575,6 +656,16 @@ public class Residue implements java.io.Serializable {
         return(center);
 
     }
+    
+    
+    public Integer[] getCentroidCoords () {
+        // calculate if called for 1st time
+        if (this.centroidCoords == null) {
+            this.calculateCentroid();
+        }
+        return this.centroidCoords;
+    }
+    
 
     /**
      * Returns the PDB atom number of the center atom of this residue.
@@ -597,10 +688,10 @@ public class Residue implements java.io.Serializable {
      * @param r the other residue
      */
     public Boolean contactPossibleWithResidue(Residue r) {
-
+   
         Integer dist = Integer.MAX_VALUE;
         try {
-            dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
+            dist = this.resDistTo(r);
         } catch(Exception e) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
@@ -616,8 +707,8 @@ public class Residue implements java.io.Serializable {
         }
 
         Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
-        Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2) + justToBeSure;
-
+        
+        Integer maxDistForContact = this.getSphereRadius() + r.getSphereRadius() +  (atomRadius * 2) + justToBeSure;
         //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
         //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
 
