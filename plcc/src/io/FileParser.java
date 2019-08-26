@@ -1083,15 +1083,13 @@ public class FileParser {
                                     tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
                                     // check that a peptid residue could be found
                                     if (tmpRes == null || tmpRes.isLigand()) {
-                                        // residue is not in DSSP file, check if it is (non-standard) free modified amino acid, otherwise ignore
-                                        if (isAminoacid(resNamePDB, false)) {
-                                            DP.getInstance().w("FP_CIF", " There seems to be a free amino acid at Res# " + resNumPDB + ". "
-                                                    + "Skipping this atom / line.");
-                                            continue;  // skip atom / line
-                                        } else {
-                                            // we have a non-standard free amino acid, treat it as ligand
-                                            isAA = false;
+                                        // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
+                                        if (! silent) {
+                                            // print note only once
+                                            if (! resNumPDB.equals(lastLigandNumPDB))
+                                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + resNumPDB + ", treating it as ligand.");
                                         }
+                                        isAA = false;
                                     } else {
                                         lastRes = tmpRes;
                                         lastRes.setModelID(m.getModelID());
@@ -1138,7 +1136,7 @@ public class FileParser {
                                 
                                 // currently not used
                                 // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
-                                
+                                                               
                                 // check if we have created ligand residue for s_residue
                                 if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
 
