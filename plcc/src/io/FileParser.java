@@ -70,6 +70,8 @@ public class FileParser {
     static HashMap<String, ArrayList<String>> homologuesMap = null;
     static List<BindingSite> s_sites;
     
+    static Integer lastIndexGetRes = 0;  // last index from s_residue where getResidueFromList found target
+    
     // The list of sulfur bridges (aka disulfide bridges) from the DSSP file. The key is the DSSP sulfur bridge
     // id (an arbitrary character, starting with 'a' for the first bridge usually). The list in the value part contains
     // the DSSP residue IDs of all residues which are part of the bridge (and thus should have length 2).
@@ -753,7 +755,8 @@ public class FileParser {
         // variables for successive matching atom -> residue -> chain
         // remember them so we dont need to lookup
         Model m = null;
-        Residue tmpRes = null;
+        Residue lastRes = null;  // starts as first residue and is always the actual one
+        Residue tmpRes = null;  // used to save lastRes if getResidue returns null
         Chain tmpChain = null;
         Residue lig = null;
         
@@ -780,6 +783,8 @@ public class FileParser {
             DP.getInstance().e("FP_CIF", "DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
+        
+        lastRes = s_residues.get(0);  // just start with first one ( we check below if it really matches)
         
         // - - ligands - -
         // -> in difference to old parser ligands are created "on the fly" together with the other residues
@@ -1051,8 +1056,8 @@ public class FileParser {
                             // chemical symbol
                             chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
-                            // standard AAs and (some) non-standard, atm: UNK
-                            //   this prevents handling such AAs as ligand
+                            // standard AAs and (some) non-standard, atm: UNK, MSE
+                            //   -> may be changed below if it is free (treat as ligand then)
                             Boolean isAA = isAminoacid(resNamePDB, true);
                             
                             // TODO: possible to ignore alt loc atoms right now?
@@ -1065,41 +1070,39 @@ public class FileParser {
                                 }
                                 continue; // do not use that atom
                             }
-                            
+                                                                               
                             // >> AA <<
-                            // update tmpRes (only if needed) 
+                            // update lastRes (only if needed) 
                             //     -> enables getting DsspResNum for atom from res
                             // match res <-> chain here 
+                            // also decide here if modified amino acids is free (no DSSP entry -> not in s_residue) and needs to be treated as ligand
                             if (isAA) {
-                                if (tmpRes == null) {
-                                    tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
-                                    if (tmpRes == null) {
-                                        DP.getInstance().w("FP_CIF", "Found atom with no matching DSSP residue in PDB line " + numLine.toString() + ". Ignoring "
-                                                + "that one.");
-                                        continue; // skip atom / line
-                                    } else {
-                                        tmpRes.setModelID(m.getModelID());
-                                        tmpRes.setChain(tmpChain);
-                                        tmpChain.addResidue(tmpRes);
-                                    }
-                                } else {
-                                    // load new Residue into tmpRes if we approached next Residue
-                                    if (! (Objects.equals(resNumPDB, tmpRes.getPdbResNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
-                                        tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
-                                        if (tmpRes == null) {
-                                            if (isAA) {
-                                                continue; // skip atom / line
-                                            } 
+                                // we no start with lastRes is first residue from s_residues, so no check for null required!
+                                // load new Residue into lastRes if we approached next Residue
+                                if (! (Objects.equals(resNumPDB, lastRes.getPdbResNum()) && chainID.equals(lastRes.getChainID()) && iCode.equals(lastRes.getiCode()))) {
+                                    tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                                    // check that a peptid residue could be found
+                                    if (tmpRes == null || tmpRes.isLigand()) {
+                                        // residue is not in DSSP file, check if it is (non-standard) free modified amino acid, otherwise ignore
+                                        if (isAminoacid(resNamePDB, false)) {
+                                            DP.getInstance().w("FP_CIF", " There seems to be a free amino acid at Res# " + resNumPDB + ". "
+                                                    + "Skipping this atom / line.");
+                                            continue;  // skip atom / line
                                         } else {
-                                            tmpRes.setChain(tmpChain);
-                                            tmpChain.addResidue(tmpRes);                                            
+                                            // we have a non-standard free amino acid, treat it as ligand
+                                            isAA = false;
                                         }
+                                    } else {
+                                        lastRes = tmpRes;
+                                        lastRes.setModelID(m.getModelID());
+                                        lastRes.setChain(tmpChain);
+                                        tmpChain.addResidue(lastRes);
+                                        
+                                        // assign PDB res name (which differs in case of modifed residues)
+                                        lastRes.setResName3(resNamePDB);
                                     }
                                 }
-                            } else {
-                                tmpRes = null;
                             }
-                            // => in case of ligand tmpRes now is null!
                             
                             Atom a = new Atom();
                             
@@ -1116,19 +1119,15 @@ public class FileParser {
                                     }
                                 }
                                 
-                                // old parser has here some outcommented code on N termini
-                                
                                 // set atom type
                                 a.setAtomtype(Atom.ATOMTYPE_AA);
                                 
                                 // only ATOMs, not HETATMs, have a DSSP entry
-                                //a.setDsspResNum(getDsspResNumForPdbResNum(resNumPDB));
                                 if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                                     a.setDsspResNum(null);
                                 }
                                 else {
-                                    // a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
-                                    a.setDsspResNum(tmpRes.getDsspResNum());
+                                    a.setDsspResNum(lastRes.getDsspResNum());
                                 }
                                 
                                 
@@ -1140,15 +1139,11 @@ public class FileParser {
                                 // currently not used
                                 // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
                                 
+                                // check if we have created ligand residue for s_residue
                                 if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
-                                                                        
-                                    // care for modified AAs (treated at first as lig) which are part of DSSP file
-                                    // and therefore also already in s_residues
-                                    lig = getResidueFromList(resNumPDB, chainID, iCode);
-                                    if (lig == null) {
-                                        // create new Residue from info, we'll have to see whether we really add it below though
-                                        lig = new Residue();
-                                    }
+
+                                    // create new Residue from info, we'll have to see whether we really add it below though
+                                    lig = new Residue();
                                     
                                     lig.setPdbResNum(resNumPDB);
                                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
@@ -1217,11 +1212,6 @@ public class FileParser {
                                         lastLigandNumPDB = resNumPDB;
                                         lastChainID = chainID;
 
-                                        //TODO: Add a check for the molecular weight of the ligand here and only add ligands
-                                        //      which are within the range (range should be defined in cfg file).
-                                        //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
-                                        //      instead, use a range over number of atoms.
-
                                         s_residues.add(lig);
                                         
                                         getChainByPdbChainID(chainID).addResidue(lig);
@@ -1262,13 +1252,13 @@ public class FileParser {
                             // >> AA + LIG <<
                             // now create the new Atom
 
-                            // tmpRes may be NULL
+                            // lastRes may be NULL
                             // Note that the command above may have returned NULL, we care for that below
 
                             a.setPdbAtomNum(atomSerialNumber);
                             a.setAtomName(atomName);
                             a.setAltLoc(altLoc);
-                            a.setResidue(tmpRes);
+                            a.setResidue(lastRes);
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
                             a.setPdbResNum(resNumPDB);
@@ -1290,16 +1280,16 @@ public class FileParser {
                             
                             if (isAA) {
                                 // >> AA <<
-                                if (tmpRes == null) {
+                                if (lastRes == null) {
                                     DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                                     continue;
                                 } else {
 
                                     if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
-                                        tmpRes.addHydrogenAtom(a);
+                                        lastRes.addHydrogenAtom(a);
                                     }
                                     else {
-                                        tmpRes.addAtom(a);
+                                        lastRes.addAtom(a);
                                         s_atoms.add(a);
                                     }
                                 }
@@ -1642,7 +1632,8 @@ public class FileParser {
             "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"));
         
         if (includeNonStandard) {
-            AANames.add("UNK");
+            AANames.add("UNK");  // UNKnown, 'X' or any amino acid (often only backbone atoms are present
+            AANames.add("MSE");  // Selenomethionine: Methionine with selen instead of sulfur (helps in crystallography)
         }
         
         if (AANames.contains(AAName)) {
@@ -1684,28 +1675,10 @@ public class FileParser {
         return(null);
     }
     
-    /**
-     * Calls getResidueFromList and returns its value with printing of error message if null returned.
-     * @param resNumPDB
-     * @param chainID
-     * @param iCode
-     * @param atomSerialNumber
-     * @param numLine current line of pdb file.
-     * @return 
-     */
-    private static Residue getResFromListWithErrMsg(Integer resNumPDB, String chainID, String iCode, Integer atomSerialNumber, Integer numLine) {
-        Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
-        if (tmpRes == null) {
-            DP.getInstance().w("FP_CIF", " Residue with PDB # " + resNumPDB + 
-                    " of chain '" + chainID + "' with iCode '" + iCode + 
-                    "' not listed in DSSP data, skipping atom " + atomSerialNumber.toString() + 
-                    " belonging to that residue (PDB line " + numLine.toString() + ").");
-        }
-        return tmpRes;
-    }
     
     /**
      * Tries to get the residue with the given PDB residue number, chain ID and insertion code from the internal list of all residues.
+     * Always starts at index of last hit (beginning with 0), i.e. rotates through list.
      * @param resNumPDB the PDB residue number
      * @param chainID the chain ID of the residue
      * @param iCode the insertion code of the residue
@@ -1717,9 +1690,13 @@ public class FileParser {
         Residue found = null;
         int numFound = 0;
 
+        // iterate up to s_residue.size() times
         for(Integer i = 0; i < s_residues.size(); i++) {
-
-            tmp = s_residues.get(i);
+            
+            // start at last occurence
+            Integer currentIndex = (lastIndexGetRes + i) % s_residues.size();
+            
+            tmp = s_residues.get(currentIndex);
 
             if(tmp.getPdbResNum().equals(resNumPDB)) {
 
@@ -1728,6 +1705,8 @@ public class FileParser {
                     if(tmp.getiCode().equals(iCode)) {
                         found = tmp;
                         numFound++;
+                        lastIndexGetRes = currentIndex;
+                        
                         // break here and return found to increase speed
                         return(found);
                     }                    
