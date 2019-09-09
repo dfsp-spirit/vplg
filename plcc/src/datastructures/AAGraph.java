@@ -469,53 +469,53 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             Residue resA;
             Residue resB;
             
-            if( !(molA instanceof Residue) || !(molB instanceof Residue)){
-                // if one is not Residue
-            DP.getInstance().w("AAGraph", "Atleast one of the molecules is an RNA and can not "
-                    + "be used for AAGraphs. Skipping that one (unwanted side effects?");
-            return false;
-            }
-            
-            else{
-                // if both Residue cast to Residue
-                  resA = (Residue) molA;
-                  resB = (Residue) molB; 
-                    int indexResA = this.getVertexIndex(resA = (Residue)molA);
-                    int indexResB = this.getVertexIndex(resB = (Residue)molB);
-            if(indexResA >= 0 && indexResB >= 0) {
-                if(rci.describesAnyContact()) {
-                    AAEdgeInfo ei = new AAEdgeInfo(rci);
-                    this.addEdge(indexResA, indexResB, ei);
-                    return true;
-                }
-                else {
-                    return false;                           
-                }
-            }
-            else {
-                Boolean notFoundIsorAreLigands = Boolean.FALSE;
-                StringBuilder sb = new StringBuilder();
-                sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + molA.getFancyName() + " and " + molB.getFancyName() + ".");
-                if(indexResA < 0 && indexResB < 0) {
-                    sb.append(" BOTH residues not found.\n");
-                    if( (! molA.isAA()) && (! molB.isAA())) { notFoundIsorAreLigands = Boolean.TRUE; }
-                }
-                else {
-                    if(indexResA < 0) {
-                        sb.append(" FIRST residue not found.\n");
-                        if( ! molA.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
-                    }
-                    else {  // indexResA < 0
-                        sb.append(" SECOND residue not found.\n");
-                        if( ! molB.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
-                    }
-                }
-                if( ! notFoundIsorAreLigands) { // only warn for non-ligand residues which were not found.
-                    DP.getInstance().w("AAGraph", sb.toString());
-                }                
+            if (!(molA instanceof Residue) || !(molB instanceof Residue)) {
+                // one is no Residue
+                DP.getInstance().w("AAGraph", "Atleast one of the molecules is an RNA and can not "
+                        + "be used for AAGraphs. Skipping that one (unwanted side effects?");
                 return false;
+            } else {
+                // both are Residue: cast to Residue
+                resA = (Residue) molA;
+                resB = (Residue) molB;
+                int indexResA = this.getVertexIndex(resA = (Residue) molA);
+                int indexResB = this.getVertexIndex(resB = (Residue) molB);
+                if (indexResA >= 0 && indexResB >= 0) {
+                    if (rci.describesAnyContact()) {
+                        AAEdgeInfo ei = new AAEdgeInfo(rci);
+                        this.addEdge(indexResA, indexResB, ei);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    Boolean notFoundIsorAreLigands = Boolean.FALSE;
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + molA.getFancyName() + " and " + molB.getFancyName() + ".");
+                    if (indexResA < 0 && indexResB < 0) {
+                        sb.append(" BOTH residues not found.\n");
+                        if ((!molA.isAA()) && (!molB.isAA())) {
+                            notFoundIsorAreLigands = Boolean.TRUE;
+                        }
+                    } else {
+                        if (indexResA < 0) {
+                            sb.append(" FIRST residue not found.\n");
+                            if (!molA.isAA()) {
+                                notFoundIsorAreLigands = Boolean.TRUE;
+                            }
+                        } else {  // indexResA < 0
+                            sb.append(" SECOND residue not found.\n");
+                            if (!molB.isAA()) {
+                                notFoundIsorAreLigands = Boolean.TRUE;
+                            }
+                        }
+                    }
+                    if (!notFoundIsorAreLigands) { // only warn for non-ligand residues which were not found.
+                        DP.getInstance().w("AAGraph", sb.toString());
+                    }
+                    return false;
+                }
             }
-                    }       
         }
         return false;
     }
