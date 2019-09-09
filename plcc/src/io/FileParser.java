@@ -59,12 +59,12 @@ public class FileParser {
     static Integer lastUsedDsspNum = null;
     static ArrayList<String> pdbLines = null;
     static ArrayList<String> dsspLines = null;
-    static ArrayList <Molecule> s_molecule = null;
+    static ArrayList <Molecule> s_molecules = null;
     static ArrayList<Model> s_models = null;
     static ArrayList<String> s_allModelIDsFromWholePDBFile = null;
     static ArrayList<Chain> s_chains = null;
-    static ArrayList<Residue> s_residues = null;
-    static ArrayList<RNA> s_rna = null;
+    static ArrayList<Integer> s_residueIndices = null;
+    static ArrayList<Integer> s_rnaIndices = null;
     static ArrayList<Atom> s_atoms = null;
     static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
@@ -126,16 +126,40 @@ public class FileParser {
         String substr = line.substring(startIndexInclusive, length);
         return substr;
     }
+    
+    
+    private static void initVariables(String pf, String df) {
+        pdbFile = pf;
+        dsspFile = df;
+        
+        dsspLines = new ArrayList<String>();
+        dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
+        if(! FileParser.silent) {
+            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
+        }
+    
+        s_models = new ArrayList<Model>();
+        s_allModelIDsFromWholePDBFile = new ArrayList<String>();
+        s_chains = new ArrayList<Chain>();
+        s_molecules = new ArrayList <Molecule> ();
+        s_residueIndices = new ArrayList<>();
+        s_rnaIndices = new ArrayList<>();
+        s_atoms = new ArrayList<Atom>();
+        s_dsspSSEs = new ArrayList<SSE>();
+        s_ptglSSEs = new ArrayList<SSE>();
+        s_sites = new ArrayList<>();
+        homologuesMap = new HashMap<>();
+    }
 
+    
     /**
      * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
      * @param pf Path to a PBD file. Does NOT test whether it exist, do that earlier.
      */
     public static Boolean initData(String pf, String df) {
 
-        pdbFile = pf;
-        dsspFile = df;
-
+        initVariables(pf, df);
+        
         if(! FileParser.silent) {
             System.out.println("  Reading files...");
         }
@@ -145,24 +169,6 @@ public class FileParser {
         if(! FileParser.silent) {
             System.out.println("    Read " + pdbLines.size() + " lines of file '" + pdbFile + "'.");
         }
-
-        dsspLines = new ArrayList<String>();
-        dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
-        if(! FileParser.silent) {
-            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
-        }
-
-        // parse the lists, filling the data arrays (models, chains, residues, atoms)
-        s_models = new ArrayList<Model>();
-        s_allModelIDsFromWholePDBFile = new ArrayList<String>();
-        s_chains = new ArrayList<Chain>();
-        s_residues = new ArrayList<Residue>();
-        s_atoms = new ArrayList<Atom>();
-        s_dsspSSEs = new ArrayList<SSE>();
-        s_ptglSSEs = new ArrayList<SSE>();
-        s_sites = new ArrayList<>();
-        s_molecule = new ArrayList <Molecule> ();
-        homologuesMap = new HashMap<>();
 
         // resIndexPDB = new Integer[maxResidues];      // Removed because some PDB files have negative residue numbers, they break this. :/ So we
         //                                              //  have to go through the whole list (which is slow and stupid, bah).
@@ -189,24 +195,7 @@ public class FileParser {
      */
     public static Boolean initDataCIF(String pf, String df) {
         
-        pdbFile = pf;
-        dsspFile = df;
-        
-        dsspLines = new ArrayList<String>();
-        dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
-        if(! FileParser.silent) {
-            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
-        }
-        s_rna = new ArrayList <RNA>();
-        s_models = new ArrayList<Model>();
-        s_chains = new ArrayList<Chain>();
-        s_residues = new ArrayList<Residue>();
-        s_atoms = new ArrayList<Atom>();
-        s_dsspSSEs = new ArrayList<SSE>();
-        s_ptglSSEs = new ArrayList<SSE>();
-        // We dont fill it yet, but need to initialize it to avoid Nullpointer exception
-        s_allModelIDsFromWholePDBFile = new ArrayList<String>();
-        metaData = new HashMap<>();
+        initVariables(pf, df);
         
         if(parseDataCIF()) {
             dataInitDone = true;            
@@ -396,12 +385,13 @@ public class FileParser {
     public static ArrayList<Model> getModels() { return(s_models); }
     public static ArrayList<String> getAllModelIDsFromWholePdbFile() { return(s_allModelIDsFromWholePDBFile); }
     public static ArrayList<Chain> getChains() { return(s_chains); }
-    public static ArrayList<Residue> getResidues() { return(s_residues); }
+    public static ArrayList<Molecule>getMolecule(){ return(s_molecules);}
+    public static ArrayList<Integer> getResidueIndices() { return(s_residueIndices); }
+    public static ArrayList<Integer> getRnaIndices() {return (s_rnaIndices);}
     public static ArrayList<Atom> getAtoms() { return(s_atoms); }
     public static ArrayList<SSE> getDsspSSEs() { return(s_dsspSSEs); }
     public static ArrayList<SSE> getPtglSSEs() { return(s_ptglSSEs); }
-    public static ArrayList<RNA> getRNA() {return (s_rna);}
-    public static ArrayList<Molecule>getMolecule(){ return(s_molecule);}
+
 
     public static HashMap<Character, ArrayList<Integer>> getSulfurBridges() {
         return s_sulfurBridges;
@@ -480,7 +470,7 @@ public class FileParser {
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
-        if(s_residues.size() < 1) {
+        if(s_molecules.size() < 1) {
             System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
@@ -552,24 +542,26 @@ public class FileParser {
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
         Residue r;
-        for(int i = 0; i < s_residues.size(); i++) {
-            r = s_residues.get(i);
-            deletedAtoms = r.chooseYourAltLoc();
-            
-            //if(r.getPdbResNum() == 209) {
-            //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
-            //}
-            
-            if(deletedAtoms.size() > 0) {
-                numResiduesAffected++;
-            }
-            
-            //delete atoms from global atom list as well
-            for(Atom a : deletedAtoms) {
-                if(s_atoms.remove(a)) {
-                    numAtomsDeletedAltLoc++;
-                } else {
-                    DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
+        for(int i = 0; i < s_molecules.size(); i++) {
+            if (s_molecules.get(i) instanceof Residue) {
+                r = (Residue) s_molecules.get(i);
+                deletedAtoms = r.chooseYourAltLoc();
+
+                //if(r.getPdbResNum() == 209) {
+                //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
+                //}
+
+                if(deletedAtoms.size() > 0) {
+                    numResiduesAffected++;
+                }
+
+                //delete atoms from global atom list as well
+                for(Atom a : deletedAtoms) {
+                    if(s_atoms.remove(a)) {
+                        numAtomsDeletedAltLoc++;
+                    } else {
+                        DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
+                    }
                 }
             }
         }
@@ -622,7 +614,7 @@ public class FileParser {
             // report statistics
             System.out.println("  All data parsed. Found " + s_models.size() + " models, " +
                                                            s_chains.size() + " chains, " +
-                                                           s_residues.size() + " residues, " +
+                                                           s_molecules.size() + " residues, " +
                                                            s_atoms.size() + " atoms.");
         }
 
@@ -740,7 +732,7 @@ public class FileParser {
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
-        if(s_residues.size() < 1) {
+        if(s_molecules.size() < 1) {
             System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
@@ -1052,7 +1044,7 @@ public class FileParser {
                                         }
                                     } else {
                                         tmpRes.setChain(tmpChain);
-                                        tmpChain.addResidue(tmpRes);
+                                        tmpChain.addMolecule(tmpRes);
                                     }
                                 } else {
                                     // load new Residue into tmpRes if we approached next Residue
@@ -1194,9 +1186,9 @@ public class FileParser {
                                         //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
                                         //      instead, use a range over number of atoms.
 
-                                        s_residues.add(lig);
+                                        s_molecules.add(lig);
 
-                                        getChainByPdbChainID(chainID).addResidue(lig);
+                                        getChainByPdbChainID(chainID).addMolecule(lig);
 
                                         // do we need this?
                                         //resIndex = s_residues.size() - 1;
@@ -1325,24 +1317,26 @@ public class FileParser {
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
         Residue r;
-        for(int i = 0; i < s_residues.size(); i++) {
-            r = s_residues.get(i);
-            deletedAtoms = r.chooseYourAltLoc();
-            
-            //if(r.getPdbResNum() == 209) {
-            //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
-            //}
-            
-            if(deletedAtoms.size() > 0) {
-                numResiduesAffected++;
-            }
-            
-            //delete atoms from global atom list as well
-            for(Atom a : deletedAtoms) {
-                if(s_atoms.remove(a)) {
-                    numAtomsDeletedAltLoc++;
-                } else {
-                    DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
+        for(int i = 0; i < s_molecules.size(); i++) {
+            if (s_molecules.get(i) instanceof Residue) {
+                r = (Residue) s_molecules.get(i);
+                deletedAtoms = r.chooseYourAltLoc();
+
+                //if(r.getPdbResNum() == 209) {
+                //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
+                //}
+
+                if(deletedAtoms.size() > 0) {
+                    numResiduesAffected++;
+                }
+
+                //delete atoms from global atom list as well
+                for(Atom a : deletedAtoms) {
+                    if(s_atoms.remove(a)) {
+                        numAtomsDeletedAltLoc++;
+                    } else {
+                        DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
+                    }
                 }
             }
         }
@@ -1628,37 +1622,6 @@ public class FileParser {
     
     
     /**
-     * DEPRECATED: Gets the Residue with the requested PDB properties from the residue list, but does not support PDB insertion code. So use the function with iCode support below instead.
-     * 
-     * @param resNum PDB residue number
-     * @param cID chain ID
-     * @return the Residue with the requested properties
-     */
-    @Deprecated private static Residue getResidueFromListOld(Integer resNum, String cID) {
-        
-        DP.getInstance().w("getResidueFromList(Integer, String): DEPRECATED: Use the function with iCode support instead!");
-
-        Residue r;
-
-        for(Integer i = 0; i < s_residues.size(); i++) {
-
-            r = s_residues.get(i);
-
-            if(r.getPdbNum().equals(resNum)) {
-
-                if(r.getChainID().equals(cID)) {
-                    return(r);
-                }
-
-            }
-        }
-
-        // Not found in the whole list, something went wrong
-        System.err.println("ERROR: Residue with PDB residue number " + resNum + " and chain ID " + cID + " does not exist in residue list.");
-        return(null);
-    }
-    
-    /**
      * Calls getResidueFromList and returns its value with printing of error message if null returned.
      * @param resNumPDB
      * @param chainID
@@ -1694,20 +1657,22 @@ public class FileParser {
         Residue found = null;
         int numFound = 0;
 
-        for(Integer i = 0; i < s_residues.size(); i++) {
+        for(Integer i = 0; i < s_molecules.size(); i++) {
 
-            tmp = s_residues.get(i);
+            if (s_molecules.get(i) instanceof Residue) {
+                tmp = (Residue) s_molecules.get(i);
 
-            if(tmp.getPdbNum().equals(resNumPDB)) {
+                if(tmp.getPdbNum().equals(resNumPDB)) {
 
-                if(tmp.getChainID().equals(chainID)) {
-                    
-                    if(tmp.getiCode().equals(iCode)) {
-                        found = tmp;
-                        numFound++;
-                        // break here and return found to increase speed
-                        return(found);
-                    }                    
+                    if(tmp.getChainID().equals(chainID)) {
+
+                        if(tmp.getiCode().equals(iCode)) {
+                            found = tmp;
+                            numFound++;
+                            // break here and return found to increase speed
+                            return(found);
+                        }                    
+                    }
                 }
             }
         }
@@ -1816,28 +1781,6 @@ public class FileParser {
         }
 
     }
-
-    
-
-    /**
-     * DEPRECATED: use getResByPdbFields() instead, this ignores chain ID and iCode, the returned residue is not unique.
-     */
-
-    @Deprecated public static Residue getResByPdbNum(Integer p) {
-        
-        DP.getInstance().w("getResByPdbNum(): This function is deprecated because it does not support chains and iCode (use getResByPdbFields()).");
-        System.exit(1);
-
-        for(Integer i = 0; i < s_residues.size(); i++) {
-            if((s_residues.get(i).getPdbNum()).equals(p)) {
-                return(s_residues.get(i));
-            }
-        }
-
-        // only reached if not found
-        System.out.println("WARNING: Could not find Residue with PDB number " + p + ".");
-        return(null);
-    }
     
 
     /**
@@ -1848,19 +1791,20 @@ public class FileParser {
      * @return The Residue object if found, null otherwise.
      */
     public static Residue getResByPdbFields(Integer p, String chID, String ic) {
+        Residue r;
         
-        for(Integer i = 0; i < s_residues.size(); i++) {
-            if((s_residues.get(i).getPdbNum()).equals(p)) {
-                
-                if((s_residues.get(i).getChainID()).equals(chID)) {
-                    
-                    if( ic == null || (s_residues.get(i).getiCode()).equals(ic)) {
-                        return(s_residues.get(i));
+        for(Integer i = 0; i < s_molecules.size(); i++) {
+            if (s_molecules.get(i) instanceof Residue) {
+                r = (Residue) s_molecules.get(i);
+                if((r.getPdbNum()).equals(p)) {
+
+                    if((r.getChainID()).equals(chID)) {
+
+                        if( ic == null || (r.getiCode()).equals(ic)) {
+                            return(r);
+                        }
                     }
-                        
-                    
                 }
-                
             }
         }
 
@@ -2502,7 +2446,6 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         Float phi = 0.0f;
         Float psi = 0.0f;        
 
-        s_residues = new ArrayList<Residue>();
         s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         s_interchainSulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         s_interchainSulfurBridgesChainID = new  HashMap<Character, String>();
@@ -2567,7 +2510,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 // EDIT: Why not?! I guess I thought that DSSP and PDB files used different chain IDs for residues when I wrote that.
                 // EDIT jnw: do the matching in CIF files later so that each file is only read once
                 if (! isCIF) {
-                    getChainByPdbChainID(dsspChainID).addResidue(r);
+                    getChainByPdbChainID(dsspChainID).addMolecule(r);
                 }
 
 
@@ -2646,9 +2589,11 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 //}
 
                 // add to list of Residues
-                s_residues.add(r);
-                resIndex = s_residues.size() - 1;
-                // procudes null ponter exception in CIF parser and I dont see where we need it (maybe I'll understand later)
+                s_molecules.add(r);
+                resIndex = s_molecules.size() - 1;
+                // add index to s_residueIndices
+                s_residueIndices.add(resIndex);
+                // produces null ponter exception in CIF parser and I dont see where we need it (maybe I'll understand later)
                 if (! isCIF) {
                     resIndexDSSP[dsspResNum] = resIndex;
                 }
@@ -2803,11 +2748,11 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                         //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
                         //      instead, use a range over number of atoms.
                         
-                        s_residues.add(lig);
+                        s_molecules.add(lig);
                         
-                        getChainByPdbChainID(chainID).addResidue(lig);
+                        getChainByPdbChainID(chainID).addMolecule(lig);
 
-                        resIndex = s_residues.size() - 1;
+                        resIndex = s_molecules.size() - 1;
                         resIndexDSSP[resNumDSSP] = resIndex;
                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
@@ -3569,7 +3514,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         radDif1 = radDif2 = maxRadDif = distDif = maxDistDif = sumDif = sumDifAbs = common = 0;
         
         // stuff for comparing the other way around
-        Integer numRes = s_residues.size();
+        Integer numRes = s_molecules.size();
         System.out.println("Assuming that " + numRes + " residues exist, preparing matrix.");
         Integer numResDSSP = numRes + 1;       // since DSSP residue numbers start with 1, not 0
         Integer [][] geom_neo_contact_exists = new Integer[numResDSSP][numResDSSP];
