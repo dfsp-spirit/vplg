@@ -168,6 +168,11 @@ public class Main {
     /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
     static Boolean useFileFromCommandline = true;
     
+    // Lists of residues and RNAs. They are initilized as null and created once from molecules the first time the function
+    //   resFromMolecules or rnaFromMolecules is called
+    static ArrayList<Residue> residues = null;
+    static ArrayList<RNA> rnas = null;
+    
 
     public static void checkArgsUsage(String[] args, Boolean[] argsUsed) {
         for(int i = 0; i < argsUsed.length; i++) {
@@ -234,9 +239,8 @@ public class Main {
 
         ArrayList<Model> models = new ArrayList<Model>();
         ArrayList<Chain> chains = new ArrayList<Chain>();
-        List<Residue> residues = new ArrayList<Residue>();
-        List<Residue> residuesWithoutLigands = new ArrayList<Residue>();
-        List<Molecule> molecules = new ArrayList<Molecule>();
+        ArrayList<Molecule> molecules = new ArrayList<Molecule>();
+        ArrayList<Residue> residuesWithoutLigands;
         HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
@@ -853,7 +857,7 @@ public class Main {
                     
                     if(s.equals("--force")) {
                         Settings.set("plcc_F_abort_if_pdb_resolution_worse_than", "-1.0");
-                        Settings.set("plcc_I_abort_if_num_residues_below", "-1");
+                        Settings.set("plcc_I_abort_if_num_molecules_below", "-1");
                         argsUsed[i] = true;
                     }
                     
@@ -1551,6 +1555,13 @@ public class Main {
                     System.out.println("Using mmCIF parser and therefore looking for .cif file.");
                     System.out.println("Filename now is: " + pdbFile);
             }
+        } else {
+            // using old parser: everything that does not work with it here
+            if (Settings.getBoolean("plcc_include_rna")) {
+                DP.getInstance().w("Legacy PDB file parser and inclusion of RNA switched on, but the old parser does not suppoert this setting." +
+                        " Use a mmCIF file and command line option '-I' to include RNA. Switching off RNA inclusion now to go on.");
+                Settings.set("plcc_include_rna", "false");
+            }
         }
 
         if(Settings.getBoolean("plcc_B_clustermode")) {
@@ -2064,7 +2075,6 @@ public class Main {
         
         models = FileParser.getModels();    // doesn't do much anymore since only the PDB lines of model 1 are currently in there
         chains = FileParser.getChains();
-        residues = FileParser.getResidues();
         molecules = FileParser.getMolecule();
         atoms = FileParser.getAtoms();
         sulfurBridges = FileParser.getSulfurBridges();
@@ -2108,9 +2118,9 @@ public class Main {
             }
         }
         
-        Integer minNumberOfResidues = Settings.getInteger("plcc_I_abort_if_num_residues_below");
-        if(residues.size() < minNumberOfResidues) {
-            DP.getInstance().e("Main", "Aborting further processing of PDB '" + pdbid + "': residue count '" + residues.size() + "' too low, must be at least '" + minNumberOfResidues + "'. (Set 'plcc_I_abort_if_num_residues_below' to a negative int value in the config file to prevent this behaviour or use --force.) Exiting now.");
+        Integer minNumberOfResidues = Settings.getInteger("plcc_I_abort_if_num_molecules_below");
+        if(molecules.size() < minNumberOfResidues) {
+            DP.getInstance().e("Main", "Aborting further processing of PDB '" + pdbid + "': molecule count '" + molecules.size() + "' too low, must be at least '" + minNumberOfResidues + "'. (Set 'plcc_I_abort_if_num_molecules_below' to a negative int value in the config file to prevent this behaviour or use --force.) Exiting now.");
             System.exit(0);
         }
         
@@ -2150,7 +2160,7 @@ public class Main {
         
 
         if(chains.size() < 1) { System.out.println("WARNING: Input files contain no chains."); }
-        if(residues.size() < 1) { System.out.println("WARNING: Input files contain no residues."); }
+        if(molecules.size() < 1) { System.out.println("WARNING: Input files contain no molecules."); }
         if(atoms.size() < 1) { System.out.println("WARNING: Input files contain no atoms."); }
 
 
@@ -2185,7 +2195,7 @@ public class Main {
                 globalMaxSeqNeighborResDist = Integer.MAX_VALUE; 
             } else {
                 // All residues exist, we can now calculate their maximal center sphere radius
-                globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
+                globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(molecules);
                 if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                     System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
                 }
@@ -2193,17 +2203,26 @@ public class Main {
                 // ... and the maximal distance between neighbors in the AA sequence.
                 // Note that this is a lot less useful with ligands enabled since they are always listed at the 
                 //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
-                globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
+                globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(molecules);     
                 if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                     System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
                 }
             }        
         }
         // ... and fill in the frequencies of all AAs in this protein.
-        getAADistribution(residues);
+        getAADistribution(resFromMolecules(molecules));
 
         if(! silent) {
-            System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + residues.size() + " Residues, " + atoms.size() + " Atoms).");        
+            if (! Settings.getBoolean("plcc_include_rna")) {
+                // RNA off
+                System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
+                        " Residues, " + atoms.size() + " Atoms).");
+            } else {
+                // RNA on
+                System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
+                        " Molecules (" + resFromMolecules(molecules).size() + " Residues and " + rnaFromMolecules(molecules).size() +
+                        " RNAs), " + atoms.size() + " Atoms).");
+            }
         }
 
 
@@ -2261,13 +2280,13 @@ public class Main {
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
-                cInfo = calculateAllContactsAlternativeModel(residues);
+                cInfo = calculateAllContactsAlternativeModel(resFromMolecules(molecules));
             }
             else {
                 if (Settings.getBoolean("plcc_B_chain_spheres_speedup")) {            
                     cInfo = calculateAllContactsChainSphereSpeedup(chains);
                 } else {
-                    cInfo = calculateAllContacts(residues);
+                    cInfo = calculateAllContacts(molecules);
                 }
             }
             if(! silent) {
@@ -2318,9 +2337,9 @@ public class Main {
             }
             else {
                 if(! silent) {
-                    System.out.println("Showing statistics overview...");
+                    System.out.println("Showing statistics overview of residues...");
                 }
-                showContactStatistics(residues.size());
+                showContactStatistics(resFromMolecules(molecules).size());
             }
             
         }
@@ -2355,17 +2374,17 @@ public class Main {
             }
             else {
                 if(! silent) {
-                    System.out.println("Writing statistics file...");
+                    System.out.println("Writing statistics file for residues...");
                 }
-                writeStatistics(conDotSetFile, pdbid, residues.size());
+                writeStatistics(conDotSetFile, pdbid, resFromMolecules(molecules).size());
             }
 
             // write the dssplig file
             if(! silent) {
-                System.out.println("Writing DSSP ligand file...");
+                System.out.println("Writing DSSP ligand file for residues...");
             }
             //writeDsspLigFile(dsspFile, dsspLigFile, cInfo, residues);
-            writeOrderedDsspLigFile(dsspFile, dsspLigFile, residues);
+            writeOrderedDsspLigFile(dsspFile, dsspLigFile, resFromMolecules(molecules));
 
             // write chains file
             if(! silent) {
@@ -2375,9 +2394,9 @@ public class Main {
 
             // write ligand file
             if(! silent) {
-                System.out.println("Writing ligand file...");
+                System.out.println("Writing ligand file for residues...");
             }
-            writeLigands(ligandsFile, pdbid, residues);
+            writeLigands(ligandsFile, pdbid, resFromMolecules(molecules));
             
             // write residue mapping files
             if(! silent) {
@@ -2525,7 +2544,7 @@ public class Main {
                     if (Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
 
                         PPIGraph ppig;
-                        ppig = new PPIGraph(molecules, cInfo);
+                        ppig = new PPIGraph(residues, cInfo);
                         ppig.setPdbid(pdbid);
                         ppig.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                         // write the PPI graph to disc
@@ -4789,6 +4808,11 @@ public class Main {
         Residue a, b;
         Integer rs = res.size();
         
+        // jnw_2019: switch rna off for alternative model
+        if (Settings.getBoolean("plcc_B_include_rna")) {
+            DP.getInstance().w("Inclusion of RNA not implemented for alternative contacts model. Ignoring RNA.");
+        }
+        
         Integer numResContactsChecked, numResContactsPossible, numResContactsImpossible;
         numResContactsChecked = numResContactsPossible = numResContactsImpossible = 0;
 
@@ -5104,17 +5128,17 @@ public class Main {
     
     
     /**
-     * Calculates all contacts between the residues in res.
-     * @param res A list of Residue objects.
+     * Calculates all contacts between the residues in mols.
+     * @param mols A list of Residue objects.
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<MolContactInfo> calculateAllContacts(List<Residue> res) {
+    public static ArrayList<MolContactInfo> calculateAllContacts(ArrayList<Molecule> mols) {
         
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
-        Residue a, b;
-        Integer rs = res.size();
+        Molecule a, b;
+        Integer rs = mols.size();
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             rs = 2;
@@ -5140,14 +5164,14 @@ public class Main {
 
         for(int i = 0; i < rs; i++) {
 
-            a = res.get(i);
+            a = mols.get(i);
             numResToSkip = 0L;
 
             
             
             for(int j = i + 1; j < rs; j++) {
 
-                b = res.get(j);
+                b = mols.get(j);
                 
                 // DEBUG
                 if(Settings.getInteger("plcc_I_debug_level") >= 1) {
@@ -5169,7 +5193,7 @@ public class Main {
                 if(a.contactPossibleWithResidue(b)) {                                        
                     numResContactsPossible++;
 
-                    //System.out.println("    DSSP res# " + a.getDsspResNum() + "/" + b.getDsspResNum() + ": Collision spheres overlap, checking on atom level.");
+                    //System.out.println("    DSSP mols# " + a.getDsspResNum() + "/" + b.getDsspResNum() + ": Collision spheres overlap, checking on atom level.");
 
                     rci = calculateAtomContactsBetweenResidues(a, b);
                     if( rci != null) {
@@ -5195,7 +5219,7 @@ public class Main {
                 }
                 else {
                     numResContactsImpossible++;
-                    //System.out.println("    DSSP res# " + a.getDsspResNum() + "/" + b.getDsspResNum() + ": No atom contact possible, skipping atom level checks.");
+                    //System.out.println("    DSSP mols# " + a.getDsspResNum() + "/" + b.getDsspResNum() + ": No atom contact possible, skipping atom level checks.");
                        
                     // Further speedup: If the distance of a residue to another Residue is very large we
                     //  may be able to skip some of the next residues (I. Koch):
@@ -5210,7 +5234,7 @@ public class Main {
                         // numResToSkip = spaceBetweenResidues / globalMaxCenterSphereDiameter;
                         numResToSkip = spaceBetweenResidues / globalMaxSeqNeighborResDist;
 
-                        // System.out.println("  Residue skipping kicked in for DSSP res " + a.getDsspResNum() + ", skipped " + numResToSkip + " residues after " + b.getDsspResNum() + " in distance " + a.resCenterDistTo(b) + ".");
+                        // System.out.println("  Residue skipping kicked in for DSSP mols " + a.getDsspResNum() + ", skipped " + numResToSkip + " residues after " + b.getDsspResNum() + " in distance " + a.resCenterDistTo(b) + ".");
                         j += numResToSkip;
                         numCmpSkipped += numResToSkip;
 
@@ -10183,18 +10207,18 @@ public class Main {
     /**
      * Determines the maximum center sphere radius of all residues. This is the distance from the (center of the) central atom to the (center of the) atom which
      * is farthest from that atom.
-     * @param res a residue list
+     * @param mols a residue list
      * @return the radius of the largest center sphere
      */
-    public static Integer getGlobalMaxCenterSphereRadius(List<Residue> res) {
+    public static Integer getGlobalMaxCenterSphereRadius(List<Molecule> mols) {
 
-        Residue r = null;
+        Molecule m = null;
         Integer maxRad, curRad;
         maxRad = curRad = 0;
 
-        for(Integer i = 0; i < res.size(); i++) {
-            r = res.get(i);
-            curRad = r.getCenterSphereRadius();
+        for(Integer i = 0; i < mols.size(); i++) {
+            m = mols.get(i);
+            curRad = m.getCenterSphereRadius();
 
             if(curRad > maxRad) {
                 maxRad = curRad;
@@ -10209,12 +10233,12 @@ public class Main {
      * Determines the maximum 3D distance between residues which are sequential neighbors. Note that the distance can be pretty large because
      * of ligands which are always listed at the end even though they may not be in the vicinity of the last protein residue, i.e., the one
      * directly preceeding them.
-     * @param res a list of residues which to consider
+     * @param mols a list of molecules which to consider
      * @return the maximum distance between two consecutive protein residues in the primary sequence
      */
-    public static Integer getGlobalMaxSeqNeighborResDist(List<Residue> res) {
+    public static Integer getGlobalMaxSeqNeighborResDist(List<Molecule> mols) {
 
-        Residue r, s;
+        Molecule r, s;
         r = s = null;
         Integer maxDist, curDist, rID, sID, rT, sT;
         maxDist = curDist = rID = sID = rT = sT = 0;
@@ -10223,10 +10247,10 @@ public class Main {
         // Iterate through residues in sequential order (DSSP numbering) and determine
         //  the maximal distance (center to center) of all pairs of residues that are
         //  neighbors in the amino acid sequence.
-        for(Integer i = 0; i < res.size() - 1; i++) {
+        for(Integer i = 0; i < mols.size() - 1; i++) {
 
-            r = res.get(i);         // Is this really DSSP ordering? how can we check quickly?
-            s = res.get(i + 1);     // NOTE: Yes, it is DSSP ordering since residues are parsed from the
+            r = mols.get(i);         // Is this really DSSP ordering? how can we check quickly?
+            s = mols.get(i + 1);     // NOTE: Yes, it is DSSP ordering since residues are parsed from the
                                     //        DSSP file and residues in there are in DSSP ordering.
 
             curDist = r.resCenterDistTo(s);
@@ -10871,34 +10895,34 @@ public class Main {
             c = contacts.get(i);
             if(c.getNumLigContactsTotal() > 0) {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
-                // c getResA und c getResB -> typecast
+                // c getMolA und c getMolB -> typecast
                 // Handle resA
                 
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
                     
-                if(c.getResA().isAA()) {
-                    if( ! protRes.contains(c.getResA())) {
-                        protRes.add((Residue)c.getResA());
+                if(c.getMolA().isAA()) {
+                    if( ! protRes.contains(c.getMolA())) {
+                        protRes.add((Residue)c.getMolA());
                     }
                 }
-                if(c.getResA().isLigand()) {
-                    if( ! ligRes.contains(c.getResA())) {
-                        ligRes.add((Residue)c.getResA());
+                if(c.getMolA().isLigand()) {
+                    if( ! ligRes.contains(c.getMolA())) {
+                        ligRes.add((Residue)c.getMolA());
                     }
                 }
 
                 // Handle resB
-                if(c.getResB().isAA()) {
-                    if( ! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                if(c.getMolB().isAA()) {
+                    if( ! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
                 }
-                if(c.getResB().isLigand()) {
-                    if( ! ligRes.contains(c.getResB())) {
-                        ligRes.add((Residue)c.getResB());
+                if(c.getMolB().isLigand()) {
+                    if( ! ligRes.contains(c.getMolB())) {
+                        ligRes.add((Residue)c.getMolB());
                     }
                 }
 
@@ -10998,32 +11022,32 @@ public class Main {
             c = contacts.get(i);
             if(c.getNumLigContactsTotal() > 0) {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
                     // Handle resA
-                if(c.getResA().isAA()) {
-                    if( ! protRes.contains(c.getResA())) {
-                        protRes.add((Residue)c.getResA());
+                if(c.getMolA().isAA()) {
+                    if( ! protRes.contains(c.getMolA())) {
+                        protRes.add((Residue)c.getMolA());
                     }
                 }
-                if(c.getResA().isLigand()) {
-                    if( ! ligRes.contains(c.getResA())) {
-                        ligRes.add((Residue)c.getResA());
+                if(c.getMolA().isLigand()) {
+                    if( ! ligRes.contains(c.getMolA())) {
+                        ligRes.add((Residue)c.getMolA());
                     }
                  
                 }
                 
                 // Handle resB
-                if(c.getResB().isAA()) {
-                    if( ! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                if(c.getMolB().isAA()) {
+                    if( ! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
                 }
-                if(c.getResB().isLigand()) {
-                    if( ! ligRes.contains(c.getResB())) {
-                        ligRes.add((Residue)c.getResB());
+                if(c.getMolB().isLigand()) {
+                    if( ! ligRes.contains(c.getMolB())) {
+                        ligRes.add((Residue)c.getMolB());
                     }
                 }
 
@@ -11055,7 +11079,7 @@ public class Main {
 
                     c = contacts.get(j);
                     
-                    if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                    if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                     }
                     else{
@@ -11063,11 +11087,11 @@ public class Main {
                         
                         
                         // first residue A is this ligand, so the other one is the contact residue
-                        ligCont.add((Residue)c.getResB());
+                        ligCont.add((Residue)c.getMolB());
                     }
                     else if(c.getDsspResNumResB().equals(r.getDsspNum())) {
                         // second residue B is this ligand, so the other one is the contact residue
-                        ligCont.add((Residue)c.getResA());
+                        ligCont.add((Residue)c.getMolA());
                     }
                     else {
                         // The current ligand is not involved in this contact
@@ -11172,32 +11196,32 @@ public class Main {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
                 
                 // Handle resA
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
                     
                     
-                    if(c.getResA().isAA()) {
-                    if( ! protRes.contains(c.getResA())) {
-                        protRes.add((Residue)c.getResA());
+                    if(c.getMolA().isAA()) {
+                    if( ! protRes.contains(c.getMolA())) {
+                        protRes.add((Residue)c.getMolA());
                     }
                 }
-                if(c.getResA().isLigand()) {
-                    if( ! ligRes.contains(c.getResA())) {
-                        ligRes.add((Residue)c.getResA());
+                if(c.getMolA().isLigand()) {
+                    if( ! ligRes.contains(c.getMolA())) {
+                        ligRes.add((Residue)c.getMolA());
                     }
                 }
                 
                  // Handle resB
-                if(c.getResB().isAA()) {
-                    if( ! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                if(c.getMolB().isAA()) {
+                    if( ! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
                 }
-                if(c.getResB().isLigand()) {
-                    if( ! ligRes.contains(c.getResB())) {
-                        ligRes.add((Residue)c.getResB());
+                if(c.getMolB().isLigand()) {
+                    if( ! ligRes.contains(c.getMolB())) {
+                        ligRes.add((Residue)c.getMolB());
                     }
                 }
                 }
@@ -11206,16 +11230,16 @@ public class Main {
             
             // Select all residues of the protein that are protein-protein contacts
             
-            if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+            if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
                 if((c.getNumContactsBB() > 0) || (c.getNumContactsBC() > 0) || (c.getNumContactsCB() > 0)|| (c.getNumContactsCC() > 0)) {
-                if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                 }
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add((Residue)c.getResB());
+                if(! protRes.contains(c.getMolB())) {
+                    protRes.add((Residue)c.getMolB());
                 }
             }
             }
@@ -11223,21 +11247,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain vdW contacts
             if(c.getNumContactsIVDW() > 0) {
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
-                  if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                  if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                 }   
-                if(! protRes.contains(c.getResB())) {
-                    protRes.add((Residue)c.getResB());
+                if(! protRes.contains(c.getMolB())) {
+                    protRes.add((Residue)c.getMolB());
                 }
-                if(! ivdwRes.contains(c.getResA())) {
-                    ivdwRes.add((Residue)c.getResA());
+                if(! ivdwRes.contains(c.getMolA())) {
+                    ivdwRes.add((Residue)c.getMolA());
                 }
-                if(! ivdwRes.contains(c.getResB())) {
-                    ivdwRes.add((Residue)c.getResB());
+                if(! ivdwRes.contains(c.getMolB())) {
+                    ivdwRes.add((Residue)c.getMolB());
                 }  
                 
                 ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11246,8 +11270,8 @@ public class Main {
                 bondsIvdw.add(tmp);
                 
                 ArrayList<String> chains = new ArrayList<String>();
-                chains.add(c.getResA().getChainID());
-                chains.add(c.getResB().getChainID());
+                chains.add(c.getMolA().getChainID());
+                chains.add(c.getMolB().getChainID());
                 bondsChainIvdw.add(chains);
                 
                 ArrayList<Integer> atoms = new ArrayList<Integer>();
@@ -11256,8 +11280,8 @@ public class Main {
                 bondsIvdwAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getIVDWContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getIVDWContactAtomNumB() - 1).getAtomName());
+                atomNames.add(c.getMolA().getAtoms().get(c.getIVDWContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getMolB().getAtoms().get(c.getIVDWContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesIvdw.add(atomNames);
                 }
                  
@@ -11266,21 +11290,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain backbone-backbone h-bridge contacts
             if(c.getNumContactsBBHB()> 0 || c.getNumContactsBBBH() > 0) {
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
-                  if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                  if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                     }
-                    if(! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                    if(! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
-                    if(! bbRes.contains(c.getResA())) {
-                        bbRes.add((Residue)c.getResA());
+                    if(! bbRes.contains(c.getMolA())) {
+                        bbRes.add((Residue)c.getMolA());
                     }
-                    if(! bbRes.contains(c.getResB())) {
-                        bbRes.add((Residue)c.getResB());
+                    if(! bbRes.contains(c.getMolB())) {
+                        bbRes.add((Residue)c.getMolB());
                     } 
                     
                     ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11289,8 +11313,8 @@ public class Main {
                 bondsBB.add(tmp);
                 
                 ArrayList<String> chains = new ArrayList<String>();
-                chains.add(c.getResA().getChainID());
-                chains.add(c.getResB().getChainID());
+                chains.add(c.getMolA().getChainID());
+                chains.add(c.getMolB().getChainID());
                 bondsChainBB.add(chains);
                 
                 if(c.getNumContactsBBHB() > 0) {
@@ -11300,8 +11324,8 @@ public class Main {
                     bondsBBAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBBHBContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBBHBContactAtomNumB() - 1).getAtomName());
+                atomNames.add(c.getMolA().getAtoms().get(c.getBBHBContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getMolB().getAtoms().get(c.getBBHBContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBB.add(atomNames);
                 }
                 
@@ -11312,8 +11336,8 @@ public class Main {
                     bondsBBAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBBBHContactAtomNumA() - 1).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBBBHContactAtomNumB() - 1).getAtomName());
+                atomNames.add(c.getMolA().getAtoms().get(c.getBBBHContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getMolB().getAtoms().get(c.getBBBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBB.add(atomNames);
                 }
                 }
@@ -11326,21 +11350,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain backbone-sidechain h-bridge contacts
             if(c.getNumContactsBCHB()> 0 || c.getNumContactsBCBH() > 0) {
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
-                    if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                    if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                     }
-                    if(! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                    if(! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
-                    if(! bcRes.contains(c.getResA())) {
-                        bcRes.add((Residue)c.getResA());
+                    if(! bcRes.contains(c.getMolA())) {
+                        bcRes.add((Residue)c.getMolA());
                     }
-                    if(! bcRes.contains(c.getResB())) {
-                        bcRes.add((Residue)c.getResB());
+                    if(! bcRes.contains(c.getMolB())) {
+                        bcRes.add((Residue)c.getMolB());
                     }
 
                     ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11349,8 +11373,8 @@ public class Main {
                     bondsBC.add(tmp);
 
                     ArrayList<String> chains = new ArrayList<String>();
-                    chains.add(c.getResA().getChainID());
-                    chains.add(c.getResB().getChainID());
+                    chains.add(c.getMolA().getChainID());
+                    chains.add(c.getMolB().getChainID());
                     bondsChainBC.add(chains);
 
                     if(c.getNumContactsBCHB() > 0) {
@@ -11359,8 +11383,8 @@ public class Main {
                         atoms.add(c.getBCHBContactAtomNumB() - 1);
                         bondsBCAtoms.add(atoms);
                         ArrayList<String> atomNames = new ArrayList<String>();
-                        atomNames.add(c.getResA().getAtoms().get(c.getBCHBContactAtomNumA() - 1).getAtomName());
-                        atomNames.add(c.getResB().getAtoms().get(c.getBCHBContactAtomNumB() - 1).getAtomName());
+                        atomNames.add(c.getMolA().getAtoms().get(c.getBCHBContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getMolB().getAtoms().get(c.getBCHBContactAtomNumB() - 1).getAtomName());
                         bondsAtomNamesBC.add(atomNames);
 
                     }
@@ -11371,8 +11395,8 @@ public class Main {
                         atoms.add(c.getBCBHContactAtomNumB() - 1);
                         bondsBCAtoms.add(atoms);
                         ArrayList<String> atomNames = new ArrayList<String>();
-                        atomNames.add(c.getResA().getAtoms().get(c.getBCBHContactAtomNumA() - 1).getAtomName());
-                        atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB() - 1).getAtomName());
+                        atomNames.add(c.getMolA().getAtoms().get(c.getBCBHContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getMolB().getAtoms().get(c.getBCBHContactAtomNumB() - 1).getAtomName());
                         bondsAtomNamesBC.add(atomNames);
                     }
                 }   
@@ -11380,21 +11404,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain sidechain-backbone h-bridge contacts
             if(c.getNumContactsCBHB()> 0 || c.getNumContactsCBBH() > 0) {
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
-                   if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                   if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                     }
-                    if(! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                    if(! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
-                    if(! cbRes.contains(c.getResA())) {
-                        cbRes.add((Residue)c.getResA());
+                    if(! cbRes.contains(c.getMolA())) {
+                        cbRes.add((Residue)c.getMolA());
                     }
-                    if(! cbRes.contains(c.getResB())) {
-                        cbRes.add((Residue)c.getResB());
+                    if(! cbRes.contains(c.getMolB())) {
+                        cbRes.add((Residue)c.getMolB());
                     }
 
                     ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11403,8 +11427,8 @@ public class Main {
                     bondsCB.add(tmp);
 
                     ArrayList<String> chains = new ArrayList<String>();
-                    chains.add(c.getResA().getChainID());
-                    chains.add(c.getResB().getChainID());
+                    chains.add(c.getMolA().getChainID());
+                    chains.add(c.getMolB().getChainID());
                     bondsChainCB.add(chains);
 
                     if(c.getNumContactsCBHB() > 0) {
@@ -11414,8 +11438,8 @@ public class Main {
                         bondsCBAtoms.add(atoms);
 
                         ArrayList<String> atomNames = new ArrayList<String>();
-                        atomNames.add(c.getResA().getAtoms().get(c.getCBHBContactAtomNumA() - 1).getAtomName());
-                        atomNames.add(c.getResB().getAtoms().get(c.getCBHBContactAtomNumB() - 1).getAtomName());
+                        atomNames.add(c.getMolA().getAtoms().get(c.getCBHBContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getMolB().getAtoms().get(c.getCBHBContactAtomNumB() - 1).getAtomName());
                         bondsAtomNamesCB.add(atomNames);
                     }
 
@@ -11426,8 +11450,8 @@ public class Main {
                         bondsCBAtoms.add(atoms);
 
                         ArrayList<String> atomNames = new ArrayList<String>();
-                        atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA() - 1).getAtomName());
-                        atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB() - 1).getAtomName());
+                        atomNames.add(c.getMolA().getAtoms().get(c.getCBBHContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getMolB().getAtoms().get(c.getCBBHContactAtomNumB() - 1).getAtomName());
                         bondsAtomNamesCB.add(atomNames);
                     } 
                 }
@@ -11435,21 +11459,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain sidechain-sidechain h-bridge contacts
             if(c.getNumContactsCCHB()> 0 || c.getNumContactsCCBH() > 0) {
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
-                    if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                    if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                     }
-                    if(! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                    if(! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
-                    if(! ccRes.contains(c.getResA())) {
-                        ccRes.add((Residue)c.getResA());
+                    if(! ccRes.contains(c.getMolA())) {
+                        ccRes.add((Residue)c.getMolA());
                     }
-                    if(! ccRes.contains(c.getResB())) {
-                        ccRes.add((Residue)c.getResB());
+                    if(! ccRes.contains(c.getMolB())) {
+                        ccRes.add((Residue)c.getMolB());
                     }
 
                     ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11458,8 +11482,8 @@ public class Main {
                     bondsCC.add(tmp);
 
                     ArrayList<String> chains = new ArrayList<String>();
-                    chains.add(c.getResA().getChainID());
-                    chains.add(c.getResB().getChainID());
+                    chains.add(c.getMolA().getChainID());
+                    chains.add(c.getMolB().getChainID());
                     bondsChainCC.add(chains);
 
                     if(c.getNumContactsCCHB() > 0) {
@@ -11469,8 +11493,8 @@ public class Main {
                         bondsCCAtoms.add(atoms);
 
                         ArrayList<String> atomNames = new ArrayList<String>();
-                        atomNames.add(c.getResA().getAtoms().get(c.getCCHBContactAtomNumA() - 1).getAtomName());
-                        atomNames.add(c.getResB().getAtoms().get(c.getCCHBContactAtomNumB() - 1).getAtomName());
+                        atomNames.add(c.getMolA().getAtoms().get(c.getCCHBContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getMolB().getAtoms().get(c.getCCHBContactAtomNumB() - 1).getAtomName());
                         bondsAtomNamesCC.add(atomNames);
                     }
 
@@ -11481,8 +11505,8 @@ public class Main {
                         bondsCCAtoms.add(atoms);
 
                         ArrayList<String> atomNames = new ArrayList<String>();
-                        atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA() - 1).getAtomName());
-                        atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB() - 1).getAtomName());
+                        atomNames.add(c.getMolA().getAtoms().get(c.getCCBHContactAtomNumA() - 1).getAtomName());
+                        atomNames.add(c.getMolB().getAtoms().get(c.getCCBHContactAtomNumB() - 1).getAtomName());
                         bondsAtomNamesCC.add(atomNames);
                     }
                 }    
@@ -11490,21 +11514,21 @@ public class Main {
             
             // Select all residues of the protein that have interchain sulfur contacts
             if(c.getNumContactsISS() > 0) {
-                if( !(c.getResA() instanceof Residue) || !(c.getResB() instanceof Residue)){
+                if( !(c.getMolA() instanceof Residue) || !(c.getMolB() instanceof Residue)){
                     continue;
                 }
                 else{
-                   if(! protRes.contains(c.getResA())) {
-                    protRes.add((Residue)c.getResA());
+                   if(! protRes.contains(c.getMolA())) {
+                    protRes.add((Residue)c.getMolA());
                     }
-                    if(! protRes.contains(c.getResB())) {
-                        protRes.add((Residue)c.getResB());
+                    if(! protRes.contains(c.getMolB())) {
+                        protRes.add((Residue)c.getMolB());
                     }
-                    if(! issRes.contains(c.getResA())) {
-                        issRes.add((Residue)c.getResA());
+                    if(! issRes.contains(c.getMolA())) {
+                        issRes.add((Residue)c.getMolA());
                     }
-                    if(! issRes.contains(c.getResB())) {
-                        issRes.add((Residue)c.getResB());
+                    if(! issRes.contains(c.getMolB())) {
+                        issRes.add((Residue)c.getMolB());
                     }
 
                     ArrayList<Integer> tmp = new ArrayList<Integer>();
@@ -11513,8 +11537,8 @@ public class Main {
                     bondsIss.add(tmp);
 
                     ArrayList<String> chains = new ArrayList<String>();
-                    chains.add(c.getResA().getChainID());
-                    chains.add(c.getResB().getChainID());
+                    chains.add(c.getMolA().getChainID());
+                    chains.add(c.getMolB().getChainID());
                     bondsChainIss.add(chains); 
                 }
             }
@@ -12771,8 +12795,8 @@ public class Main {
         
         // calculate sum of interchain contacts
         for(Integer i = 0; i < resContacts.size(); i++){
-            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
-            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
+            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getMolA().getChainID());
+            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getMolB().getChainID());
            
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
@@ -12806,8 +12830,8 @@ public class Main {
         
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
-            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
-            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
+            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getMolA().getChainID());
+            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getMolB().getChainID());
             
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
@@ -12818,12 +12842,12 @@ public class Main {
                 MolContactInfo curResCon = resContacts.get(i);
                 
                 // Die Datenkrake
-                String chainAString = curResCon.getResA().getChainID().toString();
-                String chainBString = curResCon.getResB().getChainID().toString();
+                String chainAString = curResCon.getMolA().getChainID().toString();
+                String chainBString = curResCon.getMolB().getChainID().toString();
                 String resNameA = curResCon.getResName3A();
                 String resNameB = curResCon.getResName3B();
-                String resTypeA = curResCon.getResA().getSSETypePlcc();
-                String resTypeB = curResCon.getResB().getSSETypePlcc();
+                String resTypeA = curResCon.getMolA().getSSETypePlcc();
+                String resTypeB = curResCon.getMolB().getSSETypePlcc();
                 
                 String BBDist = curResCon.getBBContactDist().toString();
                 String BCDist = curResCon.getBCContactDist().toString();
@@ -12851,15 +12875,15 @@ public class Main {
                 
                 
                 // Only if both residues belong to a SSE..
-                if (curResCon.getResA().getSSE() != null && curResCon.getResB().getSSE() != null) {
+                if (curResCon.getMolA().getSSE() != null && curResCon.getMolB().getSSE() != null) {
                     //.. and are of type helix or strand
-                    if ((!Objects.equals(curResCon.getResA().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
-                            && !Objects.equals(curResCon.getResA().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))
-                            && (!Objects.equals(curResCon.getResB().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
-                            && !Objects.equals(curResCon.getResB().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))) {
+                    if ((!Objects.equals(curResCon.getMolA().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
+                            && !Objects.equals(curResCon.getMolA().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))
+                            && (!Objects.equals(curResCon.getMolB().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
+                            && !Objects.equals(curResCon.getMolB().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))) {
 
-                        Integer ResASseDsspNum = curResCon.getResA().getSSE().getStartDsspNum();
-                        Integer ResBSseDsspNum = curResCon.getResB().getSSE().getStartDsspNum();
+                        Integer ResASseDsspNum = curResCon.getMolA().getSSE().getStartDsspNum();
+                        Integer ResBSseDsspNum = curResCon.getMolB().getSSE().getStartDsspNum();
 
                         
                         Integer tmp;
@@ -12916,13 +12940,13 @@ public class Main {
                     compGraph.numLigandLigandInteractionsMap.put(e1, 0);
                     
                     
-                    if (resContacts.get(i).getResA().getSSE()!=null){
+                    if (resContacts.get(i).getMolA().getSSE()!=null){
                         // the 1st residue of this contact belongs to a valid PTGL SSE
-                        int firstSSEClass = resContacts.get(i).getResA().getSSE().getSSETypeInt();
+                        int firstSSEClass = resContacts.get(i).getMolA().getSSE().getSSETypeInt();
                         switch (firstSSEClass){                            
                             case 1: // SSECLASS_HELIX
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixHelixInteractionsMap.put(e1, 1);  // we are creating a new edge, so this is the first contact
@@ -12945,8 +12969,8 @@ public class Main {
                                 }
                                 break;
                             case 2: // SSECLASS_BETASTRAND
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixStrandInteractionsMap.put(e1, 1);
@@ -12971,8 +12995,8 @@ public class Main {
                                 break;
                             case 3: // SSECLASS_LIGAND
                                 //System.out.println("Ligand Contact");
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixLigandInteractionsMap.put(e1, 1);
@@ -12997,8 +13021,8 @@ public class Main {
                                 break;
                             case 4:
                                 //System.out.println("Other Contact");
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixCoilInteractionsMap.put(e1, 1);
@@ -13025,8 +13049,8 @@ public class Main {
                     }
                     else{
                         // the first residue of this contact does NOT belong to a valid PTGL SSE, i.e., it is a coil
-                        if (resContacts.get(i).getResB().getSSE()!=null){
-                            int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                        if (resContacts.get(i).getMolB().getSSE()!=null){
+                            int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                             switch (secondSSE){
                                 case 1: // SSECLASS_HELIX
                                     compGraph.numHelixCoilInteractionsMap.put(e1, 1);
@@ -13050,18 +13074,18 @@ public class Main {
                             //System.out.println("Loop-loop Contact");
                         }
                     }
-                    //System.out.println("Contact found between chainName " + resContacts.get(i).getResA().getChainID() + " and chainName " + resContacts.get(i).getResB().getChainID());
+                    //System.out.println("Contact found between chainName " + resContacts.get(i).getMolA().getChainID() + " and chainName " + resContacts.get(i).getMolB().getChainID());
                 }
                 else{
                     // We already have an edge, just adjust values
                     compGraph.numAllInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numAllInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
-                    if (resContacts.get(i).getResA().getSSE()!=null){
+                    if (resContacts.get(i).getMolA().getSSE()!=null){
                         // first residue of contact belongs to valid PTGL SSE, i.e., is NOT a coil
-                        int firstSSE = resContacts.get(i).getResA().getSSE().getSSETypeInt();
+                        int firstSSE = resContacts.get(i).getMolA().getSSE().getSSETypeInt();
                         switch (firstSSE){
                             case 1: // SSECLASS_HELIX
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixHelixInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHelixHelixInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
@@ -13085,8 +13109,8 @@ public class Main {
                                 }
                                 break;
                             case 2: // SSECLASS_BETASTRAND
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixStrandInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHelixStrandInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
@@ -13111,8 +13135,8 @@ public class Main {
                                 break;
                             case 3: // SSECLASS_LIGAND
                                 //System.out.println("Ligand Contact");
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixLigandInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHelixLigandInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
@@ -13137,8 +13161,8 @@ public class Main {
                                 break;
                             case 4:
                                 //System.out.println("Other Contact");
-                                if (resContacts.get(i).getResB().getSSE()!=null){
-                                    int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1: // SSECLASS_HELIX
                                             compGraph.numHelixCoilInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHelixCoilInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
@@ -13164,8 +13188,8 @@ public class Main {
                         }
                     }
                     else{   // first residue of contact does NOT belong to valid PTGL SSE, i.e., is a coil
-                        if (resContacts.get(i).getResB().getSSE()!=null){
-                            int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
+                        if (resContacts.get(i).getMolB().getSSE()!=null){
+                            int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
                             switch (secondSSE){
                                 case 1: // SSECLASS_HELIX
                                     compGraph.numHelixCoilInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHelixCoilInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
@@ -13720,6 +13744,50 @@ public class Main {
         }
                 
         ProteinResults.getInstance().setCompGraphRes(cgr);
-    }            
+    }
+    
+    
+    /**
+     * Retrieves a list of all residues from a list of molecules.
+     * @param molecules ArrayList of Molecule
+     * @return ArrayList of Residue
+     */
+    private static ArrayList<Residue> resFromMolecules(ArrayList<Molecule> molecules) {
+        if (residues == null) {
+            residues = new ArrayList<>();
+            for (Molecule m : molecules) {
+                if (m instanceof Residue) {
+                    residues.add((Residue) m);
+                }
+            }
+            // check if empty
+            if (residues.isEmpty()) {
+                System.out.println("Detected no residues within molecules when first called resFromMolecules. Program will rely on that from now on.");
+            }
+        }
+        return residues;
+    }
+    
+    
+    /**
+     * Retrieves a list of all RNAs from a list of molecules.
+     * @param molecules ArrayList of Molecule
+     * @return ArrayList of Molecule
+     */
+    private static ArrayList<RNA> rnaFromMolecules(ArrayList<Molecule> molecules) {
+        if (rnas == null) {
+            rnas = new ArrayList<>();
+            for (Molecule m : molecules) {
+                if (m instanceof RNA) {
+                    rnas.add((RNA) m);
+                }
+            }
+            // check if empty
+            if (rnas.isEmpty()) {
+                System.out.println("Detected no RNA within molecules when first called rnaFromMolecules. Program will rely on that from now on.");
+            }
+        }
+        return rnas;
+    }
     
 }
