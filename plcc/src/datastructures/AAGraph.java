@@ -60,8 +60,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         if(minSeqDist <= 0) {
              return true;
         } else {
-            Molecule molA = c.getResA();
-            Molecule molB = c.getResB();
+            Molecule molA = c.getMolA();
+            Molecule molB = c.getMolB();
             if( ! molA.getChainID().equals(molB.getChainID())) {
                 //different chains, add contact
                 return true;
@@ -89,8 +89,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         if(maxSeqDist <= 0) {
              return true;
         } else {
-            Molecule molA = c.getResA();
-            Molecule molB = c.getResB();
+            Molecule molA = c.getMolA();
+            Molecule molB = c.getMolB();
             if( ! molA.getChainID().equals(molB.getChainID())) {
                 //different chains, do NOT add contact
                 return false;
@@ -464,8 +464,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      */
     public final boolean addEdgeFromRCI(MolContactInfo rci) {
         if(rci.describesAnyContact()) {            
-            Molecule molA = rci.getResA();
-            Molecule molB = rci.getResB();
+            Molecule molA = rci.getMolA();
+            Molecule molB = rci.getMolB();
             Residue resA;
             Residue resB;
             

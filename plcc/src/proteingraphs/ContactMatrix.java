@@ -107,8 +107,8 @@ public class ContactMatrix {
                 
         for(Integer i = 0; i < contList.size(); i++) {
             rc = contList.get(i);
-            molA = rc.getResA();
-            molB = rc.getResB();
+            molA = rc.getMolA();
+            molB = rc.getMolB();
 
             // Only handle this contact if both residues belong to the chain we are interested in (or if we are interested in all chains)
             if( (resA.getChainID().equals(this.handleChain) && resB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
@@ -773,8 +773,8 @@ public class ContactMatrix {
         Map<Integer, List<MolContactInfo>> rcMap = new HashMap<>();
         Integer resASSEPos, resBSSEPos;
         for(MolContactInfo rci : contList) {
-            resASSEPos = getSSEPosOfDsspResidue(rci.getResA().getDsspNum());
-            resBSSEPos = getSSEPosOfDsspResidue(rci.getResB().getDsspNum());
+            resASSEPos = getSSEPosOfDsspResidue(rci.getMolA().getDsspNum());
+            resBSSEPos = getSSEPosOfDsspResidue(rci.getMolB().getDsspNum());
             
             // init lists if required
             if( ! rcMap.containsKey(resASSEPos)) {
@@ -859,8 +859,8 @@ public class ContactMatrix {
                     
                     for(Integer k = 0; k < usedContList.size(); k++) {
 
-                        molA = usedContList.get(k).getResA();
-                        molB = usedContList.get(k).getResB();                                                       
+                        molA = usedContList.get(k).getMolA();
+                        molB = usedContList.get(k).getMolB();                                                       
 
                         // Get the SSEs
                         resASSEPos = getSSEPosOfDsspResidue(resA.getDsspNum());

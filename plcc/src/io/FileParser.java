@@ -3690,7 +3690,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             // We need to skip the ligand contacts, of course! They are not computed by geom_neo and they
             // would lead to an array out of bounds exception because they are not included in num_res_DSSP, the 
             // number of DSSP residues that determines the matrix size.
-            if(rc.getResA().isLigand() || rc.getResB().isLigand()) {
+            if(rc.getMolA().isLigand() || rc.getMolB().isLigand()) {
                 numLigContactsIgnored++;
                 continue;
             }
