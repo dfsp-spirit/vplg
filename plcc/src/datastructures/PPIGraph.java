@@ -26,7 +26,7 @@ import tools.DP;
  *
  * @author as
  */
-public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraphModellingLanguageFormat {
+public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
 
     /**
      * PDB identifier.
@@ -62,8 +62,8 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
         if (minSeqDist <= 0) {
             return true;
         } else {
-            Molecule molA = c.getResA();
-            Molecule molB = c.getResB();
+            Molecule molA = c.getMolA();
+            Molecule molB = c.getMolB();
             if (!molA.getChainID().equals(molB.getChainID())) {
                 //different chains, add contact
                 return true;
@@ -92,8 +92,8 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
         if (maxSeqDist <= 0) {
             return true;
         } else {
-            Molecule molA = c.getResA();
-            Molecule molB = c.getResB();
+            Molecule molA = c.getMolA();
+            Molecule molB = c.getMolB();
             if (!molA.getChainID().equals(molB.getChainID())) {
                 //different chains, do NOT add contact
                 return false;
@@ -115,7 +115,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph
      */
-    public PPIGraph(List<Molecule> vertices, ArrayList<MolContactInfo> contacts) {
+    public PPIGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
         super(vertices);
         for (int i = 0; i < contacts.size(); i++) {
             if (contactSatisfiesRules(contacts.get(i))) {
@@ -136,11 +136,16 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
      */
     public final boolean addPPIEdgeFromRCI(MolContactInfo rci) {
         if (rci.describesPPIContact()) {
-            Molecule molA = rci.getResA();
-            Molecule molB = rci.getResB();
+            Residue resA = rci.getResA();
+            Residue resB = rci.getResB();
+            
+            // check that both are residues (null if e.g. RNA)
+            if (resA == null || resB == null) {
+                return false;
+            }
 
-            int indexResA = this.getVertexIndex(molA);
-            int indexResB = this.getVertexIndex(molB);
+            int indexResA = this.getVertexIndex(resA);
+            int indexResB = this.getVertexIndex(resB);
             if (indexResA >= 0 && indexResB >= 0) {
                 if (rci.describesPPIContact()) {
                     AAEdgeInfo ei = new AAEdgeInfo(rci);
@@ -152,21 +157,21 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
             } else {
                 Boolean notFoundIsorAreLigands = Boolean.FALSE;
                 StringBuilder sb = new StringBuilder();
-                sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + molA.getFancyName() + " and " + molB.getFancyName() + ".");
+                sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + resA.getFancyName() + " and " + resB.getFancyName() + ".");
                 if (indexResA < 0 && indexResB < 0) {
                     sb.append(" BOTH residues not found.\n");
-                    if ((!molA.isAA()) && (!molB.isAA())) {
+                    if ((!resA.isAA()) && (!resB.isAA())) {
                         notFoundIsorAreLigands = Boolean.TRUE;
                     }
                 } else {
                     if (indexResA < 0) {
                         sb.append(" FIRST residue not found.\n");
-                        if (!molA.isAA()) {
+                        if (!resA.isAA()) {
                             notFoundIsorAreLigands = Boolean.TRUE;
                         }
                     } else {  // indexResA < 0
                         sb.append(" SECOND residue not found.\n");
-                        if (!molB.isAA()) {
+                        if (!resB.isAA()) {
                             notFoundIsorAreLigands = Boolean.TRUE;
                         }
                     }

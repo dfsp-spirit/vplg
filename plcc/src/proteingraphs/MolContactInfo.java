@@ -95,7 +95,7 @@ public class MolContactInfo {
     // See minContactDistances and numPairContacts; index 0 is unused; index 5 + 6 are also unused because the atom is
     //  fixed for these (HB1: backbone N, HB2: backbone O)
 
-    private Molecule resA, resB;
+    private Molecule molA, molB;
     private Integer dist;
     
     private ArrayList<String> atomAtomContactType;
@@ -120,8 +120,8 @@ public class MolContactInfo {
         minContactDistances = mcds;
         contactAtomIndexInResidueA = can_a;
         contactAtomIndexInResidueB = can_b;
-        resA = a;
-        resB = b;
+        molA = a;
+        molB = b;
         dist = d;
         numTotalLigContactsPair = nlc;
     }
@@ -145,8 +145,8 @@ public class MolContactInfo {
         minContactDistances = mcds;
         contactAtomIndexInResidueA = can_a;
         contactAtomIndexInResidueB = can_b;
-        resA = a;
-        resB = b;
+        molA = a;
+        molB = b;
         dist = d;
         numTotalLigContactsPair = nlc;
         atomAtomContactType = aact;
@@ -162,8 +162,8 @@ public class MolContactInfo {
      * @param b the second Residue
      */
     public MolContactInfo(Residue a, Residue b) {
-        resA = a;
-        resB = b;
+        molA = a;
+        molB = b;
         dist = a.resCenterDistTo(b);  
         numTotalLigContactsPair = 0;
         
@@ -179,10 +179,10 @@ public class MolContactInfo {
     }
 
     /*
-     * @return A short String representation of the contact (resA<->resB).
+     * @return A short String representation of the contact (molA<->molB).
      */
     public String shortStringRep() {
-        return(this.getResA().getUniqueString() + "<-->" + this.getResB().getUniqueString());
+        return(this.getMolA().getUniqueString() + "<-->" + this.getMolB().getUniqueString());
     }
 
     @Override public String toString() {
@@ -193,27 +193,27 @@ public class MolContactInfo {
     /** Returns a string indicating whether residue A is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
      * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").  
      */
-    public String getResTypeStringA() {  if(this.resA.isAA()) { return("PRT"); } else if(this.resA.isLigand()) { return("LIG"); } else { return("OTH"); } }
+    public String getResTypeStringA() {  if(this.molA.isAA()) { return("PRT"); } else if(this.molA.isLigand()) { return("LIG"); } else { return("OTH"); } }
     /** Returns a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
      * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
      */
-    public String getResTypeStringB() {  if(this.resB.isAA()) { return("PRT"); } else if(this.resB.isLigand()) { return("LIG"); } else { return("OTH"); } }
+    public String getResTypeStringB() {  if(this.molB.isAA()) { return("PRT"); } else if(this.molB.isLigand()) { return("LIG"); } else { return("OTH"); } }
 
 
     // getters required for writing the <pdbid>.geo file
-    public Integer getDsspResNumResA() { return(this.resA.getDsspNum()); }
-    public Integer getDsspResNumResB() { return(this.resB.getDsspNum()); }
-    public Integer getPdbResNumResA() { return(this.resA.getPdbNum()); }
-    public Integer getPdbResNumResB() { return(this.resB.getPdbNum()); }
-    public String getResName3A() { return(this.resA.getName3()); }
-    public String getResName3B() { return(this.resB.getName3()); }
-    public String getResName1A() { return(this.resA.getAAName1()); }
-    public String getResName1B() { return(this.resB.getAAName1()); }
-    public Integer getAAIDResA() { return(this.resA.getInternalAAID()); }
-    public Integer getAAIDResB() { return(this.resB.getInternalAAID()); }
+    public Integer getDsspResNumResA() { return(this.molA.getDsspNum()); }
+    public Integer getDsspResNumResB() { return(this.molB.getDsspNum()); }
+    public Integer getPdbResNumResA() { return(this.molA.getPdbNum()); }
+    public Integer getPdbResNumResB() { return(this.molB.getPdbNum()); }
+    public String getResName3A() { return(this.molA.getName3()); }
+    public String getResName3B() { return(this.molB.getName3()); }
+    public String getResName1A() { return(this.molA.getAAName1()); }
+    public String getResName1B() { return(this.molB.getAAName1()); }
+    public Integer getAAIDResA() { return(this.molA.getInternalAAID()); }
+    public Integer getAAIDResB() { return(this.molB.getInternalAAID()); }
 
-    public Integer getCenterSphereRadiusResA() { return(this.resA.getCenterSphereRadius()); }
-    public Integer getCenterSphereRadiusResB() { return(this.resB.getCenterSphereRadius()); }
+    public Integer getCenterSphereRadiusResA() { return(this.molA.getCenterSphereRadius()); }
+    public Integer getCenterSphereRadiusResB() { return(this.molB.getCenterSphereRadius()); }
     public Integer getResPairDist() { return(dist); }
 
     public Integer getHB1Dist() { return(minContactDistances[HB]); }
@@ -404,8 +404,26 @@ public class MolContactInfo {
     public ArrayList<Atom[]> getAtomAtomContacts() { return atomAtomContacts; }
     
     // DEBUG only
-    public Molecule getResA() { return(resA); }
-    public Molecule getResB() { return(resB); }
+    public Molecule getMolA() { return(molA); }
+    public Molecule getMolB() { return(molB); }
+    
+    // Return Mol as Res if possible, otherwise null
+    public Residue getResA() {
+        if (molA instanceof Residue) {
+            return (Residue) molA;
+        } else {
+            return null;
+        }
+    }
+    
+    // Return Mol as Res if possible, otherwise null
+    public Residue getResB() {
+        if (molB instanceof Residue) {
+            return (Residue) molB;
+        } else {
+            return null;
+        }
+    }
     
     /**
      * Determines whether the residue pair described by this RCI is in any contact, i.e., has contacts of any type.
