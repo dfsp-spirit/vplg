@@ -26,7 +26,6 @@ public class Chain implements java.io.Serializable {
     private String pdbChainID = null;                // chain ID from PDB file
     private String dsspChainID = null;               // chain ID from DSSP file
     private ArrayList<Molecule> molecules = null;      // a list of all Molecules of the Chain
-    private ArrayList<Residue> residues = null;      // a list of all Residues of the Chain
     private String macromolID = null;                // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
     private String macromolName = null;              // the macromol name from the PDB file
     private String modelID = null;
@@ -36,7 +35,7 @@ public class Chain implements java.io.Serializable {
     private Integer radiusFromCenter = null;         // distance from center to farthest non-H atom. -1 if no protein-atoms
 
     // constructor
-    public Chain(String ci) { pdbChainID = ci; molecules = new ArrayList<Molecule>(); }
+    public Chain(String ci) { pdbChainID = ci; molecules = new ArrayList<>();}
 
 
     // getters
@@ -48,10 +47,19 @@ public class Chain implements java.io.Serializable {
     public String getMacromolName() { return(macromolName); }
     public Model getModel() { return(model); }
     public ArrayList<Molecule> getMolecules() { return(molecules); }
-    public ArrayList<Residue> getResidues() { return(residues); }
     public ArrayList<String> getHomologues() { return(homologues); }
     public Integer[] getChainCenter() { return(chainCenter); }
     public Integer getRadiusFromCenter() { return(radiusFromCenter); }
+    
+    public ArrayList<Residue> getResidues() {
+        ArrayList<Residue> thisResidues = new ArrayList<>();
+        for (Molecule m : this.molecules) {
+            if (m instanceof Residue) {
+                thisResidues.add((Residue) m);
+            }
+        }
+        return thisResidues;
+    }
     
     /**
      * Returns a list of all ligand residues in this chain.
@@ -80,7 +88,6 @@ public class Chain implements java.io.Serializable {
     }
 
     // setters
-    public void addResidue(Residue r) { residues.add(r); }
     public void addMolecule(Molecule mol){molecules.add(mol);}
     public void setPdbChainID(String s) { pdbChainID = s; }
     public void setDsspChainID(String s) { dsspChainID = s; }
