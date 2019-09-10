@@ -614,7 +614,7 @@ public class FileParser {
             // report statistics
             System.out.println("  All data parsed. Found " + s_models.size() + " models, " +
                                                            s_chains.size() + " chains, " +
-                                                           s_molecules.size() + " residues, " +
+                                                           s_molecules.size() + " molecules, " +
                                                            s_atoms.size() + " atoms.");
         }
 
@@ -1004,9 +1004,9 @@ public class FileParser {
                             
                             // >> DNA/RNA <<
                             // ignore atm 
-                            /*if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
+                            /*if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(resNamePDB, 3))) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
+                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
                                 }
                                 continue; // do not use that atom
                             }*/
@@ -1383,11 +1383,11 @@ public class FileParser {
      private static boolean handlePdbLineANYATOM() {
         
 
-        Integer atomSerialNumber, molNumPDB, resNumPDB, resNumDSSP, rnaNumPDB;
+        Integer atomSerialNumber, resNumPDB, resNumDSSP, rnaNumPDB;
         Integer coordX, coordY, coordZ;
-        atomSerialNumber = molNumPDB = resNumPDB = resNumDSSP = coordX = coordY = coordZ = 0;
-        String atomRecordName, atomName, molNamePDB, resNamePDB, chainID, chemSym, altLoc, iCode;
-        atomRecordName = atomName = molNamePDB = resNamePDB = chainID = chemSym = altLoc = iCode = "";
+        atomSerialNumber = resNumPDB = resNumDSSP = coordX = coordY = coordZ = 0;
+        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
+        atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = iCode = "";
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         oCoordX = oCoordY = oCoordZ = 0.0;
         Float oCoordXf, oCoordYf, oCoordZf;
@@ -1399,10 +1399,10 @@ public class FileParser {
             // 11 is ignored: blank
             atomName = curLinePDB.substring(12, 16);
             altLoc = curLinePDB.substring(16, 17);
-            molNamePDB = curLinePDB.substring(17, 20);
+            resNamePDB = curLinePDB.substring(17, 20);
             // 20 is ignored: blank
             chainID = curLinePDB.substring(21, 22);
-            molNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
+            resNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
             iCode = curLinePDB.substring(26, 27);       // don't trim this!
             // 27 - 29 are ignored: blanks
             
@@ -1489,12 +1489,12 @@ public class FileParser {
                 a.setDsspResNum(null);
             }
             else {
-                a.setDsspResNum(getDsspResNumForPdbFields(molNumPDB, chainID, iCode));
+                a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
             }
         }
         else {          // HETATM
 
-            if(isIgnoredLigRes(molNamePDB)) {
+            if(isIgnoredLigRes(resNamePDB)) {
                 a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
                 // We do not need these atoms and they may lead to trouble later on, so
@@ -1511,14 +1511,12 @@ public class FileParser {
 
         // now create the new Atom        
         Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
-        Molecule tmpMol = getResidueFromList(molNumPDB, chainID, iCode);
         // Note that the command above may have returned NULL, we care for that below
        
         a.setPdbAtomNum(atomSerialNumber);
         a.setAtomName(atomName);
         a.setAltLoc(altLoc);
         a.setResidue(tmpRes);
-        //a.setMolecule(tmpMol);
         a.setChainID(chainID);        
         a.setChain(getChainByPdbChainID(chainID));
         a.setPdbResNum(resNumPDB);
@@ -1650,9 +1648,8 @@ public class FileParser {
      * @param iCode the insertion code of the residue
      * @return the residue if such a residue exists, null if no such residue exists.
      */
-    
     private static Residue getResidueFromList(Integer resNumPDB, String chainID, String iCode) {
-
+       
         Residue tmp;
         Residue found = null;
         int numFound = 0;
@@ -1661,7 +1658,7 @@ public class FileParser {
 
             if (s_molecules.get(i) instanceof Residue) {
                 tmp = (Residue) s_molecules.get(i);
-
+                
                 if(tmp.getPdbNum().equals(resNumPDB)) {
 
                     if(tmp.getChainID().equals(chainID)) {
@@ -2600,20 +2597,6 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 //resIndexPDB[pdbResNum] = resIndex;  // This will crash because some PDB files use negative residue numbers, omfg.
                 //System.out.println("    DSSP: Added residue PDB # " +  pdbResNum + ", DSSP # " + dsspResNum + " to s_residues at index " + resIndex + ".");
 
-                // Debug tests
-
-                /*
-                Residue tmp = s_residues.get(resIndex);
-                if(dsspResNum != (s_residues.get(resIndex)).getDsspResNum()) {
-                    System.err.println("ERROR: DSSP residue number of residue at index " + resIndex + " is not " + dsspResNum + " as expected, insertion failed.");
-                    System.exit(-1);
-                }
-
-                if(pdbResNum != (s_residues.get(resIndex)).getPdbResNum()) {
-                    System.err.println("ERROR: PDB residue number of residue at index " + resIndex + " is not " + pdbResNum + " as expected, insertion failed.");
-                    System.exit(-1);
-                }
-                */
 
             }
         }
