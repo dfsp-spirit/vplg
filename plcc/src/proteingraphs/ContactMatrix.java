@@ -95,8 +95,6 @@ public class ContactMatrix {
     public void fillFromContactList(List<MolContactInfo> contList, List<String> keepSSEs) {
 
         MolContactInfo rc;
-        Residue resA, resB;
-        resA = resB = null;
         Molecule molA, molB;
         molA = molB = null;
         Integer aSSEPos, bSSEPos, contNumIgnored, contNumConsidered;
@@ -111,14 +109,14 @@ public class ContactMatrix {
             molB = rc.getMolB();
 
             // Only handle this contact if both residues belong to the chain we are interested in (or if we are interested in all chains)
-            if( (resA.getChainID().equals(this.handleChain) && resB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
+            if( (molA.getChainID().equals(this.handleChain) && molB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
                 
                 
 
                 // We need to get the SSEs for the residues now. Note that they may not be part of any SSE
                 //  in our list (they may be part of an SSE of another chain or no valid SSE, e.g. a coil).
-                aSSEPos = getSSEPosOfDsspResidue(resA.getDsspNum());
-                bSSEPos = getSSEPosOfDsspResidue(resB.getDsspNum());
+                aSSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
+                bSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
                
                 if(aSSEPos < 0 || bSSEPos < 0) {
                     // At least one of these residues is not part of one of the SEEs. This can happen if it is part
@@ -863,8 +861,8 @@ public class ContactMatrix {
                         molB = usedContList.get(k).getMolB();                                                       
 
                         // Get the SSEs
-                        resASSEPos = getSSEPosOfDsspResidue(resA.getDsspNum());
-                        resBSSEPos = getSSEPosOfDsspResidue(resB.getDsspNum());
+                        resASSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
+                        resBSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
 
                         // If they don't belong to any SSEs we are interested in, forget about them. Note that these
                         //  residues may even belong to another chain.
