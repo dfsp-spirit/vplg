@@ -388,7 +388,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
 
     @Override public String toString() {
-        return("[" + sseType + ":DSSP:" + this.getStartResidue().getDsspResNum() + "-" + this.getEndResidue().getDsspResNum() + ",PDB:" + this.getStartResidue().getUniquePDBName() + "-" + this.getEndResidue().getUniquePDBName() +"]");
+        return("[" + sseType + ":DSSP:" + this.getStartResidue().getDsspNum() + "-" + this.getEndResidue().getDsspNum() + ",PDB:" + this.getStartResidue().getUniquePDBName() + "-" + this.getEndResidue().getUniquePDBName() +"]");
     }
     
     /**
@@ -404,7 +404,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * @return a string representation of this SSE object.
      */
     public String longStringRep() {
-        return("[SSE] # " + seqSseNumDssp + ", type " + sseType + ", DSSP residues " + this.getStartResidue().getDsspResNum() + ".." + this.getEndResidue().getDsspResNum() + " (length " + this.getLength() + "), sequence='" + this.getAASequence() + "'");
+        return("[SSE] # " + seqSseNumDssp + ", type " + sseType + ", DSSP residues " + this.getStartResidue().getDsspNum() + ".." + this.getEndResidue().getDsspNum() + " (length " + this.getLength() + "), sequence='" + this.getAASequence() + "'");
     }
 
     /**
@@ -435,9 +435,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
             r = residues.get(i);
 
-            if(r.getDsspResNum() < minResNumDssp) {
+            if(r.getDsspNum() < minResNumDssp) {
 
-                minResNumDssp = r.getDsspResNum();
+                minResNumDssp = r.getDsspNum();
                 startRes = r;
             }
         }
@@ -462,7 +462,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             DP.getInstance().w("SSE", "getStartDsspNum(): This SSE has no residues.");
             return 0;
         }
-        return(r.getDsspResNum());
+        return(r.getDsspNum());
     }
 
     /**
@@ -507,7 +507,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             DP.getInstance().w("SSE", "getEndDsspNum(): This SSE has no residues.");
             return 0;
         }
-        return(r.getDsspResNum());
+        return(r.getDsspNum());
     }
     
     /**
@@ -567,9 +567,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
             r = residues.get(i);
 
-            if(r.getDsspResNum() > maxResNumDssp) {
+            if(r.getDsspNum() > maxResNumDssp) {
 
-                maxResNumDssp = r.getDsspResNum();
+                maxResNumDssp = r.getDsspNum();
                 endRes = r;
             }
         }

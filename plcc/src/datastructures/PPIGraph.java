@@ -14,8 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 import plcc.Settings;
-import proteingraphs.ResContactInfo;
+import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
+import proteinstructure.Molecule;
 import tools.DP;
 
 /**
@@ -37,7 +38,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      */
     private String chainid;
 
-    private Boolean contactSatisfiesRules(ResContactInfo c) {
+    private Boolean contactSatisfiesRules(MolContactInfo c) {
         Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
         Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
         Boolean minSeqDistanceCheckPassed = checkMinSeqDistance(minSeqDist, c);
@@ -57,18 +58,18 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * @return whether the contact satisfies the minimal sequential residue
      * distance rule
      */
-    private Boolean checkMinSeqDistance(Integer minSeqDist, ResContactInfo c) {
+    private Boolean checkMinSeqDistance(Integer minSeqDist, MolContactInfo c) {
         if (minSeqDist <= 0) {
             return true;
         } else {
-            Residue resA = c.getResA();
-            Residue resB = c.getResB();
-            if (!resA.getChainID().equals(resB.getChainID())) {
+            Molecule molA = c.getMolA();
+            Molecule molB = c.getMolB();
+            if (!molA.getChainID().equals(molB.getChainID())) {
                 //different chains, add contact
                 return true;
             } else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if (seqDist < minSeqDist) {
                     return false;
                 } else {
@@ -87,18 +88,18 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * @return whether the contact satisfies the maximal sequential residue
      * distance rule
      */
-    private Boolean checkMaxSeqDistance(Integer maxSeqDist, ResContactInfo c) {
+    private Boolean checkMaxSeqDistance(Integer maxSeqDist, MolContactInfo c) {
         if (maxSeqDist <= 0) {
             return true;
         } else {
-            Residue resA = c.getResA();
-            Residue resB = c.getResB();
-            if (!resA.getChainID().equals(resB.getChainID())) {
+            Molecule molA = c.getMolA();
+            Molecule molB = c.getMolB();
+            if (!molA.getChainID().equals(molB.getChainID())) {
                 //different chains, do NOT add contact
                 return false;
             } else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if (seqDist > maxSeqDist) {
                     return false;
                 } else {
@@ -109,12 +110,12 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Advanced Constructor, constructs the edges automatically from ResContactInfo list
+     * Advanced Constructor, constructs the edges automatically from MolContactInfo list
      *
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph
      */
-    public PPIGraph(List<Residue> vertices, ArrayList<ResContactInfo> contacts) {
+    public PPIGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
         super(vertices);
         for (int i = 0; i < contacts.size(); i++) {
             if (contactSatisfiesRules(contacts.get(i))) {
@@ -126,17 +127,22 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Automatically adds an edge from a ResContactInfo object if applicable.
+     * Automatically adds an edge from a MolContactInfo object if applicable.
      * Note that the edge is only added if the RCI describes a contact.
      *
-     * @param rci the ResContactInfo object, must be for 2 residues which are
-     * part of this graph
+     * @param rci the MolContactInfo object, must be for 2 residues which are
+ part of this graph
      * @return true if the edge was added, false otherwise
      */
-    public final boolean addPPIEdgeFromRCI(ResContactInfo rci) {
+    public final boolean addPPIEdgeFromRCI(MolContactInfo rci) {
         if (rci.describesPPIContact()) {
             Residue resA = rci.getResA();
             Residue resB = rci.getResB();
+            
+            // check that both are residues (null if e.g. RNA)
+            if (resA == null || resB == null) {
+                return false;
+            }
 
             int indexResA = this.getVertexIndex(resA);
             int indexResB = this.getVertexIndex(resB);
@@ -221,18 +227,28 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
         gmlf.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
 
         // print all nodes
-        Residue residue;
+        Residue residue ;
+        Molecule molecule;
         for (Integer i = 0; i < this.getNumVertices(); i++) {
-            residue = this.vertices.get(i);
+            molecule = this.vertices.get(i);
             gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
-            gmlf.append("    label \"").append(i).append("-").append(residue.getUniquePDBName()).append("\"\n");
-            gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
-            gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
-            gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
-            gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
-            gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
-            gmlf.append("    chain \"").append(residue.getChainID()).append("\"\n");
+            gmlf.append("    label \"").append(i).append("-").append(molecule.getUniquePDBName()).append("\"\n");
+            gmlf.append("    chain \"").append(molecule.getChainID()).append("\"\n"); 
+                
+            if(molecule instanceof Residue){
+                residue = (Residue) molecule;
+                gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
+                gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
+                gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
+                gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
+            
+            }
+            else
+                if(!(molecule instanceof Residue)){
+                    gmlf.append("    rna \"");
+                }
+            
             gmlf.append(endNode).append("\n");
         }
 
@@ -266,7 +282,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * @return the euclidian distance
      */
     public int getEdgeDistance(int i, int j) {
-        return this.getVertex(i).resDistTo(this.getVertex(j));
+        return this.getVertex(i).distTo(this.getVertex(j));
     }
 
     /**
@@ -312,6 +328,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
         StringBuilder sbAag = new StringBuilder();
         StringBuilder sbIdx = new StringBuilder();
         Residue residue;
+        Molecule molecule;
         HashMap<Integer, Integer> indexTable = new HashMap<Integer, Integer>();
 
         // Header for index file
@@ -340,15 +357,15 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
         for (int i = 0; i < sortedList.size(); i++) {
             indexTable.put(sortedList.get(i), i);
 
-            residue = this.vertices.get(sortedList.get(i));
+            molecule = this.vertices.get(sortedList.get(i));
 
             sbIdx.append(i);
             sbIdx.append(",");
             sbIdx.append(sortedList.get(i));
             sbIdx.append(",");
-            sbIdx.append(residue.getPdbResNum());
+            sbIdx.append(molecule.getPdbNum());
             sbIdx.append(",");
-            sbIdx.append(residue.getResName3());
+            sbIdx.append(molecule.getName3());
             sbIdx.append(System.lineSeparator());
         }
 

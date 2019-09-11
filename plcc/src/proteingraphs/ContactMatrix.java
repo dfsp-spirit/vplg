@@ -10,6 +10,7 @@ package proteingraphs;
 
 // imports
 import proteinstructure.Residue;
+import proteinstructure.Molecule;
 import proteinstructure.SSE;
 import tools.DP;
 import java.util.ArrayList;
@@ -91,11 +92,11 @@ public class ContactMatrix {
      * @param contList a list of residue level contacts
      * @param keepSSEs a list of SSE type Strings that holds all SSE types which should be kept. All others will be filtered. For an albe graph, this list would be ["H", "E"].
      */
-    public void fillFromContactList(List<ResContactInfo> contList, List<String> keepSSEs) {
+    public void fillFromContactList(List<MolContactInfo> contList, List<String> keepSSEs) {
 
-        ResContactInfo rc;
-        Residue resA, resB;
-        resA = resB = null;
+        MolContactInfo rc;
+        Molecule molA, molB;
+        molA = molB = null;
         Integer aSSEPos, bSSEPos, contNumIgnored, contNumConsidered;
         aSSEPos = bSSEPos = null;
         contNumIgnored = contNumConsidered = 0;
@@ -104,18 +105,18 @@ public class ContactMatrix {
                 
         for(Integer i = 0; i < contList.size(); i++) {
             rc = contList.get(i);
-            resA = rc.getResA();
-            resB = rc.getResB();
+            molA = rc.getMolA();
+            molB = rc.getMolB();
 
             // Only handle this contact if both residues belong to the chain we are interested in (or if we are interested in all chains)
-            if( (resA.getChainID().equals(this.handleChain) && resB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
+            if( (molA.getChainID().equals(this.handleChain) && molB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
                 
                 
 
                 // We need to get the SSEs for the residues now. Note that they may not be part of any SSE
                 //  in our list (they may be part of an SSE of another chain or no valid SSE, e.g. a coil).
-                aSSEPos = getSSEPosOfDsspResidue(resA.getDsspResNum());
-                bSSEPos = getSSEPosOfDsspResidue(resB.getDsspResNum());
+                aSSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
+                bSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
                
                 if(aSSEPos < 0 || bSSEPos < 0) {
                     // At least one of these residues is not part of one of the SEEs. This can happen if it is part
@@ -378,7 +379,7 @@ public class ContactMatrix {
         Integer pos = -1;
 
         for(Integer i = 0; i < this.sseList.size(); i++) {            
-            if( (this.sseList.get(i).getStartResidue().getDsspResNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspResNum() >= dsspResNum)  ) {
+            if( (this.sseList.get(i).getStartResidue().getDsspNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspNum() >= dsspResNum)  ) {
                 //System.out.println("   +DSSP Residue " + dsspResNum + " is part of SSE #" + i + ": " + this.sseList.get(i).shortStringRep() + ".");
                 return(i);
                 }            
@@ -411,8 +412,8 @@ public class ContactMatrix {
 
         for(Integer i = 0; i < this.sseList.size(); i++) {
 
-            if(this.sseList.get(i).getStartResidue().getDsspResNum().equals(dsspStart)) {
-                if(this.sseList.get(i).getEndResidue().getDsspResNum().equals(dsspEnd)) {
+            if(this.sseList.get(i).getStartResidue().getDsspNum().equals(dsspStart)) {
+                if(this.sseList.get(i).getEndResidue().getDsspNum().equals(dsspEnd)) {
                     return(i);
                 }
             }
@@ -618,13 +619,13 @@ public class ContactMatrix {
      *
      */
     public void calculateSSEContactMatrix() {
-        
+
         //DEBUG
         //System.out.println("Array comparison of contBC and contCB matrices follows:");
         //for(Integer i = 0; i < contBC.length; i++) {
         //    this.printArrayComparison(contBC, contCB, i);
         //}
-        
+
 
         SSE a,b;
         a = b = null;
@@ -762,24 +763,24 @@ public class ContactMatrix {
      *        slows the process down, therefore it should be set to 'false' if in doubt.
      * 
      */
-    public void calculateSSESpatialRelationMatrix(List<ResContactInfo> contList, Boolean computeAll) {
+    public void calculateSSESpatialRelationMatrix(List<MolContactInfo> contList, Boolean computeAll) {
 
         // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string 
         //   (jnw_2019: more like the number of the SSE it is part of), and as value a list of all contacts 
         //   of that residue. This is done only once, and saves us from sequentially iterating through the 
         //   contact list to find the ones for the current residue (|R|^2) times later.
-        Map<Integer, List<ResContactInfo>> rcMap = new HashMap<>();
+        Map<Integer, List<MolContactInfo>> rcMap = new HashMap<>();
         Integer resASSEPos, resBSSEPos;
-        for(ResContactInfo rci : contList) {
-            resASSEPos = getSSEPosOfDsspResidue(rci.getResA().getDsspResNum());
-            resBSSEPos = getSSEPosOfDsspResidue(rci.getResB().getDsspResNum());
+        for(MolContactInfo rci : contList) {
+            resASSEPos = getSSEPosOfDsspResidue(rci.getMolA().getDsspNum());
+            resBSSEPos = getSSEPosOfDsspResidue(rci.getMolB().getDsspNum());
             
             // init lists if required
             if( ! rcMap.containsKey(resASSEPos)) {
-                rcMap.put(resASSEPos, new ArrayList<ResContactInfo>());
+                rcMap.put(resASSEPos, new ArrayList<MolContactInfo>());
             }
             if( ! rcMap.containsKey(resBSSEPos)) {
-                rcMap.put(resBSSEPos, new ArrayList<ResContactInfo>());
+                rcMap.put(resBSSEPos, new ArrayList<MolContactInfo>());
             }
             
             // add data
@@ -793,6 +794,8 @@ public class ContactMatrix {
            
         SSE sseA, sseB;
         Residue resA, resB;
+        Molecule molA, molB;
+        molA = molB = null;
         sseA = sseB = null;
         resA = resB = null;
         Integer sumMax, sumMin, difMax, difMin, tmp;
@@ -854,20 +857,20 @@ public class ContactMatrix {
                     }
 
                     // Compute the doubleDistance over all contact pairs of sseA and sseB
-                    List<ResContactInfo> contListAB = new ArrayList<>();
+                    List<MolContactInfo> contListAB = new ArrayList<>();
                     if(rcMap.containsKey(i)) { contListAB.addAll(rcMap.get(i)); }
                     if(rcMap.containsKey(j)) { contListAB.addAll(rcMap.get(j)); }
                     
-                    List<ResContactInfo> usedContList = contListAB;
+                    List<MolContactInfo> usedContList = contListAB;
                     
                     for(Integer k = 0; k < usedContList.size(); k++) {
 
-                        resA = usedContList.get(k).getResA();
-                        resB = usedContList.get(k).getResB();                                                       
+                        molA = usedContList.get(k).getMolA();
+                        molB = usedContList.get(k).getMolB();                                                       
 
                         // Get the SSEs
-                        resASSEPos = getSSEPosOfDsspResidue(resA.getDsspResNum());
-                        resBSSEPos = getSSEPosOfDsspResidue(resB.getDsspResNum());
+                        resASSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
+                        resBSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
 
                         // If they don't belong to any SSEs we are interested in, forget about them. Note that these
                         //  residues may even belong to another chain.
@@ -879,7 +882,7 @@ public class ContactMatrix {
                         if((resASSEPos.equals(i) && resBSSEPos.equals(j)) || (resASSEPos.equals(j) && resBSSEPos.equals(i))) {
                             
                             // check for new sumMax
-                            tmp = usedContList.get(k).getDsspResNumResA() + usedContList.get(k).getDsspResNumResB();
+                            tmp = usedContList.get(k).getDsspNumA() + usedContList.get(k).getDsspNumB();
                             if(tmp > sumMax) {
                                 sumMax = tmp;
                             }
@@ -890,12 +893,12 @@ public class ContactMatrix {
                             }
 
                             if (Settings.getInteger("plcc_I_debug_level") >= 4) {
-                                System.out.println("[DEBUG LV 4] Res " + resA.getDsspResNum() + " + " + resB.getDsspResNum());
+                                System.out.println("[DEBUG LV 4] Res " + resA.getDsspNum() + " + " + resB.getDsspNum());
                                 System.out.println("  Sum: " + tmp);
                             }
                             
                             // check for new difMax
-                            tmp = Math.abs(usedContList.get(k).getDsspResNumResA() - usedContList.get(k).getDsspResNumResB());
+                            tmp = Math.abs(usedContList.get(k).getDsspNumA() - usedContList.get(k).getDsspNumB());
                             
                             if (Settings.getInteger("plcc_I_debug_level") >= 4) {
                                 System.out.println("  Diff: " + tmp);

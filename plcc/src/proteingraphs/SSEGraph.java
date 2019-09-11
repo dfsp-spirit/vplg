@@ -1146,7 +1146,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         Integer pos = -1;
 
         for(Integer i = 0; i < this.sseList.size(); i++) {
-            if( (this.sseList.get(i).getStartResidue().getDsspResNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspResNum() >= dsspResNum)  ) {
+            if( (this.sseList.get(i).getStartResidue().getDsspNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspNum() >= dsspResNum)  ) {
                 //System.out.println("   +DSSP Residue " + dsspResNum + " is part of SSE #" + i + ": " + this.sseList.get(i).shortStringRep() + ".");
                 return(i);
             }
@@ -1179,8 +1179,8 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
 
         for(Integer i = 0; i < this.sseList.size(); i++) {
 
-            if(this.sseList.get(i).getStartResidue().getDsspResNum().equals(dsspStart)) {
-                if(this.sseList.get(i).getEndResidue().getDsspResNum().equals(dsspEnd)) {
+            if(this.sseList.get(i).getStartResidue().getDsspNum().equals(dsspStart)) {
+                if(this.sseList.get(i).getEndResidue().getDsspNum().equals(dsspEnd)) {
                     return(i);
                 }
             }
@@ -1546,7 +1546,7 @@ E	3	3	3
         SSE sse;
         for(Integer i = 0; i < this.sseList.size(); i++) {
             sse = this.getVertex(i);
-            pf.append(sse.getPLCCSSELabel()).append("\t").append(sse.getAASequence().length()).append("\t").append(sse.getStartResidue().getPdbResNum()).append("\t").append(sse.getEndResidue().getPdbResNum()).append("\n");
+            pf.append(sse.getPLCCSSELabel()).append("\t").append(sse.getAASequence().length()).append("\t").append(sse.getStartResidue().getPdbNum()).append("\t").append(sse.getEndResidue().getPdbNum()).append("\n");
         }
 
         // separator to indicate that edges follow

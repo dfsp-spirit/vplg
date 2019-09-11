@@ -8,7 +8,7 @@
 package datastructures;
 
 import graphformats.IGraphModellingLanguageFormat;
-import proteingraphs.ResContactInfo;
+import proteingraphs.MolContactInfo;
 
 /**
  * Edge information for an amino acid (AA) graph.
@@ -17,14 +17,14 @@ import proteingraphs.ResContactInfo;
 public class AAEdgeInfo implements IGraphModellingLanguageFormat {
     
     /** Information about the contacts between this residue pair. */
-    protected ResContactInfo rci;
+    protected MolContactInfo rci;
     
     
     public AAEdgeInfo() {
         this.rci = null;
     }
     
-    public AAEdgeInfo(ResContactInfo rci) {
+    public AAEdgeInfo(MolContactInfo rci) {
         this.rci = rci;
     }
     
@@ -40,11 +40,11 @@ public class AAEdgeInfo implements IGraphModellingLanguageFormat {
     
     
     // simple getters and setters follow
-    public ResContactInfo getRci() {
+    public MolContactInfo getRci() {
         return rci;
     }
 
-    public void setRci(ResContactInfo rci) {
+    public void setRci(MolContactInfo rci) {
         this.rci = rci;
     }
     

@@ -29,8 +29,8 @@ public class Atom implements java.io.Serializable {
     private String modelID = null;
     private Model model = null;
     private Integer pdbAtomNumber = null;       // atom number from pdb file
-    private Residue residue = null;             // Residue this Atom belongs to
-    private Integer type = null;               // atom type:  0=AA, 1=Ligand, 2=Ignored HETATM (e.g. 'DOD'-residue atoms) 3=Ignored ATOM (e.g. H, Q)
+    private Molecule molecule = null;             // Residue this Atom belongs to
+    private Integer type = null;               // atom type:  0=AA, 1=Ligand, 2=Ignored HETATM (e.g. 'DOD'-molecule atoms) 3=Ignored ATOM (e.g. H, Q)
     private Integer pdbResNum = null;
     private Integer dsspResNum = null;
     private Integer coordX = null;              // 3D coordinate X from pdb file, converted to 10th part Angstroem
@@ -44,6 +44,7 @@ public class Atom implements java.io.Serializable {
     public static final Integer ATOMTYPE_LIGAND = 1;
     public static final Integer ATOMTYPE_IGNORED_LIGAND = 2;
     public static final Integer ATOMTYPE_IGNORED_ATOM = 3;
+    public static final Integer ATOMTYPE_RNA = 4;
 
     /**
      * Getter for PDB alternate location identifier.
@@ -61,9 +62,10 @@ public class Atom implements java.io.Serializable {
         this.altLoc = altLoc;
     }
 
-    public Boolean isLigandAtom() { return(residue.getType() == 1); }
-    public Boolean isProteinAtom() { return(residue.getType() == 0); }
-    public Boolean isOtherAtom() { return(residue.getType() == 2); }
+    public Boolean isLigandAtom() { return this.type == ATOMTYPE_LIGAND; }
+    public Boolean isProteinAtom() { return this.type == ATOMTYPE_AA; }
+    public Boolean isOtherAtom() { return this.type == ATOMTYPE_IGNORED_LIGAND; }
+    public Boolean isRNA() {return this.type == ATOMTYPE_RNA;}
 
     
     
@@ -212,7 +214,7 @@ public class Atom implements java.io.Serializable {
     }
 
     @Override public String toString() {
-        return("[Atom] #" + this.pdbAtomNumber + " NAME='" + this.name + "' CS='" + this.chemSym + "' Type=" + this.type + " Chain=" + this.chainID + " ResDssp=" + this.getResidue().getDsspResNum() + " ResPDB=" + this.getResidue().getUniquePDBName() + " Coords=" + getCoordString() + " AltLoc='" + this.altLoc + "'.");
+        return("[Atom] #" + this.pdbAtomNumber + " NAME='" + this.name + "' CS='" + this.chemSym + "' Type=" + this.type + " Chain=" + this.chainID + " ResDssp=" + this.getMolecule().getDsspNum() + " ResPDB=" + this.getMolecule().getUniquePDBName() + " Coords=" + getCoordString() + " AltLoc='" + this.altLoc + "'.");
     }
 
 
@@ -422,7 +424,7 @@ public class Atom implements java.io.Serializable {
     public Integer getCoordY() { return(coordY); }
     public Integer getCoordZ() { return(coordZ); }
     public Integer getPdbLineNum() { return(pdbLineNum); }
-    public Residue getResidue() { return(residue); }
+    public Molecule getMolecule() { return(molecule); }
     public Integer getPdbResNum() { return(pdbResNum); }
     public Integer getDsspResNum() { return(dsspResNum); }
     public Integer getAtomType() { return(type); }
@@ -438,7 +440,7 @@ public class Atom implements java.io.Serializable {
     public void setCoordY(Integer i) { coordY = i; }
     public void setCoordZ(Integer i) { coordZ = i; }
     public void setPdbLineNum(Integer i) { pdbLineNum = i; }
-    public void setResidue(Residue r) { residue = r; }
+    public void setMolecule(Molecule m) { molecule = m; }
     public void setPdbResNum(Integer i) { pdbResNum = i; }
     public void setDsspResNum(Integer i) { dsspResNum = i; }
     public void setAtomtype(Integer i) { type = i; }
