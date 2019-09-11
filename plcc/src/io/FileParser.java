@@ -150,6 +150,7 @@ public class FileParser {
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
+        metaData = new HashMap<>();
         homologuesMap = new HashMap<>();
     }
 
@@ -742,8 +743,8 @@ public class FileParser {
         Boolean columnsChecked = false;
               
         // variables per (atom) line
-        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ, rnaNumPDB, molNumPDB;
-        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode, molNamePDB, PDB, rnaNamePDB;
+        Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
+        String atomRecordName, atomName, chainID, chemSym, altLoc, iCode, molNamePDB;
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         Float oCoordXf, oCoordYf, oCoordZf;
         int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
@@ -969,8 +970,8 @@ public class FileParser {
                             
                             // - - atom - -
                             // reset variables
-                            atomSerialNumber = molNumPDB = resNumPDB = rnaNumPDB= coordX =  coordY = coordZ = null;
-                            atomRecordName = atomName = resNamePDB = molNamePDB = chainID = rnaNamePDB = chemSym = altLoc = null;
+                            atomSerialNumber = molNumPDB = coordX =  coordY = coordZ = null;
+                            atomRecordName = atomName = molNamePDB = chainID = chemSym = altLoc = null;
                             iCode = " "; // if column does not exist or ? || . is assigned use 1 blank (compare old parser)
                             oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
                             oCoordXf = oCoordYf = oCoordZf = null;
@@ -1081,7 +1082,7 @@ public class FileParser {
                                 continue; // do not use that atom
                             }
         
-                            if( ! Settings.getBoolean("plcc_B_include-rna")) {
+                            if( ! Settings.getBoolean("plcc_B_include_rna")) {
                                 if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                         DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
@@ -1098,15 +1099,15 @@ public class FileParser {
                             if (isAA) {
                                 // we no start with lastMol is first residue from s_residues, so no check for null required!
                                 // load new Residue into lastMol if we approached next Residue
-                                if (! (Objects.equals(resNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
-                                    tmpMol = getResidueFromList(resNumPDB, chainID, iCode);
+                                if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
+                                    tmpMol = getResidueFromList(molNumPDB, chainID, iCode);
                                     // check that a peptid residue could be found
                                     if (tmpMol == null || tmpMol.isLigand()) {
                                         // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
                                         if (! silent) {
                                             // print note only once
-                                            if (! resNumPDB.equals(lastLigandNumPDB))
-                                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + resNumPDB + ", treating it as ligand.");
+                                            if (! molNumPDB.equals(lastLigandNumPDB))
+                                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand.");
                                         }
                                         isAA = false;
                                     } else {
@@ -1116,7 +1117,7 @@ public class FileParser {
                                         tmpChain.addMolecule(lastMol);
                                         
                                         // assign PDB res name (which differs in case of modifed residues)
-                                        lastMol.setName3(resNamePDB);
+                                        lastMol.setName3(molNamePDB);
                                     }
                                 }
                             }
@@ -1147,7 +1148,7 @@ public class FileParser {
                                     a.setDsspResNum(lastMol.getDsspNum());
                                 }
                                 
-                                /*if(  Settings.getBoolean("plcc_B_include-rna")) {
+                                /*if(  Settings.getBoolean("plcc_B_include_rna")) {
                                     a.setAtomtype(Atom.ATOMTYPE_RNA);
                                 }*/
                                 
@@ -1166,7 +1167,7 @@ public class FileParser {
                                     // create new Residue from info, we'll have to see whether we really add it below though
                                     lig = new Residue();
                                     
-                                    lig.setPdbNum(resNumPDB);
+                                    lig.setPdbNum(molNumPDB);
                                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                                     
                                     // assign fake DSSP Num increasing with each seen ligand
@@ -1176,7 +1177,7 @@ public class FileParser {
                                     lig.setDsspNum(resNumDSSP);
                                     lig.setChainID(chainID);
                                     lig.setiCode(iCode);
-                                    lig.setName3(resNamePDB);
+                                    lig.setName3(molNamePDB);
                                     lig.setAAName1(AminoAcid.getLigandName1());
                                     lig.setChain(getChainByPdbChainID(chainID));
                                     // still just assigning default model 1
@@ -1185,10 +1186,10 @@ public class FileParser {
                                     
                                     
                                     // add ligand to list of residues if it not on the ignore list
-                                    if(isIgnoredLigRes(resNamePDB)) {
+                                    if(isIgnoredLigRes(molNamePDB)) {
                                         ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but
                                                         //  this ligand won't be stored so decrement to previous value.
-                                        //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + resNumPDB + "' at PDB line " + pLineNum + ".");
+                                        //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + molNumPDB + "' at PDB line " + pLineNum + ".");
                                     } else {
                                         
                                         // ignore this for now: needs parsing of two more loops (_pdbx_nonpoly_scheme, _chem_comp)   	 
@@ -1230,7 +1231,7 @@ public class FileParser {
                                         
                                         */
 
-                                        lastLigandNumPDB = resNumPDB;
+                                        lastLigandNumPDB = molNumPDB;
                                         lastChainID = chainID;
 
                                         s_molecules.add(lig);
@@ -1240,9 +1241,9 @@ public class FileParser {
                                         // do we need this?
                                         //resIndex = s_residues.size() - 1;
                                         //resIndexDSSP[resNumDSSP] = resIndex;
-                                        //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
+                                        //resIndexPDB[molNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                                         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + resNumDSSP + ").");
+                                            System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + resNumDSSP + ").");
                                             System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                                         }
 
@@ -1250,7 +1251,7 @@ public class FileParser {
                                 }
                                    
                                 
-                                if(isIgnoredLigRes(resNamePDB)) {
+                                if(isIgnoredLigRes(molNamePDB)) {
                                     a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
                                     // We do not need these atoms and they may lead to trouble later on, so
@@ -1259,12 +1260,12 @@ public class FileParser {
                                     //  If people want all ligands they have to change the isIgnoredLigRes() function.
                                     
                                     // DEBUG
-                                    // DP.getInstance().w("FP_CIF", " Ignored ligand atom of '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspResNum().toString() + ").");
+                                    // DP.getInstance().w("FP_CIF", " Ignored ligand atom of '" +  resNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspResNum().toString() + ").");
                                     continue; // can we do this here? Does it cut off other important stuff? -> added to res but not atom (s.a.)
                                 }
                                 else {
                                     a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
-                                    //a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
+                                    //a.setDsspResNum(getDsspResNumForPdbFields(molNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
                                 }
                                 
                                 
@@ -1282,7 +1283,7 @@ public class FileParser {
                             a.setMolecule(lastMol);
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
-                            a.setPdbResNum(resNumPDB);
+                            a.setPdbResNum(molNumPDB);
                             // we cant get the DSSP res num easily here and have to do it later (I guess)
                             // old parser seems to assign 0 here whatsoever so we just leave the default value there
                             // a.setDsspResNum(resNumDSSP);

@@ -282,7 +282,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * @return the euclidian distance
      */
     public int getEdgeDistance(int i, int j) {
-        return this.getVertex(i).resDistTo(this.getVertex(j));
+        return this.getVertex(i).distTo(this.getVertex(j));
     }
 
     /**

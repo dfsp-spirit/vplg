@@ -420,7 +420,7 @@ public class Molecule {
      * @return the radius, in 1/10th Angstroem (so 20 means 2.0 A).
      */
     
-    private Integer getCenterSphereRadius() {
+    protected Integer getCenterSphereRadius() {
 
         Atom throwAway = null;
 
