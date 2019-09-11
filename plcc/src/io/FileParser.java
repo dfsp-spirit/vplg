@@ -134,6 +134,16 @@ public class FileParser {
         pdbFile = pf;
         dsspFile = df;
         
+        // read all lines of the files into lists
+        if(! FileParser.silent) {
+            System.out.println("  Reading files...");
+        }
+        pdbLines = new ArrayList<String>();
+        pdbLines = slurpPDBFileToModel(pdbFile, "2");
+        if(! FileParser.silent) {
+            System.out.println("    Read " + pdbLines.size() + " lines of file '" + pdbFile + "'.");
+        }
+        
         dsspLines = new ArrayList<String>();
         dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
         if(! FileParser.silent) {
@@ -160,18 +170,8 @@ public class FileParser {
      * @param pf Path to a PBD file. Does NOT test whether it exist, do that earlier.
      */
     public static Boolean initData(String pf, String df) {
-
-        initVariables(pf, df);
         
-        if(! FileParser.silent) {
-            System.out.println("  Reading files...");
-        }
-        // read all lines of the files into lists
-        pdbLines = new ArrayList<String>();
-        pdbLines = slurpPDBFileToModel(pdbFile, "2");
-        if(! FileParser.silent) {
-            System.out.println("    Read " + pdbLines.size() + " lines of file '" + pdbFile + "'.");
-        }
+        initVariables(pf, df);
 
         // resIndexPDB = new Integer[maxResidues];      // Removed because some PDB files have negative residue numbers, they break this. :/ So we
         //                                              //  have to go through the whole list (which is slow and stupid, bah).
