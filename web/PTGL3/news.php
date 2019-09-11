@@ -51,6 +51,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<p>Here we list important information on PTGL updates, planned maintenance times, and more.</p>
 		<br /><br/>
 
+		<h4>SEP 11, 2019: Webserver maintenance from SEP 20-27</h4>
+		<p>Our webserver hosting the PTGL will be under maintenance from September 20 to 27. During this time our webserver and all services may be partly unavailable.</p>
+		<br /><br/>
+
 		<h4>MAY 14, 2019: Updating server to latest PDB release</h4>
 		<p>We are currently running an update to the latest PDB version on our cluster. The update will be rolled out to the PTGL server in the next few weeks. In this time the server may be unavailable. This update will also include large structures (> 99,999 atoms or > 62 chains) for the first time.</p>
 		<br /><br/>
