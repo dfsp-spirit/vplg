@@ -15,6 +15,7 @@ import java.util.Arrays;
 import io.IO;
 import plcc.Settings;
 import tools.DP;
+import plcc.Main;
 
 /**
  * Represents a protein chain in a PDB file.
@@ -31,8 +32,9 @@ public class Chain implements java.io.Serializable {
     private String modelID = null;
     private Model model = null;                                                                                                                                                                                                                             // the Model of this Chain
     private ArrayList<String> homologues = null;     // a list of homologue chains (defined by PDB COMPND)
-    private final Integer[] chainCenter = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
-    private Integer radiusFromCenter = null;         // distance from center to farthest non-H atom. -1 if no protein-atoms
+    private final Integer[] chainCentroid = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
+    private Integer radiusFromCentroid = null;         // distance from center to farthest non-H atom. -1 if no protein-atoms
+    private Integer maxSeqNeighborAADist = null;    // largest distance between sequential residue neighbors excluding ligands (center to center)
 
     // constructor
     public Chain(String ci) { pdbChainID = ci; molecules = new ArrayList<>();}
@@ -48,8 +50,30 @@ public class Chain implements java.io.Serializable {
     public Model getModel() { return(model); }
     public ArrayList<Molecule> getMolecules() { return(molecules); }
     public ArrayList<String> getHomologues() { return(homologues); }
-    public Integer[] getChainCenter() { return(chainCenter); }
-    public Integer getRadiusFromCenter() { return(radiusFromCenter); }
+    
+    
+    /**
+     * Retrieves (and computes if called 1st time) the coordinates of the chain centroid.
+     * @return 
+     */
+    public Integer[] getChainCentroid() {
+        if (chainCentroid == null) {
+            this.computeChainCentroidAndRadius();
+        }
+        return(chainCentroid); 
+    }
+    
+    
+    /**
+     * Retrieves (and computes if called 1st time) the distance from chain center to farthest atom.
+     * @return radius as 10th of Angström
+     */
+    public Integer getRadiusFromCentroid() {
+        if (radiusFromCentroid == null) {
+            this.computeChainCentroidAndRadius();
+        }
+        return(radiusFromCentroid);
+    }
     
     public ArrayList<Residue> getResidues() {
         ArrayList<Residue> thisResidues = new ArrayList<>();
@@ -86,6 +110,39 @@ public class Chain implements java.io.Serializable {
             }
         return ligands;
     }
+    
+    /**
+     * Returns a list of all amino acid residues in this chain.
+     * @return a list of all amino acid residues in this chain
+     */
+    public ArrayList<Residue> getAllAAResidues() {
+        ArrayList<Residue> AAResidues = new ArrayList<>();
+        Residue r;
+        for(Molecule m : this.molecules) {
+            if (m instanceof Residue) {
+                r = (Residue) m;
+                if (r.isAA()) {
+                    AAResidues.add(r);
+                }
+            }
+        }
+        return AAResidues;
+    }
+    
+    
+    /**
+     * Retrieves (and calculates if called 1st time) the maximum sequence neighbor distance between amino acids.
+     * @return the maximum sequence neighbor distance between amino acids in 10th of Angström
+     */
+    public Integer getMaxSeqNeighborAADist() {
+        if (maxSeqNeighborAADist == null) {
+            // Would make sense to have the function here in Chain, but the Main relies on it for the old (no chain-sphere speedup, no centroid) calculation.
+            //   Would be possible to move the function here and make it static, though.
+            maxSeqNeighborAADist = Main.getGlobalMaxSeqNeighborResDist(this.getAllAAResidues());
+        }
+        return maxSeqNeighborAADist;
+    }
+    
 
     // setters
     public void addMolecule(Molecule mol){molecules.add(mol);}
@@ -217,7 +274,7 @@ public class Chain implements java.io.Serializable {
     /**
      * Computes the geometrical center of all atoms and the largest distance from center to an atom (=radius).
      */
-    public void computeChainCenterAndRadius() {
+    private void computeChainCentroidAndRadius() {
         // compute center
         Integer[] tmpCenter = new Integer[3];
         tmpCenter[0] = tmpCenter[1] = tmpCenter[2] = 0;
@@ -236,12 +293,12 @@ public class Chain implements java.io.Serializable {
         
         if (tmpAtomNumber > 0) {
         
-            chainCenter[0] = tmpCenter[0] / tmpAtomNumber;
-            chainCenter[1] = tmpCenter[1] / tmpAtomNumber;
-            chainCenter[2] = tmpCenter[2] / tmpAtomNumber;
+            chainCentroid[0] = (int) (Math.round((double) tmpCenter[0] / tmpAtomNumber));
+            chainCentroid[1] = (int) (Math.round((double) tmpCenter[1] / tmpAtomNumber));
+            chainCentroid[2] = (int) (Math.round((double) tmpCenter[2] / tmpAtomNumber));
 
             if (Settings.getInteger("plcc_I_debug_level") > 0) {
-                System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCenter));
+                System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCentroid));
             }
 
             // compute radius
@@ -249,7 +306,7 @@ public class Chain implements java.io.Serializable {
             int tmpCurrentDist;
             for (Molecule mol : molecules) {
                 for (Atom a : mol.getAtoms()) {
-                    tmpCurrentDist = a.distToPoint(chainCenter[0], chainCenter[1], chainCenter[2]);
+                    tmpCurrentDist = a.distToPoint(chainCentroid[0], chainCentroid[1], chainCentroid[2]);
                     // System.out.println("[DEBUG] Distance to center from atom " + a.toString() + " is " + String.valueOf(tmpCurrentDist));
                     if (tmpCurrentDist > tmpBiggestDist) {
                         tmpBiggestDist = tmpCurrentDist;
@@ -261,11 +318,11 @@ public class Chain implements java.io.Serializable {
                 System.out.println("[DEBUG] Radius of chain " + pdbChainID + " is " + String.valueOf(tmpBiggestDist));
             }
 
-            radiusFromCenter = tmpBiggestDist;
-        
+            radiusFromCentroid = tmpBiggestDist;
+                
         } else {
             System.out.println("  [WARNING] Chain " + this.pdbChainID + " seems not to hold protein atoms. No center can be detected.");
-            radiusFromCenter = -1;
+            radiusFromCentroid = -1;
         }        
     }
     
@@ -285,9 +342,9 @@ public class Chain implements java.io.Serializable {
         Integer dist, tmpSum;
         
         tmpSum = 0;
-        tmpSum += (this.chainCenter[0] - c.getChainCenter()[0]) * (this.chainCenter[0] - c.getChainCenter()[0]);
-        tmpSum += (this.chainCenter[1] - c.getChainCenter()[1]) * (this.chainCenter[1] - c.getChainCenter()[1]);
-        tmpSum += (this.chainCenter[2] - c.getChainCenter()[2]) * (this.chainCenter[2] - c.getChainCenter()[2]);
+        tmpSum += (this.getChainCentroid()[0] - c.getChainCentroid()[0]) * (this.getChainCentroid()[0] - c.getChainCentroid()[0]);
+        tmpSum += (this.getChainCentroid()[1] - c.getChainCentroid()[1]) * (this.getChainCentroid()[1] - c.getChainCentroid()[1]);
+        tmpSum += (this.getChainCentroid()[2] - c.getChainCentroid()[2]) * (this.getChainCentroid()[2] - c.getChainCentroid()[2]);
         
         dist = (int)Math.round(Math.sqrt(tmpSum));
         
@@ -295,16 +352,16 @@ public class Chain implements java.io.Serializable {
         Integer atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
         
         Integer justToBeSure = 4;   // account for small errors due to rounding
-        Integer summedSpheres = this.getRadiusFromCenter() + c.getRadiusFromCenter() + (atomRadius * 2) + justToBeSure;
+        Integer summedSpheres = this.getRadiusFromCentroid() + c.getRadiusFromCentroid() + (atomRadius * 2) + justToBeSure;
 
         //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
         //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
 
         if (Settings.getInteger("plcc_I_debug_level") > 0) {
             System.out.println("[DEBUG][CHAIN] Chain " + this.pdbChainID + " and " + c.pdbChainID);
-            System.out.println(" ... mid points: " + this.chainCenter[0] + "|" + this.chainCenter[1] + "|" + this.chainCenter[2]);
-            System.out.println(" ... mid points: " + c.chainCenter[0] + "|" + c.chainCenter[1] + "|" + c.chainCenter[2]);
-            System.out.println(" ... radii: " + this.radiusFromCenter + " and " + c.radiusFromCenter);
+            System.out.println(" ... mid points: " + this.chainCentroid[0] + "|" + this.chainCentroid[1] + "|" + this.chainCentroid[2]);
+            System.out.println(" ... mid points: " + c.chainCentroid[0] + "|" + c.chainCentroid[1] + "|" + c.chainCentroid[2]);
+            System.out.println(" ... radii: " + this.radiusFromCentroid + " and " + c.radiusFromCentroid);
             System.out.println(" ... distance: " + dist);
             System.out.println(" ... summedSpheres: " + summedSpheres);
         }

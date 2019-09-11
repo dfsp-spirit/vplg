@@ -70,8 +70,10 @@ function get_total_ligancenteredgraphs_count($db) {
 		Enter the PDB identifier you are interested in below to see one ligand-centered graph for each ligand of that protein.
 		
 		<br><br>
+		<!--
 		<div class="boxedred"><p>NOTICE: This feature is still under development. Data is only available for protein 4a97 atm. Data will be available for all proteins after the next PTGL update.</p></div>
-		
+		-->		
+
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->

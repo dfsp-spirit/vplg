@@ -97,11 +97,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<div class="row" id="member3">
 		<div class="col-sm-6">
 			<div class="leftColumn">
-				<strong>Tim Schäfer</strong>
+				<strong>Jan Niclas Wolf</strong>
 				<br>
 				Johann Wolfgang Goethe-University Frankfurt am Main
 				<br>
-				Faculty of Computer Science and Mathematics
+				Faculty of Computer Science and Mathematics, Dept. 12
 				<br>
 				Institute for Computer Science
 				<br>
@@ -118,9 +118,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<div class="col-sm-6">
 			<div class="rightColumn">
 				<br>
-				<i class="fa fa-phone"></i> Phone  +49 +69 798-24655
+				<i class="fa fa-phone"></i> Phone  +49 +69 798-24651
 				<br>
-				<i class="fa fa-envelope-o"></i> e-mail:  tim.schaefer (at) bioinformatik.uni-frankfurt.de
+				<i class="fa fa-envelope-o"></i> e-mail:  Wolf (at) bioinformatik.uni-frankfurt.de
 				<br>
 				<i class="fa fa-external-link"><a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank"></i>http://www.bioinformatik.uni-frankfurt.de/tools/vplg/</a>
 			</div><!-- end rightColumn -->
@@ -132,7 +132,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<div id="PageIntro">
 		<div class="container" id="pageintro">
 		<strong>Authors</strong><br>
-		The VPLG software, PTGL API and the database schema were written/designed by Tim Schäfer. The web frontend was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer. Markus Kessler worked on the complex graph code. Tatiana Bakirova, Ben Haladik and Tim Schäfer worked on graphlet code.
+		The VPLG software, PTGL API and the database schema were written/designed by Tim Schäfer. The web frontend was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer. Markus Kessler worked on the complex graph code. Tatiana Bakirova, Ben Haladik and Tim Schäfer worked on graphlet code. Jan Niclas Wolf implemented a parser of mmCIF files, Max Schmitt reworked the motif search, Selina Post adapted his method for a generalized structure search and Katja Korolew designed and started programming on RNA inclusion. Since 2018 the maintenance of PTGL and the VPLG software is done by Jan Niclas Wolf.
 		
 		<br><br>
 		<strong>Acknowledgement</strong><br>

@@ -63,8 +63,7 @@ public class Residue extends Molecule implements java.io.Serializable {
     private String ligName = null;                          // HETNAM record of PDB file (name of this hetero group)
     private String ligFormula = null;                       // FORMUL record of PDB file (chemical formula of this hetero group)
     private String ligSynonyms = null;                      // HETSYN record of PDB file (synonyms for this hetero group)
-    private Integer centerSphereRadius = null;
-    
+
     
     /**
      * Determines the chemical properties of this AA, according to the 5 types system.
@@ -117,7 +116,6 @@ public class Residue extends Molecule implements java.io.Serializable {
         this.chainID = Mol.getChainID();
         this.modelID = Mol.getModelID();
         this.iCode = Mol.getiCode();
-        this.centerSphereRadius = Mol.getCenterSphereRadius();
         this.pdbNum = Mol.getPdbNum();
         this.dsspNum = Mol.getDsspNum();
         this.Name3 = Mol.getName3();
@@ -151,13 +149,20 @@ public class Residue extends Molecule implements java.io.Serializable {
     }
     
 
-    
-
-
-    
-
-    
-    
+    /**
+     * Returns the C alpha atoms of this residue or null if it has none.
+     * @return the alpha carbon or null 
+     */
+    public Atom getAlphaCarbonAtom() {
+        if(this.isAA()) {
+            for(Atom a : this.atoms) {
+                if(a.isCalphaAtom()) {
+                    return a;
+                }
+            }
+        }
+        return null;
+    }
     
     
     @Override public String toString() {

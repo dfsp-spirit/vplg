@@ -35,7 +35,6 @@ public class Molecule {
     public String chainID = null;
     public String modelID = null;
     public String iCode = null; 
-    public Integer centerSphereRadius = null;
     public Integer pdbNum = null;                       // pdb molecule number
     public Integer dsspNum = null;   
     public String Name3 = null; // guess what
@@ -45,26 +44,14 @@ public class Molecule {
     public String sseStringDssp = "?";
     public String plccSSEType = "N";                       // not part of any PLCC SSE by default
     public Boolean isPartOfDsspSse = false;                // whether this molecule is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* molecules)
+    protected Integer centerSphereRadius = null;
+    private Integer[] centroidCoords = null;                // x,y,z coordinates of residue centroid
+    private Integer centroidSphereRadius = null; // distance from centroid to farthest atom (= radius of sphere around centroid encompassing all atoms)
 
     
     //constructor
     //public Molecule(){this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); this.Name3=null;}
 
-   
-     /**
-     * Returns the C alpha atoms of this molecule or null if it has none.
-     * @return the alpha carbon or null 
-     */
-    public Atom getAlphaCarbonAtom() {
-        if(this.isAA()) {
-            for(Atom a : this.atoms) {
-                if(a.isCalphaAtom()) {
-                    return a;
-                }
-            }
-        }
-        return null;
-    }
     
     /**
      * Determines whether this Molecule has at least one Atom.
@@ -433,7 +420,7 @@ public class Molecule {
      * @return the radius, in 1/10th Angstroem (so 20 means 2.0 A).
      */
     
-    public Integer getCenterSphereRadius() {
+    private Integer getCenterSphereRadius() {
 
         Atom throwAway = null;
 
@@ -455,6 +442,48 @@ public class Molecule {
 
         return(this.centerSphereRadius);
     }
+    
+    
+    /**
+     * Calculates the sphere radius of the centroid of this residue and saves it to the class var centerSphereRadius.
+     */
+    private void calculateCentroidSphereRadius() {
+        Integer[] centroidCoordinates = this.getCentroidCoords();
+        Integer curDist, maxDist;
+        curDist = maxDist = 0;
+        for (Atom a : this.atoms) {
+            curDist = a.distToPoint(centroidCoordinates[0], centroidCoordinates[1], centroidCoordinates[2]);
+            if (curDist > maxDist) { maxDist = curDist; }
+        }
+        this.centroidSphereRadius = maxDist;
+    }
+    
+    private Integer getCentroidSphereRadius() {
+        // if called 1st time calculate sphere radius
+        if (this.centroidSphereRadius == null) {
+            this.calculateCentroidSphereRadius();
+        }
+        return this.centroidSphereRadius;
+    }
+    
+    
+    public Integer[] getCentroidCoords () {
+        // calculate if called for 1st time
+        if (this.centroidCoords == null) {
+            this.calculateCentroid();
+        }
+        return this.centroidCoords;
+    }
+    
+    
+    /**
+     * Returns the sphere radius of this residue depending on the settings.
+     * @return sphere radius as 10th of Angström
+     */
+    public Integer getSphereRadius() {
+        return (Settings.getBoolean("plcc_B_centroid_method")) ? getCentroidSphereRadius() : getCenterSphereRadius();
+    }
+    
     
     /**
      * Returns a string representation of the Atoms of this molecule.
@@ -615,7 +644,26 @@ public class Molecule {
         return(info);        
     }
     
-        /**
+    /**
+     * Calculates the centroid of this residue (center of mass of all atoms) and saves it to class var centroidCoords.
+     */
+    private void calculateCentroid() {
+        Integer[] centroid = {0,0,0};
+        
+        for (Atom a : this.atoms) {
+            centroid[0] += a.getCoordX();
+            centroid[1] += a.getCoordY();
+            centroid[2] += a.getCoordZ();
+        }
+        
+        centroid[0] = (int) (Math.round((double) centroid[0] / this.atoms.size()));
+        centroid[1] = (int) (Math.round((double) centroid[1] / this.atoms.size()));
+        centroid[2] = (int) (Math.round((double) centroid[2] / this.atoms.size()));
+        
+        this.centroidCoords = centroid;
+    }
+    
+    /**
      * Returns the PDB atom number of the center atom of this molecule.
      */
     public Integer getCenterAtomNum() {
@@ -706,26 +754,55 @@ public class Molecule {
     }
     
     /**
-     * Determines the distance to another Residue, from Residue center to Residue center (C alpha atom to C alpha atom for AAs)
-     * @param r the other residue
+     * Determines the distance to another Molecule, from center atom center atom (C alpha atom to C alpha atom for AAs)
+     * @param m the other molecule
      * @return The center-to-center distance.
      */
-    public Integer resCenterDistTo(Molecule r) {
+    private Integer centerDistTo(Molecule m) {
 
         Atom a = this.getCenterAtom();
-        Atom b = r.getCenterAtom();
+        Atom b = m.getCenterAtom();
 
         if(a == null || b == null) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbNum + " and " + r.getPdbNum() + " lacking center atoms, assuming 100.");
+                DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbNum + " and " + m.getPdbNum() + " lacking center atoms, assuming 100.");
             }
             return(100);      
         }
         else {
             //DEBUG
-            //System.out.println("DEBUG: Residue C-alpha distance of " + this + " and " + r + " (C-alpha coords: " + a.getCoordString() + " / " + b.getCoordString() + ") is " + a.distToAtom(b) + ".");
+            //System.out.println("DEBUG: Residue C-alpha distance of " + this + " and " + m + " (C-alpha coords: " + a.getCoordString() + " / " + b.getCoordString() + ") is " + a.distToAtom(b) + ".");
             return(a.distToAtom(b));
         }
+    }
+    
+    
+    /**
+     * Determines the distance to another molecule, from centroid to centroid.
+     * @param m the other residue
+     * @return centroid-to-centroid distance
+     */
+    private Integer centroidDistTo(Molecule m) {
+        Atom helperCentroidAtom = new Atom();
+        Integer[] thisCentroidCoordinates = this.getCentroidCoords();
+        
+        helperCentroidAtom.setCoordX(thisCentroidCoordinates[0]);
+        helperCentroidAtom.setCoordY(thisCentroidCoordinates[1]);
+        helperCentroidAtom.setCoordZ(thisCentroidCoordinates[2]);
+        
+        Integer[] rCentroidCoords = m.getCentroidCoords();
+        
+        return helperCentroidAtom.distToPoint(rCentroidCoords[0], rCentroidCoords[1], rCentroidCoords[2]);
+    }
+    
+    
+    /**
+     * Determines the distance from this molecule to another, depending on settings.
+     * @param m other molecule
+     * @return molecule-molecule distance
+     */
+    public Integer distTo(Molecule m) {
+        return (Settings.getBoolean("plcc_B_centroid_method") ? this.centroidDistTo(m) : this.centerDistTo(m));
     }
    
 }

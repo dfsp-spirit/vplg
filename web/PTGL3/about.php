@@ -326,7 +326,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		<a class="anchor" id="adj"></a>
 		<a class="anchor" id="red"></a>
-		<h5> <u>The adjucent and reduced notation</u> </h5>
+		<h5> <u>The adjacent and reduced notation</u> </h5>
 		<p>All vertices of the <a href="#proteinGraph">Protein graph</a> are considered in the adjacent (ADJ) notation of a Folding graph. SSEs of the Folding graph are ordered
 		according to their occurrence in the sequence. Beginning with the first SSE and following the spatial neighbourhoods the sequential distances
 		are noted followed by the neighbourhood type.</p>
@@ -420,7 +420,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<a class="anchor" id="help"></a>
 		<h3>Help</h3>
-		<h4>Why is there no result for my PDB ID?</h2>
+		<h4>Why is there no result for my PDB ID?</h4>
 		<ul>
 			<li> Check if the entered PDB ID (4 characters) is correct </li>
 			<li> PTGL is currently updated annually, check that the structure is not too new (<a href="http://ptgl.uni-frankfurt.de/content.php">Content</a>) </li>
@@ -429,7 +429,16 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<li> If nothing of the above applies, you can <a href="http://ptgl.uni-frankfurt.de/contact.php">Contact</a> us </li>
 			<li> You can compute your own results with the open source <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/">VPLG</a> software
 		</ul>
-		
+
+		<br>
+
+		<h4>Why is there no graph image?</h4>
+		<b>PNG</b>
+		<p>Large images, i.e. many SSEs in case of PGs or many chains in case of CGs, often need some time until the browser can display them. Sometimes they are not even displayed at all, because of the required memory. You can still download the graph images via the respective buttons. However, even offline viewers may not display such large images correctly or at all due to the memory requirement.</p>
+		<br>
+		<b>SVG</b>
+		<p>Sometimes SVG images are missing, because of errors generating them. If available, you can just download the the respective PNG file instead, or download the GML file and create your own graph images.</p>		
+
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 

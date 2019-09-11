@@ -71,6 +71,8 @@ public class FileParser {
     static HashMap<String, ArrayList<String>> homologuesMap = null;
     static List<BindingSite> s_sites;
     
+    static Integer lastIndexGetRes = 0;  // last index from s_residue where getResidueFromList found target
+    
     // The list of sulfur bridges (aka disulfide bridges) from the DSSP file. The key is the DSSP sulfur bridge
     // id (an arbitrary character, starting with 'a' for the first bridge usually). The list in the value part contains
     // the DSSP residue IDs of all residues which are part of the bridge (and thus should have length 2).
@@ -547,10 +549,6 @@ public class FileParser {
                 r = (Residue) s_molecules.get(i);
                 deletedAtoms = r.chooseYourAltLoc();
 
-                //if(r.getPdbResNum() == 209) {
-                //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
-                //}
-
                 if(deletedAtoms.size() > 0) {
                     numResiduesAffected++;
                 }
@@ -621,6 +619,11 @@ public class FileParser {
         return(true);
     }
     
+    /**
+     * Returns an array of 'words' seperated by an arbitrary amount of spaces.
+     * @param line
+     * @return
+     */
     private static String[] lineToArrayCIF(String line) {
         String tmpReturnList[] = new String[line.split(" ").length];
         String tmpLineList[];
@@ -634,9 +637,8 @@ public class FileParser {
             }
         }
         
-        // TODO aktuell viele NULL Einträge da Größe festgesetzt
-        
-        return tmpReturnList;
+        // return Array without null entries
+        return Arrays.copyOfRange(tmpReturnList, 0, counterValues);
     }
     
     /**
@@ -677,6 +679,49 @@ public class FileParser {
     }
     
     /**
+     * Checks for the presence of predefined (hard coded) column headers.
+     * @param categoryName The name of the category
+     * @param columnHeaders The column headers found in the file
+     * @return A list of all required columns that were missing
+     */
+    private static ArrayList<String> checkColumns(String categoryName, ArrayList<String> columnHeaders) {
+        // different columns are expected depending on category
+        // define them here:
+        String[] reqColumns;
+        switch (categoryName) {
+            case "_atom_site":
+                reqColumns = new String[] {"id", "type_symbol", "label_atom_id", "label_comp_id", 
+                    "label_asym_id", "Cartn_x", "Cartn_y", "Cartn_z"};
+                break;
+            default:
+                if (! Settings.getBoolean("plcc_B_no_warn")) {
+                    DP.getInstance().w("FP_CIF", "Tried to check table of category " + categoryName +
+                            " for presence of important columns, but function is not defined for that " +
+                            "category. Ignoring the check and moving on.");
+                }
+                reqColumns = new String[0];
+        }
+        
+        ArrayList<String> missingColumns = new ArrayList<>();
+
+        Boolean found;
+        for (String reqColumn : reqColumns) {
+            found = false;
+            for (String colHeader: columnHeaders) {
+                if (colHeader.equals(reqColumn)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (! found) {
+                    missingColumns.add(reqColumn);
+            }
+        }
+        
+        return missingColumns;
+    }
+    
+    /**
      * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and applies appropriate function to handle each line. 
      * @return ignore (?)
      */
@@ -690,10 +735,11 @@ public class FileParser {
         
         // variables for one loop (reset when hitting new loop)
         String tableCategory = null;
-        // Key: name of column; Val: position in list; Val -1 means warning has been printed that missing
+        // Key: name of column; Val: position in list
         //  -> if auth columns from atom_site not present they will be mapped to the PDB columns
         //     therefore always use auth columns unless you explicitly want the PDB ones
         HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
+        Boolean columnsChecked = false;
               
         // variables per (atom) line
         Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ, rnaNumPDB, molNumPDB;
@@ -708,15 +754,15 @@ public class FileParser {
         // variables for successive matching atom -> residue/RNA : Molecule -> chain  
         // remember them so we dont need to lookup
         Model m = null;
-        Residue tmpRes = null;
+        Molecule lastMol = null;    // starts as first residue and is always the actual one
+        Residue tmpMol = null;      // used to save lastMol if getResidue returns null
         Chain tmpChain = null;
         Residue lig = null;
-        Molecule tmpMol = null;
         
         Integer numLine = 0;
         
         // variables for already printed warnings
-        Boolean further_model_warning_printed = false;
+        Boolean furtherModelWarningPrinted = false;
 
 
         // - - - DSSP - - -
@@ -733,9 +779,11 @@ public class FileParser {
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
         if(s_molecules.size() < 1) {
-            System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
+            DP.getInstance().e("FP_CIF", "DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
+        
+        lastMol = s_molecules.get(0);  // just start with first one ( we check below if it really matches)
         
         // - - ligands - -
         // -> in difference to old parser ligands are created "on the fly" together with the other residues
@@ -834,12 +882,34 @@ public class FileParser {
                             
                         } else {
                             // we are in the row section (data!)
-                            // do some checks first
-                            // TODO check if all important columns are present
-                            // ESPECIALLY set auth cols to normal ones if missing
-                            // AND abort execution if important ones are missing (replaces printing of warnings
-                            //     when -1 in importantcolhead
-                            // AND warn for others, e.g. alt_id
+                            
+                            // check once if required column headers are present
+                            if (! columnsChecked) {
+                                ArrayList<String> missingCols = checkColumns(tableCategory, new ArrayList<>(colHeaderPosMap.keySet()));
+                                if (missingCols.size() > 0) {
+                                    DP.getInstance().e("FP_CIF", "Missing following columns in " + tableCategory + 
+                                            ": " + missingCols);
+                                    DP.getInstance().e("FP_CIF", " Exiting now.");
+                                    System.exit(1);
+                                }
+                                
+                                // if auth columns not present map them to PDB ones
+                                // pdbx_PDB_model_num not checked as no equivalent existing (just use default model 1 if not existing)
+                                String[] authCols = {"auth_atom_id", "auth_asym_id", "auth_comp_id", "auth_seq_id"};
+                                // Matching equivalents to author columns
+                                String[] pdbCols = {"label_atom_id", "label_asym_id", "label_comp_id", "label_seq_id"};
+                                for (int i = 0; i < authCols.length; i++) {
+                                    if (colHeaderPosMap.get(authCols[i]) == null) {
+                                        colHeaderPosMap.put(authCols[i], colHeaderPosMap.get(pdbCols[i]));
+                                        if (! silent) {
+                                            System.out.println("   Using " + pdbCols[i] + " instead of "+ 
+                                                    "missing column " + authCols[i]);
+                                        }
+                                    }
+                                }
+                                
+                                columnsChecked = true;
+                            }
                             
                             // get data of line
                             tmpLineData = lineToArrayCIF(line);
@@ -848,7 +918,7 @@ public class FileParser {
                             // Look if model numbers are included
                             if (colHeaderPosMap.get("pdbx_PDB_model_num") != null) {
                                 tmp_modelID = tmpLineData[colHeaderPosMap.get("pdbx_PDB_model_num")];
-                                
+                               
                                 // save modelID for print later
                                 if (! s_allModelIDsFromWholePDBFile.contains(tmp_modelID)) {
                                     s_allModelIDsFromWholePDBFile.add(tmp_modelID);
@@ -864,9 +934,9 @@ public class FileParser {
                                 } else {
                                     // same model as before?
                                     if (! m.getModelID().equals(tmp_modelID)) {
-                                        if (! further_model_warning_printed) {
+                                        if (! furtherModelWarningPrinted) {
                                             System.out.println("   PDB: Found further models. Ignoring them.");
-                                            further_model_warning_printed = true;
+                                            furtherModelWarningPrinted = true;
                                         }
 
                                         // skip this line
@@ -989,16 +1059,9 @@ public class FileParser {
                             // chemical symbol
                             chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
-                            Boolean isAA = isAminoacid(molNamePDB);
-                            
-                            //private static void define_Atomtype(String molname){
-                            //if(isAA()){
-                            
-                            //return Atom.ATOMTYPE_AA;}
-                            //if(isRNA())
-                            //return Atom.ATOMTYPE_RNA;
-                            
-                            
+                            // standard AAs and (some) non-standard, atm: UNK, MSE
+                            //   -> may be changed below if it is free (treat as ligand then)
+                            Boolean isAA = isAminoacid(molNamePDB, true);
 
                             // TODO: possible to ignore alt loc atoms right now?
                             
@@ -1017,6 +1080,7 @@ public class FileParser {
                                 }
                                 continue; // do not use that atom
                             }
+        
                             if( ! Settings.getBoolean("plcc_B_include-rna")) {
                                 if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -1025,45 +1089,37 @@ public class FileParser {
                                     continue; // do not use that atom
                                 }
                             }
-                            
-                            //switch(atomtype){
-                            //case ATOMTYPE_AA:
-                            //a.setAtomtype(Atom.ATOMTYPE_AA);
-                            //case ATOMTYPE_LIGAND
-                            //a.setAtomtype(Atom.ATOMTYPE_LIGAND);
-                            //case ATOMTYPE_RNA:
-                            //a.setAtomtype(Atom.ATOMTYPE_RNA);
-                            //break;
-                            
+                                                                               
+                            // >> AA <<
+                            // update lastMol (only if needed) 
+                            //     -> enables getting DsspResNum for atom from res
+                            // match res <-> chain here 
+                            // also decide here if modified amino acids is free (no DSSP entry -> not in s_residue) and needs to be treated as ligand
                             if (isAA) {
-                                if (tmpRes == null) {
-                                    tmpRes = getResFromListWithErrMsg(molNumPDB, chainID, iCode, atomSerialNumber, numLine);
-                                    if (tmpRes == null) {
-                                        if (isAA) {
-                                            continue; // skip atom / line
+                                // we no start with lastMol is first residue from s_residues, so no check for null required!
+                                // load new Residue into lastMol if we approached next Residue
+                                if (! (Objects.equals(resNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
+                                    tmpMol = getResidueFromList(resNumPDB, chainID, iCode);
+                                    // check that a peptid residue could be found
+                                    if (tmpMol == null || tmpMol.isLigand()) {
+                                        // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
+                                        if (! silent) {
+                                            // print note only once
+                                            if (! resNumPDB.equals(lastLigandNumPDB))
+                                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + resNumPDB + ", treating it as ligand.");
                                         }
+                                        isAA = false;
                                     } else {
-                                        tmpRes.setChain(tmpChain);
-                                        tmpChain.addMolecule(tmpRes);
-                                    }
-                                } else {
-                                    // load new Residue into tmpRes if we approached next Residue
-                                    if (! (Objects.equals(molNumPDB, tmpRes.getPdbNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
-                                        tmpRes = getResFromListWithErrMsg(molNumPDB, chainID, iCode, atomSerialNumber, numLine);
-                                        if (tmpRes == null) {
-                                            if (isAA) {
-                                                continue; // skip atom / line
-                                            } 
-                                        } else {
-                                            tmpMol.setChain(tmpChain);
-                                            tmpChain.addMolecule(tmpMol);                                            
-                                        }
+                                        lastMol = tmpMol;
+                                        lastMol.setModelID(m.getModelID());
+                                        lastMol.setChain(tmpChain);
+                                        tmpChain.addMolecule(lastMol);
+                                        
+                                        // assign PDB res name (which differs in case of modifed residues)
+                                        lastMol.setName3(resNamePDB);
                                     }
                                 }
-                            } else {
-                                tmpRes = null;
                             }
-                            // => in case of ligand tmpRes now is null!
                             
                             Atom a = new Atom();
                             
@@ -1080,19 +1136,15 @@ public class FileParser {
                                     }
                                 }
                                 
-                                // old parser has here some outcommented code on N termini
-                                
-                                // set atom type   --> ATOMTYPE_RNA 
+                                // set atom type
                                 a.setAtomtype(Atom.ATOMTYPE_AA);
                                 
                                 // only ATOMs, not HETATMs, have a DSSP entry
-                                //a.setDsspResNum(getDsspResNumForPdbResNum(resNumPDB));
                                 if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                                     a.setDsspResNum(null);
                                 }
                                 else {
-                                    // a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
-                                    a.setDsspResNum(tmpRes.getDsspNum());
+                                    a.setDsspResNum(lastMol.getDsspNum());
                                 }
                                 
                                 /*if(  Settings.getBoolean("plcc_B_include-rna")) {
@@ -1107,19 +1159,19 @@ public class FileParser {
                                 
                                 // currently not used
                                 // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
-                                
+                                                               
+                                // check if we have created ligand residue for s_residue
                                 if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
-                                    
-                                    int resNumDSSP;
-                                    
+
                                     // create new Residue from info, we'll have to see whether we really add it below though
                                     lig = new Residue();
+                                    
                                     lig.setPdbNum(resNumPDB);
                                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                                     
                                     // assign fake DSSP Num increasing with each seen ligand
                                     ligandsTreatedNum ++;
-                                    resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
+                                    int resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
                                     
                                     lig.setDsspNum(resNumDSSP);
                                     lig.setChainID(chainID);
@@ -1128,7 +1180,7 @@ public class FileParser {
                                     lig.setAAName1(AminoAcid.getLigandName1());
                                     lig.setChain(getChainByPdbChainID(chainID));
                                     // still just assigning default model 1
-                                    lig.setModelID("1");
+                                    lig.setModelID(m.getModelID());
                                     lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                                     
                                     
@@ -1181,13 +1233,8 @@ public class FileParser {
                                         lastLigandNumPDB = resNumPDB;
                                         lastChainID = chainID;
 
-                                        //TODO: Add a check for the molecular weight of the ligand here and only add ligands
-                                        //      which are within the range (range should be defined in cfg file).
-                                        //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
-                                        //      instead, use a range over number of atoms.
-
                                         s_molecules.add(lig);
-
+                                        
                                         getChainByPdbChainID(chainID).addMolecule(lig);
 
                                         // do we need this?
@@ -1226,13 +1273,13 @@ public class FileParser {
                             // >> AA + LIG <<
                             // now create the new Atom
 
-                            // tmpRes may be NULL
+                            // lastMol may be NULL
                             // Note that the command above may have returned NULL, we care for that below
 
                             a.setPdbAtomNum(atomSerialNumber);
                             a.setAtomName(atomName);
                             a.setAltLoc(altLoc);
-                            a.setResidue(tmpRes);
+                            a.setMolecule(lastMol);
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
                             a.setPdbResNum(resNumPDB);
@@ -1254,16 +1301,16 @@ public class FileParser {
                             
                             if (isAA) {
                                 // >> AA <<
-                                if (tmpRes == null) {
+                                if (lastMol == null) {
                                     DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                                     continue;
                                 } else {
 
                                     if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
-                                        tmpRes.addHydrogenAtom(a);
+                                        lastMol.addHydrogenAtom(a);
                                     }
                                     else {
-                                        tmpRes.addAtom(a);
+                                        lastMol.addAtom(a);
                                         s_atoms.add(a);
                                     }
                                 }
@@ -1271,7 +1318,7 @@ public class FileParser {
                                 // >> LIG <<
                                 if (! (lig == null)) {
                                     lig.addAtom(a);
-                                    a.setResidue(lig);
+                                    a.setMolecule(lig);
                                     s_atoms.add(a);
                                 }
                             }  
@@ -1293,18 +1340,20 @@ public class FileParser {
                     // '#' seems to stand between each category, we use it to decide if loop ended
                     //     and hope it does not occur inside a loop
                     inLoop = false;
+                    colHeaderPosMap.clear();
+                    columnsChecked = false;
+                    
                 }
-            }
-            
-            if (! (silent || FileParser.essentialOutputOnly)) {
-                System.out.println("  PDB: Found in total " + s_chains.size() + " chains.");
-            }
-            
+            } // end of reading in lines
 	} catch (IOException e) {
             System.err.println("ERROR: Could not parse PDB file.");
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
+        
+        if (! (silent || FileParser.essentialOutputOnly)) {
+            System.out.println("  PDB: Found in total " + s_chains.size() + " chains.");
+        }
         
         // alt loc treatment copy&pasted from old parser
         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
@@ -1322,9 +1371,6 @@ public class FileParser {
                 r = (Residue) s_molecules.get(i);
                 deletedAtoms = r.chooseYourAltLoc();
 
-                //if(r.getPdbResNum() == 209) {
-                //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
-                //}
 
                 if(deletedAtoms.size() > 0) {
                     numResiduesAffected++;
@@ -1516,7 +1562,7 @@ public class FileParser {
         a.setPdbAtomNum(atomSerialNumber);
         a.setAtomName(atomName);
         a.setAltLoc(altLoc);
-        a.setResidue(tmpRes);
+        a.setMolecule(tmpRes);
         a.setChainID(chainID);        
         a.setChain(getChainByPdbChainID(chainID));
         a.setPdbResNum(resNumPDB);
@@ -1590,14 +1636,21 @@ public class FileParser {
     }
     /**
      * Returns true if AAName is standard aminoacid name (3-letter code).
-     * @param AAName Aminoacid name, 3-letter code, capitalized
+     * @param AAName Amino acid name, 3-letter code, capitalized
+     * @param includeNonStandard allows additional to 20 standard amino acids: UNK
      * @return 
      */
-    private static boolean isAminoacid(String AAName) {
-        String[] standardAANames = {"ALA", "ARG", "ASN", "ASP", "CYS", 
+    private static boolean isAminoacid(String AAName, Boolean includeNonStandard) {
+        ArrayList<String> AANames = new ArrayList<>(Arrays.asList("ALA", "ARG", "ASN", "ASP", "CYS", 
             "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
-            "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"};
-        if (Arrays.asList(standardAANames).contains(AAName)) {
+            "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"));
+        
+        if (includeNonStandard) {
+            AANames.add("UNK");  // UNKnown, 'X' or any amino acid (often only backbone atoms are present
+            AANames.add("MSE");  // Selenomethionine: Methionine with selen instead of sulfur (helps in crystallography)
+        }
+        
+        if (AANames.contains(AAName)) {
             return true;
         } else {
             return false;
@@ -1618,7 +1671,7 @@ public class FileParser {
         }
     }
     
-    
+
     /**
      * Calls getResidueFromList and returns its value with printing of error message if null returned.
      * @param resNumPDB
@@ -1640,9 +1693,11 @@ public class FileParser {
         }
         return tmpRes;
     }
+
     
     /**
      * Tries to get the residue with the given PDB residue number, chain ID and insertion code from the internal list of all residues.
+     * Always starts at index of last hit (beginning with 0), i.e. rotates through list.
      * @param resNumPDB the PDB residue number
      * @param chainID the chain ID of the residue
      * @param iCode the insertion code of the residue
@@ -1654,8 +1709,12 @@ public class FileParser {
         Residue found = null;
         int numFound = 0;
 
+        // iterate up to s_residue.size() times
         for(Integer i = 0; i < s_molecules.size(); i++) {
-
+            
+            // start at last occurence
+            Integer currentIndex = (lastIndexGetRes + i) % s_molecules.size();
+            
             if (s_molecules.get(i) instanceof Residue) {
                 tmp = (Residue) s_molecules.get(i);
                 
@@ -1663,12 +1722,15 @@ public class FileParser {
 
                     if(tmp.getChainID().equals(chainID)) {
 
+                    
                         if(tmp.getiCode().equals(iCode)) {
                             found = tmp;
                             numFound++;
+                            lastIndexGetRes = currentIndex;
+
                             // break here and return found to increase speed
                             return(found);
-                        }                    
+                        }
                     }
                 }
             }
@@ -2923,7 +2985,8 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         }
 
         if(resultChain == null) {
-            System.err.println("ERROR: Could not find Chain '" + cID + "' in s_chains.");
+            DP.getInstance().e("FP", "Could not find Chain '" + cID + "' in s_chains. Maybe using cif-type "
+                    + "DSSP file instead of legacy type? Exiting now.");
             System.exit(1);
             return(null);   // for the IDE
         }
@@ -3622,9 +3685,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             radDif1 = radDif2 = distDif = 0;
             for(MolContactInfo rc : ourContacts) {
                 
-                //System.out.println("Comparing with our contact pair " + rc.getDsspResNumResA() + "," + rc.getDsspResNumResB() + ".");
+                //System.out.println("Comparing with our contact pair " + rc.getDsspNumA() + "," + rc.getDsspNumB() + ".");
                 
-                if((rc.getDsspResNumResA().equals(resADsspNum) && rc.getDsspResNumResB().equals(resBDsspNum)) || (rc.getDsspResNumResA().equals(resBDsspNum) && rc.getDsspResNumResB().equals(resADsspNum))) {                    
+                if((rc.getDsspNumA().equals(resADsspNum) && rc.getDsspNumB().equals(resBDsspNum)) || (rc.getDsspNumA().equals(resBDsspNum) && rc.getDsspNumB().equals(resADsspNum))) {                    
                     found = true;
                     common++;
                     
@@ -3639,17 +3702,17 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     sumDifAbs += radDif2;
                     if(radDif2 > maxRadDif) { maxRadDif = radDif2; }
                     
-                    sumDif += rc.getResPairDist() - resDist;
-                    distDif = Math.abs(rc.getResPairDist() - resDist);
+                    sumDif += rc.getMolPairDist() - resDist;
+                    distDif = Math.abs(rc.getMolPairDist() - resDist);
                     sumDifAbs += distDif;
                     if(distDif > maxDistDif) { maxDistDif = distDif; }                    
                     
-                    System.out.println("  Found. We claim radii " + rc.getCenterSphereRadiusResA() + "," + rc.getCenterSphereRadiusResB() +  " in CA dist " + rc.getResPairDist() + ". (Differences: " + radDif1 + "," + radDif2 + "," + distDif + ")");
+                    System.out.println("  Found. We claim radii " + rc.getCenterSphereRadiusResA() + "," + rc.getCenterSphereRadiusResB() +  " in CA dist " + rc.getMolPairDist() + ". (Differences: " + radDif1 + "," + radDif2 + "," + distDif + ")");
                     break;
                 }
                 else {
                     // ourContacts are ordered...
-                    if(rc.getDsspResNumResA() > resADsspNum) {
+                    if(rc.getDsspNumA() > resADsspNum) {
                         // ...so checking the rest is useless.
                         found = false;
                         numGeomNeoContactsMissingInPlcc++;
@@ -3667,8 +3730,8 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         //  the number of plcc contacts which were not accepted by geom_neo 
         Integer dsspResA, dsspResB;
         for(MolContactInfo rc : ourContacts) {
-            dsspResA = rc.getDsspResNumResA();
-            dsspResB = rc.getDsspResNumResB();
+            dsspResA = rc.getDsspNumA();
+            dsspResB = rc.getDsspNumB();
             
             // We need to skip the ligand contacts, of course! They are not computed by geom_neo and they
             // would lead to an array out of bounds exception because they are not included in num_res_DSSP, the 

@@ -1,5 +1,4 @@
 
-
 <div class="container">
 	<div class="navbar navbar-fixed-top" id="navColor">
 		<div class="container">

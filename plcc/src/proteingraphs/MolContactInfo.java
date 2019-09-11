@@ -164,7 +164,7 @@ public class MolContactInfo {
     public MolContactInfo(Residue a, Residue b) {
         molA = a;
         molB = b;
-        dist = a.resCenterDistTo(b);  
+        dist = a.distTo(b);  
         numTotalLigContactsPair = 0;
         
         numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
@@ -186,7 +186,7 @@ public class MolContactInfo {
     }
 
     @Override public String toString() {
-        return("[RCI] TypeA " + getResTypeStringA() + ", TypeB " + getResTypeStringB() + ", ResA "+ getDsspResNumResA() + ", ResB " + getDsspResNumResB());
+        return("[RCI] TypeA " + getResTypeStringA() + ", TypeB " + getResTypeStringB() + ", ResA "+ getDsspNumA() + ", ResB " + getDsspNumB());
     }
 
 
@@ -201,20 +201,20 @@ public class MolContactInfo {
 
 
     // getters required for writing the <pdbid>.geo file
-    public Integer getDsspResNumResA() { return(this.molA.getDsspNum()); }
-    public Integer getDsspResNumResB() { return(this.molB.getDsspNum()); }
-    public Integer getPdbResNumResA() { return(this.molA.getPdbNum()); }
-    public Integer getPdbResNumResB() { return(this.molB.getPdbNum()); }
-    public String getResName3A() { return(this.molA.getName3()); }
-    public String getResName3B() { return(this.molB.getName3()); }
-    public String getResName1A() { return(this.molA.getAAName1()); }
-    public String getResName1B() { return(this.molB.getAAName1()); }
+    public Integer getDsspNumA() { return(this.molA.getDsspNum()); }
+    public Integer getDsspNumB() { return(this.molB.getDsspNum()); }
+    public Integer getPdbNumA() { return(this.molA.getPdbNum()); }
+    public Integer getPdbNumB() { return(this.molB.getPdbNum()); }
+    public String getName3A() { return(this.molA.getName3()); }
+    public String getName3B() { return(this.molB.getName3()); }
+    public String getName1A() { return(this.molA.getAAName1()); }
+    public String getName1B() { return(this.molB.getAAName1()); }
     public Integer getAAIDResA() { return(this.molA.getInternalAAID()); }
     public Integer getAAIDResB() { return(this.molB.getInternalAAID()); }
 
-    public Integer getCenterSphereRadiusResA() { return(this.molA.getCenterSphereRadius()); }
-    public Integer getCenterSphereRadiusResB() { return(this.molB.getCenterSphereRadius()); }
-    public Integer getResPairDist() { return(dist); }
+    public Integer getCenterSphereRadiusResA() { return(this.molA.getSphereRadius()); }
+    public Integer getCenterSphereRadiusResB() { return(this.molB.getSphereRadius()); }
+    public Integer getMolPairDist() { return(dist); }
 
     public Integer getHB1Dist() { return(minContactDistances[HB]); }
     public Integer getHB2Dist() { return(minContactDistances[BH]); }

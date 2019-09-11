@@ -19,7 +19,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import graphdrawing.DrawTools.IMAGEFORMAT;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import static java.lang.Math.abs;
+import java.util.logging.Level;
 import plcc.Main;
 import motifs.MotifSearchTools;
 import motifs.Motifs;
@@ -1255,7 +1259,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");            
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null, runtime_secs int, num_residues int, insert_date timestamp with time zone DEFAULT now(), insert_completed boolean default FALSE);");
             doInsertQuery("CREATE TABLE " + tbl_macromolecule + " (macromolecule_id serial primary key,  pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, mol_id_pdb text not null, mol_name text not null, mol_ec_number text, mol_organism_scientific text, mol_organism_common text, mol_chains text);");
-            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_id_pdb text not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(4) not null, mol_id_pdb text not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_nm_chaintomacromolecule + " (chaintomacromol_id serial primary key, chaintomacromol_chainid int not null references " + tbl_chain + " ON DELETE CASCADE, chaintomacromol_macromolid int not null references " + tbl_macromolecule + " ON DELETE CASCADE);");
             doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
@@ -1268,7 +1272,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text, num_vertices int, num_edges int);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
-            doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
+            doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(4) not null, PRIMARY KEY(pdb_id, chain_name));");
             
             doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50], runtime_secs int);");
             doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50], runtime_secs int);");
@@ -1313,7 +1317,7 @@ public class DBManager {
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_alphalig + " (linnotalphalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_betalig + " (linnotbetalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_albelig + " (linnotalbelig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");           
-            doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, denorm_pdb_id varchar(4) not null, denorm_chain_name varchar(2) not null, denorm_graph_type int not null, denorm_graph_type_string text not null, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, filepath_linnot_image_def_svg text, filepath_linnot_image_def_png text, filepath_linnot_image_def_pdf text, num_sses int);");
+            doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, denorm_pdb_id varchar(4) not null, denorm_chain_name varchar(4) not null, denorm_graph_type int not null, denorm_graph_type_string text not null, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, filepath_linnot_image_def_svg text, filepath_linnot_image_def_png text, filepath_linnot_image_def_pdf text, num_sses int);");
             doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity + " (graphletsimilarity_id serial primary key, graphletsimilarity_sourcegraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphletsimilarity_targetgraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, score numeric);");
             doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity_complex + " (complexgraphletsimilarity_id serial primary key, complexgraphletsimilarity_sourcegraph int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complexgraphletsimilarity_targetgraph int not null references " + tbl_complexgraph + " ON DELETE CASCADE, score numeric);");
             doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity_aa + " (aagraphletsimilarity_id serial primary key, aagraphletsimilarity_sourcegraph int not null references " + tbl_aagraph + " ON DELETE CASCADE, aagraphletsimilarity_targetgraph int not null references " + tbl_aagraph + " ON DELETE CASCADE, score numeric);");
@@ -1568,10 +1572,10 @@ public class DBManager {
             
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_fk ON " + tbl_fglinnot + " (linnot_foldinggraph_id);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_numsses ON " + tbl_fglinnot + " (num_sses);");
-            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_adj ON " + tbl_fglinnot + " (ptgl_linnot_adj text_pattern_ops);");
-            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_red ON " + tbl_fglinnot + " (ptgl_linnot_red text_pattern_ops);");
-            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_seq ON " + tbl_fglinnot + " (ptgl_linnot_seq text_pattern_ops);");
-            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_key ON " + tbl_fglinnot + " (ptgl_linnot_key text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_adj ON " + tbl_fglinnot + " USING hash (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_red ON " + tbl_fglinnot + " USING hash (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_seq ON " + tbl_fglinnot + " USING hash (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_key ON " + tbl_fglinnot + " USING hash (ptgl_linnot_key text_pattern_ops);");
             
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_denormpdbid ON " + tbl_fglinnot + " (denorm_pdb_id);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_denormchain ON " + tbl_fglinnot + " (denorm_chain_name);");
@@ -2227,9 +2231,23 @@ connection.close();
      * @param ln a String of the linear notation (RED or ADJ)
      * @return a list with list, representing the graph of the given notation in an adjacency matrix
      */
-    public static ArrayList<ArrayList<Character>> parseRedOrAdjToMatrix(String ln){
+    public static ArrayList<ArrayList<Character>> parseRedOrAdjToMatrix(String ln, String graphtype){
         //initial steps
         ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //stores later genererated matrix
+        
+        //do nothing, if linear notation is empty ( {}, [], () )
+        if (ln.length() <= 2){
+            return matrix;
+        }
+        //return matrix = [[x]], if linear notation contains only one entry ( [e], [h] )
+        if (ln.length() == 3){
+            ArrayList<Character> row1 = new ArrayList<>();
+            row1.add('x'); //only one nod, that is not adjacent to itself
+            matrix.add(row1);
+            
+            return matrix; 
+        }
+        
         ln = ln.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("[", "").replace("]", ""); //linnot whithout brackets
         int minVal = 0;
         int maxVal = 0;
@@ -2238,7 +2256,15 @@ connection.close();
         ArrayList<int[]> myListArray = new ArrayList<>(); //auxiliary variable
         //Beginning of Matrix has to be computed seperated from the rest
         myArray[0] = 0; //From where does the edge come? In this case 0, because it is the first edge
-        myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
+        
+        if ("alpha".equals(graphtype) || "beta".equals(graphtype)){
+            myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
+        }
+        else { //graphtype = "albe", 
+            //skip the first ellement in linnot, cause it has only information about SSEType, e.g. [e]
+            myArray[1] = 0 + Integer.parseInt(linnot[1].substring(0, linnot[1].length()-2));
+        }
+        
         if (myArray[1] > maxVal) {
             maxVal = myArray[1];
         }
@@ -2246,8 +2272,17 @@ connection.close();
             minVal = myArray[1];
         }
         int origin = myArray[1]; 
+        
+        String edgetype_substr; // alpha/beta and albe require different positions of the edgetype in the linear notation
+        if ("alpha".equals(graphtype) || "beta".equals(graphtype)) {
+            edgetype_substr = linnot[0].substring(linnot[0].length()-1); // e.g. edgetype_substr = "p" for "-1pe"
+        }
+        else { //graphtype = "albe"
+            edgetype_substr = linnot[1].substring(linnot[1].length()-2, linnot[1].length()-1); // e.g. edgetype_substr = "p" for "1p"
+        }
+        
         //which edge (parallel, antiparallel or mixed) is used?
-        switch (linnot[0].substring(linnot[0].length()-1)) {
+        switch (edgetype_substr) {
             case "m":
                 myArray[2] = 0;
                 break;
@@ -2263,15 +2298,36 @@ connection.close();
             default:
                 break;
         }
+        
         myListArray.add(myArray.clone());
         
+        int index_shift; //to get the right positions of the numbers in linnot
+        int start_index; //the for loop has to start at different positions, cause albe skips the first position in linnot
+        
+        if ("alpha".equals(graphtype) || "beta".equals(graphtype)) {
+            start_index = 1;
+            index_shift = 1;
+        }
+        else { //graphtype = "albe"
+            start_index = 2;
+            index_shift = 2;
+        }
+
         //iterate over the whole linnot.
-        for (int i = 1; i < linnot.length; i++) {
+        for (int i = start_index; i < linnot.length; i++) {
             myArray[0] = origin; //From where does the edge come from?
-            myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-1)); //where will the edge go to?
+            myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-index_shift)); //where will the edge go to?
             origin = myArray[1];
+            
+            if ("alpha".equals(graphtype) || "beta".equals(graphtype)) {
+            edgetype_substr = linnot[i].substring(linnot[i].length()-1); // e.g. edgetype_substr = "p" for "-1pe"
+            }
+            else { //graphtype = "albe"
+                edgetype_substr = linnot[i].substring(linnot[i].length()-2, linnot[i].length()-1); // e.g. edgetype_substr = "p" for "1p"
+            }
+            
             //which edge (parallel, antiparallel or mixed) is used?
-            switch (linnot[i].substring(linnot[i].length()-1)) {
+            switch (edgetype_substr) {
                 case "m":
                     myArray[2] = 0;
                     break;
@@ -2294,8 +2350,6 @@ connection.close();
             if (myArray[1] < minVal) {
                 minVal = myArray[1];
             }
-            
-            
         }
         
         
@@ -2331,7 +2385,126 @@ connection.close();
         return matrix;
     }
     
+    /**
+     * Searches a small matrix in a bigger one and returns the indexes of the bigger matrix, where the small one was found
+     * @param pattern two-dimensional ArrayList that represents a linear notation of an input
+     * @param matrix two-dimensional ArrayList that represents a linear notation of a protein graph
+     * @return array with the two indices where the pattern was found in the matrix. If the pattern was not found, return [-1, 0]
+     */
+    public static int[] matrixSearch(ArrayList<ArrayList<Character>> pattern, ArrayList<ArrayList<Character>> matrix) {
+        int[] output_array = new int[2]; //saves the indexes of the found pattern
+         
+        //go through every position in half of the matrix, where you can place the pattern without overlap
+        for (int x = 0; x <= matrix.size() - pattern.size(); x++){
+            for (int y = 0; y <= x; y++){      
+                int i;
+                int j = 0;
+                
+                //go through the pattern and try to find a match
+                outerloop:
+                for (i = 0; i < pattern.size(); i++){
+                    for (j = 0; j <= i; j++){
+                        if (!Objects.equals(matrix.get(x+i).get(y+j), pattern.get(i).get(j))){
+                            break outerloop;
+                        }
+                    }
+                }
+                if (i == j && j == pattern.size()){ //if a match was found
+                    //x, y are the indexes in matrix where the pattern was found
+                    output_array[0] = x;
+                    output_array[1] = y;
+                    return(output_array);
+                }
+            }
+        }
+        //if the pattern was not found. -1 is equal to no result
+        output_array[0] = -1;
+        return(output_array);
+    } 
+    
+    /**
+     * Searches the structure of a given linear notation in the whole PTGL database
+     * @param linnot the linear notation
+     * @param gt the graph type of the linear notation ("alpha", "beta" or "albe")
+     * @return a 2D ArrayList that contains all Proteins [PDBID, Chainname] in which the linnot was found
+     */
+    public static ArrayList<ArrayList<String>> matrixSearchDB(String linnot, String gt) {
         
+        //the results (proteins that contain the linnot) will be stored here: [[pdbid, chain], ...]
+        ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
+        
+        ResultSetMetaData md;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;   
+        PreparedStatement statement = null;
+        ResultSet rs = null;     
+        StringBuilder querySB = new StringBuilder();
+        
+        //create SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT denorm_pdb_id, denorm_chain_name, denorm_graph_type_string, ptgl_linnot_red, num_sses ");
+        querySB.append("FROM plcc_fglinnot ");
+        querySB.append("WHERE denorm_graph_type_string = ? ;");
+        
+        String query = querySB.toString();
+        
+        try {
+            
+            statement = dbc.prepareStatement(query);
+            statement.setString(1, gt);
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+                                   
+            //evaluate SQL-statement and store it in the list tableData
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "matrixSearchDb: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);              
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "matrixSearchDb: Could not close statement and reset autocommit.");}
+        }
+        
+        //iterate over all present linnots and save them as an adjacencymatrix in the list "matrixList"
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>();
+        ArrayList<ArrayList<Character>> matrix = new ArrayList<ArrayList<Character>>(); //the adjacency matrix
+        ArrayList<ArrayList<Character>> pattern = parseRedOrAdjToMatrix(linnot, gt); // change the input "linnot" into an adjacencymatrix
+        
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (pattern.size() <= Integer.parseInt(tD.get(4)) && Integer.parseInt(tD.get(4)) > 1) { // tD.get(4) = number of SSEs
+                    
+                    matrix = parseRedOrAdjToMatrix(tD.get(3), gt); //parse linnot to adjacencymatrix
+                    matrixList.add(matrix);
+                    
+                    int[] output_array = new int[2]; //saves the indexes of the found pattern
+                    output_array = DBManager.matrixSearch(pattern, matrix);
+                    
+                    if (output_array[0] != -1){ //if the pattern wasn't found, output_array[0] = -1
+                        ArrayList<String> pdbidAndChainOfProt = new ArrayList<String>();
+                        pdbidAndChainOfProt.add(tD.get(0));
+                        pdbidAndChainOfProt.add(tD.get(1));
+                        results.add(pdbidAndChainOfProt);
+                    } 
+                }
+            }
+        }
+        return results;
+    }
+    
     /**
      * Determines whether at least one matrix in a list of matrices contains a Four Helix Bundle
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
@@ -2460,7 +2633,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "alpha")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -2700,7 +2873,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -2943,7 +3116,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -3157,7 +3330,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -8785,7 +8958,7 @@ connection.close();
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
-                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0), "beta")); //parse linnot to adjacency matrix
                 }
                 
             }
@@ -9091,7 +9264,7 @@ connection.close();
             for (ArrayList<String> tD : tableData) {
                 linnotSeqList.add(tD.get(3));
                 if (tD.get(2).length() > 2 && getNumVerticesFromLinnotSeq(linnotSeqList) >= 8) {
-                    matrixList.add(parseRedOrAdjToMatrix(tD.get(2))); //parse linnot to adjacency matrix
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(2), "alpha")); //parse linnot to adjacency matrix
                     
                 }
                 linnotSeqList = new ArrayList<>();

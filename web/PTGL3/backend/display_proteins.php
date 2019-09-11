@@ -8,6 +8,10 @@
  *   
  * @author Daniel Bruness <dbruness@gmail.com>
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
+ * 
+ * Changed by Jan Niclas Wolf (jnw) <Wolf@bioinformatik.uni-frankfurt.de>
+ *  2019:   - fix display of chains with IDs of > 1 char (max 4 currently)
+ *          - clearer error messages
  */
 
 ini_set('display_errors', 0);
@@ -229,9 +233,10 @@ $recent_chain_id = "";
 foreach ($chains as $value){
     $new_chain = true;
     // check for correct format (maybe check also for correct letters/numbers..?)
-    if (!(strlen($value) == 5)) {
+    //  jnw_2019: b/c of large structures in mmCIF format up to 4-char chain IDs are allowed
+    if (!(strlen($value) <= 8)) {
             //echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
-            array_push($SHOW_ERROR_LIST, "PDB chain '" . $value . "' has a wrong PDB-ID and chain format, expected something like '7timA'.");
+            array_push($SHOW_ERROR_LIST, "PDB chain '" . $value . "' has a wrong PDB-ID and chain format, expected something like '7timA'. Up to 4 character chains are allowed.");
             continue;
     }
     // if everything is fine..
@@ -256,7 +261,7 @@ foreach ($chains as $value){
                           ORDER BY graph_type"; 
 
         pg_prepare($db, "getChains", $query);		
-        $result = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));  
+        $result = pg_execute($db, "getChains", array("%".$pdbID."%", $chainName));  
       
         $tableString .= '
                         <li> <!-- start element of outer slider, a chain -->
@@ -368,7 +373,7 @@ foreach ($chains as $value){
                 $tableString .= '</li> <!-- closing inner slider element -->' . "\n";
 
             } else {
-                $tableString .= "<li><h3>No data found in the database for request protein $pdbID chain $chainName, sorry.</h3>";
+                $tableString .= "<li><h5>No data found in the database for requested protein $pdbID chain $chainName, sorry. Maybe it only contains RNA/DNA?</h5>";
             }
    
         } // end fetch chain data (images etc..)
@@ -435,7 +440,7 @@ foreach ($chains as $value){
             // counter for the data-slide-index property of the bxSlider.
             $c = 0;					
             // create thumbails for the (inner) slider. One thumb for each graphtype
-            $result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));
+            $result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", $chainName));
             while ($arr = pg_fetch_array($result_thumbs, NULL, PGSQL_ASSOC)){
                 if(isset($arr['graph_image_png']) && file_exists($IMG_ROOT_PATH.$arr['graph_image_png'])) {
                     $tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
@@ -444,7 +449,7 @@ foreach ($chains as $value){
                 }
             }
         } else {
-            $tableString .= "<div><h2>No data found in the database for request protein $pdbID chain $chainName, sorry.</h2></div>";
+            $tableString .= "<div><h5>No data found in the database for requested protein $pdbID chain $chainName, sorry. Maybe it only contains RNA/DNA?</h5></div>";
         }            
             $tableString .= '</div> <!-- end pager div, the one to select graph type -->' . "\n";
             $tableString .= '</div> <!-- end proteingraph div -->' . "\n";
