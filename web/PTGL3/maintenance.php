@@ -395,13 +395,24 @@ function get_linnots_filename($graphtype_int, $notation) {
 		               
 		               // ----- get the number of PDB files in the database -----
 		               $res = array();
-		               $res = handle_fixed_query_one_result($db, "SELECT count(pdb_id) as cnt from plcc_protein;", array("cnt"));
+		               $res = handle_fixed_query_one_result($db, "SELECT count(pdb_id) as cnt from plcc_protein WHERE insert_completed = 't';", array("cnt"));
 		               if(is_array($res)) {
 		                   $num_pdb_files = $res["cnt"];
 		                   //echo "yes, $num_pdb_files PDB files.";
 		                   $result_string_stats .= get_int_var_line("num_pdb_files", $num_pdb_files);
 		               } else {
 		                   array_push($SHOW_ERROR_LIST, "PDB file count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+
+		               // ----- get the number of large PDB files in the database -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(pdb_id) as cnt from plcc_protein WHERE insert_completed = 't' AND is_large_structure = 't';", array("cnt"));
+		               if(is_array($res)) {
+		                   $num_large_structures = $res["cnt"];
+		                   $result_string_stats .= get_int_var_line("num_large_structures", $num_large_structures);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "Large structure count database query failed: '" . $res[0] . "'");
 		                   $all_queries_ok = FALSE;
 		               }
 		               

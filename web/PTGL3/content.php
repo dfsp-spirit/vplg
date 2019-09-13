@@ -389,6 +389,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 
 		<h4><?php echo $num_pdb_files; ?> PDB files</h4>
+		<h4><p style="text-indent:30px;"><?php echo $num_large_structures; ?> Large structures (>62 chain or >99,999 atoms) of them</p></h4>
 		<h4><?php echo $num_protein_chains; ?> Protein chains</h4>
 		<?php if($num_protein_chains_nonredundant > 0) { echo "<h4>$num_protein_chains_nonredundant Non-redundant protein chains</h4>";
 		} 
