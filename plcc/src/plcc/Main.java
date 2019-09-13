@@ -3491,7 +3491,7 @@ public class Main {
             }
                         
             try {
-                DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), resolution, numResidues);
+                DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), resolution, numResidues, Boolean.parseBoolean(md.get("isLarge")));
                 if(! silent) {
                     System.out.println("  Info on protein '" + pdbid + "' written to DB.");
                 }

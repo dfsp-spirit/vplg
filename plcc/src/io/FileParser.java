@@ -86,7 +86,7 @@ public class FileParser {
     // Filled by cif parser so that file only needs to be read once
     // contains some basic meta data (compare with getPDBMetaData()):
     // HashMap of (String, String) pairs (key, value) with information on the PDB file
-    //   -> 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title'.
+    //   -> 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title', 'isLarge'.
     static HashMap<String, String> metaData = null;
     
     static Boolean dataInitDone = false;
@@ -733,6 +733,7 @@ public class FileParser {
         Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
         Boolean inLoop = false;
         int ligandsTreatedNum = 0;
+        int numberAtoms = 0;
         
         // variables for one loop (reset when hitting new loop)
         String tableCategory = null;
@@ -883,6 +884,8 @@ public class FileParser {
                             
                         } else {
                             // we are in the row section (data!)
+                            
+                            numberAtoms++;
                             
                             // check once if required column headers are present
                             if (! columnsChecked) {
@@ -1390,8 +1393,13 @@ public class FileParser {
         
         // add empty Strings to metadata to avoid SQL null errors
         fillMetadataEmptyStrings();
+        if (s_chains.size() > 62 || numberAtoms > 99999) {
+            metaData.put("isLarge", "true");
+        } else {
+            metaData.put("isLarge", "false");
+        }
         
-        // all lines have beenn read
+        // all lines have been read
         return(true);
     }
 
@@ -3111,10 +3119,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
     /**
      * Retrieves meta data that applies to the whole PDB file from its lines, e.g. experiment type and resolution.
-     *
+     * Only use this function for the old parser (legacy PDB files)! Use getMetaData() for the new parser (mmCIF).
      * @return A HashMap of (String, String) pairs (key, value) with information on the PDB file. The following
-     * Strings are set: 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title'.
-     *
+     * Strings are set: 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title', 'isLarge' as false.
      */
     public static HashMap<String, String> getPDBMetaData() {
 
@@ -3171,6 +3178,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         md.put("header", header);
         md.put("title", title);
         md.put("date", date);
+        md.put("isLarge", "false");  // only old parser uses this function, therefore always return false (old FP cant treat large structures)
         
         // register md with results
         ProteinResults pr = ProteinResults.getInstance();
