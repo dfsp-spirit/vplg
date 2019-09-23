@@ -2500,7 +2500,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
     /**
      * Parses the DSSP data and creates the residue list from it.
-     * @param isCIF true if using mmCIF parser and mmCIF pdb file as chain ids may be 4 character long then
+     * @param isCIF true if using mmCIF parser and mmCIF pdb file as chain IDs may be 4 character long then
      */
     private static void createAllResiduesFromDsspData(Boolean isCIF) {
 
@@ -2512,7 +2512,8 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         sseString = "UNDEF";
         Character lastChar = null;
         Float phi = 0.0f;
-        Float psi = 0.0f;        
+        Float psi = 0.0f;
+        int offset;  // if > 99,999 residues everything is shifted
 
         s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         s_interchainSulfurBridges = new HashMap<Character, ArrayList<Integer>>();
@@ -2522,8 +2523,10 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
             dLine = dsspLines.get(i);
             dLineNum = i + 1;
+            
+            offset = Math.max(dLine.split(" ")[0].length() - 5, 0);  // typically first 5 columns code for res num, but if exceeded add offset
 
-            if(dLine.substring(13, 14).equals("!")) {       // chain brake
+            if(dLine.substring(13 + offset, 14 + offset).equals("!")) {       // chain brake
                 if(! FileParser.silent) {
                     if (! Settings.getBoolean("plcc_B_no_chain_break_info")) {
                         System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
@@ -2534,7 +2537,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
                 try {
                     // column 0 is ignored: blank
-                    dsspResNum = Integer.valueOf(dLine.substring(1, 5).trim());
+                    dsspResNum = Integer.valueOf(dLine.substring(1 + offset, 5 + offset).trim());
                     
                     // last used DSSP res num is later needed for ligands
                     // (and we only wand to go through dssp file once)
@@ -2544,24 +2547,24 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     }
                     
                     // 5 is ignored: blank
-                    pdbResNum = Integer.valueOf(dLine.substring(6, 10).trim());
-                    iCode = dLine.substring(10, 11);                    
+                    pdbResNum = Integer.valueOf(dLine.substring(6 + offset, 10 + offset).trim());
+                    iCode = dLine.substring(10 + offset, 11 + offset);                    
                     // with PDB mmCIF files things got more difficult: 4-character chain ids
                     //     prioritize AUTHCHAIN > CHAIN
                     if (! isCIF) {
-                        dsspChainID = dLine.substring(11, 12);
+                        dsspChainID = dLine.substring(11 + offset, 12 + offset);
                     } else {
-                        dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
+                        dsspChainID = dLine.substring(159 + offset, 163 + offset).trim(); // AUTHCHAIN column 160-163
                     }
                     
                     // 12 is ignored: blank
-                    resName1Letter = dLine.substring(13, 14);
+                    resName1Letter = dLine.substring(13 + offset, 14 + offset);
                     // 14+15 are ignored: blank
-                    sseString = dLine.substring(16, 17);
+                    sseString = dLine.substring(16 + offset, 17 + offset);
                     // lots of stuff is ignored here
-                    phi = Float.valueOf(dLine.substring(103, 108).trim());  // phi backbone angle
-                    psi = Float.valueOf(dLine.substring(109, 114).trim());  // psi backbone angle
-                    acc = Integer.valueOf(dLine.substring(35, 38).trim());  // solvent accessible surface
+                    phi = Float.valueOf(dLine.substring(103 + offset, 108 + offset).trim());  // phi backbone angle
+                    psi = Float.valueOf(dLine.substring(109 + offset, 114 + offset).trim());  // psi backbone angle
+                    acc = Integer.valueOf(dLine.substring(35 + offset, 38 + offset).trim());  // solvent accessible surface
                     // rest is ignored: not needed
                 } catch(Exception e) {
                     System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed: '" + e.getMessage() + "'. DSSP file looks broken.");
