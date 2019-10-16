@@ -2513,6 +2513,12 @@ connection.close();
     public static Boolean matrixContainsFourHelixBundle(ArrayList<ArrayList<ArrayList<Character>>> matrixList) {
         //iterate over all given folding graphs
         for (ArrayList<ArrayList<Character>> matrix : matrixList) {
+            // Reject too large graphs (>= 10 SSEs). Otherwise the chance of a lucky match is high.
+            //   -> empiric value by MS
+            if (matrix.size() >= 10) {
+                return false;
+            }
+            
             //make sure no "Alpha Horseshoe" is contained
             for (int j = 0; j < matrix.size()-7; j++) {
                     if ('a' == matrix.get(j).get(j+1) && 'a' == matrix.get(j+1).get(j+2) && 'a' == matrix.get(j+2).get(j+3)
@@ -2530,24 +2536,18 @@ connection.close();
                             //typical antiparallel Helix Bundle
                             if ('a' == matrix.get(i).get(i+1+k) && 'a' == matrix.get(i+1+k).get(i+2+k+o) &&
                                 'a' == matrix.get(i+2+k+o).get(i+3+k+o+p)) {
-                                if (matrix.size() < 10) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
-                                    return true;
-                                }
+                                return true;
                                 
                             }
                             //parallel Helix Bundle
                             if ('p' == matrix.get(i).get(i+1+k) && 'a' == matrix.get(i+1+k).get(i+2+k+o) &&
                                 'p' == matrix.get(i+2+k+o).get(i+3+k+o+p)) {
-                                if (matrix.size() < 10) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
-                                    return true;
-                                }
+                                return true;
                             } 
                         }
                     }
                 }
             }
-
-            
         }
         
         return false;
