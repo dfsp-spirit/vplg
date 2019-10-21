@@ -2515,7 +2515,7 @@ connection.close();
         for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             // Reject too large graphs (>= 10 SSEs). Otherwise the chance of a lucky match is high.
             //   -> empiric value by MS
-            if (matrix.size() >= 10) {
+            if (matrix.size() > 9) {
                 return false;
             }
             
@@ -3032,8 +3032,8 @@ connection.close();
             for (int i = 0; i < matrix.size()-7; i++) {
                 //check first layer
                 if ('a' == matrix.get(0+i).get(7+i) && 'a' == matrix.get(2+i).get(7+i) && 'a' == matrix.get(2+i).get(5+i)) {
-                        firstHalf = true;
-                    }
+                    firstHalf = true;
+                }
             }
         
         }
@@ -3247,7 +3247,11 @@ connection.close();
         for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             for (int i = 0; i < matrix.size()-6; i++) {
                 if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+4) && 'a' == matrix.get(i+2).get(i+5) && 
-                    ( ('a' == matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)) || ('a' != matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)) || ('a' == matrix.get(i+2).get(i+3) && 'a' != matrix.get(i+3).get(i+4)) ) && 'a' == matrix.get(i+5).get(i+6)) {
+                        // at least one antiparallel edge within 2,3 and 3,4 (original documentation by MS says that if only one is antiparallel other has to be arbitrary edge != missing)
+                        ( ('a' == matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)) ||
+                        ('a' != matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)) || 
+                        ('a' == matrix.get(i+2).get(i+3) && 'a' != matrix.get(i+3).get(i+4)) )
+                        && 'a' == matrix.get(i+5).get(i+6)) {
                     return true;
                 }
             }
@@ -9157,15 +9161,19 @@ connection.close();
     public static Boolean matrixContainsGlobinFold(ArrayList<ArrayList<ArrayList<Character>>> matrixList) {
         //iterate over all given folding graphs
         for (ArrayList<ArrayList<Character>> matrix : matrixList) {
+            // Reject too large graphs (>= 11 SSEs). Otherwise the chance of a lucky match is high.
+            //   -> empiric value by MS
+            if (matrix.size() > 10) {
+                return false;
+            }
+            
             for (int i = 0; i < matrix.size()-7; i++) {
                 //Every sequential adjacent vertex have no edge or a mixed edge. Only the last to vertices share an antiparallel edge.
                 if (('m' == matrix.get(i).get(i+1) || 'x' == matrix.get(i).get(i+1)) && ('m' == matrix.get(i+1).get(i+2) || 'x' == matrix.get(i+1).get(i+2)) &&
                     ('m' == matrix.get(i+2).get(i+3) || 'x' == matrix.get(i+2).get(i+3)) && ('m' == matrix.get(i+3).get(i+4) || 'x' == matrix.get(i+3).get(i+4)) &&
                     ('m' == matrix.get(i+4).get(i+5) || 'x' == matrix.get(i+4).get(i+5)) && ('m' == matrix.get(i+5).get(i+6) || 'x' == matrix.get(i+5).get(i+6)) &&
                     ('a' == matrix.get(i+6).get(i+7) || 'a' == matrix.get(i+5).get(i+7))) {
-                    if (matrix.size() < 11) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
