@@ -22,9 +22,6 @@ require 'Slim/Slim.php';
 $app = new \Slim\Slim();
 $app->setName('ptgl3api');
 
-$response = $app->response();
-$response->header('Access-Control-Allow-Origin', '*');
-
 /**
  * Step 3: Define the Slim application routes
  *
@@ -44,8 +41,9 @@ $ptgl_api_url = rtrim($ptgl_base_url,"/") . "/api/index.php";
 
 
 $api_settings = array();
-$api_settings['prefer_files_to_db'] = TRUE;	// if this is set to TRUE, protein graph data in standard graph file formats (GML, XML, JSON) is taken from flat files on disk (the path is constructed). If is is set to FALSE, the string is queried from the database.
-$api_settings['data_path'] = '../data/';
+$api_settings['prefer_files_to_db'] = TRUE;
+//$api_settings['data_path'] = '../data/';
+$api_settings['data_path'] = '../' . $IMG_ROOT_PATH;
 
  
 // GET route
@@ -66,7 +64,7 @@ $app->get(
                 small,strong,sub,sup,var,
                 b,i,
                 dl,dt,dd,ol,ul,li,
-                fieldset,form,label,legend,
+		fieldset,form,label,legend,
                 table,caption,tbody,tfoot,thead,tr,th,td,
                 article,aside,canvas,details,figcaption,figure,
                 footer,header,hgroup,menu,nav,section,summary,
