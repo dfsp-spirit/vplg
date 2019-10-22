@@ -452,7 +452,7 @@ EOT;
 // set application-wide route conditions
 \Slim\Route::setDefaultConditions(array(
     'pdbid' => '[a-zA-Z0-9]{4}',
-    'chain' => '[a-zA-Z0-9]{1}',
+    'chain' => '[a-zA-Z0-9]{1,4}',
     'graphtype' => 'alpha|beta|albe|alphalig|betalig|albelig',
     'linnot' => 'adj|red|key|seq',
     'fold' => '[0-9]{1,}',
