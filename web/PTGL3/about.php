@@ -78,6 +78,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					</ul>
 					</li>
 									</ul>
+					<li class="noBullets">  <a href="#complexGraph">Complex graphs</a> </li>
 			<li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
 			<li class="noBullets"> <a href="#api">The <?php echo "$SITE_TITLE"; ?> REST API</a> </li>
 			<li class="noBullets"> <a href="#help"> Help </a> </li>
@@ -374,6 +375,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		
 		
+		<a class="anchor" id="complexGraph"></a>
+		<h3>Complex Graphs</h3>
+		<p>A Complex graph is defined as undirected graph. The vertices correspond to protein chains and are named by their author-provided chain ID from the PDB file. Edges denote a spatial contact and the edge weight corresponds to the number of residue-residue contacts.</p>
+
+		<p><img src="./images/4a97_CG.png" alt="Complex graph" title="Complex graph" class="img-responsive imgFormAboutphp2"/></p>
+
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		
 		
