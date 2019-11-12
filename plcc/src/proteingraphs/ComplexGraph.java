@@ -521,6 +521,9 @@ public class ComplexGraph extends UAdjListGraph {
         if (Settings.getBoolean("plcc_B_graphimg_footer")) {
 
         // Draw the vertex numbering into the footer
+        
+            // old version where in CGs > 99 vertices only each second footer information is printed
+            /*
             // Determine the dist between vertices that will have their vertex number printed below them in the footer field
             Integer printNth = 1;
             if (cg.getVertices().size() > 9) {
@@ -529,6 +532,7 @@ public class ComplexGraph extends UAdjListGraph {
             if (cg.getVertices().size() > 99) {
                 printNth = 2;
             }
+            */
 
             // line markers: S for sequence order, G for graph order
             Integer lineHeight = pl.textLineHeight;
@@ -540,39 +544,47 @@ public class ComplexGraph extends UAdjListGraph {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }
             iChainID = -1;
-            String edgesString = cg.proteinNodeMap.toString();
-            //System.out.println("DrawChainLevelCG: edgesString is '" + edgesString + "'.");
+            String[] vertexNameAssignment = cg.proteinNodeMap.toString().replace("{", "").replace("}", "").replace(" ", "").split(",");  // produces array of "x=a" where x is number of vertex and a chain name
             
             
-
+            
             for (Integer i = 0; i < cg.getVertices().size(); i++) {                
-                // Draw label for every nth vertex
-                if ((i + 1) % printNth == 0) {
-                    chainNumber = "" + (i + 1);
-                    //sseNumberSeq = "" + (cg.proteinNodeMap.get(i));
-                    Integer foundIndex = edgesString.indexOf(i.toString() + "=");
-                    String chainId;
-                    if (i < 10) {
-                        chainId = edgesString.substring(foundIndex + 2, foundIndex + 3);
-                    } else {
-                        chainId = edgesString.substring(foundIndex + 3, foundIndex + 4);
+                // Draw each label until 999 and from then on only even ones
+                if (i >= 999) {
+                    if (i % 2 == 0) {
+                        continue;
                     }
+                }
+                chainNumber = "" + (i + 1);
+                //sseNumberSeq = "" + (cg.proteinNodeMap.get(i));
 
-                    chainName = "" + chainId;
-                    //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
-                    stringHeight = fontMetrics.getAscent();
+                // old version of getting chain name
+                /*
+                Integer foundIndex = edgesString.indexOf(i.toString() + "=");
+                String chainId;
+                if (i < 10) {
+                    chainId = edgesString.substring(foundIndex + 2, foundIndex + 3);
+                } else {
+                    chainId = edgesString.substring(foundIndex + 3, foundIndex + 4);
+                }
+                chainName = "" + chainId;
+                */
 
-                    ig2.drawString(chainNumber, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
-                    ig2.drawString(chainName, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 1) + (stringHeight / 4));
-                    ig2.drawString(molInfoForChains.get(chainName), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
+                chainName = vertexNameAssignment[i].split("=")[1];
+
+                //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
+                stringHeight = fontMetrics.getAscent();
+
+                ig2.drawString(chainNumber, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                ig2.drawString(chainName, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 1) + (stringHeight / 4));
+                ig2.drawString(molInfoForChains.get(chainName), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
 
                 // determine chain of SSEs
                 /*for(Integer x = 0; x < cg.getVertices().size(); x++){
-                     if(i < cg.chainEnd.get(x)) {iChainID = x; break;}
-                     }
-                     */
-                    //if(iChainID != -1) {ig2.drawString(cg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
-                }
+                 if(i < cg.chainEnd.get(x)) {iChainID = x; break;}
+                 }
+                 */
+                //if(iChainID != -1) {ig2.drawString(cg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
             }
 
             /*
