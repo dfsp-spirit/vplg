@@ -48,11 +48,7 @@ public class FileParser {
     public static Boolean silent = false;
     public static Boolean essentialOutputOnly = false;
     static String fs = System.getProperty("file.separator");
-    static Integer maxResidues = 11000;
-    static Integer maxUsedDsspResNumInDsspFile = null;
-    static String firstModelName = "1";             // the model ID that identifies the first model in a PDB file
-    static String defaultModelName = firstModelName;
-    static String lastAltLoc = " ";
+
     static String dsspFile = null;
     static String pdbFile = null;
     static Integer dsspDataStartLine = null;
@@ -83,32 +79,11 @@ public class FileParser {
     // This list is needed to track if sulfur bridges span between to independent chains.
     static HashMap<Character, String> s_interchainSulfurBridgesChainID;
     
-    // Filled by cif parser so that file only needs to be read once
-    // contains some basic meta data (compare with getPDBMetaData()):
-    // HashMap of (String, String) pairs (key, value) with information on the PDB file
-    //   -> 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title', 'isLarge'.
-    static HashMap<String, String> metaData = null;
-    
     static Boolean dataInitDone = false;
 
-    static Integer curLineNumPDB = null;
-    static Integer curLineNumDSSP = null;
-    static String curLinePDB = null;
-    static String curLineDSSP = null;
-    static String curModelID = null;
-    static String oldModelID = null;
-    static String curChainID = null;
-    static String oldChainID = null;
-    static Integer curResNumPDB = null;
-    static Integer curResNumDSSP = null;
-    static Residue curRes = null;
     static Integer[] resIndexPDB = null;        // for a DSSP res number, holds the index of that residue in s_residues
     static Integer[] resIndexDSSP = null;       // for a PDB res number, holds the index of that residue in s_residues
-    static Integer curRNANumPDB = null;
-    static Integer curRNANumDSSP = null;
-    static RNA curRNA = null;
-    static Integer [] RNAIndexPDB = null;
-    static Integer [] RNAIndexDssp = null;
+
 
     
     /**
