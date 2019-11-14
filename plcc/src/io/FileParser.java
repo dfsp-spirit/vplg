@@ -39,12 +39,9 @@ public class FileParser {
     public static Boolean essentialOutputOnly = false;
     static String fs = System.getProperty("file.separator");
 
-    static String dsspFile = null;
     static String pdbFile = null;
-    static Integer dsspDataStartLine = null;
     static Integer lastUsedDsspNum = null;
     static ArrayList<String> pdbLines = null;
-    static ArrayList<String> dsspLines = null;
     static ArrayList <Molecule> s_molecules = null;
     static ArrayList<Model> s_models = null;
     static ArrayList<String> s_allModelIDsFromWholePDBFile = null;
@@ -52,7 +49,6 @@ public class FileParser {
     static ArrayList<Integer> s_residueIndices = null;
     static ArrayList<Integer> s_rnaIndices = null;
     static ArrayList<Atom> s_atoms = null;
-    static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
     static HashMap<String, ArrayList<String>> homologuesMap = null;
     static List<BindingSite> s_sites;
@@ -75,7 +71,7 @@ public class FileParser {
     static Integer[] resIndexDSSP = null;       // for a PDB res number, holds the index of that residue in s_residues
 
 
-    
+      
     /**
      * Parses the contents of a line from the given startIndex to the end of the line.
      * @param startIndexInclusive the start index, inclusive
@@ -326,7 +322,7 @@ public class FileParser {
     
      
     /**
-     * Inserts spaces on left end until targetStr has length newLenght.
+    * Inserts spaces on left end until targetStr has length newLenght.
      * If newLength less than / equals length of targetStr then targetStr is returned
      * @param targetStr
      * @param newLength 
@@ -478,7 +474,7 @@ public class FileParser {
         //System.err.println("ERROR: Residue with PDB residue number '" + resNum + "' and chain ID '" + cID + "' and iCode '" + ic + "' does not exist in residue list.");
         return(found);
     } 
-
+    
 
     // reads the dssp lines (starting at first line) till it arrives at the first data line (skips header stuff)
     private static Integer readDsspToData() {

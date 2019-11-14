@@ -9,6 +9,9 @@
 package io;
 
 // imports
+import java.util.ArrayList;
+import proteinstructure.SSE;
+
 
 
 /**
@@ -16,6 +19,12 @@ package io;
  * @author niclas
  */
 public class DsspParser {
+    
+    // declare class vars
+    static String dsspFile = null;
+    static Integer dsspDataStartLine = null;
+    static ArrayList<String> dsspLines = null;
+    static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     
     
     
