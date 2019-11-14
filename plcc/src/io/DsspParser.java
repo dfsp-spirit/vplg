@@ -9,14 +9,9 @@
 package io;
 
 // imports
-import static io.FileParser.pdbFile;
 import java.util.ArrayList;
-import java.util.HashMap;
-import proteinstructure.Atom;
-import proteinstructure.Chain;
-import proteinstructure.Model;
-import proteinstructure.Molecule;
 import proteinstructure.SSE;
+import tools.DP;
 
 
 
@@ -101,6 +96,91 @@ public class DsspParser {
     }
     
     
+    public static Integer getDsspResNumForPdbFields(Integer prn, String chainID, String iCode) {
+        Integer foundDsspResNum = null;
+        Integer foundPdbResNum = null;
+        String foundPdbICode = null;
+        String foundChain = null;
+        Integer resultDsspResNum = null;
+        String dline = null;
+        String tmpPdbResNum = null;
+        Character lastChar = null;
+
+        //System.out.println("    Starting search at DSSP line number '" + (dsspDataStartLine - 1) + "'.");
+        for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
+            dline = dsspLines.get(i);
+            foundDsspResNum = Integer.valueOf(dline.substring(1, 5).trim());
+
+            //System.out.println("Looking for PDB# " + prn + " at line "  + (i + 1) + ": '" + dline + "'");
+
+            // skip chain brakes
+            if(isChainBreakLine(dline)) {
+                continue;
+            }
+            
+            // The PDB residue number string may still contain the iCode (e.g. '123A', thus we cannot simply try to cast it to Integer
+            try{
+                tmpPdbResNum = dline.substring(7, 11).trim();
+                foundChain = dline.substring(11, 12).trim();
+
+                if(tmpPdbResNum.length() == 0) { // The next command (lastChar) would be out of bounds anyway if this code is executed
+                    DP.getInstance().w("Length of PDB number at line " + (i + 1) + " of DSSP file is 0." );
+                }
+
+                lastChar = tmpPdbResNum.charAt(tmpPdbResNum.length() - 1);
+                if(Character.isDigit(lastChar)) {
+                    // The last char is a digit, so the iCode field is empty.
+                    foundPdbICode = " ";
+                    foundPdbResNum = Integer.valueOf(tmpPdbResNum);
+                }
+                else {
+                    // The last character is NO digit so it is the iCode
+                    if(tmpPdbResNum.length() <= 1) {
+                        DP.getInstance().w("Length of PDB number at line " + (i + 1) + " of DSSP file is 1 and this is not a digit." );
+                    }
+                    else {
+                        foundPdbResNum = Integer.valueOf(tmpPdbResNum.substring(0, tmpPdbResNum.length() - 1));
+                        foundPdbICode = tmpPdbResNum.substring(tmpPdbResNum.length() - 2, tmpPdbResNum.length() - 1);
+                    }
+                }
+            } catch(Exception e) {
+                DP.getInstance().w("Something went wrong with parsing PDB number at line " + (i + 1) + " of DSSP file, ignoring." );
+                //System.exit(-1);
+            }
+
+            //System.out.println("    Found PDB residue number '" + foundPdbResNum + "', looking for '" + prn + "'. DSSP # is '" + foundDsspResNum + "' here.");
+
+            if(foundPdbResNum.equals(prn)) {
+                
+                if(foundChain.equals(chainID)) {
+                    
+                    if(foundPdbICode.equals(iCode)) {
+                        resultDsspResNum = foundDsspResNum;
+                        break;
+                    }
+                }                
+            }            
+        }
+
+        //if(resultDsspResNum == null) {
+        //    System.out.println("WARNING: getDsspResNumForPdbFields(): Could not find DSSP residue number for residue with PDB number " + prn + " and chainID '" + chainID + "' and iCode '" + iCode + "'.");
+        //}
+        
+        return(resultDsspResNum);
+    }
     
+    
+    /**
+     * Determines whether a line from a DSSP file is a chainbreak line.
+     * @return True if it is, false otherwise.
+     */
+    public static Boolean isChainBreakLine(String dsspLine) {
+        if((dsspLine.substring(13, 14)).equals("!")) {
+            return(true);
+        }
+        else {
+            return(false);
+        }
+    }
     
 }
