@@ -40,7 +40,6 @@ public class FileParser {
     static String fs = System.getProperty("file.separator");
 
     static String pdbFile = null;
-    static Integer lastUsedDsspNum = null;
     static ArrayList<String> pdbLines = null;
     static ArrayList <Molecule> s_molecules = null;
     static ArrayList<Model> s_models = null;
@@ -118,6 +117,9 @@ public class FileParser {
         s_atoms = new ArrayList<Atom>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
+        s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
+        s_interchainSulfurBridges = new HashMap<Character, ArrayList<Integer>>();
+        s_interchainSulfurBridgesChainID = new  HashMap<Character, String>();
         homologuesMap = new HashMap<>();
     }
 

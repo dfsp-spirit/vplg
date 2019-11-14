@@ -9,7 +9,6 @@
 package io;
 
 // imports
-import static io.FileParser.s_sulfurBridges;
 import java.util.ArrayList;
 import java.util.HashMap;
 import plcc.Settings;
@@ -35,6 +34,7 @@ public class DsspParser {
     static Integer curLineNumDSSP = null;
     static String curLineDSSP = null;
     static Integer curResNumDSSP = null;
+    static Integer lastUsedDsspNum = null;
     
     static boolean dataInitDone = false;
     
@@ -208,9 +208,6 @@ public class DsspParser {
         Float psi = 0.0f;
         int offset;  // if > 99,999 residues everything is shifted
 
-        s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
-        s_interchainSulfurBridges = new HashMap<Character, ArrayList<Integer>>();
-        s_interchainSulfurBridgesChainID = new  HashMap<Character, String>();
         Residue r;
 
         for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
@@ -274,7 +271,7 @@ public class DsspParser {
                 // EDIT: Why not?! I guess I thought that DSSP and PDB files used different chain IDs for residues when I wrote that.
                 // EDIT jnw: do the matching in CIF files later so that each file is only read once
                 if (! isCIF) {
-                    getChainByPdbChainID(dsspChainID).addMolecule(r);
+                    FileParser.getChainByPdbChainID(dsspChainID).addMolecule(r);
                 }
 
 
@@ -292,19 +289,19 @@ public class DsspParser {
                         resName1Letter = "C";   // change residue code cysteine
 
                         // now go save the sulfur bridge
-                        if(s_sulfurBridges.containsKey(c)) {
+                        if(FileParser.s_sulfurBridges.containsKey(c)) {
                             // the sulfur bridge partner is already in there
-                            (s_sulfurBridges.get(c)).add(dsspResNum);
+                            (FileParser.s_sulfurBridges.get(c)).add(dsspResNum);
 
                             // Check whether its a interhcain sulfur bridge (different chain IDs)
-                            if(! s_interchainSulfurBridgesChainID.get(c).equals(dsspChainID)) {
+                            if(! FileParser.s_interchainSulfurBridgesChainID.get(c).equals(dsspChainID)) {
                                 ArrayList<Integer> tmpInterchain = new ArrayList<Integer>();
 
                                 // Get the dsspResNum from the first residue of this interchain sulfur bridge
-                                tmpInterchain.add(s_sulfurBridges.get(c).get(0));
+                                tmpInterchain.add(FileParser.s_sulfurBridges.get(c).get(0));
                                 // Also add the dsspResNum of the current (second) residue.
                                 tmpInterchain.add(dsspResNum);
-                                s_interchainSulfurBridges.put(c, tmpInterchain);
+                                FileParser.s_interchainSulfurBridges.put(c, tmpInterchain);
                             }
 
 
@@ -312,11 +309,11 @@ public class DsspParser {
                             // this is the first residue of the sulfur bridge pair
                             ArrayList<Integer> tmp = new ArrayList<Integer>();
                             tmp.add(dsspResNum);
-                            s_sulfurBridges.put(c, tmp);
+                            FileParser.s_sulfurBridges.put(c, tmp);
 
                             // If its the first residue of the sulfur bridge save the chain this residue belongs to.
                             // This will be used to check if the second residue is on the same change or not.
-                            s_interchainSulfurBridgesChainID.put(c, dsspChainID);
+                            FileParser.s_interchainSulfurBridgesChainID.put(c, dsspChainID);
                         }
                     }
                 } catch (Exception e) {
@@ -353,13 +350,13 @@ public class DsspParser {
                 //}
 
                 // add to list of Residues
-                s_molecules.add(r);
-                resIndex = s_molecules.size() - 1;
+                FileParser.s_molecules.add(r);
+                resIndex = FileParser.s_molecules.size() - 1;
                 // add index to s_residueIndices
-                s_residueIndices.add(resIndex);
+                FileParser.s_residueIndices.add(resIndex);
                 // produces null ponter exception in CIF parser and I dont see where we need it (maybe I'll understand later)
                 if (! isCIF) {
-                    resIndexDSSP[dsspResNum] = resIndex;
+                    FileParser.resIndexDSSP[dsspResNum] = resIndex;
                 }
                 //resIndexPDB[pdbResNum] = resIndex;  // This will crash because some PDB files use negative residue numbers, omfg.
                 //System.out.println("    DSSP: Added residue PDB # " +  pdbResNum + ", DSSP # " + dsspResNum + " to s_residues at index " + resIndex + ".");
