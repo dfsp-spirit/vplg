@@ -94,11 +94,9 @@ public class FileParser {
     /**
      * Inits class variables.
      * @param pf PDB file path
-     * @param df DSSP file path
      */
-    protected static void initVariables(String pf, String df) {
+    protected static void initVariables(String pf) {
         pdbFile = pf;
-        dsspFile = df;
         
         // read all lines of the files into lists
         if(! FileParser.silent) {
@@ -109,12 +107,7 @@ public class FileParser {
         if(! FileParser.silent) {
             System.out.println("    Read " + pdbLines.size() + " lines of file '" + pdbFile + "'.");
         }
-        
-        dsspLines = new ArrayList<String>();
-        dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
-        if(! FileParser.silent) {
-            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
-        }
+
     
         s_models = new ArrayList<Model>();
         s_allModelIDsFromWholePDBFile = new ArrayList<String>();
@@ -123,7 +116,6 @@ public class FileParser {
         s_residueIndices = new ArrayList<>();
         s_rnaIndices = new ArrayList<>();
         s_atoms = new ArrayList<Atom>();
-        s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
         homologuesMap = new HashMap<>();
@@ -236,7 +228,7 @@ public class FileParser {
     // Reads a PDB file until it hit the model with the ID specified in the argument 'stopAtModelID'.
     // This means that if you set the latter to "3" it will stop reading after the last line of model "2", ignoring
     // the rest of the file.
-    private static ArrayList<String> slurpPDBFileToModel(String file, String stopAtModelID) {
+    protected static ArrayList<String> slurpPDBFileToModel(String file, String stopAtModelID) {
 
         ArrayList<String> lines = new ArrayList<String>();
         Integer numLines = 0;
@@ -308,7 +300,6 @@ public class FileParser {
     public static ArrayList<Integer> getResidueIndices() { return(s_residueIndices); }
     public static ArrayList<Integer> getRnaIndices() {return (s_rnaIndices);}
     public static ArrayList<Atom> getAtoms() { return(s_atoms); }
-    public static ArrayList<SSE> getDsspSSEs() { return(s_dsspSSEs); }
     public static ArrayList<SSE> getPtglSSEs() { return(s_ptglSSEs); }
 
 

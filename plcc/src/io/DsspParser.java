@@ -9,7 +9,13 @@
 package io;
 
 // imports
+import static io.FileParser.pdbFile;
 import java.util.ArrayList;
+import java.util.HashMap;
+import proteinstructure.Atom;
+import proteinstructure.Chain;
+import proteinstructure.Model;
+import proteinstructure.Molecule;
 import proteinstructure.SSE;
 
 
@@ -29,6 +35,28 @@ public class DsspParser {
     static Integer curLineNumDSSP = null;
     static String curLineDSSP = null;
     static Integer curResNumDSSP = null;
+    
+    
+    /**
+     * Inits class variables.
+     * @param df DSSP file path
+     */
+    protected static void initVariables(String df) {
+        dsspFile = df;
+        
+        // read all lines of the files into lists
+        if(! FileParser.silent) {
+            System.out.println("  Reading files...");
+        }
+        
+        dsspLines = new ArrayList<String>();
+        dsspLines = FileParser.slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
+        if(! FileParser.silent) {
+            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
+        }
+
+        s_dsspSSEs = new ArrayList<SSE>();
+    }
     
     
     // reads the dssp lines (starting at first line) till it arrives at the first data line (skips header stuff)
