@@ -28,10 +28,8 @@ import proteinstructure.Atom;
 import proteinstructure.BindingSite;
 import proteinstructure.Chain;
 import proteinstructure.Model;
-import proteinstructure.Molecule;
 import proteinstructure.ProtMetaInfo;
 import proteinstructure.Residue;
-import proteinstructure.SSE;
 import resultcontainers.ProteinResults;
 import tools.DP;
 
@@ -43,7 +41,6 @@ import tools.DP;
  */
 public class LegacyParser extends FileParser {
     static Integer maxResidues = 11000;  // could be useless, but was included in pre-dissolved file parser
-    static Integer maxUsedDsspResNumInDsspFile = null;  // used to determine fake DSSP numbers for ligands
     static String firstModelName = "1";  // the model ID that identifies the first model in a PDB file
     static String defaultModelName = firstModelName;
     
@@ -145,7 +142,7 @@ public class LegacyParser extends FileParser {
             System.out.println("  Creating all Residues...");
         }
         dsspDataStartLine = readDsspToData();
-        createAllResiduesFromDsspData(false);    // fills s_residues
+        DsspParser.createAllResiduesFromDsspData(false);    // fills s_residues
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
@@ -1284,47 +1281,6 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         // This could be reached for various valid entries I guess (or do they have a HETSYN line with empty syn field?).
         //System.out.println("WARNING: getLigSynonyms(): No synonym found for hetero group " + ligName3 + ".");
         return("");
-    }
-    
-    
-    private static Integer getLastUsedDsspResNumOfDsspFile() {
-
-        Integer dLineNum, dsspResNum;
-        dLineNum = dsspResNum = 0;
-        String dLine;
-        dLine = "";
-
-        if(maxUsedDsspResNumInDsspFile == null) {
-            // value is not known yet, we have to determine it from the DSSP file
-            for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
-                dLine = dsspLines.get(i);
-                dLineNum = i + 1;
-                
-                if( (dLine.length() >= 14)) { // Warning has been printed before
-                    if(! dLine.substring(13, 14).equals("!")) {       // if this is NOT a chain brake line
-
-                        try {
-                            dsspResNum = Integer.valueOf(dLine.substring(1, 5).trim());
-                        } catch (Exception e) {
-                            System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed. DSSP file broken.");
-                            e.printStackTrace();
-                            System.exit(1);
-                        }
-                    }
-                }
-            }
-
-            // DSSP residue numbers are ordered in the file so after iterating through
-            //  all lines of the file, this holds the last used DSSP residue number.
-
-            maxUsedDsspResNumInDsspFile = dsspResNum;
-            //System.out.println("    DSSP: Last used DSSP residue number is " + maxUsedDsspResNumInDsspFile + ", found in line " + dLineNum + ".");
-
-
-        }
-
-        // value is known now and saved in class global var, just return it.
-        return(maxUsedDsspResNumInDsspFile);
     }
     
     

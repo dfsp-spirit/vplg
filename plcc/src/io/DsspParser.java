@@ -35,6 +35,7 @@ public class DsspParser {
     static String curLineDSSP = null;
     static Integer curResNumDSSP = null;
     static Integer lastUsedDsspNum = null;
+    static Integer maxUsedDsspResNumInDsspFile = null;  // used to determine fake DSSP numbers for ligands
     
     static boolean dataInitDone = false;
     
@@ -376,6 +377,47 @@ public class DsspParser {
             System.exit(1);
             return(null);
         }
+    }
+    
+        
+    private static Integer getLastUsedDsspResNumOfDsspFile() {
+
+        Integer dLineNum, dsspResNum;
+        dLineNum = dsspResNum = 0;
+        String dLine;
+        dLine = "";
+
+        if(maxUsedDsspResNumInDsspFile == null) {
+            // value is not known yet, we have to determine it from the DSSP file
+            for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
+                dLine = dsspLines.get(i);
+                dLineNum = i + 1;
+                
+                if( (dLine.length() >= 14)) { // Warning has been printed before
+                    if(! dLine.substring(13, 14).equals("!")) {       // if this is NOT a chain brake line
+
+                        try {
+                            dsspResNum = Integer.valueOf(dLine.substring(1, 5).trim());
+                        } catch (Exception e) {
+                            System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed. DSSP file broken.");
+                            e.printStackTrace();
+                            System.exit(1);
+                        }
+                    }
+                }
+            }
+
+            // DSSP residue numbers are ordered in the file so after iterating through
+            //  all lines of the file, this holds the last used DSSP residue number.
+
+            maxUsedDsspResNumInDsspFile = dsspResNum;
+            //System.out.println("    DSSP: Last used DSSP residue number is " + maxUsedDsspResNumInDsspFile + ", found in line " + dLineNum + ".");
+
+
+        }
+
+        // value is known now and saved in class global var, just return it.
+        return(maxUsedDsspResNumInDsspFile);
     }
     
 }
