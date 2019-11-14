@@ -49,15 +49,12 @@ public class LegacyParser extends FileParser {
     static String defaultModelName = firstModelName;
     
     static Integer curLineNumPDB = null;
-    static Integer curLineNumDSSP = null;
     static String curLinePDB = null;
-    static String curLineDSSP = null;
     static String curModelID = null;
     static String oldModelID = null;
     static String curChainID = null;
     static String oldChainID = null;
     static Integer curResNumPDB = null;
-    static Integer curResNumDSSP = null;
     static Residue curRes = null;
     
     
