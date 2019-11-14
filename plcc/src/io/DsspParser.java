@@ -196,8 +196,8 @@ public class DsspParser {
      * Parses the DSSP data and creates the residue list from it.
      * @param isCIF true if using mmCIF parser and mmCIF pdb file as chain IDs may be 4 character long then
      */
-    private static void createAllResiduesFromDsspData(Boolean isCIF) {
-
+    protected static void createAllResiduesFromDsspData(Boolean isCIF) {
+        
         String dLine;
         Integer dLineNum, dsspResNum, pdbResNum, resIndex, acc;
         dLineNum = dsspResNum = pdbResNum = 0;
@@ -208,6 +208,9 @@ public class DsspParser {
         Float phi = 0.0f;
         Float psi = 0.0f;
         int offset;  // if > 99,999 residues everything is shifted
+        
+        // moved here and was previously executed >before< calling this function at all
+        dsspDataStartLine = readDsspToData();
 
         Residue r;
 
@@ -380,7 +383,7 @@ public class DsspParser {
     }
     
         
-    private static Integer getLastUsedDsspResNumOfDsspFile() {
+    protected static Integer getLastUsedDsspResNumOfDsspFile() {
 
         Integer dLineNum, dsspResNum;
         dLineNum = dsspResNum = 0;

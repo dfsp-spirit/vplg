@@ -426,7 +426,7 @@ public class FileParser {
      * @param iCode the insertion code of the residue
      * @return the residue if such a residue exists, null if no such residue exists.
      */
-    private static Residue getResidueFromList(Integer resNumPDB, String chainID, String iCode) {
+    protected static Residue getResidueFromList(Integer resNumPDB, String chainID, String iCode) {
        
         Residue tmp;
         Residue found = null;
@@ -510,7 +510,7 @@ public class FileParser {
 
 
     // determines whether a model with a certain model ID already exists in s_models
-    private static Boolean modelExistsWithModelID(String mID) {
+    protected static Boolean modelExistsWithModelID(String mID) {
 
         Model m;
 
@@ -575,7 +575,7 @@ public class FileParser {
 
 
     // Determines if an ATOM should be ignored via its chemSym string
-    private static Boolean isIgnoredAtom(String cSym) {
+    protected static Boolean isIgnoredAtom(String cSym) {
 
         // Ignored atoms: H=hydrogen, Q=pseudo atom used in NMR refinement, D=deuterium (^2H)
         if(cSym.trim().equals("H") || cSym.trim().equals("Q") || cSym.trim().equals("D")) {

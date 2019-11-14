@@ -141,7 +141,7 @@ public class LegacyParser extends FileParser {
         if(! silent) {
             System.out.println("  Creating all Residues...");
         }
-        dsspDataStartLine = readDsspToData();
+        
         DsspParser.createAllResiduesFromDsspData(false);    // fills s_residues
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
@@ -431,7 +431,7 @@ public class LegacyParser extends FileParser {
                 a.setDsspResNum(null);
             }
             else {
-                a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+                a.setDsspResNum(DsspParser.getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
             }
         }
         else {          // HETATM
@@ -1045,7 +1045,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     lig = new Residue();
                     lig.setPdbNum(resNumPDB);
                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
-                    resNumDSSP = getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number
+                    resNumDSSP = DsspParser.getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number
                     lig.setDsspNum(resNumDSSP);
                     lig.setChainID(chainID);
                     lig.setiCode(iCode);
