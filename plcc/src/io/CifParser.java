@@ -11,6 +11,7 @@ package io;
 // imports
 
 // import static io.FileParser.dsspDataStartLine;
+import static io.FileParser.s_chains;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -35,11 +36,23 @@ import tools.DP;
  */
 public class CifParser {
     
+    // declare class vars
+    static HashMap<String, String> metaData;
+    
     
     public static HashMap<String, String> getMetaData() {
         return metaData;
     }
     
+    /**
+     * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
+     * @param pf PDB file path
+     * @param df DSSP file path
+     */
+    protected static void initVariables(String pf, String df) {
+        FileParser.initVariables(pf, df);
+        metaData = new HashMap<>();
+    }
     
     /**
      * Like initData but for mmCIF data.
@@ -821,9 +834,34 @@ public class CifParser {
                     missingColumns.add(reqColumn);
             }
         }
-        
         return missingColumns;
     }
     
     
+    /**
+     * Gets chain by ID if existing otherwise creates it.
+     * @param cID chain ID as String
+     * @param m Model to which the chain belongs
+     * @return 
+     */
+    private static Chain getOrCreateChain(String cID, Model m) {
+        for (Chain existing_c : s_chains) {
+            if (existing_c.getPdbChainID().equals(cID)) {
+                return existing_c;
+            }
+        }
+        
+        // reaching this code only if chain didnt exist
+        Chain c = new Chain(cID);
+        c.setModel(m);
+        c.setModelID(m.getModelID());
+        m.addChain(c);
+        s_chains.add(c);
+        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
+            System.out.println("   PDB: New chain named " + cID + " found.");
+        }
+        return c;
+    }
+    
+      
 }

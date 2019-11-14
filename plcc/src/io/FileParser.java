@@ -95,6 +95,11 @@ public class FileParser {
     }
     
     
+    /**
+     * Inits class variables.
+     * @param pf PDB file path
+     * @param df DSSP file path
+     */
     protected static void initVariables(String pf, String df) {
         pdbFile = pf;
         dsspFile = df;
@@ -125,7 +130,6 @@ public class FileParser {
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
-        metaData = new HashMap<>();
         homologuesMap = new HashMap<>();
     }
 
@@ -320,40 +324,14 @@ public class FileParser {
         return s_interchainSulfurBridges;
     }
     
-    
+     
     /**
-     * Gets chain by ID if existing otherwise creates it.
-     * @param cID chain ID as String
-     * @param m Model to which the chain belongs
+     * Inserts spaces on left end until targetStr has length newLenght.
+     * If newLength less than / equals length of targetStr then targetStr is returned
+     * @param targetStr
+     * @param newLength 
      * @return 
      */
-    private static Chain getOrCreateChain(String cID, Model m) {
-        for (Chain existing_c : s_chains) {
-            if (existing_c.getPdbChainID().equals(cID)) {
-                return existing_c;
-            }
-        }
-        
-        // reaching this code only if chain didnt exist
-        Chain c = new Chain(cID);
-        c.setModel(m);
-        c.setModelID(m.getModelID());
-        m.addChain(c);
-        s_chains.add(c);
-        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
-            System.out.println("   PDB: New chain named " + cID + " found.");
-        }
-        return c;
-    }
-    
-     
-     /**
-      * Inserts spaces on left end until targetStr has length newLenght.
-      * If newLength less than / equals length of targetStr then targetStr is returned
-      * @param targetStr
-      * @param newLength 
-      * @return 
-      */
      public static String leftInsertSpaces(String targetStr, int newLength) {
          if (newLength <= targetStr.length()) {
              return targetStr;
