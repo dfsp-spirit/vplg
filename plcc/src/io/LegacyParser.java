@@ -39,7 +39,7 @@ import tools.DP;
  * 
  * @author jnw
  */
-public class LegacyParser {
+class LegacyParser {
     static Integer maxResidues = 11000;  // could be useless, but was included in pre-dissolved file parser
     static String firstModelName = "1";  // the model ID that identifies the first model in a PDB file
     static String defaultModelName = firstModelName;

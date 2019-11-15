@@ -34,7 +34,7 @@ import tools.DP;
  *
  * @author niclas
  */
-public class CifParser {
+class CifParser {
     
     // declare class vars
     static HashMap<String, String> metaData;
@@ -42,7 +42,7 @@ public class CifParser {
     static boolean silent;
     
     
-    public static HashMap<String, String> getMetaData() {
+    protected static HashMap<String, String> getMetaData() {
         return metaData;
     }
     
@@ -61,7 +61,7 @@ public class CifParser {
      * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
      * @return 
      */
-    public static Boolean initData(String pf) {
+    protected static Boolean initData(String pf) {
         
         silent = FileParser.settingSilent();
         
