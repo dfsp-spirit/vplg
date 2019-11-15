@@ -2125,19 +2125,8 @@ public class Main {
 
 
         // **************************************    here we go: parse files and get data    ******************************************
-        if(! silent) {
-            if( ! Settings.getBoolean("plcc_B_only_essential_output")) {
-                System.out.println("Getting data...");
-            }
-            FileParser.silent = false;
-        } else {
-            FileParser.silent = true;
-        }
-        if(Settings.getBoolean("plcc_B_only_essential_output")) {
-            FileParser.essentialOutputOnly = true;
-        }
-        else {
-            FileParser.essentialOutputOnly = false;
+        if(! silent && ! Settings.getBoolean("plcc_B_only_essential_output")) {
+            System.out.println("Getting data...");
         }
         
         if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {

@@ -500,7 +500,7 @@ public class FileParser {
     }
 
 
-    public static Boolean isIgnoredLigRes(String r) {
+    protected static Boolean isIgnoredLigRes(String r) {
         if(r.equals("DOD") || r.equals("HOH")) {
             return(true);
         } else {
@@ -584,5 +584,42 @@ public class FileParser {
 
         return(false);
     }
+
+    public static Boolean convertPdbModelsToChains(String convertModelsToChainsInputFile, String convertModelsToChainsOutputFile) {
+        if (settingCIF()) {
+            DP.getInstance().w("FP", "Converting mmCIF file's models to chains is not implemented. "
+                    + "Turn use of mmCIF parser off and retry with legacy PDB file.");
+            return false;
+        } else {
+            return LegacyParser.convertPdbModelsToChains(convertModelsToChainsInputFile, convertModelsToChainsOutputFile);
+        }
+    }
+    
+    public static void initData(String pdbFile, String dsspFile) {
+        DsspParser.initVariables(dsspFile);
+        FileParser.initVariables(pdbFile);
+        
+        if (settingCIF()) {
+            CifParser.initData(pdbFile);
+        } else {
+            LegacyParser.initData(pdbFile);
+        }
+    }
+
+    // setting methods
+    private static boolean settingCIF() {
+        return Settings.getBoolean("plcc_B_use_mmCIF_parser");
+    }
+    
+    // protected so that other parsers can use
+    protected static boolean settingSilent() {
+        return Settings.getBoolean("plcc_B_silent");
+    }
+    
+    // protected so that other parsers can use
+    protected static boolean settingEssentialOutput() {
+        return Settings.getBoolean("plcc_B_only_essential_output");
+    }
+
 
 }

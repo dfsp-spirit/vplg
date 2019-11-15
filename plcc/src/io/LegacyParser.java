@@ -39,10 +39,13 @@ import tools.DP;
  * 
  * @author jnw
  */
-public class LegacyParser extends FileParser {
+public class LegacyParser {
     static Integer maxResidues = 11000;  // could be useless, but was included in pre-dissolved file parser
     static String firstModelName = "1";  // the model ID that identifies the first model in a PDB file
     static String defaultModelName = firstModelName;
+    static boolean dataInitDone;
+    static boolean silent;
+    static boolean essentialOutputOnly;
     
     static Integer curLineNumPDB = null;
     static String curLinePDB = null;
@@ -58,13 +61,14 @@ public class LegacyParser extends FileParser {
      * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
      * @param pf Path to a PBD file. Does NOT test whether it exist, do that earlier.
      */
-    public static Boolean initData(String pf) {
+    protected static Boolean initData(String pf) {
         
-        initVariables(pf);
+        silent = FileParser.settingSilent();
+        essentialOutputOnly = FileParser.essentialOutputOnly;
 
         // resIndexPDB = new Integer[maxResidues];      // Removed because some PDB files have negative residue numbers, they break this. :/ So we
         //                                              //  have to go through the whole list (which is slow and stupid, bah).
-        resIndexDSSP = new Integer[maxResidues];
+        FileParser.resIndexDSSP = new Integer[maxResidues];
 
         
         if(parseData()) {
@@ -109,8 +113,8 @@ public class LegacyParser extends FileParser {
         }
         createAllModelsFromHandledPdbLines();   // fills s_models
 
-        if(s_models.size() > 1) {
-            System.out.println("ERROR: Found > 1 model (" + s_models.size() + " to be precise) models in the parsed PDB file lines, something went wrong. Exiting.");
+        if(FileParser.s_models.size() > 1) {
+            System.out.println("ERROR: Found > 1 model (" + FileParser.s_models.size() + " to be precise) models in the parsed PDB file lines, something went wrong. Exiting.");
             System.exit(1);
         }
         
@@ -130,10 +134,10 @@ public class LegacyParser extends FileParser {
             }
                 createAllBindingSitesFromPdbData(); // fills s_bindingsites
             if(! (silent || essentialOutputOnly)) {
-                for(BindingSite s : s_sites) {
+                for(BindingSite s : FileParser.s_sites) {
                     System.out.println("    PDB: " + s.toString());
                 }
-                System.out.println("    Found " + s_sites.size() + " binding sites.");
+                System.out.println("    Found " + FileParser.s_sites.size() + " binding sites.");
             }
         }
         
@@ -146,7 +150,7 @@ public class LegacyParser extends FileParser {
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
-        if(s_molecules.size() < 1) {
+        if(FileParser.s_molecules.size() < 1) {
             System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
@@ -178,10 +182,10 @@ public class LegacyParser extends FileParser {
         Boolean ignoreRestOfFile = false;
        
         // parse all PDB lines based on format definitions at http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
-        for(Integer i = 0; i < pdbLines.size(); i++) {
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
 
             curLineNumPDB = i + 1;
-            curLinePDB = pdbLines.get(i);
+            curLinePDB = FileParser.pdbLines.get(i);
 
             //System.out.println("  PDB line " + currentLineNumPDB + ": " + currentLinePDB + "");
 
@@ -218,9 +222,9 @@ public class LegacyParser extends FileParser {
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
         Residue r;
-        for(int i = 0; i < s_molecules.size(); i++) {
-            if (s_molecules.get(i) instanceof Residue) {
-                r = (Residue) s_molecules.get(i);
+        for(int i = 0; i < FileParser.s_molecules.size(); i++) {
+            if (FileParser.s_molecules.get(i) instanceof Residue) {
+                r = (Residue) FileParser.s_molecules.get(i);
                 deletedAtoms = r.chooseYourAltLoc();
 
                 if(deletedAtoms.size() > 0) {
@@ -229,7 +233,7 @@ public class LegacyParser extends FileParser {
 
                 //delete atoms from global atom list as well
                 for(Atom a : deletedAtoms) {
-                    if(s_atoms.remove(a)) {
+                    if(FileParser.s_atoms.remove(a)) {
                         numAtomsDeletedAltLoc++;
                     } else {
                         DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
@@ -243,7 +247,7 @@ public class LegacyParser extends FileParser {
             Integer siteResPdbResNum; String siteResChainID; String siteResName;
             int numResAssigned = 0;
             int numWaterResIgnored = 0;
-            for(BindingSite s : s_sites) {
+            for(BindingSite s : FileParser.s_sites) {
                 List<String[]> siteResidueInfos = s.getResidueInfos();
                 // try-catch for coping with the Int/Str-ParseError if insertion codes
                 //    are used in the SITE fields
@@ -254,7 +258,7 @@ public class LegacyParser extends FileParser {
 
                         siteResChainID = resInfo[1];
                         siteResName = resInfo[0];
-                        Residue res = getResByPdbFields(siteResPdbResNum, siteResChainID, null);
+                        Residue res = FileParser.getResByPdbFields(siteResPdbResNum, siteResChainID, null);
                         if(res != null) {
                             res.addPartOfBindingSite(s);
                             numResAssigned++;
@@ -284,10 +288,10 @@ public class LegacyParser extends FileParser {
             System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
 
             // report statistics
-            System.out.println("  All data parsed. Found " + s_models.size() + " models, " +
-                                                           s_chains.size() + " chains, " +
-                                                           s_molecules.size() + " molecules, " +
-                                                           s_atoms.size() + " atoms.");
+            System.out.println("  All data parsed. Found " + FileParser.s_models.size() + " models, " +
+                                                           FileParser.s_chains.size() + " chains, " +
+                                                           FileParser.s_molecules.size() + " molecules, " +
+                                                           FileParser.s_atoms.size() + " atoms.");
         }
 
         return(true);
@@ -408,7 +412,7 @@ public class LegacyParser extends FileParser {
         // handle stuff that's different between ATOMs and HETATMs
         if(atomRecordName.equals("ATOM")) {
 
-            if(isIgnoredAtom(chemSym)) {
+            if(FileParser.isIgnoredAtom(chemSym)) {
                 //a.setAtomtype(3);
                 
                 if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
@@ -436,7 +440,7 @@ public class LegacyParser extends FileParser {
         }
         else {          // HETATM
 
-            if(isIgnoredLigRes(resNamePDB)) {
+            if(FileParser.isIgnoredLigRes(resNamePDB)) {
                 a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
                 // We do not need these atoms and they may lead to trouble later on, so
@@ -452,7 +456,7 @@ public class LegacyParser extends FileParser {
         }
 
         // now create the new Atom        
-        Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+        Residue tmpRes = FileParser.getResidueFromList(resNumPDB, chainID, iCode);
         // Note that the command above may have returned NULL, we care for that below
        
         a.setPdbAtomNum(atomSerialNumber);
@@ -460,7 +464,7 @@ public class LegacyParser extends FileParser {
         a.setAltLoc(altLoc);
         a.setMolecule(tmpRes);
         a.setChainID(chainID);        
-        a.setChain(getChainByPdbChainID(chainID));
+        a.setChain(FileParser.getChainByPdbChainID(chainID));
         a.setPdbResNum(resNumPDB);
         a.setDsspResNum(resNumDSSP); // always 0 atm (default value and changed later?)
         a.setCoordX(coordX);
@@ -470,7 +474,7 @@ public class LegacyParser extends FileParser {
 
         if(curModelID != null) {
             a.setModelID(curModelID);
-            a.setModel(getModelByModelID(curModelID));
+            a.setModel(FileParser.getModelByModelID(curModelID));
         }
         
         if(tmpRes == null) {
@@ -483,7 +487,7 @@ public class LegacyParser extends FileParser {
             }
             else {
                 tmpRes.addAtom(a);
-                s_atoms.add(a);
+                FileParser.s_atoms.add(a);
             }
         }
 
@@ -508,7 +512,7 @@ public class LegacyParser extends FileParser {
             // Reduce rewrites the PDB file and does NOT fill the empty lines with spaces, so we need to cope with shorter line lengths here.
             if(curLinePDB.length() < 27) {
                 cID = curLinePDB.substring(21, 22);
-                cTerminusResNumPDB = Integer.valueOf((getLineContentsToEndFrom(22, curLinePDB).trim()));                                        
+                cTerminusResNumPDB = Integer.valueOf((FileParser.getLineContentsToEndFrom(22, curLinePDB).trim()));                                        
                 iCode = ""; // icode parsing is not supported with reduce-made PDB files, I'm not sure what they do with it and how we should discriminate it from the last digit of the residue number
                 DP.getInstance().w("Main", " Non-standard PDB 'TER' line of length " + curLinePDB.length() + " encountered. Parsing of iCode not supported for these lines. Assuming terminating residue number '" + cTerminusResNumPDB + "' and empty iCode for chain '" + cID + "'.");
             }
@@ -553,12 +557,12 @@ public class LegacyParser extends FileParser {
         String pLine = "";
 
         // create default model
-        s_models.add(new Model(defaultModelName));
+        FileParser.s_models.add(new Model(defaultModelName));
 
-        for(Integer i = 0; i < pdbLines.size(); i++) {
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
 
             pLineNum = i + 1;
-            pLine = pdbLines.get(i);
+            pLine = FileParser.pdbLines.get(i);
 
             if(pLine.startsWith("MODEL ")) {
 
@@ -571,28 +575,28 @@ public class LegacyParser extends FileParser {
                 }
 
                 // Model found
-                if( ! modelExistsWithModelID(mID)) {
+                if( ! FileParser.modelExistsWithModelID(mID)) {
                     m = new Model(mID);
                     if(! (silent || essentialOutputOnly)) {
                         System.out.println("    PDB: New PDB Model (model ID '" + mID + "') starts at PDB line " + pLineNum + ".");
                     }
-                    s_models.add(m);
+                    FileParser.s_models.add(m);
                 }
             }
 
         }
 
         // create the default model if this is a non-NMR file (crystal data) that contains no models
-        if(s_models.size() < 1) {
+        if(FileParser.s_models.size() < 1) {
             if(! (silent || essentialOutputOnly)) {
                 System.out.println("    PDB: No models found in handled PDB lines. This most likely is a crystal data (non-NMR) file. Adding default model '" + defaultModelName + "'.");
             }
-            s_models.add(new Model(defaultModelName));
+            FileParser.s_models.add(new Model(defaultModelName));
             
         }
 
         if(! (silent || essentialOutputOnly)) {
-            System.out.println("    PDB: Handled PDB lines contain data from " + s_models.size() + " model(s).");
+            System.out.println("    PDB: Handled PDB lines contain data from " + FileParser.s_models.size() + " model(s).");
         }
 
     }
@@ -602,14 +606,14 @@ public class LegacyParser extends FileParser {
     // many others follow.
     private static void createAllModelIDsFromWholePdbFile() {
 
-        ArrayList<String> allPDBLines = slurpFile(pdbFile);
+        ArrayList<String> allPDBLines = FileParser.slurpFile(FileParser.pdbFile);
         Integer pLineNum = 0;
         String mID = "";
         String pLine = "";
         Integer numModels = 0;
 
         if(! silent) {
-            System.out.println("  Counting total number of models in the whole PDB file '" + pdbFile + "' (" + allPDBLines.size() + " lines)...");
+            System.out.println("  Counting total number of models in the whole PDB file '" + FileParser.pdbFile + "' (" + allPDBLines.size() + " lines)...");
         }
 
         for(Integer i = 0; i < allPDBLines.size(); i++) {
@@ -630,7 +634,7 @@ public class LegacyParser extends FileParser {
                 // Model found
                 //System.out.println("    PDB: New PDB Model (model ID '" + mID + "') starts at PDB line " + pLineNum + ".");
                 numModels++;
-                s_allModelIDsFromWholePDBFile.add(mID);
+                FileParser.s_allModelIDsFromWholePDBFile.add(mID);
             }
 
         }
@@ -670,10 +674,10 @@ public class LegacyParser extends FileParser {
         String[] curChains;
         Boolean nextLineContinuesChainList = false;
           
-        for(Integer i = 0; i < pdbLines.size(); i++) {
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
           
             pLineNum = i + 1;
-            pLine = pdbLines.get(i);
+            pLine = FileParser.pdbLines.get(i);
 
                 
             if (pLine.startsWith("COMPND  ")) {
@@ -703,7 +707,7 @@ public class LegacyParser extends FileParser {
                                         homologueChains.add(hChain);
                                     }
                                 }
-                                homologuesMap.put(chain, homologueChains);
+                                FileParser.homologuesMap.put(chain, homologueChains);
                             }
                         }
                     }
@@ -740,10 +744,10 @@ public class LegacyParser extends FileParser {
         String siteDescription;            
         Map<String, BindingSite> sites = new HashMap<>();
             
-        for(Integer i = 0; i < pdbLines.size(); i++) {
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
 
             pLineNum = i + 1;
-            pLine = pdbLines.get(i);
+            pLine = FileParser.pdbLines.get(i);
                         
             if(pLine.startsWith("REMARK 800")) {                
                 int lineLength = pLine.length();
@@ -830,7 +834,7 @@ public class LegacyParser extends FileParser {
         }
 
         for(String key : sites.keySet()) {
-            s_sites.add(sites.get(key));
+            FileParser.s_sites.add(sites.get(key));
         }
         
     }
@@ -907,10 +911,10 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         Boolean cAlreadyExists;
         String modelID = null;
 
-        for(Integer i = 0; i < pdbLines.size(); i++) {
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
 
             pLineNum = i + 1;
-            pLine = pdbLines.get(i);
+            pLine = FileParser.pdbLines.get(i);
             cAlreadyExists = false;
 
             // keep track of current model
@@ -941,8 +945,8 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 }
 
                 // Chain found, add it if it is a new one
-                for(Integer j = 0; j < s_chains.size(); j++) {      // s_chains is small so this should be ok
-                    d = s_chains.get(j);
+                for(Integer j = 0; j < FileParser.s_chains.size(); j++) {      // s_chains is small so this should be ok
+                    d = FileParser.s_chains.get(j);
                     if(d.getPdbChainID().equals(cID)) {
                         cAlreadyExists = true;
                         break;
@@ -957,9 +961,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                         c.setModelID(modelID);       // left at null otherwise, which is fine
                     }
                     
-                    c.setHomologues(homologuesMap.get(cID));
+                    c.setHomologues(FileParser.homologuesMap.get(cID));
 
-                    s_chains.add(c);
+                    FileParser.s_chains.add(c);
 
                     if(! (silent || essentialOutputOnly)) {
                         System.out.println("    PDB: New PDB Chain (chain ID '" + cID + "') starts at PDB line " + pLineNum + ".");
@@ -970,7 +974,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         }
 
         if(! silent) {
-            System.out.println("    PDB: Scanned PDB file for Chains, found " + s_chains.size() + ".");
+            System.out.println("    PDB: Scanned PDB file for Chains, found " + FileParser.s_chains.size() + ".");
         }
 
     }
@@ -997,9 +1001,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         Integer pLineNum = 0;
         String pLine = "";
 
-        for(Integer i = 0; i < pdbLines.size(); i++) {
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
 
-            pLine = pdbLines.get(i);
+            pLine = FileParser.pdbLines.get(i);
             pLineNum = i + 1;
 
             // keep track of current model
@@ -1051,13 +1055,13 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     lig.setiCode(iCode);
                     lig.setName3(resNamePDB);
                     lig.setAAName1(AminoAcid.getLigandName1());
-                    lig.setChain(getChainByPdbChainID(chainID));
+                    lig.setChain(FileParser.getChainByPdbChainID(chainID));
                     lig.setModelID(modelID);
                     lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                                       
 
                     // add ligand to list of residues if it not on the ignore list
-                    if(isIgnoredLigRes(resNamePDB)) {
+                    if(FileParser.isIgnoredLigRes(resNamePDB)) {
                         curLigNum--;    // We had to increment before to determine the fake DSSP res number, but
                                         //  this ligand won't be stored so decrement to previous value.
                         //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + resNumPDB + "' at PDB line " + pLineNum + ".");
@@ -1105,12 +1109,12 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                         //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
                         //      instead, use a range over number of atoms.
                         
-                        s_molecules.add(lig);
+                        FileParser.s_molecules.add(lig);
                         
-                        getChainByPdbChainID(chainID).addMolecule(lig);
+                        FileParser.getChainByPdbChainID(chainID).addMolecule(lig);
 
-                        resIndex = s_molecules.size() - 1;
-                        resIndexDSSP[resNumDSSP] = resIndex;
+                        resIndex = FileParser.s_molecules.size() - 1;
+                        FileParser.resIndexDSSP[resNumDSSP] = resIndex;
                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                         if(! (silent || essentialOutputOnly)) {
                             System.out.println("    PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + pLineNum + ", ligand #" + curLigNum + ", DSSP #" + resNumDSSP + ").");
@@ -1133,13 +1137,13 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
     
     
     // parses the lines of a PDB file to find the formula of a hetero residue in the FORMUL records
-    public static String getLigFormula(String ligName3) {
+    protected static String getLigFormula(String ligName3) {
         String hetID, continuation, asterisk, formula, line;
         hetID = continuation = asterisk = formula = line = "";
         Integer compNum = 0;
 
-        for(Integer i = 0; i < pdbLines.size(); i++) {
-            line = pdbLines.get(i);
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
+            line = FileParser.pdbLines.get(i);
 
             if(line.startsWith("FORMUL")) {
 
@@ -1154,7 +1158,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     // Ugly hack for the non-standard PDB files produced by the 'reduce' hydrogen program follows.
                     // Reduce rewrites the PDB file and does NOT fill the empty lines with spaces, so we need to cope with shorter line lengths here.
                     if(line.length() < 71) {
-                        formula = getLineContentsToEndFrom(19, line);
+                        formula = FileParser.getLineContentsToEndFrom(19, line);
                     }
                     else {
                         // this is the method for standard PDB files
@@ -1188,12 +1192,12 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
     }
 
     // parses the lines of a PDB file to find the chemical name of a hetero residue in the HETNAM records
-    public static String getLigName(String ligName3) {
+    protected static String getLigName(String ligName3) {
         String hetID, continuation, name, line;
         hetID = continuation = name = line = "";
 
-        for(Integer i = 0; i < pdbLines.size(); i++) {
-            line = pdbLines.get(i);
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
+            line = FileParser.pdbLines.get(i);
 
             if(line.startsWith("HETNAM")) {
 
@@ -1205,7 +1209,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     // Ugly hack for the non-standard PDB files produced by the 'reduce' hydrogen program follows.
                     // Reduce rewrites the PDB file and does NOT fill the empty lines with spaces, so we need to cope with shorter line lengths here.
                     if(line.length() < 71) {
-                        name = getLineContentsToEndFrom(15, line);
+                        name = FileParser.getLineContentsToEndFrom(15, line);
                     }
                     else {
                         name = (line.substring(15, 71)).trim();
@@ -1245,12 +1249,12 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
     }
 
     // parses the lines of a PDB file to find the synonyms for a hetero residue in the HETSYN records
-    public static String getLigSynonyms(String ligName3) {
+    protected static String getLigSynonyms(String ligName3) {
         String hetID, continuation, synonyms, line;
         hetID = continuation = synonyms = line = "";
 
-        for(Integer i = 0; i < pdbLines.size(); i++) {
-            line = pdbLines.get(i);
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
+            line = FileParser.pdbLines.get(i);
 
             if(line.startsWith("HETSYN")) {
 
@@ -1290,14 +1294,14 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * @param chainid the chain ID
      * @return  the PMI
      */
-    public static ProtMetaInfo getMetaInfo(String pdbid, String chainid) {
+    protected static ProtMetaInfo getMetaInfo(String pdbid, String chainid) {
 
         ProtMetaInfo pmi = new ProtMetaInfo(pdbid, chainid);
-        String mol_id = pmi.setYourMolID(pdbLines);
+        String mol_id = pmi.setYourMolID(FileParser.pdbLines);
 
         if(pmi.isReady()) {
             //System.out.println("    Extracted MOL_ID '" + mol_id + "' for chain '" + chainid + "' from PDB header.");
-            if(pmi.parseAllMetaData(pdbLines)) {
+            if(pmi.parseAllMetaData(FileParser.pdbLines)) {
                 //if(! silent) {
                 //    System.out.println("    Retrieved all meta data for chain '" + chainid + "' from PDB header.");
                 //}
@@ -1317,7 +1321,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * @return A HashMap of (String, String) pairs (key, value) with information on the PDB file. The following
      * Strings are set: 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title', 'isLarge' as false.
      */
-    public static HashMap<String, String> getPDBMetaData() {
+    protected static HashMap<String, String> getPDBMetaData() {
 
         HashMap<String, String> md = new HashMap<String, String>();
         Double resolution = -1.0;
@@ -1328,8 +1332,8 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         String date = "NA";
 
         String line;
-        for(Integer i = 0; i < pdbLines.size(); i++) {
-            line = pdbLines.get(i);
+        for(Integer i = 0; i < FileParser.pdbLines.size(); i++) {
+            line = FileParser.pdbLines.get(i);
             
             if(line.startsWith("EXPDTA")) {
                 // line looks like this: 'EXPDTA    SOLUTION NMR'
@@ -1430,9 +1434,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * @param outFile the output path for the new file
      * @return true if converting was successful or if there was nothing to convert (no or only one model), false otherwise.
      */
-    public static Boolean convertPdbModelsToChains(String pdbFile, String outFile) {
+    protected static Boolean convertPdbModelsToChains(String pdbFile, String outFile) {
         // Read the PDB file
-        ArrayList<String> file = slurpFile(pdbFile);
+        ArrayList<String> file = FileParser.slurpFile(pdbFile);
         
         Integer pLineNum = 0;
         String mID = "";
@@ -1717,7 +1721,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * @param ourContacts an ArrayList containing the contact data computed by this application
      * 
      */
-    public static void compareResContactsWithPdbidDotGeoFile(String filePath, Boolean isGeoLig, ArrayList<MolContactInfo> ourContacts) {
+    protected static void compareResContactsWithPdbidDotGeoFile(String filePath, Boolean isGeoLig, ArrayList<MolContactInfo> ourContacts) {
         
         Integer radDif1, radDif2, maxRadDif, distDif, maxDistDif, sumDif, sumDifAbs, common;  // difference logging
         
@@ -1732,7 +1736,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             System.exit(1);
         }
                
-        ArrayList<String> lines = slurpFile(filePath);        
+        ArrayList<String> lines = FileParser.slurpFile(filePath);        
         String line;
         
             
@@ -1758,7 +1762,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         radDif1 = radDif2 = maxRadDif = distDif = maxDistDif = sumDif = sumDifAbs = common = 0;
         
         // stuff for comparing the other way around
-        Integer numRes = s_molecules.size();
+        Integer numRes = FileParser.s_molecules.size();
         System.out.println("Assuming that " + numRes + " residues exist, preparing matrix.");
         Integer numResDSSP = numRes + 1;       // since DSSP residue numbers start with 1, not 0
         Integer [][] geom_neo_contact_exists = new Integer[numResDSSP][numResDSSP];
@@ -1987,9 +1991,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * @param compareSSEContactsFile the input file to parse (the geo.dat output file of geom_neo)
      * @param pg the current protein graph. Its contacts should be compared to those in the input file
      */
-    public static void compareSSEContactsWithGeoDatFile(String compareSSEContactsFile, ProtGraph pg) {
+    protected static void compareSSEContactsWithGeoDatFile(String compareSSEContactsFile, ProtGraph pg) {
         
-        ArrayList<String> lines = slurpFile(compareSSEContactsFile);        
+        ArrayList<String> lines = FileParser.slurpFile(compareSSEContactsFile);        
         String line;
         
             
