@@ -34,10 +34,12 @@ import tools.DP;
  *
  * @author niclas
  */
-public class CifParser extends FileParser {
+public class CifParser {
     
     // declare class vars
     static HashMap<String, String> metaData;
+    static boolean dataInitDone;
+    static boolean silent;
     
     
     public static HashMap<String, String> getMetaData() {
@@ -59,9 +61,9 @@ public class CifParser extends FileParser {
      * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
      * @return 
      */
-    public static Boolean initDataCIF(String pf) {
+    public static Boolean initData(String pf) {
         
-        initVariables(pf);
+        silent = FileParser.settingSilent();
         
         if(parseDataCIF()) {
             dataInitDone = true;            
@@ -135,12 +137,12 @@ public class CifParser extends FileParser {
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
-        if(s_molecules.size() < 1) {
+        if(FileParser.s_molecules.size() < 1) {
             DP.getInstance().e("FP_CIF", "DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
         
-        lastMol = s_molecules.get(0);  // just start with first one ( we check below if it really matches)
+        lastMol = FileParser.s_molecules.get(0);  // just start with first one ( we check below if it really matches)
         
         // - - ligands - -
         // -> in difference to old parser ligands are created "on the fly" together with the other residues
@@ -156,7 +158,7 @@ public class CifParser extends FileParser {
 
         
         try {
-            BufferedReader in = new BufferedReader(new FileReader(pdbFile));
+            BufferedReader in = new BufferedReader(new FileReader(FileParser.pdbFile));
             String line;
             while ((line = in.readLine()) != null) {
                 numLine ++;
@@ -279,14 +281,14 @@ public class CifParser extends FileParser {
                                 tmp_modelID = tmpLineData[colHeaderPosMap.get("pdbx_PDB_model_num")];
                                
                                 // save modelID for print later
-                                if (! s_allModelIDsFromWholePDBFile.contains(tmp_modelID)) {
-                                    s_allModelIDsFromWholePDBFile.add(tmp_modelID);
+                                if (! FileParser.s_allModelIDsFromWholePDBFile.contains(tmp_modelID)) {
+                                    FileParser.s_allModelIDsFromWholePDBFile.add(tmp_modelID);
                                 }
                                         
                                 if (m == null) {
                                     // use first model
                                     m = new Model(tmp_modelID);
-                                    s_models.add(m);
+                                    FileParser.s_models.add(m);
                                     if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                                         System.out.println("   PDB: New model '" + m.getModelID() + "' found");
                                     }
@@ -305,7 +307,7 @@ public class CifParser extends FileParser {
                             } else {
                                 // create default model instead
                                 m = new Model("1");
-                                s_models.add(m);
+                                FileParser.s_models.add(m);
                                 System.out.println("   PDB: No model column. Creating default model '1'");
                             }
                             
@@ -420,7 +422,7 @@ public class CifParser extends FileParser {
                             
                             // standard AAs and (some) non-standard, atm: UNK, MSE
                             //   -> may be changed below if it is free (treat as ligand then)
-                            Boolean isAA = isAminoacid(molNamePDB, true);
+                            Boolean isAA = FileParser.isAminoacid(molNamePDB, true);
 
                             // TODO: possible to ignore alt loc atoms right now?
                             
@@ -433,7 +435,7 @@ public class CifParser extends FileParser {
                                 continue; // do not use that atom
                             }*/
                             
-                            if(FileParser.isDNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
+                            if(FileParser.isDNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                                 }
@@ -441,7 +443,7 @@ public class CifParser extends FileParser {
                             }
         
                             if( ! Settings.getBoolean("plcc_B_include_rna")) {
-                                if(FileParser.isRNAresidueName(leftInsertSpaces(molNamePDB, 3))) {
+                                if(FileParser.isRNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                         DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                                     }
@@ -458,7 +460,7 @@ public class CifParser extends FileParser {
                                 // we no start with lastMol is first residue from s_residues, so no check for null required!
                                 // load new Residue into lastMol if we approached next Residue
                                 if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
-                                    tmpMol = getResidueFromList(molNumPDB, chainID, iCode);
+                                    tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
                                     // check that a peptid residue could be found
                                     if (tmpMol == null || tmpMol.isLigand()) {
                                         // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
@@ -485,7 +487,7 @@ public class CifParser extends FileParser {
                             // handle stuff that's different between ATOMs (AA) and HETATMs (ligand)
                             if(isAA) {
                                 // >> AA <<
-                                if (isIgnoredAtom(chemSym)) {
+                                if (FileParser.isIgnoredAtom(chemSym)) {
                                     if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                                         if (Settings.getInteger("plcc_I_debug_level") > 0) {
                                             System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
@@ -537,14 +539,14 @@ public class CifParser extends FileParser {
                                     lig.setiCode(iCode);
                                     lig.setName3(molNamePDB);
                                     lig.setAAName1(AminoAcid.getLigandName1());
-                                    lig.setChain(getChainByPdbChainID(chainID));
+                                    lig.setChain(FileParser.getChainByPdbChainID(chainID));
                                     // still just assigning default model 1
                                     lig.setModelID(m.getModelID());
                                     lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                                     
                                     
                                     // add ligand to list of residues if it not on the ignore list
-                                    if(isIgnoredLigRes(molNamePDB)) {
+                                    if(FileParser.isIgnoredLigRes(molNamePDB)) {
                                         ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but
                                                         //  this ligand won't be stored so decrement to previous value.
                                         //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + molNumPDB + "' at PDB line " + pLineNum + ".");
@@ -592,9 +594,9 @@ public class CifParser extends FileParser {
                                         lastLigandNumPDB = molNumPDB;
                                         lastChainID = chainID;
 
-                                        s_molecules.add(lig);
+                                        FileParser.s_molecules.add(lig);
                                         
-                                        getChainByPdbChainID(chainID).addMolecule(lig);
+                                        FileParser.getChainByPdbChainID(chainID).addMolecule(lig);
 
                                         // do we need this?
                                         //resIndex = s_residues.size() - 1;
@@ -609,7 +611,7 @@ public class CifParser extends FileParser {
                                 }
                                    
                                 
-                                if(isIgnoredLigRes(molNamePDB)) {
+                                if(FileParser.isIgnoredLigRes(molNamePDB)) {
                                     a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
                                     // We do not need these atoms and they may lead to trouble later on, so
@@ -640,7 +642,7 @@ public class CifParser extends FileParser {
                             a.setAltLoc(altLoc);
                             a.setMolecule(lastMol);
                             a.setChainID(chainID);        
-                            a.setChain(getChainByPdbChainID(chainID));
+                            a.setChain(FileParser.getChainByPdbChainID(chainID));
                             a.setPdbResNum(molNumPDB);
                             // we cant get the DSSP res num easily here and have to do it later (I guess)
                             // old parser seems to assign 0 here whatsoever so we just leave the default value there
@@ -670,7 +672,7 @@ public class CifParser extends FileParser {
                                     }
                                     else {
                                         lastMol.addAtom(a);
-                                        s_atoms.add(a);
+                                        FileParser.s_atoms.add(a);
                                     }
                                 }
                             } else {
@@ -678,7 +680,7 @@ public class CifParser extends FileParser {
                                 if (! (lig == null)) {
                                     lig.addAtom(a);
                                     a.setMolecule(lig);
-                                    s_atoms.add(a);
+                                    FileParser.s_atoms.add(a);
                                 }
                             }  
                         }
@@ -725,9 +727,9 @@ public class CifParser extends FileParser {
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
         Residue r;
-        for(int i = 0; i < s_molecules.size(); i++) {
-            if (s_molecules.get(i) instanceof Residue) {
-                r = (Residue) s_molecules.get(i);
+        for(int i = 0; i < FileParser.s_molecules.size(); i++) {
+            if (FileParser.s_molecules.get(i) instanceof Residue) {
+                r = (Residue) FileParser.s_molecules.get(i);
                 deletedAtoms = r.chooseYourAltLoc();
 
 
@@ -737,7 +739,7 @@ public class CifParser extends FileParser {
 
                 //delete atoms from global atom list as well
                 for(Atom a : deletedAtoms) {
-                    if(s_atoms.remove(a)) {
+                    if(FileParser.s_atoms.remove(a)) {
                         numAtomsDeletedAltLoc++;
                     } else {
                         DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
