@@ -24,7 +24,10 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import plcc.Settings;
+import proteingraphs.MolContactInfo;
+import proteingraphs.ProtGraph;
 import proteinstructure.BindingSite;
+import proteinstructure.ProtMetaInfo;
 
 
 /**
@@ -586,7 +589,7 @@ public class FileParser {
     }
 
     public static Boolean convertPdbModelsToChains(String convertModelsToChainsInputFile, String convertModelsToChainsOutputFile) {
-        if (settingCIF()) {
+        if (settingCif()) {
             DP.getInstance().w("FP", "Converting mmCIF file's models to chains is not implemented. "
                     + "Turn use of mmCIF parser off and retry with legacy PDB file.");
             return false;
@@ -599,15 +602,40 @@ public class FileParser {
         DsspParser.initVariables(dsspFile);
         FileParser.initVariables(pdbFile);
         
-        if (settingCIF()) {
+        if (settingCif()) {
             CifParser.initData(pdbFile);
         } else {
             LegacyParser.initData(pdbFile);
         }
     }
+    
+    public static void compareResContactsWithPdbidDotGeoFile(String compareResContactsFile, boolean b, ArrayList<MolContactInfo> cInfo) {
+        LegacyParser.compareResContactsWithPdbidDotGeoFile(compareResContactsFile, b, cInfo);
+    }
+    
+    public static void compareSSEContactsWithGeoDatFile(String get, ProtGraph pg) {
+        LegacyParser.compareSSEContactsWithGeoDatFile(pdbFile, pg);
+    }
+    
+    public static HashMap<String, String> getMetaData() {
+        if (settingCif()) {
+            return CifParser.getMetaData();
+        } else {
+            return LegacyParser.getPDBMetaData();
+        }
+    }
+    
+    public static ProtMetaInfo getMetaInfo(String pdbid, String chain) {
+        if (settingCif()) {
+            DP.getInstance().w("FP", "Parsing of chain meta info not implemented for CIF parser. Providing empty meta info.");
+            return new ProtMetaInfo(pdbid, chain);
+        } else {
+            return LegacyParser.getMetaInfo(pdbid, chain);
+        }
+    }
 
     // setting methods
-    private static boolean settingCIF() {
+    private static boolean settingCif() {
         return Settings.getBoolean("plcc_B_use_mmCIF_parser");
     }
     

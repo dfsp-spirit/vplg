@@ -2129,12 +2129,7 @@ public class Main {
             System.out.println("Getting data...");
         }
         
-        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-            FileParser.initDataCIF(pdbFile, dsspFile);
-        }
-        else {
-            FileParser.initData(pdbFile, dsspFile);
-        }
+        FileParser.initData(pdbFile, dsspFile);
          
         if (Settings.getBoolean("plcc_B_debug_only_parse")) {
             System.out.println("Exiting now as requested by settings.");
@@ -2183,13 +2178,7 @@ public class Main {
         Float badResolution = Settings.getFloat("plcc_F_abort_if_pdb_resolution_worse_than");
         if(badResolution >= 0.0) {
             HashMap<String, String> md;
-            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-                md = FileParser.getPDBMetaData();
-            } else {
-                // CIF parser only goes once through file and has meta data already created if available
-                md = FileParser.getMetaData();
-            }
-
+            md = FileParser.getMetaData();
             
             Double resolution = -1.0;
             try {
@@ -3454,12 +3443,8 @@ public class Main {
         
         // meta Data in CIF files is created while parsing the file once
         //     -> no need to call a function to create it, just get it!
-        HashMap<String, String> md;
-        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-            md = FileParser.getMetaData();
-        } else {
-            md = FileParser.getPDBMetaData();
-        }
+        HashMap<String, String> md = FileParser.getMetaData();
+
         Double resolution = -1.0;
         try {
             resolution = Double.valueOf(md.get("resolution"));
@@ -3511,13 +3496,7 @@ public class Main {
                
         // meta Data in CIF files is created while parsing the file once
         //     -> no need to call a function to create it, just get it!
-        HashMap<String, String> md;
-        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-            md = FileParser.getMetaData();
-        } else {
-            md = FileParser.getPDBMetaData();
-        }
-        
+        HashMap<String, String> md = FileParser.getMetaData();        
         
         // check which chains belong to the same macro molecule
         Map<String, List<String>> macroMoleculesOfPDBfileToChains = new HashMap<>();    // key of the map is the MOL_ID
@@ -3535,12 +3514,7 @@ public class Main {
                         
             // CIF parser for now does not parse Prot meta info
             //     -> just use default values
-            ProtMetaInfo pmi;
-            if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-                pmi = new ProtMetaInfo(pdbid, chain);
-            } else {
-                pmi = FileParser.getMetaInfo(pdbid, chain);
-            }
+            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, chain);
             
             //pmi.print();
             
@@ -12999,12 +12973,8 @@ public class Main {
 
         // meta Data in CIF files is created while parsing the file once
         //     -> no need to call a function to create it, just get it!
-        HashMap<String, String> md;
-        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-            md = FileParser.getMetaData();
-        } else {
-            md = FileParser.getPDBMetaData();
-        }
+        HashMap<String, String> md = FileParser.getMetaData();
+        
         Double res = -1.0;
         try {
             res = Double.valueOf(md.get("resolution"));
