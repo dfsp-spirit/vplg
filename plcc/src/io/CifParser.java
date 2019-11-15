@@ -34,7 +34,7 @@ import tools.DP;
  *
  * @author niclas
  */
-public class CifParser {
+public class CifParser extends FileParser {
     
     // declare class vars
     static HashMap<String, String> metaData;
@@ -47,10 +47,9 @@ public class CifParser {
     /**
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
      * @param pf PDB file path
-     * @param df DSSP file path
      */
-    protected static void initVariables(String pf, String df) {
-        FileParser.initVariables(pf, df);
+    protected static void initVariables(String pf) {
+        FileParser.initVariables(pf);
         metaData = new HashMap<>();
     }
     
@@ -60,9 +59,9 @@ public class CifParser {
      * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
      * @return 
      */
-    public static Boolean initDataCIF(String pf, String df) {
+    public static Boolean initDataCIF(String pf) {
         
-        initVariables(pf, df);
+        initVariables(pf);
         
         if(parseDataCIF()) {
             dataInitDone = true;            
@@ -129,10 +128,10 @@ public class CifParser {
         if(! FileParser.silent) {
             System.out.println("  Creating all Molecules...");
         }
-        dsspDataStartLine = readDsspToData();
+
         // fills s_residues using AUTHCHAIN for chain ids
         // we need to do this here to get DsspResNum
-        createAllResiduesFromDsspData(true);
+        DsspParser.createAllResiduesFromDsspData(true);
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
@@ -531,7 +530,7 @@ public class CifParser {
                                     
                                     // assign fake DSSP Num increasing with each seen ligand
                                     ligandsTreatedNum ++;
-                                    int resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
+                                    int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
                                     
                                     lig.setDsspNum(resNumDSSP);
                                     lig.setChainID(chainID);

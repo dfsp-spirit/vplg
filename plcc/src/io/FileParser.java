@@ -363,7 +363,7 @@ public class FileParser {
      * @param includeNonStandard allows additional to 20 standard amino acids: UNK
      * @return 
      */
-    private static boolean isAminoacid(String AAName, Boolean includeNonStandard) {
+    protected static boolean isAminoacid(String AAName, Boolean includeNonStandard) {
         ArrayList<String> AANames = new ArrayList<>(Arrays.asList("ALA", "ARG", "ASN", "ASP", "CYS", 
             "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
             "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"));
