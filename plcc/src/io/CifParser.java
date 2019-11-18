@@ -9,9 +9,6 @@
 package io;
 
 // imports
-
-// import static io.FileParser.dsspDataStartLine;
-import static io.FileParser.s_chains;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -50,7 +47,7 @@ class CifParser {
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
      * @param pf PDB file path
      */
-    protected static void initVariables(String pf) {
+    private static void initVariables(String pf) {
         metaData = new HashMap<>();
     }
     
@@ -66,7 +63,7 @@ class CifParser {
         
         silent = FileParser.settingSilent();
         
-        if(parseDataCIF()) {
+        if(parseData()) {
             dataInitDone = true;            
             return(true);
         }
@@ -84,7 +81,7 @@ class CifParser {
      * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and applies appropriate function to handle each line. 
      * @return ignore (?)
      */
-    private static Boolean parseDataCIF() {
+    private static Boolean parseData() {
         // - - - Vars - - -
         //
         // for now local variables, may be needed as class variable though
@@ -714,7 +711,7 @@ class CifParser {
 	}
         
         if (! (silent || FileParser.essentialOutputOnly)) {
-            System.out.println("  PDB: Found in total " + s_chains.size() + " chains.");
+            System.out.println("  PDB: Found in total " + FileParser.s_chains.size() + " chains.");
         }
         
         // alt loc treatment copy&pasted from old parser
@@ -751,7 +748,7 @@ class CifParser {
         
         // add empty Strings to metadata to avoid SQL null errors
         fillMetadataEmptyStrings();
-        if (s_chains.size() > 62 || numberAtoms > 99999) {
+        if (FileParser.s_chains.size() > 62 || numberAtoms > 99999) {
             metaData.put("isLarge", "true");
         } else {
             metaData.put("isLarge", "false");
@@ -847,7 +844,7 @@ class CifParser {
      * @return 
      */
     private static Chain getOrCreateChain(String cID, Model m) {
-        for (Chain existing_c : s_chains) {
+        for (Chain existing_c : FileParser.s_chains) {
             if (existing_c.getPdbChainID().equals(cID)) {
                 return existing_c;
             }
@@ -858,7 +855,7 @@ class CifParser {
         c.setModel(m);
         c.setModelID(m.getModelID());
         m.addChain(c);
-        s_chains.add(c);
+        FileParser.s_chains.add(c);
         if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("   PDB: New chain named " + cID + " found.");
         }
