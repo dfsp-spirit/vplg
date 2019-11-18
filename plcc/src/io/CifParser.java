@@ -125,7 +125,7 @@ class CifParser {
         // - - - DSSP - - -
         //
         // - - residues - -
-        if(! FileParser.silent) {
+        if(! silent) {
             System.out.println("  Creating all Molecules...");
         }
 
@@ -141,9 +141,6 @@ class CifParser {
         }
         
         lastMol = FileParser.s_molecules.get(0);  // just start with first one ( we check below if it really matches)
-        
-        // - - ligands - -
-        // -> in difference to old parser ligands are created "on the fly" together with the other residues
         
         
         // - - - PDB - - - 
@@ -189,7 +186,7 @@ class CifParser {
                     if (line.startsWith("_exptl.method")) {
                         tmpLineData = lineToArrayCIF(line);
                         if (tmpLineData.length > 1) {
-                            if (! (tmpLineData[1] == "?" || tmpLineData[1] == ".")) {
+                            if (! ("?".equals(tmpLineData[1]) || ".".equals(tmpLineData[1]))) {
                                 metaData.put("experiment", tmpLineData[1]);
                             } else {
                                 metaData.put("experiment", "");
@@ -202,7 +199,7 @@ class CifParser {
                     if (line.startsWith("_reflns.d_resolution_high") || line.startsWith("_reflns.d_res_high") || line.startsWith("_refine.ls_d_res_high")) {
                         tmpLineData = lineToArrayCIF(line);
                         if (tmpLineData.length > 1) {
-                            if (! (tmpLineData[1] == "?" || tmpLineData[1] == ".")) {
+                            if (! ("?".equals(tmpLineData[1]) || ".".equals(tmpLineData[1]))) {
                                 metaData.put("resolution", tmpLineData[1]);
                             } else {
                                 metaData.put("resolution", "");
@@ -770,9 +767,9 @@ class CifParser {
         int counterValues = 0;
         tmpLineList = line.split(" ");
         
-        for (int i=0; i < tmpLineList.length; i++) {
-            if (! tmpLineList[i].isEmpty()) {
-                tmpReturnList[counterValues] = tmpLineList[i];
+        for (String tmpLineListEntry : tmpLineList) {
+            if (!tmpLineListEntry.isEmpty()) {
+                tmpReturnList[counterValues] = tmpLineListEntry;
                 counterValues++;
             }
         }
