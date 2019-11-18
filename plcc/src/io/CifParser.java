@@ -51,7 +51,6 @@ class CifParser {
      * @param pf PDB file path
      */
     protected static void initVariables(String pf) {
-        FileParser.initVariables(pf);
         metaData = new HashMap<>();
     }
     
@@ -62,6 +61,8 @@ class CifParser {
      * @return 
      */
     protected static Boolean initData(String pf) {
+        
+        initVariables(pf);
         
         silent = FileParser.settingSilent();
         
