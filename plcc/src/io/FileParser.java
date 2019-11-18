@@ -102,7 +102,7 @@ public class FileParser {
         
         // read all lines of the files into lists
         if(! FileParser.silent) {
-            System.out.println("  Reading files...");
+            System.out.println("  Reading PDB file...");
         }
         pdbLines = new ArrayList<String>();
         pdbLines = slurpPDBFileToModel(pdbFile, "2");

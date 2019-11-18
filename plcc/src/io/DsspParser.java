@@ -49,7 +49,7 @@ public class DsspParser {
         
         // read all lines of the files into lists
         if(! FileParser.silent) {
-            System.out.println("  Reading files...");
+            System.out.println("  Reading DSSP file...");
         }
         
         dsspLines = new ArrayList<String>();
