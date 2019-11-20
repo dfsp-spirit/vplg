@@ -38,6 +38,7 @@ public class DsspParser {
     static Integer maxUsedDsspResNumInDsspFile = null;  // used to determine fake DSSP numbers for ligands
     
     static boolean dataInitDone = false;
+    static boolean silent;
     
     
     /**
@@ -46,15 +47,16 @@ public class DsspParser {
      */
     protected static void initVariables(String df) {
         dsspFile = df;
+        silent = silent;
         
         // read all lines of the files into lists
-        if(! FileParser.silent) {
+        if(! silent) {
             System.out.println("  Reading DSSP file...");
         }
         
         dsspLines = new ArrayList<String>();
         dsspLines = FileParser.slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
-        if(! FileParser.silent) {
+        if(! silent) {
             System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
         }
 
@@ -89,7 +91,7 @@ public class DsspParser {
         }
 
         if(hitDsspData) {
-            if(! FileParser.silent) {
+            if(! silent) {
                 System.out.println("    DSSP: Found start of DSSP data in line " + curLineNumDSSP + ".");
             }
             return(curLineNumDSSP);
@@ -221,7 +223,7 @@ public class DsspParser {
             offset = Math.max(dLine.split(" ")[0].length() - 5, 0);  // typically first 5 columns code for res num, but if exceeded add offset
 
             if(dLine.substring(13 + offset, 14 + offset).equals("!")) {       // chain brake
-                if(! FileParser.silent) {
+                if(! silent) {
                     if (! Settings.getBoolean("plcc_B_no_chain_break_info")) {
                         System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
                     }
@@ -365,9 +367,14 @@ public class DsspParser {
                 //resIndexPDB[pdbResNum] = resIndex;  // This will crash because some PDB files use negative residue numbers, omfg.
                 //System.out.println("    DSSP: Added residue PDB # " +  pdbResNum + ", DSSP # " + dsspResNum + " to s_residues at index " + resIndex + ".");
 
-
+                
             }
+        }  // end of iterating over DSSP lines
+        
+        if (! silent) {
+            System.out.println("    DSSP: Found " + FileParser.s_molecules.size() + " residues.");
         }
+        
     }
     
     
