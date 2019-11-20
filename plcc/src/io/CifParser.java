@@ -178,14 +178,14 @@ class CifParser {
                         System.exit(1);
                     }
                     inLoop = true;
-
+                    
                     // reset vars per loop
                     lastLigandNumPDB = 0;  // really here?
                     chainID = "";  // really here?
                 }
                 
                 // check for atom coordinate data
-                if (line.startsWith("_atom_site") || (inLoop && tableCategory != null && tableCategory.equals("_atom_site"))) {
+                if (line.startsWith("_atom_site.") || (inLoop && tableCategory != null && tableCategory.equals("_atom_site"))) {
                     handleAtomSiteLine(line);
                 }
 
@@ -321,9 +321,9 @@ class CifParser {
     
     
     private static void handleAtomSiteLine(String line) {
-        // atom coordinates should always be within a loop
+        // atom coordinates should always be within a loop      
         if (! inLoop) {
-            DP.getInstance().e("FP_CIF", "Atom coordinates seem not be within a loop. Is the file broken? Exiting now.");
+            DP.getInstance().e("FP_CIF", "Parsing line " + numLine + ". Atom coordinates seem not be within a loop. Is the file broken? Exiting now.");
             System.exit(2);
         }
         
@@ -560,7 +560,7 @@ class CifParser {
                 // load new Residue into lastMol if we approached next Residue
                 if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
                     tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
-                    // check that a peptid residue could be found
+                    // check that a peptid residue could be found                   
                     if (tmpMol == null || tmpMol.isLigand()) {
                         // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
                         if (! silent) {
