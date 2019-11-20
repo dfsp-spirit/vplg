@@ -433,25 +433,22 @@ public class FileParser {
        
         Residue tmp;
         Residue found = null;
-        int numFound = 0;
 
-        // iterate up to s_residue.size() times
+        // iterate up to s_molecules.size() times
         for(Integer i = 0; i < s_molecules.size(); i++) {
             
             // start at last occurence
             Integer currentIndex = (lastIndexGetRes + i) % s_molecules.size();
             
-            if (s_molecules.get(i) instanceof Residue) {
-                tmp = (Residue) s_molecules.get(i);
-                
+            if (s_molecules.get(currentIndex) instanceof Residue) {
+                tmp = (Residue) s_molecules.get(currentIndex);
+                              
                 if(tmp.getPdbNum().equals(resNumPDB)) {
 
                     if(tmp.getChainID().equals(chainID)) {
 
-                    
                         if(tmp.getiCode().equals(iCode)) {
                             found = tmp;
-                            numFound++;
                             lastIndexGetRes = currentIndex;
 
                             // break here and return found to increase speed
@@ -460,10 +457,6 @@ public class FileParser {
                     }
                 }
             }
-        }
-        
-        if(numFound > 1) {
-            System.err.println("ERROR: More than one residue in list matches description (PDB#=" + resNumPDB + ", chain=" + chainID + ", iCode=" + iCode + ").");
         }
 
         // Not found in the whole list, something went wrong
