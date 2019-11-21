@@ -610,6 +610,24 @@ public class FileParser {
         LegacyParser.compareSSEContactsWithGeoDatFile(pdbFile, pg);
     }
     
+    
+    /**
+     * Fills homologuesMap from list of chain IDs.
+     * @param ChainIDs
+     */
+    protected static void fillHomologuesMapFromChainIdList(String[] ChainIDs) {
+        for (String chain : ChainIDs) {
+            ArrayList<String> homologueChains = new ArrayList<>();
+            for (String hChain : ChainIDs) {
+                if (!chain.equals(hChain)) {
+                    homologueChains.add(hChain);
+                }
+            }
+            homologuesMap.put(chain, homologueChains);
+        }
+    }
+    
+    
     public static HashMap<String, String> getMetaData() {
         if (settingCif()) {
             return CifParser.getMetaData();

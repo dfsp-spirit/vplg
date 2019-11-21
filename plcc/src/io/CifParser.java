@@ -138,7 +138,21 @@ class CifParser {
             while ((line = in.readLine()) != null) {
                 numLine ++;
                 
-                // first, check if line is a comment ending a loop
+                // check for beginning of loop (table-like lines)
+                if (line.startsWith("loop_")) {
+                    // loops must not be nested by mmCIF definition
+                    if (inLoop) {
+                        DP.getInstance().e("FP_CIF", "Found a nested loop starting in line " + numLine + " which is forbidden by the mmCIF definition. Exiting now.");
+                        System.exit(1);
+                    }
+                    inLoop = true;
+                    
+                    // reset vars per loop
+                    lastLigandNumPDB = 0;  // really here?
+                    chainID = "";  // really here?
+                }
+                
+                // check if line is a comment ending a loop
                 if (line.startsWith("#")) {
                     inLoop = false;
                     colHeaderPosMap.clear();
@@ -146,7 +160,6 @@ class CifParser {
                     tableCategory = null;
                     continue;  // nothing else to do / parse here
                 }
-                
                 // from now on: line does not start with '#' (is no comment)
 
                 // check for data block
@@ -170,18 +183,8 @@ class CifParser {
                     handleResolutionLine(line);
                 }
                 
-                // check for beginning of loop (table-like lines)
-                if (line.startsWith("loop_")) {
-                    // loops must not be nested by mmCIF definition
-                    if (inLoop) {
-                        DP.getInstance().e("FP_CIF", "Found a nested loop starting in line " + numLine + " which is forbidden by the mmCIF definition. Exiting now.");
-                        System.exit(1);
-                    }
-                    inLoop = true;
-                    
-                    // reset vars per loop
-                    lastLigandNumPDB = 0;  // really here?
-                    chainID = "";  // really here?
+                if (line.startsWith("_entity_poly.")) {
+                    handleEntityPolyLine(line);
                 }
                 
                 // check for atom coordinate data
@@ -320,6 +323,31 @@ class CifParser {
     }
     
     
+    /**
+     * Handle a line starting with '_entity_poly.' holding entity information of polymeres.
+     * Fills, for example, the homologuesMap.
+     * @param line 
+     */
+    private static void handleEntityPolyLine(String line) {
+        String[] lineData = lineToArray(line);
+        
+        if (inLoop) {
+            // not implemented yet
+        } else {
+            if (line.startsWith("_entity_poly.pdbx_strand_id")) {
+                if (lineData.length > 1) {
+                    FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Handle a line starting with '_atom_site.' holding atom coordinates. Creates the atoms, ligands, chains and models.
+     * Matches atoms <-> residues <-> chains <-> models.
+     * @param line 
+     */
     private static void handleAtomSiteLine(String line) {
         // atom coordinates should always be within a loop      
         if (! inLoop) {
@@ -913,5 +941,30 @@ class CifParser {
         return c;
     }
     
+    
+    /**
+     * Creates from a list all aub lists excluding one different element.
+     * @param targetArray
+     * @return 
+     */
+    private static ArrayList<ArrayList<String>> arrayToSubListsWithoutOne(String[] targetArray) {
+        ArrayList<ArrayList<String>> subLists = new ArrayList<>();
+        ArrayList<String> tmpList = new ArrayList<>();
+        
+        for (int i = 0; i < targetArray.length; i++) {
+            tmpList = new ArrayList<>();
+            for (int j = 0; j < targetArray.length; j++) {
+                if (i != j) {
+                    // sub list shall exclude one element
+                    tmpList.add(targetArray[j]);
+                    System.out.println("tmpList: " + tmpList);
+                }
+            }
+            subLists.add(tmpList);
+        }
+        
+        return subLists;
+    }
+
       
 }

@@ -700,15 +700,8 @@ class LegacyParser {
                         if (!nextLineContinuesChainList) {
                             chainLine = chainLine.replaceAll(" ", "").replace(";", "");
                             curChains = chainLine.split(",");
-                            for (String chain : curChains) {
-                                ArrayList<String> homologueChains = new ArrayList<>();
-                                for (String hChain : curChains) {
-                                    if (!chain.equals(hChain)) {
-                                        homologueChains.add(hChain);
-                                    }
-                                }
-                                FileParser.homologuesMap.put(chain, homologueChains);
-                            }
+                            
+                            FileParser.fillHomologuesMapFromChainIdList(curChains);
                         }
                     }
                 } catch (Exception e) {
