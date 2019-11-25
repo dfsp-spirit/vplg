@@ -369,7 +369,7 @@ class CifParser {
                 seenColumns = (seenColumns + lineData.length >= colHeaderPosMap.size() ? 0 : seenColumns + lineData.length);
             } 
         } else {
-            if (currentCategory.equals("_entity_poly.pdbx_strand_id")) {
+            if (lineData.length > 0 && lineData[0].equals("_entity_poly.pdbx_strand_id")) {
                 if (lineData.length > 1) {
                     FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
                 }
@@ -969,6 +969,7 @@ class CifParser {
         c.setModel(m);
         c.setModelID(m.getModelID());
         m.addChain(c);
+        c.setHomologues(FileParser.homologuesMap.get(cID));     
         FileParser.s_chains.add(c);
         if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("   PDB: New chain named " + cID + " found.");
