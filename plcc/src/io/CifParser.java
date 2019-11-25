@@ -459,19 +459,24 @@ class CifParser {
 
         // - - chain - -
         // check for a new chain (always hold the current 
-        if (colHeaderPosMap.get("auth_asym_id") != null) {
-            if (lineData.length >= colHeaderPosMap.get("auth_asym_id") + 1) {
+        // get chain ID
+        if (colHeaderPosMap.get("auth_asym_id") != null && lineData.length >= colHeaderPosMap.get("auth_asym_id") + 1) {
                 String tmp_cID = lineData[colHeaderPosMap.get("auth_asym_id")];
+                
+                // get macromolID
+                String tmpMolId;
+                if (colHeaderPosMap.get("label_entity_id") != null && lineData.length >= colHeaderPosMap.get("label_entity_id") + 1) {
+                    tmpMolId = lineData[colHeaderPosMap.get("label_entity_id")];
+                } else {
+                    tmpMolId = "";
+                }
+                
                 if (tmpChain == null) {
-                    tmpChain = getOrCreateChain(tmp_cID, m);
+                    tmpChain = getOrCreateChain(tmp_cID, m, tmpMolId);
                 } else 
                     if (! (tmpChain.getPdbChainID().equals(tmp_cID))) {
-                        tmpChain = getOrCreateChain(tmp_cID, m);
+                        tmpChain = getOrCreateChain(tmp_cID, m, tmpMolId);
                     }
-            } else {
-                DP.getInstance().w("FP_CIF", " Line " + numLine + " should contain a value in column " + 
-                        colHeaderPosMap.get("auth_asym_id") + " (expected chain name) but didnt. Skipping line.");
-            }  
         }
 
         // - - atom - -
@@ -957,7 +962,7 @@ class CifParser {
      * @param m Model to which the chain belongs
      * @return 
      */
-    private static Chain getOrCreateChain(String cID, Model m) {
+    private static Chain getOrCreateChain(String cID, Model m, String entityID) {
         for (Chain existing_c : FileParser.s_chains) {
             if (existing_c.getPdbChainID().equals(cID)) {
                 return existing_c;
@@ -969,7 +974,8 @@ class CifParser {
         c.setModel(m);
         c.setModelID(m.getModelID());
         m.addChain(c);
-        c.setHomologues(FileParser.homologuesMap.get(cID));     
+        c.setHomologues(FileParser.homologuesMap.get(cID));
+        c.setMacromolID(entityID);       
         FileParser.s_chains.add(c);
         if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("   PDB: New chain named " + cID + " found.");
