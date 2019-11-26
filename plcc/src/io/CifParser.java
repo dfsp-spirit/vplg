@@ -44,6 +44,7 @@ class CifParser {
     private static ArrayList<ProtMetaInfo> allProteinMetaInfos = new ArrayList<>();
     private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
     private static String pdbID;
+    private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
     
     // - - - vars for parsing - - -
     static Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
@@ -210,6 +211,10 @@ class CifParser {
                     // TODO: really the best attribute(s) to do this?
                     handleResolutionLine();
                     break;
+                case "_entity":
+                    // parse entity information to retrieve mol name later
+                    handleEntityLine();
+                    break;
                 case "_entity_poly":
                     // check for homologues chains
                     handleEntityPolyLine();
@@ -230,6 +235,9 @@ class CifParser {
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
+        
+        // TODELETE
+        System.out.println(entityInformation);
         
         if (! (silent || FileParser.essentialOutputOnly)) {
             System.out.println("  PDB: Found in total " + FileParser.s_chains.size() + " chains.");
@@ -348,6 +356,24 @@ class CifParser {
         if (lineData.length > 1 && (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high"))) {
             if (valueIsAssigned(lineData[1])) {
                 metaData.put("resolution", lineData[1]);
+            }
+        }
+    }
+    
+    
+    /**
+     * 
+     */
+    private static void handleEntityLine() {
+        if (inLoop && !inString) {
+            
+        } else {
+            if (lineData.length > 1) {
+                if (lineData[0].equals("_entity.id")) {
+                    entityInformation.put(lineData[1], new HashMap<String, String>());
+                } else {
+                    entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0], lineData[1]);
+                }
             }
         }
     }
