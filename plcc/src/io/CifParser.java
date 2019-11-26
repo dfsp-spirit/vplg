@@ -43,6 +43,7 @@ class CifParser {
     static HashMap<String, String> metaData;
     private static ArrayList<ProtMetaInfo> allProteinMetaInfos = new ArrayList<>();
     private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
+    private static String pdbID;
     
     // - - - vars for parsing - - -
     static Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
@@ -299,7 +300,7 @@ class CifParser {
     
     
     /**
-     * Handles a line starting with 'data' defining a data block.
+     * Handles a line starting with 'data' defining a data block. Parses the PDB ID.
      * @return if this is the first data block encountered
      */
     private static boolean handleDataLine(String line) {
@@ -310,12 +311,15 @@ class CifParser {
             dataBlockFound = true;
             if (line.length() > 5) {
                 if (! silent) {
-                    System.out.println("  PDB: Found the first data block named: " + line.subSequence(5, line.length()));
+                    pdbID = line.substring(5, line.length()).toLowerCase();
+                    System.out.println("  PDB: Found the first data block named: " + pdbID);
                 }
             }
             else {
                 if (! silent) {
-                    System.out.println("  PDB: Found the first data block (without a name).");
+                    DP.getInstance().w("FP_CIF", "Expected first data block to be named after PDB ID, but found no name. "
+                            + "Protein meta information for the chains will contain to PDB ID because of this.");
+                    pdbID = "";
                 }
             }
             return true;
@@ -980,9 +984,10 @@ class CifParser {
     
     
     /**
-     * Gets chain by ID if existing otherwise creates it.
+     * Gets chain by ID if existing otherwise creates it. Also creates the ProtMetaInfo for this chain if necessary.
      * @param cID chain ID as String
      * @param m Model to which the chain belongs
+     * @param entityID the entity_id from a cif file describing the macromolecular ID from legacy file
      * @return 
      */
     private static Chain getOrCreateChain(String cID, Model m, String entityID) {
@@ -993,16 +998,24 @@ class CifParser {
         }
         
         // reaching this code only if chain didnt exist
+        //   that means that also not ProtMetaInfo exists, so create one here
         Chain c = new Chain(cID);
+        ProtMetaInfo pmi = new ProtMetaInfo(pdbID, cID);
+        
         c.setModel(m);
         c.setModelID(m.getModelID());
         m.addChain(c);
+        
         c.setHomologues(FileParser.homologuesMap.get(cID));
-        c.setMacromolID(entityID);
+        //c.setMacromolID(entityID);
+        pmi.setMacromolID(entityID);
+        
         FileParser.s_chains.add(c);
         if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("   PDB: New chain named " + cID + " found.");
         }
+        
+        allProteinMetaInfos.add(pmi);
         return c;
     }
     
@@ -1010,12 +1023,12 @@ class CifParser {
     protected static ProtMetaInfo getProteinMetaInfo(String pdbID, String chainID) {
         // iterate up to allProteinMetaInfos.size() times
         for(Integer i = 0; i < allProteinMetaInfos.size(); i++) {
-            
+                       
             // start at last occurence
             Integer currentIndex = (lastIndexProtMetaInfos + i) % allProteinMetaInfos.size();
             
             ProtMetaInfo pmi = allProteinMetaInfos.get(currentIndex);
-                              
+                      
             if(pmi.getPdbid().equals(pdbID)  && pmi.getChainid().equals(chainID)) {
 
                 return(pmi);
