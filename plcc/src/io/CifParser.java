@@ -1021,24 +1021,32 @@ class CifParser {
     
 
     protected static ProtMetaInfo getProteinMetaInfo(String pdbID, String chainID) {
+        Boolean foundPMI = false;
+        ProtMetaInfo pmi = null;
+        Integer currentIndex = lastIndexProtMetaInfos;
+
         // iterate up to allProteinMetaInfos.size() times
         for(Integer i = 0; i < allProteinMetaInfos.size(); i++) {
                        
             // start at last occurence
-            Integer currentIndex = (lastIndexProtMetaInfos + i) % allProteinMetaInfos.size();
+            currentIndex = (lastIndexProtMetaInfos + i) % allProteinMetaInfos.size();
             
-            ProtMetaInfo pmi = allProteinMetaInfos.get(currentIndex);
+            pmi = allProteinMetaInfos.get(currentIndex);
                       
             if(pmi.getPdbid().equals(pdbID)  && pmi.getChainid().equals(chainID)) {
-
-                return(pmi);
+                foundPMI = true;
+                break;
             }
         }
         
-        // if no matching pmi was found (should not happen), return empty pmi and throw warning
-        DP.getInstance().w("No protein chain meta information for PDB ID: " + pdbID + " and chain ID " + chainID + " found."
-            + " Returning empty informtation instead.");
-        return new ProtMetaInfo(pdbID, chainID);
+        if (! foundPMI) {
+            pmi = new ProtMetaInfo(pdbID, chainID);
+            // if no matching pmi was found (should not happen), return empty pmi and throw warning
+            DP.getInstance().w("No protein chain meta information for PDB ID: " + pdbID + " and chain ID " + chainID + " found."
+                + " Returning empty informtation instead.");
+        }
+        lastIndexProtMetaInfos = currentIndex;
+        return pmi;
     }
     
     
