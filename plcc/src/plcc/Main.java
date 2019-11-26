@@ -2156,7 +2156,7 @@ public class Main {
         }
         
         models = FileParser.getModels();    // doesn't do much anymore since only the PDB lines of model 1 are currently in there
-        chains = FileParser.getChains();
+        chains = FileParser.getChains();       
         molecules = FileParser.getMolecule();
         atoms = FileParser.getAtoms();
         sulfurBridges = FileParser.getSulfurBridges();
@@ -3485,7 +3485,7 @@ public class Main {
      */
     public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<MolContactInfo> resContacts, String pdbid, String outputDir) {
         Boolean silent = Settings.getBoolean("plcc_B_silent");
-        
+               
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
         Chain c;
         List<SSE> chainDsspSSEs = new ArrayList<>();
@@ -3512,10 +3512,9 @@ public class Main {
                 System.out.println("  +++++ Handling chain '" + chain + "'. +++++");
             }
                         
-            // CIF parser for now does not parse Prot meta info
-            //     -> just use default values
+            // CIF parser does not parse all protein chain meta information, return in these cases default values
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, chain);
-            
+                       
             //pmi.print();
             
             
@@ -3634,7 +3633,7 @@ public class Main {
                 }
                 System.out.print("\n");
             }
-            
+                        
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chainName
             for(Integer j = 0; j < allChainSSEs.size(); j++) {
                 allChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chainName
@@ -4058,7 +4057,7 @@ public class Main {
                         }
                     }
                 }
-
+                
                 // ###TEST-PG-METRICS
                 if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
                     
@@ -4267,7 +4266,7 @@ public class Main {
         
         // Calculate Complex Graph
         if(Settings.getBoolean("plcc_B_complex_graphs")) {
-            // calculate ALBELIG CG
+            // calculate ALBELIG CG           
             calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
             
             // test: also calculate ALBE CG
@@ -12938,7 +12937,6 @@ public class Main {
      * @param graphType the graph type, one of the constants like SSEGraph.GRAPHTYPE_ALBE 
      */
     public static void calculateComplexGraph(List<Chain> allChains, List<Residue> resList, List<MolContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
-
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
@@ -13831,7 +13829,7 @@ public class Main {
             }
             
             Map<String, String> molInfoForChains = new HashMap<>();
-            for(Chain tc : cg.getAllChains()) {
+            for(Chain tc : cg.getAllChains()) {               
                 molInfoForChains.put(tc.getPdbChainID(), tc.getMacromolID());
             }
             

@@ -23,6 +23,7 @@ import proteinstructure.Atom;
 import proteinstructure.Chain;
 import proteinstructure.Model;
 import proteinstructure.Molecule;
+import proteinstructure.ProtMetaInfo;
 import proteinstructure.Residue;
 import tools.DP;
 
@@ -40,6 +41,8 @@ class CifParser {
     
     // data structures
     static HashMap<String, String> metaData;
+    private static ArrayList<ProtMetaInfo> allProteinMetaInfos = new ArrayList<>();
+    private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
     
     // - - - vars for parsing - - -
     static Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
@@ -85,11 +88,6 @@ class CifParser {
     
     // constants
     static final String[] NO_VALUE_PLACEHOLDERS = {".", "?"};  // characters that are used in mmCIFs as placeholder when no value exists
-    
-    
-    protected static HashMap<String, String> getMetaData() {
-        return metaData;
-    }
     
     /**
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
@@ -954,35 +952,7 @@ class CifParser {
         
         colHeaderPosMap.put(elementsSeperatedByDot[1].trim(), colHeaderPosMap.size());
     }
-    
-    
-    /**
-     * Gets chain by ID if existing otherwise creates it.
-     * @param cID chain ID as String
-     * @param m Model to which the chain belongs
-     * @return 
-     */
-    private static Chain getOrCreateChain(String cID, Model m, String entityID) {
-        for (Chain existing_c : FileParser.s_chains) {
-            if (existing_c.getPdbChainID().equals(cID)) {
-                return existing_c;
-            }
-        }
-        
-        // reaching this code only if chain didnt exist
-        Chain c = new Chain(cID);
-        c.setModel(m);
-        c.setModelID(m.getModelID());
-        m.addChain(c);
-        c.setHomologues(FileParser.homologuesMap.get(cID));
-        c.setMacromolID(entityID);       
-        FileParser.s_chains.add(c);
-        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
-            System.out.println("   PDB: New chain named " + cID + " found.");
-        }
-        return c;
-    }
-    
+
     
     /**
      * Creates from a list all aub lists excluding one different element.
@@ -1006,6 +976,61 @@ class CifParser {
         }
         
         return subLists;
+    }
+    
+    
+    /**
+     * Gets chain by ID if existing otherwise creates it.
+     * @param cID chain ID as String
+     * @param m Model to which the chain belongs
+     * @return 
+     */
+    private static Chain getOrCreateChain(String cID, Model m, String entityID) {
+        for (Chain existing_c : FileParser.s_chains) {
+            if (existing_c.getPdbChainID().equals(cID)) {
+                return existing_c;
+            }
+        }
+        
+        // reaching this code only if chain didnt exist
+        Chain c = new Chain(cID);
+        c.setModel(m);
+        c.setModelID(m.getModelID());
+        m.addChain(c);
+        c.setHomologues(FileParser.homologuesMap.get(cID));
+        c.setMacromolID(entityID);
+        FileParser.s_chains.add(c);
+        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
+            System.out.println("   PDB: New chain named " + cID + " found.");
+        }
+        return c;
+    }
+    
+
+    protected static ProtMetaInfo getProteinMetaInfo(String pdbID, String chainID) {
+        // iterate up to allProteinMetaInfos.size() times
+        for(Integer i = 0; i < allProteinMetaInfos.size(); i++) {
+            
+            // start at last occurence
+            Integer currentIndex = (lastIndexProtMetaInfos + i) % allProteinMetaInfos.size();
+            
+            ProtMetaInfo pmi = allProteinMetaInfos.get(currentIndex);
+                              
+            if(pmi.getPdbid().equals(pdbID)  && pmi.getChainid().equals(chainID)) {
+
+                return(pmi);
+            }
+        }
+        
+        // if no matching pmi was found (should not happen), return empty pmi and throw warning
+        DP.getInstance().w("No protein chain meta information for PDB ID: " + pdbID + " and chain ID " + chainID + " found."
+            + " Returning empty informtation instead.");
+        return new ProtMetaInfo(pdbID, chainID);
+    }
+    
+    
+    protected static HashMap<String, String> getMetaData() {
+        return metaData;
     }
 
       
