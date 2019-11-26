@@ -90,6 +90,7 @@ class CifParser {
     
     // constants
     static final String[] NO_VALUE_PLACEHOLDERS = {".", "?"};  // characters that are used in mmCIFs as placeholder when no value exists
+    static final String SINGLE_LINE_STRING_MARKER = "'";
     
     /**
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
@@ -235,9 +236,6 @@ class CifParser {
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
-        
-        // TODELETE
-        System.out.println(entityInformation);
         
         if (! (silent || FileParser.essentialOutputOnly)) {
             System.out.println("  PDB: Found in total " + FileParser.s_chains.size() + " chains.");
@@ -889,23 +887,37 @@ class CifParser {
     
     
     /**
-     * Returns an array of 'words' seperated by an arbitrary amount of spaces.
+     * Returns an array of 'words' seperated by an arbitrary amount of spaces. Considers in-line strings.
      * @param line
      * @return
      */
     private static String[] lineToArray(String line) {
-        String tmpReturnList[] = new String[line.split(" ").length];
-        String tmpLineList[];
+        String tmpReturnList[] = new String[line.split(" ").length + 1];
+        String tmpItem = "";
         int counterValues = 0;
-        tmpLineList = line.split(" ");
+        boolean inLineString = false;
         
-        for (String tmpLineListEntry : tmpLineList) {
-            if (!tmpLineListEntry.isEmpty()) {
-                tmpReturnList[counterValues] = tmpLineListEntry;
-                counterValues++;
+        for (int i = 0; i < line.length(); i++) {
+            switch (line.charAt(i)) {
+                case ' ':
+                    if (!inLineString) {
+                        if (tmpItem.length() > 0) {
+                            tmpReturnList[counterValues] = tmpItem;                   
+                            counterValues++;
+                            tmpItem = "";
+                        }
+                    } else {
+                        tmpItem += line.charAt(i);
+                    }
+                    break;
+                case '\'':
+                    inLineString = !inLineString;
+                    break;
+                default:
+                    tmpItem += line.charAt(i);
             }
         }
-        
+
         // return Array without null entries
         return Arrays.copyOfRange(tmpReturnList, 0, counterValues);
     }
