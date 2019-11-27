@@ -630,7 +630,7 @@ public class FileParser {
     
     public static HashMap<String, String> getMetaData() {
         if (settingCif()) {
-            return CifParser.getMetaData();
+            return CifParser.metaData;
         } else {
             return LegacyParser.getPDBMetaData();
         }

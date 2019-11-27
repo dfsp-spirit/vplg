@@ -40,51 +40,51 @@ class CifParser {
     static boolean silent;
     
     // data structures
-    static HashMap<String, String> metaData;
+    protected static HashMap<String, String> metaData;
     private static ArrayList<ProtMetaInfo> allProteinMetaInfos = new ArrayList<>();
     private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
     private static String pdbID;
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
     
     // - - - vars for parsing - - -
-    static Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
-    static Integer numLine = 0;
-    static Boolean inLoop = false;
-    static Boolean inString = false;
-    static int seenColumns = 0;
-    static String[] lineData;  // array which holds the data items from one line (seperated by spaces)
+    private static Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
+    private static Integer numLine = 0;
+    private static Boolean inLoop = false;
+    private static Boolean inString = false;
+    private static int seenColumns = 0;
+    private static String[] lineData;  // array which holds the data items from one line (seperated by spaces)
     
     // - - variables for one loop (reset when hitting new loop) - -
-    static String currentCategory = null;
+    private static String currentCategory = null;
     // Key: name of column; Val: position in list
     //  -> if auth columns from atom_site not present they will be mapped to the PDB columns
     //     therefore always use auth columns unless you explicitly want the PDB ones
-    static HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
-    static Boolean columnsChecked = false;
+    private static HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
+    private static Boolean columnsChecked = false;
     
     // - - atom_site - -
-    static int ligandsTreatedNum = 0;
-    static int numberAtoms = 0;
+    private static int ligandsTreatedNum = 0;
+    private static int numberAtoms = 0;
     
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
-    static Model m = null;
-    static Molecule lastMol = null;    // starts as first residue and is always the actual one
-    static Residue tmpMol = null;      // used to save lastMol if getResidue returns null
-    static Chain tmpChain = null;
-    static Residue lig = null;
+    private static Model m = null;
+    private static Molecule lastMol = null;    // starts as first residue and is always the actual one
+    private static Residue tmpMol = null;      // used to save lastMol if getResidue returns null
+    private static Chain tmpChain = null;
+    private static Residue lig = null;
 
     // - variables per (atom) line -
-    static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
-    static String atomRecordName, atomName, chainID, chemSym, altLoc, iCode, molNamePDB;
-    static Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
-    static Float oCoordXf, oCoordYf, oCoordZf;
-    static int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
-    static String lastChainID = ""; // s.a.
-    static String[] tmpLineData;
-    static String tmpModelID;
+    private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
+    private static String atomRecordName, atomName, chainID, chemSym, altLoc, iCode, molNamePDB;
+    private static Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
+    private static Float oCoordXf, oCoordYf, oCoordZf;
+    private static int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
+    private static String lastChainID = ""; // s.a.
+    private static String[] tmpLineData;
+    private static String tmpModelID;
 
     // - variables for already printed warnings -
-    static Boolean furtherModelWarningPrinted = false;
+    private static Boolean furtherModelWarningPrinted = false;
     
     // - - - - - - 
     
@@ -141,7 +141,7 @@ class CifParser {
             String line;
             while ((line = in.readLine()) != null) {
                 numLine ++;
-                
+                               
                 // check for beginning of loop (table-like lines)
                 if (line.startsWith("loop_")) {
                     // loops must not be nested by mmCIF definition
@@ -364,12 +364,14 @@ class CifParser {
      */
     private static void handleEntityLine() {
         if (inLoop && !inString) {
-            
+            // TODO
         } else {
+            // no loop just category.item and data per line
             if (lineData.length > 1) {
                 if (lineData[0].equals("_entity.id")) {
                     entityInformation.put(lineData[1], new HashMap<String, String>());
                 } else {
+                    // we only have on entity, so add the information to the only entity ID
                     entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0], lineData[1]);
                 }
             }
@@ -1086,11 +1088,5 @@ class CifParser {
         lastIndexProtMetaInfos = currentIndex;
         return pmi;
     }
-    
-    
-    protected static HashMap<String, String> getMetaData() {
-        return metaData;
-    }
-
       
 }
