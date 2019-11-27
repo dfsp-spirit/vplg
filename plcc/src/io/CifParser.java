@@ -51,8 +51,8 @@ class CifParser {
     private static Integer numLine = 0;
     private static Boolean inLoop = false;
     private static Boolean inString = false;
-    private static int seenColumns = 0;
     private static String[] lineData;  // array which holds the data items from one line (seperated by spaces)
+    private static String interruptedLine;  // used to build up a line that is interrupted by a multi-line string
     
     // - - variables for one loop (reset when hitting new loop) - -
     private static String currentCategory = null;
@@ -142,6 +142,9 @@ class CifParser {
             while ((line = in.readLine()) != null) {
                 numLine ++;
                                
+                //
+                // - - control sequences - -
+                //
                 // check for beginning of loop (table-like lines)
                 if (line.startsWith("loop_")) {
                     // loops must not be nested by mmCIF definition
@@ -161,21 +164,36 @@ class CifParser {
                     colHeaderPosMap.clear();
                     columnsChecked = false;
                     currentCategory = null;
-                    seenColumns = 0;
                     inString = false;
                     continue;  // nothing else to do / parse here
                 }
                 // from now on: line does not start with '#' (is no comment)
                 
+                // - - handle multi-line strings - -
+                // check if line is part of a multi-line string
+                if (inString) {
+                    interruptedLine += line;
+                    continue;  // parse combined line, nothing else to parse here
+                }
+                
                 // check if line encloses a string
                 if (line.startsWith(";")) {
                     inString = !inString;
-                    
-                    // after ending a string there cannot be anything else, but increment seenColumns
-                    if (!inString) {seenColumns++; continue;}
-                }
-                // from now on: line does not end a string with semi-colon
 
+                    if (inString) {
+                        // reset interrupted line
+                        interruptedLine = line.substring(1, line.length());
+                        continue;  // parse line when it is built together
+                    } else {
+                        // after ending a string parse the combined line
+                        line = interruptedLine;
+                    }
+                }
+                // from now on: cannot be inString and line should always hold all data items (not splitted)
+                
+                //
+                // - - parse data - -
+                //
                 // check for data block
                 if (line.startsWith("data_")) {
                     if (! handleDataLine(line)) {
@@ -200,7 +218,7 @@ class CifParser {
                 
                 // get the data items
                 lineData = lineToArray(line);
-                
+                               
                 switch(currentCategory) {
                 case "_exptl":
                     // check for experimental method
@@ -363,7 +381,7 @@ class CifParser {
      * 
      */
     private static void handleEntityLine() {
-        if (inLoop && !inString) {
+        if (inLoop) {
             // TODO
         } else {
             // no loop just category.item and data per line
@@ -384,17 +402,14 @@ class CifParser {
      * Fills, for example, the homologuesMap.
      */
     private static void handleEntityPolyLine() {
-        if (inLoop && !inString) {
+        if (inLoop) {
             
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 // we need to make sure that line holds _entity_poly.pdbx_strand_id, but the information my be split over multiple lines
                 //   so remember how many data items we already saw in seenColumns
-                if (colHeaderPosMap.get("pdbx_strand_id") - seenColumns <= lineData.length - 1) {
-                    FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id") - seenColumns].split(","));
+                if (colHeaderPosMap.get("pdbx_strand_id") <= lineData.length - 1) {
+                    FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
                 }
-
-                // remember how many data items we already saw
-                seenColumns = (seenColumns + lineData.length >= colHeaderPosMap.size() ? 0 : seenColumns + lineData.length);
             } 
         } else {
             if (lineData.length > 0 && lineData[0].equals("_entity_poly.pdbx_strand_id")) {
