@@ -182,11 +182,11 @@ class CifParser {
 
                     if (inString) {
                         // reset interrupted line
-                        interruptedLine = line.substring(1, line.length());
+                        interruptedLine = line.substring(0, line.length());  // keep the semicolon to hide special characters inside
                         continue;  // parse line when it is built together
                     } else {
                         // after ending a string parse the combined line
-                        line = interruptedLine;
+                        line = interruptedLine + ";";  // / keep the semicolon to hide special characters inside
                     }
                 }
                 // from now on: cannot be inString and line should always hold all data items (not splitted)
@@ -215,7 +215,7 @@ class CifParser {
                     }
                 }
                 // from now on: not in loop column header definition
-                
+                              
                 // get the data items
                 lineData = lineToArray(line);
                                
@@ -905,38 +905,94 @@ class CifParser {
     
     /**
      * Returns an array of 'words' seperated by an arbitrary amount of spaces. Considers in-line strings.
+     * @param handleSpecialCharacters whether single and double quotation should be considered.
+     *   Should be false whenever a combined multi-line string is provided and true otherwise.
      * @param line
      * @return
      */
     private static String[] lineToArray(String line) {
-        String tmpReturnList[] = new String[line.split(" ").length + 1];
+        ArrayList<String> dataItemList = new ArrayList<>();
         String tmpItem = "";
-        int counterValues = 0;
         boolean inLineString = false;
+        boolean inLineQuote = false;
+        boolean inMultiString = false;  // surrounded by semi-colon and hides everything
+        
+        // used to  determine whether single-quotation starts in-line string
+        Character prev_char;
+        Character next_char;
         
         for (int i = 0; i < line.length(); i++) {
-            switch (line.charAt(i)) {
-                case ' ':
-                    if (!inLineString) {
-                        if (tmpItem.length() > 0) {
-                            tmpReturnList[counterValues] = tmpItem;                   
-                            counterValues++;
-                            tmpItem = "";
-                        }
+            
+            if (inMultiString) {
+                // accept everything but ending semi-colon
+                if (line.charAt(i) == ';') {
+                    inMultiString = false;
+                } else {
+                    tmpItem += line.charAt(i);
+                }
+            } else {
+            
+                if (inLineQuote) {
+                    // accept everything but ending quote
+                    if (line.charAt(i) == '"') {
+                        inLineQuote = false;
                     } else {
                         tmpItem += line.charAt(i);
                     }
-                    break;
-                case '\'':
-                    inLineString = !inLineString;
-                    break;
-                default:
-                    tmpItem += line.charAt(i);
+                } else {
+
+                    // if there is previous / next character assign it, else assign ' ', i.e., handle single quoations on start / end as in-line string
+                    prev_char = (i > 0 ? line.charAt(i - 1) : ' ');
+                    next_char = (i < line.length() - 1 ? line.charAt(i + 1) : ' ');
+
+                    switch (line.charAt(i)) {
+                        case ' ':
+                            if (!inLineString) {
+                                if (tmpItem.length() > 0) {
+                                    dataItemList.add(tmpItem);                   
+                                    tmpItem = "";
+                                }
+                            } else {
+                                tmpItem += line.charAt(i);
+                            }
+                            break;
+                        case '"':
+                            inLineQuote = true;
+                            break;
+                        case ';':
+                            inMultiString = true;
+                            break;
+                        case '\'':
+                            if (!inLineString && prev_char == ' ') {
+                                inLineString = true;
+                                break;
+                            } else {
+                                if (inLineString && next_char == ' ') {
+                                    inLineString = false;
+                                    break;
+                                }
+                            }
+                            // if arriving here, it is an in-word single quotation mark
+                            tmpItem += line.charAt(i);
+                            break;
+                        default:
+                            tmpItem += line.charAt(i);
+                    }
+                }
             }
         }
+        
+        // lines appear to end with a whitespace, still care for when they do not
+        if (tmpItem.length() > 0) {
+            dataItemList.add(tmpItem);
+        }
+        
+        if (inLineString) {
+            DP.getInstance().w("FP_CIF", "In line " + numLine + " an not ending inline-string (single quotation mark) was found. Is the file correct? Trying to ignore it.");
+        }
 
-        // return Array without null entries
-        return Arrays.copyOfRange(tmpReturnList, 0, counterValues);
+        // return Array instead of list
+        return dataItemList.toArray(new String[dataItemList.size()]);
     }
     
     
