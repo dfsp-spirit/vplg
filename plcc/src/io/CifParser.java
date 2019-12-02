@@ -47,12 +47,12 @@ class CifParser {
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
     
     // - - - vars for parsing - - -
-    private static Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
+    private static Boolean dataBlockFound = false;  // for now only parse the first data block (stop if seeing 2nd block)
     private static Integer numLine = 0;
     private static Boolean inLoop = false;
     private static Boolean inString = false;
     private static String[] lineData;  // array which holds the data items from one line (seperated by spaces)
-    private static String interruptedLine;  // used to build up a line that is interrupted by a multi-line string
+    private static String interruptedLine = "";  // used to build up a line that is interrupted by a multi-line string
     
     // - - variables for one loop (reset when hitting new loop) - -
     private static String currentCategory = null;
@@ -141,7 +141,7 @@ class CifParser {
             String line;
             while ((line = in.readLine()) != null) {
                 numLine ++;
-                               
+                                               
                 //
                 // - - control sequences - -
                 //
@@ -170,31 +170,27 @@ class CifParser {
                 // from now on: line does not start with '#' (is no comment)
                 
                 // - - handle multi-line strings - -
-                // check if line is part of a multi-line string
-                if (inString) {
-                    interruptedLine += line;
-                    continue;  // parse combined line, nothing else to parse here
-                }
-                
                 // check if line encloses a string
                 if (line.startsWith(";")) {
                     inString = !inString;
-
-                    if (inString) {
-                        // reset interrupted line
-                        interruptedLine = line.substring(0, line.length());  // keep the semicolon to hide special characters inside
-                        continue;  // parse line when it is built together
-                    } else {
-                        // after ending a string parse the combined line
-                        line = interruptedLine + ";";  // / keep the semicolon to hide special characters inside
+                    
+                    if (!inString) {
+                        interruptedLine += ";";  // parse combined line
                     }
                 }
-                // from now on: cannot be inString and line should always hold all data items (not splitted)
+                
+                // check if line is part of a multi-line string
+                if (inString) {
+                    interruptedLine += line;  // keep the semicolon to hide special characters inside. reset is done after switch/case treating a (combined) line
+                    continue;  // only parse combined line, nothing else to parse here
+                }
+                // from now on: cannot be inString and line should always hold all data items (not splitted), despite when new line and single quotation string
                 
                 //
                 // - - parse data - -
                 //
-                // check for data block
+                
+                // check for data block - do this FIRST b/c line is too short for a 'normal' line
                 if (line.startsWith("data_")) {
                     if (! handleDataLine(line)) {
                         // encountered second data block -> stop here
@@ -206,7 +202,7 @@ class CifParser {
                 }
                 // from now on: not in data block line
                 
-                // check for category
+                // check for category - do this SECOND b/c column header are too short for a 'normal' line
                 if (line.startsWith("_")) {
                     currentCategory = line.split("\\.")[0];
                     if (inLoop) {
@@ -215,10 +211,22 @@ class CifParser {
                     }
                 }
                 // from now on: not in loop column header definition
-                              
+                
                 // get the data items
+                if (! interruptedLine.equals("")) {
+                    // we want to combine the line with previous line(s)
+                    line = interruptedLine;
+                    interruptedLine = "";
+                }
                 lineData = lineToArray(line);
-                               
+                
+                // check for minimum lenght of lineData (2 for non-loop and #header for loop) and merge with coming line if not
+                if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 2)) {
+                    interruptedLine += line + " ";
+                    continue;
+                }
+                // from now on: line contains expected lenght of data items
+        
                 switch(currentCategory) {
                 case "_exptl":
                     // check for experimental method
@@ -246,6 +254,9 @@ class CifParser {
                     // if in no (wanted) category we can continue
                     continue;
                 }
+                
+                // reset here, b/c we only get here when a (combined) line was treated
+                interruptedLine = "";
 
 
             } // end of reading in lines
@@ -356,7 +367,7 @@ class CifParser {
      * Saves the value in metaData.
      */
     private static void handleExptlLine() {
-        if (lineData.length > 1 && lineData[0].equals("_exptl.method")) {
+        if (lineData[0].equals("_exptl.method")) {
             if (valueIsAssigned(lineData[1])) {
                 metaData.put("experiment", lineData[1]);
             }
@@ -369,7 +380,7 @@ class CifParser {
      * defining the resolution. Saves the value in metaData. Is probably not the best way to extract the resolution.
      */
     private static void handleResolutionLine() {
-        if (lineData.length > 1 && (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high"))) {
+        if (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high")) {
             if (valueIsAssigned(lineData[1])) {
                 metaData.put("resolution", lineData[1]);
             }
@@ -385,13 +396,11 @@ class CifParser {
             // TODO
         } else {
             // no loop just category.item and data per line
-            if (lineData.length > 1) {
-                if (lineData[0].equals("_entity.id")) {
-                    entityInformation.put(lineData[1], new HashMap<String, String>());
-                } else {
-                    // we only have on entity, so add the information to the only entity ID
-                    entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0], lineData[1]);
-                }
+            if (lineData[0].equals("_entity.id")) {
+                entityInformation.put(lineData[1], new HashMap<String, String>());
+            } else {
+                // we only have one entity, so add the information to the only entity ID
+                entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0], lineData[1]);
             }
         }
     }
@@ -403,7 +412,6 @@ class CifParser {
      */
     private static void handleEntityPolyLine() {
         if (inLoop) {
-            
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 // we need to make sure that line holds _entity_poly.pdbx_strand_id, but the information my be split over multiple lines
                 //   so remember how many data items we already saw in seenColumns
@@ -412,10 +420,8 @@ class CifParser {
                 }
             } 
         } else {
-            if (lineData.length > 0 && lineData[0].equals("_entity_poly.pdbx_strand_id")) {
-                if (lineData.length > 1) {
-                    FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
-                }
+            if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
+                FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
             }
         }
     }
