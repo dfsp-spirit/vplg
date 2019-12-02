@@ -165,6 +165,7 @@ class CifParser {
                     columnsChecked = false;
                     currentCategory = null;
                     inString = false;
+                    interruptedLine = "";
                     continue;  // nothing else to do / parse here
                 }
                 // from now on: line does not start with '#' (is no comment)
@@ -225,6 +226,9 @@ class CifParser {
                     interruptedLine += line + " ";
                     continue;
                 }
+                if ((inLoop && lineData.length > colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length > 2)) {
+                    DP.getInstance().w("FP_CIF", "Line " + numLine + " (together with previous if combined) seems to be too long. Trying to ignore it, but may miss data.");
+                }
                 // from now on: line contains expected lenght of data items
         
                 switch(currentCategory) {
@@ -250,9 +254,6 @@ class CifParser {
                     // check for atom coordinate data
                     handleAtomSiteLine();
                     break;
-                default:
-                    // if in no (wanted) category we can continue
-                    continue;
                 }
                 
                 // reset here, b/c we only get here when a (combined) line was treated
