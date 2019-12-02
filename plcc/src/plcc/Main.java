@@ -13142,11 +13142,16 @@ public class Main {
         for(Integer i = 0; i < resContacts.size(); i++){
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getMolA().getChainID());
             ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getMolB().getChainID());
-           
+                      
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
             
-            
+            // only fill top-right part of matrix
+            if (chainAint > chainBint) {
+                int tmpSave = chainAint;
+                chainAint = chainBint;
+                chainBint = tmpSave;
+            }
             
             // We only want interchain contacts
             if (!chainA.equals(chainB)){
@@ -13158,7 +13163,7 @@ public class Main {
             }
         }
         
-        
+            
         ArrayList<String> conInfo = new ArrayList<String>();
         conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
                   + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");

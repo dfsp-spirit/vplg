@@ -431,8 +431,13 @@ public class ComplexGraph extends UAdjListGraph {
                     ig2.setFont(labelfont);
                     ig2.setPaint(Color.BLACK);
                     Integer cInteractions = cg.numChainInteractions[i][j];
+                    
                     if(cInteractions != null) {
                         ig2.drawString(cInteractions.toString(), labelPosX, labelPosY + (stringHeight / 4));
+                    } else {
+                        // This may happen if not the top-right part of the numChainInteractions is filled (due to some different ordering in the chains)
+                        DP.getInstance().w("ComplexGraph", "Tried to read out a null entry from numChainInteractions while writing the edge weights in the chain-level CG. "
+                                + "This is probably a programming error, so please inform the developers.");
                     }
 
                 }
