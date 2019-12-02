@@ -260,7 +260,7 @@ class CifParser {
                 interruptedLine = "";
 
 
-            } // end of reading in lines
+            } // end of reading in lines           
 	} catch (IOException e) {
             System.err.println("ERROR: Could not parse PDB file.");
             System.err.println("ERROR: Message: " + e.getMessage());
@@ -394,7 +394,15 @@ class CifParser {
      */
     private static void handleEntityLine() {
         if (inLoop) {
-            // TODO
+            String tmpEntityID = lineData[0];
+            entityInformation.put(tmpEntityID, new HashMap<String, String>());
+            
+            // get all available information per entity, despite ID (saved as superior key)
+            for (String colHeader : colHeaderPosMap.keySet()) {
+                if (! colHeader.equals("id")) {
+                    entityInformation.get(tmpEntityID).put(colHeader, lineData[colHeaderPosMap.get(colHeader)]);
+                }
+            }
         } else {
             // no loop just category.item and data per line
             if (lineData[0].equals("_entity.id")) {
