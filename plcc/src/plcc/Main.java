@@ -13148,19 +13148,14 @@ public class Main {
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
             
-            // only fill top-right part of matrix
-            if (chainAint > chainBint) {
-                int tmpSave = chainAint;
-                chainAint = chainBint;
-                chainBint = tmpSave;
-            }
-            
             // We only want interchain contacts
             if (!chainA.equals(chainB)){
                 if(compGraph.numChainInteractions[chainAint][chainBint] == null){
                     compGraph.numChainInteractions[chainAint][chainBint] = 1;
+                    compGraph.numChainInteractions[chainBint][chainAint] = 1;
                 } else {
                     compGraph.numChainInteractions[chainAint][chainBint]++;
+                    compGraph.numChainInteractions[chainBint][chainAint]++;
                 }
             }
         }
