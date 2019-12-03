@@ -141,7 +141,7 @@ class CifParser {
             String line;
             while ((line = in.readLine()) != null) {
                 numLine ++;
-                                               
+                                                             
                 //
                 // - - control sequences - -
                 //
@@ -177,6 +177,7 @@ class CifParser {
                     
                     if (!inString) {
                         interruptedLine += ";";  // parse combined line
+                        line = "";  // so we dont add it multiple times and with space
                     }
                 }
                 
@@ -191,7 +192,7 @@ class CifParser {
                 // - - parse data - -
                 //
                 
-                // check for data block - do this FIRST b/c line is too short for a 'normal' line
+                // 1) check for data block - do this FIRST b/c line is too short for a 'normal' line
                 if (line.startsWith("data_")) {
                     if (! handleDataLine(line)) {
                         // encountered second data block -> stop here
@@ -203,7 +204,7 @@ class CifParser {
                 }
                 // from now on: not in data block line
                 
-                // check for category - do this SECOND b/c column header are too short for a 'normal' line
+                // 2) check for category - do this SECOND b/c column header are too short for a 'normal' line
                 if (line.startsWith("_")) {
                     currentCategory = line.split("\\.")[0];
                     if (inLoop) {
@@ -216,14 +217,14 @@ class CifParser {
                 // get the data items
                 if (! interruptedLine.equals("")) {
                     // we want to combine the line with previous line(s)
-                    line = interruptedLine;
+                    line = interruptedLine + " " + line;
                     interruptedLine = "";
                 }
                 lineData = lineToArray(line);
                 
                 // check for minimum lenght of lineData (2 for non-loop and #header for loop) and merge with coming line if not
                 if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 2)) {
-                    interruptedLine += line + " ";
+                    interruptedLine += line;
                     continue;
                 }
                 if ((inLoop && lineData.length > colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length > 2)) {
@@ -302,6 +303,9 @@ class CifParser {
                 }
             }
         }
+        
+        // create all protein meta data from entityInformation
+        fillProteinMetaData();
         
         // add empty Strings to metadata to avoid SQL null errors
         fillMetadataEmptyStrings();
@@ -393,14 +397,17 @@ class CifParser {
      * 
      */
     private static void handleEntityLine() {
+        String tmpValue;
+        
         if (inLoop) {
             String tmpEntityID = lineData[0];
             entityInformation.put(tmpEntityID, new HashMap<String, String>());
-            
+                        
             // get all available information per entity, despite ID (saved as superior key)
             for (String colHeader : colHeaderPosMap.keySet()) {
                 if (! colHeader.equals("id")) {
-                    entityInformation.get(tmpEntityID).put(colHeader, lineData[colHeaderPosMap.get(colHeader)]);
+                    tmpValue = (valueIsAssigned(lineData[colHeaderPosMap.get(colHeader)]) ? lineData[colHeaderPosMap.get(colHeader)] : null);  // assign value or null
+                    entityInformation.get(tmpEntityID).put(colHeader, (valueIsAssigned(tmpValue) ? tmpValue : ""));
                 }
             }
         } else {
@@ -409,7 +416,8 @@ class CifParser {
                 entityInformation.put(lineData[1], new HashMap<String, String>());
             } else {
                 // we only have one entity, so add the information to the only entity ID
-                entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0], lineData[1]);
+                tmpValue = (valueIsAssigned(lineData[1]) ? lineData[1] : null);  // assign value or null
+                entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0].split("\\.")[1], tmpValue);
             }
         }
     }
@@ -422,11 +430,7 @@ class CifParser {
     private static void handleEntityPolyLine() {
         if (inLoop) {
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
-                // we need to make sure that line holds _entity_poly.pdbx_strand_id, but the information my be split over multiple lines
-                //   so remember how many data items we already saw in seenColumns
-                if (colHeaderPosMap.get("pdbx_strand_id") <= lineData.length - 1) {
-                    FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
-                }
+                FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
             } 
         } else {
             if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
@@ -1021,6 +1025,39 @@ class CifParser {
                 metaData.put(field, "");
             }
         }
+    }
+    
+    
+    /**
+     * Fills allProteinMetaInfos from entityInformation. PMIs already have to be created (e.g. during parsing and creation of chains).
+     */
+    private static void fillProteinMetaData() {
+        String tmpValue;
+        HashMap <String, String> tmpEntityInfo;
+
+        for (ProtMetaInfo pmi : allProteinMetaInfos) {
+            tmpEntityInfo = entityInformation.get(pmi.getMacromolID());
+
+            // pdbx_description -> molName
+            tmpValue = tmpEntityInfo.get("pdbx_description");
+            if (tmpValue != null) {
+                pmi.setMolName(tmpValue);
+            } 
+            
+            // pdbx_ec -> ecnumber
+            tmpValue = tmpEntityInfo.get("pdbx_ec");
+            if (tmpValue != null) {
+                pmi.setECNumber(tmpValue);
+            }
+            
+            // FileParser.homologuesMap -> allMolChains
+            //   seems like this is never used, but cant hurt to fill it, since we have the information
+            tmpValue = FileParser.homologuesMap.get(pmi.getChainid()).toString().replace("[", "").replace("]", "");
+            if (tmpValue != null) {
+                tmpValue = (tmpValue.length() > 0 ? tmpValue + ", " + pmi.getChainid() : pmi.getChainid());  // include your own ID as it says '>all', but only append if there are other chains
+                pmi.setAllMolChains(tmpValue);
+            }   
+        }       
     }
     
     /**
