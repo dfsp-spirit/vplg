@@ -400,7 +400,8 @@ public class ProtMetaInfo {
     public void print() {
         System.out.println("| Printing data on ProtMetaInfo for protein " + this.pdbid + ", chain " + this.chainid + ".");
         System.out.println("| molID=" + this.macromolID + ", molName=" + this.molName + ", orgScientific=" + this.orgScientific);
-        System.out.println("| orgCommon=" + this.orgCommon + ", orgTaxid=" + this.orgTaxid);
+        System.out.println("| orgCommon=" + this.orgCommon + ", orgTaxid=" + this.orgTaxid + ", ecNumber=" + this.ecnumber);
+        System.out.println("| allMolChains=" + this.allmolchains);
     }
 
 
