@@ -638,7 +638,6 @@ public class FileParser {
     
     public static ProtMetaInfo getMetaInfo(String pdbid, String chain) {
         if (settingCif()) {
-            DP.getInstance().w("FP", "Parsing of protein chain meta information not fully implemented for CIF parser. Providing what we have got.");
             return CifParser.getProteinMetaInfo(pdbid, chain);
         } else {
             return LegacyParser.getMetaInfo(pdbid, chain);
