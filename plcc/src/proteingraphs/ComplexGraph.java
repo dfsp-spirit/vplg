@@ -61,6 +61,7 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numAllInteractionsMap;
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
+    public Map<Vertex, String> molMap;  // contains for each vertex (= protein chain) the corresponding molecule name
     public Map<List<Integer>, Integer> numSSEContacts;
     public Map<List<Integer>, List<String>> numSSEContactChainNames;
 
@@ -95,6 +96,7 @@ public class ComplexGraph extends UAdjListGraph {
         numAllInteractionsMap = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
         proteinNodeMap = createVertexMap();
+        molMap = createVertexMap();
         chainNamesInEdge = createEdgeMap();
         numSSEContacts = new HashMap<>();
         numSSEContactChainNames = new HashMap<>();
@@ -673,7 +675,7 @@ public class ComplexGraph extends UAdjListGraph {
             }
         }
 
-        GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge> gw = new GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge>(this);
+        GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge> gw = new GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge>(this);        
         gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
             @Override
             public String getAttribute() {
@@ -688,6 +690,24 @@ public class ComplexGraph extends UAdjListGraph {
             @Override
             public String write(Vertex o) {
                 return '"' + proteinNodeMap.get(o).toString() + '"';
+            }
+        });
+        
+        // add a new line per node holding the chain's molecule name
+        gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
+            @Override
+            public String getAttribute() {
+                return "mol_name";
+            }
+
+            @Override
+            public boolean hasValue(Vertex o) {
+                return molMap.containsKey(o);
+            }
+
+            @Override
+            public String write(Vertex o) {
+                return '"' + molMap.get(o) + '"';
             }
         });
 
@@ -714,7 +734,7 @@ public class ComplexGraph extends UAdjListGraph {
             }
 
         });
-
+       
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));

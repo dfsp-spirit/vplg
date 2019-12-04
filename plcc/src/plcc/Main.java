@@ -13087,6 +13087,7 @@ public class Main {
         for(Integer i = 0; i < allChains.size(); i++) {
             ComplexGraph.Vertex v = compGraph.createVertex();
             compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
+            compGraph.molMap.put(v, FileParser.getMetaInfo(pdbid, allChains.get(i).getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
 
             // get AA sequence string for each chainName
             for(Residue resi : allChains.get(i).getResidues()){
