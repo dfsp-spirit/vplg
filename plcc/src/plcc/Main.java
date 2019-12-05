@@ -13128,6 +13128,8 @@ public class Main {
                     if (allChains.get(i).getHomologues() != null) {
                         if ((allChains.get(i).getHomologues().contains(compareChainID)) && (!Objects.equals(i, j))) {
                             compGraph.homologueChains[i][j] = 1;
+                            // fill bottom-left and top-right triangle of matrix (required since chains are unordered b/c of speedup)
+                            compGraph.homologueChains[j][i] = 1;
                         } else {
                             compGraph.homologueChains[i][j] = 0;
                         }
