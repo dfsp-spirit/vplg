@@ -5031,7 +5031,7 @@ public class Main {
         System.out.println("chainMaxSeqNeighborAAResDist " + maxSequenceNeighborDist);
         */
 
-        if(spaceBetweenResidues > maxSequenceNeighborDist) {
+        if(spaceBetweenResidues > maxSequenceNeighborDist) {           
             numResToSkip = spaceBetweenResidues / maxSequenceNeighborDist;
 
             if(Settings.getInteger("plcc_I_debug_level") >= 2) {
@@ -5148,7 +5148,7 @@ public class Main {
             if (Settings.getBoolean("plcc_B_write_lig_geolig")) {
                 for (int i = 0; i < ligResiduesA.size(); i++) {
                     res1 = ligResiduesA.get(i);
-                    
+                                       
                     // 2.1)
                     // here we have to start at j = 0 b/c it is another list!
                     for (int j = 0; j < AAResiduesA.size(); j++) {
@@ -5223,7 +5223,7 @@ public class Main {
             //   2.1) res2 = AA -> seq neigh skip
             //   2.2) res2 = lig -> no skip possible b/c we do not calculate MaxSeqNeighborDist for ligands
             // 3) res1 = lig (from other chain)
-            //   3.1) res2 = AA (from other chain) -> seq neigh skip
+            //   3.1) res2 = AA (from THIS chain) -> seq neigh skip
             
             for (int l = k + 1; l < chainCount; l++) {
                 
@@ -5235,13 +5235,11 @@ public class Main {
                     continue;
                 }
                 
-                // vars for possible swapping of inner and outer loop to maximize skips
+                // vars for possible swapping of inner and outer loop to maximize skips -> only for loop 1.1) b/c we have no maxSeqNeighborDist for ligands!
                 ArrayList<Residue> innerLoopChainAAs = new ArrayList<>();
                 ArrayList<Residue> outerLoopChainAAs = new ArrayList<>();
-                ArrayList<Residue> innerLoopChainLigs = new ArrayList<>();
-                ArrayList<Residue> outerLoopChainLigs = new ArrayList<>();
-                int innerChainMaxSeqNeighborAADist, outerChainMaxSeqNeighborAADist;
-                innerChainMaxSeqNeighborAADist = outerChainMaxSeqNeighborAADist = 0;  // value needs to be initialized for Netbeans, just take something small
+                int innerChainMaxSeqNeighborAADist;
+                innerChainMaxSeqNeighborAADist = 0;  // value needs to be initialized for Netbeans, just take something small
 
                 // check chain overlap
                 if (chainA.contactPossibleWithChain(chainB)) {
@@ -5251,24 +5249,18 @@ public class Main {
                     ligResiduesB.addAll(chainB.getAllLigandResidues());
 
                     Integer chainBMaxSeqNeighborAADist = chainB.getMaxSeqNeighborAADist();
-                    
-                    // decide which chain as 2 (used for skip), atm just take longer chain as 2
-                    if (chainANumberResidues > chainBNumberResidues) {
+                                       
+                    // decide which chain as 2 (used for skip in loop 1.1), atm just take longer chain as 2
+                    if (chainA.getAllAAResidues().size() > chainB.getAllAAResidues().size()) {
                         outerLoopChainAAs.addAll(AAResiduesB);
-                        outerLoopChainLigs.addAll(ligResiduesB);
                         innerLoopChainAAs.addAll(AAResiduesA);
-                        innerLoopChainLigs.addAll(ligResiduesA);
                         innerChainMaxSeqNeighborAADist = chainBMaxSeqNeighborAADist;
-                        outerChainMaxSeqNeighborAADist = chainAMaxSeqNeighborAADist;
                     } else {
                         outerLoopChainAAs.addAll(AAResiduesA);
-                        outerLoopChainLigs.addAll(ligResiduesA);
                         innerLoopChainAAs.addAll(AAResiduesB);
-                        innerLoopChainLigs.addAll(ligResiduesB);
                         innerChainMaxSeqNeighborAADist = chainAMaxSeqNeighborAADist;
-                        outerChainMaxSeqNeighborAADist = chainBMaxSeqNeighborAADist;
                     }
-                    
+                                       
                     // 1)
                     for (int i = 0; i < outerLoopChainAAs.size(); i++) {
 
@@ -5311,15 +5303,15 @@ public class Main {
                     if (Settings.getBoolean("plcc_B_write_lig_geolig")) {
                         
                         // 2)
-                        for (int i = 0; i < outerLoopChainLigs.size(); i++) {
+                        for (int i = 0; i < ligResiduesA.size(); i++) {
 
-                            res1 = outerLoopChainLigs.get(i);
-
+                            res1 = ligResiduesA.get(i);
+                            
                             // 2.1)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
-                            for (int j = 0; j < innerLoopChainAAs.size(); j++) {
+                            for (int j = 0; j < AAResiduesB.size(); j++) {
 
-                                res2 = innerLoopChainAAs.get(j);
+                                res2 = AAResiduesB.get(j);
 
                                 if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                     if(! silent) {
@@ -5342,7 +5334,7 @@ public class Main {
                                 }
                                 else {
                                     numResContactsImpossible++;
-                                    numResToSkip = calculateSkipNeighborNum(res1, res2, innerChainMaxSeqNeighborAADist, j, innerLoopChainAAs.size());
+                                    numResToSkip = calculateSkipNeighborNum(res1, res2, chainBMaxSeqNeighborAADist, j, AAResiduesB.size());
                                     j += numResToSkip;
                                     seqNeighSkippedResInterChain += numResToSkip;                            
                                 }
@@ -5350,9 +5342,9 @@ public class Main {
                             
                             // 2.2)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
-                            for (int j = 0; j < innerLoopChainLigs.size(); j++) {
+                            for (int j = 0; j < ligResiduesB.size(); j++) {
 
-                                res2 = innerLoopChainLigs.get(j);
+                                res2 = ligResiduesB.get(j);
 
                                 if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                     if(! silent) {
@@ -5383,15 +5375,15 @@ public class Main {
                         
                         // 3)
                         // HINT: for this nested loop outer and inner are swapped: this way we can profit from the lig-AA skipping
-                        for (int i = 0; i < innerLoopChainLigs.size(); i++) {
+                        for (int i = 0; i < ligResiduesB.size(); i++) {
 
-                            res1 = innerLoopChainLigs.get(i);
+                            res1 = ligResiduesB.get(i);
 
                             // 3.1)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
-                            for (int j = 0; j < outerLoopChainAAs.size(); j++) {
+                            for (int j = 0; j < AAResiduesA.size(); j++) {
 
-                                res2 = outerLoopChainAAs.get(j);
+                                res2 = AAResiduesA.get(j);
 
                                 if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                     if(! silent) {
@@ -5414,7 +5406,7 @@ public class Main {
                                 }
                                 else {
                                     numResContactsImpossible++;
-                                    numResToSkip = calculateSkipNeighborNum(res1, res2, outerChainMaxSeqNeighborAADist, j, outerLoopChainAAs.size());
+                                    numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                                     j += numResToSkip;
                                     seqNeighSkippedResInterChain += numResToSkip;                            
                                 }
