@@ -932,7 +932,7 @@ class CifParser {
     private static String[] lineToArray(String line) {
         ArrayList<String> dataItemList = new ArrayList<>();
         String tmpItem = "";
-        boolean inLineString = false;
+        boolean inLineString = false;  // marked by single-quoation mark
         boolean inLineQuote = false;
         boolean inMultiString = false;  // surrounded by semi-colon and hides everything
         
@@ -942,64 +942,68 @@ class CifParser {
         
         for (int i = 0; i < line.length(); i++) {
             
+            char tmpChar = line.charAt(i);
+            
             if (inMultiString) {
                 // accept everything but ending semi-colon
-                if (line.charAt(i) == ';') {
+                if (tmpChar == ';') {
                     inMultiString = false;
-                } else {
-                    tmpItem += line.charAt(i);
+                    continue;
                 }
             } else {
             
                 if (inLineQuote) {
                     // accept everything but ending quote
-                    if (line.charAt(i) == '"') {
+                    if (tmpChar == '"') {
                         inLineQuote = false;
-                    } else {
-                        tmpItem += line.charAt(i);
+                        continue;
                     }
                 } else {
-
+                    
                     // if there is previous / next character assign it, else assign ' ', i.e., handle single quoations on start / end as in-line string
                     prev_char = (i > 0 ? line.charAt(i - 1) : ' ');
                     next_char = (i < line.length() - 1 ? line.charAt(i + 1) : ' ');
+                    
+                    if (inLineString) {
+                        // accept everything but ending single-quote
+                        if (tmpChar == '\'' && next_char == ' ') {
+                            inLineString = false;
+                            continue;
+                        }
+                    } else {
+                        // we are not in multi-line, single-line string or quotation
 
-                    switch (line.charAt(i)) {
-                        case ' ':
-                            if (!inLineString) {
+                        switch (tmpChar) {
+                            case ' ':
                                 if (tmpItem.length() > 0) {
                                     dataItemList.add(tmpItem);                   
                                     tmpItem = "";
                                 }
-                            } else {
-                                tmpItem += line.charAt(i);
-                            }
-                            break;
-                        case '"':
-                            inLineQuote = true;
-                            break;
-                        case ';':
-                            inMultiString = true;
-                            break;
-                        case '\'':
-                            if (!inLineString && prev_char == ' ') {
-                                inLineString = true;
                                 break;
-                            } else {
-                                if (inLineString && next_char == ' ') {
-                                    inLineString = false;
-                                    break;
+                            case '"':
+                                inLineQuote = true;
+                                break;
+                            case ';':
+                                inMultiString = true;
+                                break;
+                            case '\'':
+                                if (prev_char == ' ') {
+                                    inLineString = true;
+                                } else {
+                                    // in-word single-quotation, e.g., 5'-O
+                                    tmpItem += tmpChar;
                                 }
-                            }
-                            // if arriving here, it is an in-word single quotation mark
-                            tmpItem += line.charAt(i);
-                            break;
-                        default:
-                            tmpItem += line.charAt(i);
-                    }
-                }
-            }
-        }
+                                break;
+                            default:
+                                tmpItem += tmpChar;
+                        }  // end of switch-case
+                        continue;
+                    }  // end of in-lineString
+                }  // end of if in-quote
+            }  // end of if in-multiString
+            // only reached when in some flagged part and end not reached, so simply add character
+            tmpItem += tmpChar;
+        }  // end of for-loop over line's characters
         
         // lines appear to end with a whitespace, still care for when they do not
         if (tmpItem.length() > 0) {
