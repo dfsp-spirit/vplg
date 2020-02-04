@@ -350,8 +350,8 @@ class CifParser {
         else {
             dataBlockFound = true;
             if (line.length() > 5) {
+                pdbID = line.substring(5, line.length()).toLowerCase();
                 if (! silent) {
-                    pdbID = line.substring(5, line.length()).toLowerCase();
                     System.out.println("  PDB: Found the first data block named: " + pdbID);
                 }
             }
@@ -1166,7 +1166,7 @@ class CifParser {
         
         // reaching this code only if chain didnt exist
         //   that means that also not ProtMetaInfo exists, so create one here
-        Chain c = new Chain(cID);
+        Chain c = new Chain(cID);      
         ProtMetaInfo pmi = new ProtMetaInfo(pdbID, cID);
         
         c.setModel(m);

@@ -47,7 +47,7 @@ public class DsspParser {
      */
     protected static void initVariables(String df) {
         dsspFile = df;
-        silent = silent;
+        silent = Settings.getBoolean("plcc_B_silent");
         
         // read all lines of the files into lists
         if(! silent) {

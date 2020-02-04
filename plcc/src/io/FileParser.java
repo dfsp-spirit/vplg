@@ -98,6 +98,8 @@ public class FileParser {
      * @param pf PDB file path
      */
     protected static void initVariables(String pf) {
+        silent = Settings.getBoolean("plcc_B_silent");
+        
         pdbFile = pf;
         
         // read all lines of the files into lists
