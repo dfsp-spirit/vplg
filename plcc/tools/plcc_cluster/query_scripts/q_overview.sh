@@ -7,14 +7,20 @@ PGPASSWORD="vplg"
 echo "Number of pdb_ids:"
 psql $PSQL_OPTIONS -c 'SELECT count(pdb_id) from plcc_protein;'
 
-echo "Finished insertion:"
-psql $PSQL_OPTIONS -c "SELECT COUNT(*) FROM plcc_protein WHERE insert_completed = 't'"
+echo "Number of completed pdb_ids:"
+psql $PSQL_OPTIONS -c "SELECT count(pdb_id) from plcc_protein WHERE insert_completed = 't';"
 
-echo "Aborted insertion:"
-psql $PSQL_OPTIONS -c "SELECT COUNT(*) FROM plcc_protein WHERE insert_completed = 'f'"
+echo ".. including large structures:"
+psql $PSQL_OPTIONS -c "SELECT count(pdb_id) from plcc_protein WHERE insert_completed = 't' AND is_large_structure = 't';"
+
+echo "Number of uncompleted pdb_ids:"
+psql $PSQL_OPTIONS -c "SELECT count(pdb_id) from plcc_protein WHERE insert_completed = 'f';"
 
 echo "Number of chains:"
 psql $PSQL_OPTIONS -c 'SELECT count(chain_id) from plcc_chain;'
+
+echo ".. including chains of large structures:"
+psql $PSQL_OPTIONS -c "SELECT count(chain_id) from plcc_chain c, plcc_protein p WHERE c.pdb_id = p.pdb_id AND p.is_large_structure = 't';"
 
 echo "Number of protein graphs:"
 psql $PSQL_OPTIONS -c 'SELECT count(graph_id) from plcc_graph;'
