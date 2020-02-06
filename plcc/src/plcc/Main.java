@@ -5012,41 +5012,46 @@ public class Main {
         // jnw_2019: following taken from old contact computation and adopted such that maxSeqNeighDist without ligands and within each chain
         //   See there for comments how sequence neigbhor skip works in general (removed here for brevity)
         
-        int justToBeSure = 2;  // Account for rounding errors up to justToBeSure Angström (eg. 2 means 0.2)
-        int combinedAtomRadius = 0;
-        long spaceBetweenResidues, numResToSkip;
-        
-        combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
-        combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
-        
-        spaceBetweenResidues = res1.distTo(res2) - (combinedAtomRadius + res1.getSphereRadius() + res2.getSphereRadius() + justToBeSure);
+        if (maxSequenceNeighborDist > 0) {
+            int justToBeSure = 2;  // Account for rounding errors up to justToBeSure Angström (eg. 2 means 0.2)
+            int combinedAtomRadius = 0;
+            long spaceBetweenResidues, numResToSkip;
 
-        //DEBUG
-        /*
-        System.out.println("ResCenterDist: " + res1.distTo(res2));
-        System.out.println("Res1 CenterSphereRadius: " + res1.getSphereRadius());
-        System.out.println("Res2 CenterSphereRadius: " + res2.getSphereRadius());
-        System.out.println("combinedAtomRadius: " + combinedAtomRadius);
-        System.out.println("spaceBetweenResidues: " + spaceBetweenResidues);
-        System.out.println("chainMaxSeqNeighborAAResDist " + maxSequenceNeighborDist);
-        */
+            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
+            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
 
-        if(spaceBetweenResidues > maxSequenceNeighborDist) {           
-            numResToSkip = spaceBetweenResidues / maxSequenceNeighborDist;
+            spaceBetweenResidues = res1.distTo(res2) - (combinedAtomRadius + res1.getSphereRadius() + res2.getSphereRadius() + justToBeSure);
 
-            if(Settings.getInteger("plcc_I_debug_level") >= 2) {
-                System.out.println("  [DEBUG LV 2] Residue skipping kicked in for DSSP res " + res1.getDsspNum() + ", skipped " + numResToSkip + " residues after " + res2.getDsspNum() + " in distance " + res1.distTo(res2));
-            }
+            //DEBUG
+            /*
+            System.out.println("ResCenterDist: " + res1.distTo(res2));
+            System.out.println("Res1 CenterSphereRadius: " + res1.getSphereRadius());
+            System.out.println("Res2 CenterSphereRadius: " + res2.getSphereRadius());
+            System.out.println("combinedAtomRadius: " + combinedAtomRadius);
+            System.out.println("spaceBetweenResidues: " + spaceBetweenResidues);
+            System.out.println("chainMaxSeqNeighborAAResDist " + maxSequenceNeighborDist);
+            */
 
-            // preserve correct statistics if skip
-            // +1 b/c j is incremented after loop body
-            if (currentSeqPos + numResToSkip + 1 > SeqLength) {
-                // only add which are really skipped
-                return SeqLength - currentSeqPos - 1;
+            if(spaceBetweenResidues > maxSequenceNeighborDist) {           
+                numResToSkip = spaceBetweenResidues / maxSequenceNeighborDist;
+
+                if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                    System.out.println("  [DEBUG LV 2] Residue skipping kicked in for DSSP res " + res1.getDsspNum() + ", skipped " + numResToSkip + " residues after " + res2.getDsspNum() + " in distance " + res1.distTo(res2));
+                }
+
+                // preserve correct statistics if skip
+                // +1 b/c j is incremented after loop body
+                if (currentSeqPos + numResToSkip + 1 > SeqLength) {
+                    // only add which are really skipped
+                    return SeqLength - currentSeqPos - 1;
+                } else {
+                    return numResToSkip;
+                }
             } else {
-                return numResToSkip;
+                return 0;
             }
         } else {
+            // Means that there are no residues in the chain, ergo no skip to be calculated -> REALLY?
             return 0;
         }
     }

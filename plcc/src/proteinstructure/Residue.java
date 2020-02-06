@@ -26,9 +26,9 @@ import plcc.Settings;
  */
 public class Residue extends Molecule implements java.io.Serializable {
     
-    //public static final Integer RESIDUE_TYPE_AA = 0;
-    //public static final Integer RESIDUE_TYPE_LIGAND = 1;
-    //public static final Integer RESIDUE_TYPE_OTHER = 2;
+    public static final Integer RESIDUE_TYPE_AA = 0;
+    public static final Integer RESIDUE_TYPE_LIGAND = 1;
+    public static final Integer RESIDUE_TYPE_OTHER = 2;
     
     
     // declare class vars
@@ -39,6 +39,143 @@ public class Residue extends Molecule implements java.io.Serializable {
     
     /** The binding sites, if any, that this residue is part of (for protein residues which are part of the pocket, NOT for ligands which dock into a pocket).  */
     private List<BindingSite> partOfBindingSites;
+    
+    
+    /**
+     * Determines all AltLoc identifiers which have an alpha carbon atom assigned to them for this residue.
+     * @return the list of all altLocs which include alpha carbons
+     */ 
+    protected ArrayList<String> getAltLocsWithAlphaCarbonAtoms() {
+        
+        if(! this.isAA()) {
+            DP.getInstance().w("Non-AA residue cannot contain alpha carbon atom but asked to look for one.");
+        }
+        
+        ArrayList<String> altLocsWithAlphaCarbon = new ArrayList<String>();
+        
+        String candidateAltLoc;
+        for(Atom a : this.atoms) {
+            if(a.isCalphaAtom()) {
+                // Be careful not to add an AltLoc which has several C-alpha 
+                // atoms listed twice (should never happen and makes no sense, but
+                // with PDB files you never know).
+                candidateAltLoc = a.getAltLoc();
+                if( ! altLocsWithAlphaCarbon.contains(candidateAltLoc)) {
+                    altLocsWithAlphaCarbon.add(candidateAltLoc);
+                }
+            }
+        }
+        
+        return altLocsWithAlphaCarbon;
+    }
+    
+    
+    /**
+     * Tells this molecule to choose its alternate location PDB identifier and delete all its
+     * atoms which have other AltLocs. For amino acids, this will choose the AltLoc which has a C-alpha atom
+     * and maximizes the number of atoms in the molecule. For non-AAs, this function will always choose the AltLoc identifier which
+     * maximizes the number of atoms in this molecule. The list of deleted atoms is returned so they can be deleted
+     * from the global atom list as well.
+     * @return the list of the atoms that were deleted
+     */
+    public ArrayList<Atom> chooseYourAltLoc() {
+    
+        int numAtomsBefore = this.atoms.size();
+        if(numAtomsBefore < 1) {
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Molecule " + this.getFancyName() + " of chain " + this.getChainID() + " has NO atoms at all *before* choosing alternative location PDB field and deleting others.");
+            }
+            return new ArrayList<Atom>();
+        }                
+        ArrayList<Atom> deletedAtoms;
+    
+        String chosenAltLoc;
+        if(this.isAA()) {
+            chosenAltLoc = getAltLocWithAlphaCarbonAndMostAtoms();
+        } else {
+            chosenAltLoc = this.getAltLocWithMostAtoms();
+        }
+    
+        int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
+    
+        if((numAtomsWithChosenAltLoc < 1 || numAtomsWithChosenAltLoc > Main.MAX_ATOMS_PER_AA) && this.isAA()) {
+            if( ! Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
+                DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA molecule " + this.getFancyName() + ".");
+            }
+        }
+   
+        
+        
+        deletedAtoms = this.deleteAtomsWithAltLocDifferentFrom(chosenAltLoc);
+                
+        if(this.atoms.size() < 1) {
+            DP.getInstance().w("Molecule  " + this.getFancyName() + " of chain " + this.getChainID() + " has no atoms after choosing alternative location PDB field (had " + numAtomsBefore + " before).");
+        }
+        
+        return deletedAtoms;
+    }
+    
+        /**
+     * Returns the alternate location identifier that most atoms of this molecule share.
+     * @return the most common alternate location identifier of this molecule. If this molecule
+     * has no atoms, a space (" ", the PDB default altLoc) will be returned.
+     */
+       public String getAltLocWithAlphaCarbonAndMostAtoms() {
+        
+        ArrayList<String> altLocsCA = this.getAltLocsWithAlphaCarbonAtoms();
+        if(altLocsCA.size() < 1) {
+            DP.getInstance().w("Molecule  " + this.getFancyName() + " has no AltLoc which includes an alpha carbon atom.");
+            return this.getAltLocWithMostAtoms();
+        }
+        
+        if(altLocsCA.size() == 1) {
+            return altLocsCA.get(0);
+        }
+        
+        String maxAltLoc = " ";
+        
+        // add all altLocs
+        String altLoc;
+        Integer newCount;
+        Integer maxCount = 0;
+        HashMap<String, Integer> atomCountsByAltLoc = new HashMap<String, Integer>();
+        for(Atom a : this.atoms) {
+            altLoc = a.getAltLoc();
+            
+            // skip AltLocs which do not contain C alpha atoms
+            if( ! altLocsCA.contains(altLoc)) {
+                continue;
+            }
+            
+            if(atomCountsByAltLoc.containsKey(altLoc)) {
+                // altLoc already listed, so just increase count
+                newCount = atomCountsByAltLoc.get(altLoc) + 1;
+            } else {
+                // altLoc not listed yet so this is the first atom with this type, put it in there
+                newCount = 1;                
+            }
+            atomCountsByAltLoc.put(altLoc, newCount);
+            
+            // keep track of maximum
+            if(newCount > maxCount) {
+                maxAltLoc = altLoc;
+                maxCount = newCount;
+            }
+        }
+        
+        //DEBUG
+        /*
+        if(this.pdbResNum == 209) {
+            System.out.println("DEBUG: " + atomCountsByAltLoc.keySet().size() + " Alternate locations and their atoms counts for " + this.toString() + ": ");
+            for(String al : atomCountsByAltLoc.keySet()) {
+                System.out.println(" '" + al + "' has " +  atomCountsByAltLoc.get(al) + " atoms (of " + this.atoms.size() + " total).");
+            }
+            System.out.println("DEBUG: MaxAltLoc=" + maxAltLoc + ", maxCount=" + maxCount + ".");
+        }
+        */
+                
+        return maxAltLoc;
+    }
 
     public List<BindingSite> getPartOfBindingSites() {
         return partOfBindingSites;
@@ -141,12 +278,104 @@ public class Residue extends Molecule implements java.io.Serializable {
     
     
     /**
+     * This function determines whether we need to look at the atoms to check for interchain contacts between this residue and a second one.
+     * If the center spheres don't overlap, there cannot exist any atom contacts. Also if both residues are from the same chain, there cannot
+     * exist any interchain atom contacts.
+     * @param r the other residue
+     * @return True if contact is possible, false otherwise.
+     */
+    public Boolean interchainContactPossibleWithResidue (Residue r) {
+        Integer dist = Integer.MAX_VALUE;
+        try {
+            dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
+        } catch(Exception e) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
+            }
+            return(false);
+        }
+        Integer atomRadius;
+        if(this.isLigand() || r.isLigand()) {
+            atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
+        }
+        else {
+            atomRadius = 40; //Settings.getInteger("plcc_I_atom_radius");
+        }
+
+        Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2);
+
+        //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
+        //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
+
+        if(dist > (maxDistForContact) || ((this.isAA() || r.isAA()) && (this.getChainID().equals(r.getChainID())))) {
+            return(false);
+        }
+        else {
+            return(true);
+        }
+    }
+    
+    
+    /**
+     * This function determines whether we need to look at the atoms to check for contacts betweens
+     * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
+     * @param r the other residue
+     */
+    public Boolean contactPossibleWithResidue(Molecule m) {
+        // ugly code: instead of instanceof some generic methods should be used
+        if (m instanceof Residue) {
+            Residue r;
+            r = (Residue) m;
+            
+            Integer dist = Integer.MAX_VALUE;
+            try {
+                dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
+            } catch(Exception e) {
+                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                    DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
+                }
+                return(false);
+            }
+            Integer atomRadius;
+            if(this.isLigand() || r.isLigand()) {
+                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
+            }
+            else {
+                atomRadius = Settings.getInteger("plcc_I_atom_radius");
+            }
+
+            Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
+            Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2) + justToBeSure;
+
+            //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
+            //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
+
+            if(dist > (maxDistForContact)) {
+                return(false);
+            }
+            else {
+                return(true);
+            }
+        } else {
+            DP.getInstance().w("Tried to get distance between Molecules. Due to ugly code this is not possible atm.");
+        }
+
+        // if one of them is Molecule or RNA
+        return false;
+    }
+    
+    
+    /**
      * Determines whether this residue is part of any binding site.
      * @return whether this residue is part of any binding site
      */
     public Boolean isBindingSiteResidue() {
         return(this.partOfBindingSites.size() > 0);
     }
+    
+    public Boolean isLigand() { return(this.type.equals(Residue.RESIDUE_TYPE_LIGAND)); }
+    public Boolean isAA() { return(this.type.equals(Residue.RESIDUE_TYPE_AA)); }
+    public Boolean isOtherRes() { return(this.type.equals(Residue.RESIDUE_TYPE_OTHER)); }
     
 
     /**
@@ -162,6 +391,140 @@ public class Residue extends Molecule implements java.io.Serializable {
             }
         }
         return null;
+    }
+    
+    
+    /**
+     * Determines the center atom of this molecule, and also sets the center sphere radius for the molecule.
+     * @return the center atom
+     */
+    public Atom getCenterAtom() {
+    	 Atom a, b, center;
+         a = b = center = null;
+         Integer maxDistForAtom, dist = 0; // just assign a small start value
+         Integer MAXDIST = Integer.MAX_VALUE;   // just assign a *very* large start value
+         Integer totalMinMaxDist = MAXDIST;
+         //Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+
+         if(atoms.size() < 1) {
+             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                 DP.getInstance().w("getCenterAtom(): PDB molecule  " + this.pdbNum + " chain " + this.getChainID() + " of type " + getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
+             }
+             return(null);
+         }
+
+         // If this is an AA, use the CA.
+         if(this.isAA()) {
+
+             for(Integer i = 0; i < atoms.size(); i++) {
+                 a = atoms.get(i);
+                 if(a.isCalphaAtom()) {
+                     center = a;
+                     break;
+                 }
+             }
+
+             
+             if(center == null) {
+
+                 // Dying may be too harsh -- maybe use the ligand version if this molecule has no C alpha atom?
+                 //System.err.println("ERROR: Could not determine C alpha atom of PDB molecule " + this.pdbResNum + ", PDB file broken.");
+                 //System.exit(1);
+
+                 System.out.println("WARNING: PDB molecule  " + this.pdbNum + " has no C alpha atom, PDB file broken. Using 1st atom as center.");
+                 center = atoms.get(0);
+                 
+             }
+
+             // For the return value of this function alone we would be done, but we want to set the C alpha sphere
+             //  radius as well. It is the maximal distance of the center atom to any other atom of this molecule.
+             maxDistForAtom = 0;
+             for(Integer j = 0; j < this.atoms.size(); j++) {
+
+                 b = this.atoms.get(j);
+                 
+                 if(a.equalsAtom(b)) {
+                    continue; 
+                 }
+                 
+                 dist = center.distToAtom(b);
+
+                 if(dist > maxDistForAtom) {
+                     maxDistForAtom = dist;
+                 }
+
+             }
+
+             // The distance to any other atom cannot be smaller than 2 * atomRadius, otherwise the vdW radii of
+             //  the atoms would overlap. If this occurs in a PDB file, something most likely is wrong with the file.
+             //  Note though that this only applies to AA molecules because a ligand could consist of a single atom
+             //  and in that case the center sphere radius can be smaller than 2 * atomRadius.
+             //if(maxDistForAtom < (2 * atomRadius)) {
+             //    maxDistForAtom = 2 * atomRadius;
+             //}
+
+             // The maximal distance of the Atom we chose to any other Atom of this molecule is the C alpha/center sphere radius
+             this.centerSphereRadius = maxDistForAtom;
+
+         }
+         else {
+
+             // If this is a ligand, calculate the center by using the atom with the
+             //  minimal maximal distance to all other atoms of this molecule.      
+           
+             for(Integer i = 0; i < atoms.size(); i++) {
+                 
+                 a = atoms.get(i);
+                 maxDistForAtom = 0;
+
+                 for(Integer j = 0; j < atoms.size(); j++) {     // we need to compare the atom to itself (distance = 0 then) if there only is a single atom in this molecule (which holds for ligands like 'MG'). So j=i, not j=i+1.
+
+                     b = atoms.get(j);
+                     dist = a.distToAtom(b);
+
+                     if(dist > maxDistForAtom) {
+                         maxDistForAtom = dist;
+                     }
+                 }
+
+                 // We determined the maximal distance of this atom to any other atom of this molecule.
+                 // Now check whether this maxDist is smaller than the smallest current maxDist.
+
+                 if(maxDistForAtom < totalMinMaxDist) {
+                     totalMinMaxDist = maxDistForAtom;
+
+                     // Also update the current center atom. We can't break here though because
+                     //  this may still get improved/overwritten during the rest of the loop.
+                     center = a;
+                 }
+
+             }
+
+             // The maximal distance of the Atom we chose to any other Atom of this molecule is the C alpha/center sphere radius
+             centerSphereRadius = totalMinMaxDist;            
+
+         }
+
+         // If totalMinMaxDist still has the original value of MAXDIST something most likely is very wrong since
+         //  no atoms within a single molecule should have such a large distance.
+         // Note though that this value is not touched for AAs since the C alpha is assumed to be the center, thus
+         //  we don't compare all atoms with each other for AAs. We only calculate the distance from the CA to all others.
+         if(Objects.equals(totalMinMaxDist, MAXDIST) && (! this.isAA())) {
+             System.err.println("ERROR: MinMax distance of the atoms of PDB molecule  " + pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
+             System.exit(-1);
+         }
+
+
+         // just die if we could not determine a center atom
+         if(center == null) {
+                 System.err.println("ERROR: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ".");
+                 System.exit(-1);
+         }
+         
+         
+         return(center);
+
+     
     }
     
     
@@ -215,6 +578,8 @@ public class Residue extends Molecule implements java.io.Serializable {
             return("NOT_A_LIGAND_SO_NO_HET_SYNONYMS");
         }
     }
+    
+    public Integer getType() {return this.type;}
 
     
     //setters
@@ -224,14 +589,8 @@ public class Residue extends Molecule implements java.io.Serializable {
     public void setLigSynonyms(String s) { ligSynonyms = s; }
     public void setPhi(Float f) { phi = f; }
     public void setPsi(Float f) { psi = f; }
-    public void setAcc(Integer f) { acc = f; }
-    
-    
-
-    
-
-    
-    
+    public void setAcc(Integer f) { acc = f; }   
+    public void setType(Integer i) { type = i;}
     
 }
     
