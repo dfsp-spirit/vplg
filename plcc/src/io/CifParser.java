@@ -1037,6 +1037,7 @@ class CifParser {
      */
     private static void fillProteinMetaData() {
         String tmpValue;
+        ArrayList<String> tmpArrayList;
         HashMap <String, String> tmpEntityInfo;
 
         for (ProtMetaInfo pmi : allProteinMetaInfos) {
@@ -1056,9 +1057,12 @@ class CifParser {
             
             // FileParser.homologuesMap -> allMolChains
             //   seems like this is never used, but cant hurt to fill it, since we have the information
-            tmpValue = FileParser.homologuesMap.get(pmi.getChainid()).toString().replace("[", "").replace("]", "");
-            if (tmpValue != null) {
-                tmpValue = (tmpValue.length() > 0 ? tmpValue + ", " + pmi.getChainid() : pmi.getChainid());  // include your own ID as it says '>all', but only append if there are other chains
+            tmpArrayList = FileParser.homologuesMap.get(pmi.getChainid());
+            if (tmpArrayList != null) {
+                
+                tmpValue = tmpArrayList.toString().replace("[", "").replace("]", "");
+                
+                tmpValue = (tmpValue.length() > 0 ? tmpValue + ", " + pmi.getChainid() : pmi.getChainid());  // include your own ID as it says '>all', but only append if there are other chains              
                 pmi.setAllMolChains(tmpValue);
             }   
         }       
