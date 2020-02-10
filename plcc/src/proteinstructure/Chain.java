@@ -321,7 +321,7 @@ public class Chain implements java.io.Serializable {
             radiusFromCentroid = tmpBiggestDist;
                 
         } else {
-            System.out.println("  [WARNING] Chain " + this.pdbChainID + " seems not to hold protein atoms. No center can be detected.");
+            DP.getInstance().w("Chain " + this.pdbChainID + " seems not to hold protein atoms. No center can be detected.", 2);
             radiusFromCentroid = -1;
         }        
     }

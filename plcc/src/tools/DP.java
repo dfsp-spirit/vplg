@@ -43,8 +43,9 @@ public class DP {
     /**
      * Prints a warning. Newline is added at the end.
      * @param msg the message to print
+     * @param optionalNumberLeadingSpaces vararg where first element is used to create that many leading spaces before warning
      */
-    public void w(String msg) {
+    public void w(String msg, int... optionalNumberLeadingSpaces) {
         Boolean doWarn = true;
         try {
             doWarn = ( ! Settings.getBoolean("plcc_B_no_warn"));
@@ -52,8 +53,12 @@ public class DP {
             // the settings have not been inited yet, so assume that we should warn
             //System.err.println("WARNING: No settings yet.");
         }
+        
+        // if optionalNumberLeadingSpaces is given, take first number for number of spaces. Zero spaces otherwise
+        String leadingSpaces = new String(new char[optionalNumberLeadingSpaces.length > 0? optionalNumberLeadingSpaces[0] : 0]).replace("\0", " ");
+        
         if(doWarn) {
-            System.err.println(DP.appTag + DP.warningTag + msg);
+            System.err.println(leadingSpaces + DP.appTag + DP.warningTag + msg);
         }
     }
     
@@ -62,7 +67,7 @@ public class DP {
      * @param srcTag the source tag to print before the actual message
      * @param msg the message to print
      */
-    public void w(String srcTag, String msg) {
+    public void w(String srcTag, String msg, int... optionalNumberLeadingSpaces) {
         Boolean doWarn = true;
         try {
             doWarn = ( ! Settings.getBoolean("plcc_B_no_warn"));
