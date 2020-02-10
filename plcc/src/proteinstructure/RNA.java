@@ -37,4 +37,16 @@ public class RNA extends Molecule implements java.io.Serializable {
         this.isPartOfDsspSse = Mol.getDsspSseState();
     }  
     
+    // ugly implementation b/c of abstract Molecule
+    public Boolean isLigand() { return false; }
+    public Boolean isAA() { return false; }
+    public Integer getType() { return 3; }
+    public Boolean contactPossibleWithResidue(Molecule m) { 
+        DP.getInstance().w("Function contactPossibleWithResidue not implemented for RNA yet. Returning false");
+        return false;
+    }
+    public Atom getCenterAtom() {
+        DP.getInstance().w("Function getCenterAtom not implemented for RNA yet. Returning null");
+        return null;
+    }
 }
