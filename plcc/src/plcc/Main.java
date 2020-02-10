@@ -1548,6 +1548,17 @@ public class Main {
                         argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
                     }
                     
+                    if (s.equals("--settingsfile")) {
+                        if (args.length <= i + 1) {
+                            syntaxError();
+                        }
+                        numSettingsLoaded = Settings.load(args[i + 1]);
+                        if (numSettingsLoaded > 0) {
+                            outputToBePrintedUnlessSilent.append("  Loaded ").append(numSettingsLoaded).append(" settings as requested by command line argument from properties file ").append(args[i + 1]).append(".\n");
+                        }
+                        argsUsed[i] = argsUsed[i+1] = true;
+                    }
+                    
                     
 
                 } //end for loop
@@ -11191,6 +11202,7 @@ public class Main {
         System.out.println("   --include-rna           : Parse RNA and include in graph formalism and visualization");
         System.out.println("   --matrix-structure-search <nt> <ln> <gt>: search a structure <ln> in linear notation in a Proteingraph; <nt> = type of linnot; <gt> = graphtype of linnot");
         System.out.println("   --matrix-structure-search-db <nt> <ln> <gt>: search a structure <ln> in linear notation in the whole database; <nt> = type of linnot; <gt> = graphtype of linnot");
+        System.out.println("   --settingsfile <f>      : load settings from file <f>.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
