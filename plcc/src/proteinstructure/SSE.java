@@ -27,7 +27,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
     
     // settings
-    private Integer MAX_RES = 100000;
+    private Integer MAX_RES = Integer.MAX_VALUE;
     public static final String SSE_TYPE_LIGAND = "L";                   // ligand
     public static final String SSE_TYPE_BETASTRAND = "E";               // beta strand that is part of a beta sheet
     public static final String SSE_TYPE_ALPHA_HELIX = "H";              // alpha helix
