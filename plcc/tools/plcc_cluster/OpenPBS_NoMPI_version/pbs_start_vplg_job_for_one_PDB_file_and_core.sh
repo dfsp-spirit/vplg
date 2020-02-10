@@ -96,6 +96,8 @@ if [ "$SILENT" = "NO" ]; then
     echo $APPTAG pbs job id is $PBS_JOBID
     echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
     echo "$APPTAG Using '$INPUT_FILE' as input file."
+else
+    echo $APPTAG Running on host `hostname` 
 fi
 
 if [ ! -f "$INPUT_FILE" ]; then
