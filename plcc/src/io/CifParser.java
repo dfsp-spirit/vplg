@@ -176,7 +176,7 @@ class CifParser {
                     inString = !inString;
                     
                     if (!inString) {
-                        interruptedLine += ";";  // parse combined line
+                        interruptedLine += "\n;";  // add newline char to mark end of multi-line string & parse combined line
                         line = "";  // so we dont add it multiple times and with space
                     }
                 }
@@ -231,7 +231,7 @@ class CifParser {
                     DP.getInstance().w("FP_CIF", "Line " + numLine + " (together with previous if combined) seems to be too long. Trying to ignore it, but may miss data.");
                 }
                 // from now on: line contains expected lenght of data items
-        
+                       
                 switch(currentCategory) {
                 case "_exptl":
                     // check for experimental method
@@ -945,11 +945,17 @@ class CifParser {
             char tmpChar = line.charAt(i);
             
             if (inMultiString) {
-                // accept everything but ending semi-colon
-                if (tmpChar == ';') {
+                // accept everything but ending newline-character+semi-colon or newline-character
+                
+                // end of multi-line string
+                if (tmpChar == ';' && line.charAt(i - 1 ) == '\n') {
+                    // newline can only appear before multi-line-ending semi-colon, so it should be okay to assume there is always a char before
                     inMultiString = false;
                     continue;
                 }
+                
+                // newline-character only used to mark multi-line ending semi-colon, so exclude it from data
+                if (tmpChar == '\n') { continue; }
             } else {
             
                 if (inLineQuote) {
