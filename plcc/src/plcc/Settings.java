@@ -398,7 +398,7 @@ public class Settings {
         
         // motifs
         defSet("plcc_B_compute_motifs", "true", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB).");
-        
+        defSet("plcc_B_compute_7tim", "false", "Whether to search for 7tim motif in FGs if compute_motifs is true.");
         
         // complex graphs: same, mere, edge contact threshold
         defSet("plcc_B_complex_graphs", "false" , "Whether or not complex graphs are drawn.");

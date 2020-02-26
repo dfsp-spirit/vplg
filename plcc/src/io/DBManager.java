@@ -2173,13 +2173,15 @@ connection.close();
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
-        if(DBManager.chainContainsMotif_TIMBarrel(chain_db_id)) {
-            motif_db_id = Motifs.MOTIFCODE__TIM_BARREL.longValue();
-            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
-            if(rowsAffectedThisMotif > 0) {
-                foundMotifsForChain.add(Motifs.MOTIF__TIM_BARREL);
+        if (Settings.getBoolean("plcc_B_compute_7tim")) {
+            if(DBManager.chainContainsMotif_TIMBarrel(chain_db_id)) {
+                motif_db_id = Motifs.MOTIFCODE__TIM_BARREL.longValue();
+                rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+                if(rowsAffectedThisMotif > 0) {
+                    foundMotifsForChain.add(Motifs.MOTIF__TIM_BARREL);
+                }
+                rowsAffectedTotal += rowsAffectedThisMotif;
             }
-            rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
         if(DBManager.chainContainsMotif_AlphaBetaPlait(chain_db_id)) {
