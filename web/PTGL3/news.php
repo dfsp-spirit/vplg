@@ -51,6 +51,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<p>Here we list important information on PTGL updates, planned maintenance times, and more.</p>
 		<br /><br/>
 
+		<h4>MAR 02, 2020: Updating server to latest PDB release</h4>
+		<p>We are currently rolling out an Update to the PTGL server. Until finished, the server may be unavailable. This update will also fix some issues with large structures' CGs.</p>
+		<br /><br/>
+
 		<h4>SEP 11, 2019: Webserver maintenance from SEP 20-27</h4>
 		<p>Our webserver hosting the PTGL will be under maintenance from September 20 to 27. During this time our webserver and all services may be partly unavailable.</p>
 		<br /><br/>
