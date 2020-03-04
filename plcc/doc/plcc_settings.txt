@@ -132,8 +132,8 @@ plcc_I_img_default_font_size=18
 # plcc_B_graphtype_albelig: Determines whether alpha-beta graphs with ligands are drawn
 plcc_B_graphtype_albelig=true
 
-# plcc_B_strict_ptgl_behaviour: Whether plcc should try to strictly mimick the PTGL, including questionable stuff.
-plcc_B_strict_ptgl_behaviour=true
+# plcc_B_round_coordinates: Whether plcc should try to strictly mimick the PTGL, including questionable stuff.
+plcc_B_round_coordinates=true
 
 # plcc_I_img_legend_font_size: The legend font size used in output images.
 plcc_I_img_legend_font_size=18
@@ -244,7 +244,7 @@ plcc_B_graphtype_alphalig=true
 plcc_B_graphimg_header=true
 
 # plcc_I_max_contacts_per_type: The maximum number of contacts of a certain type that is counted for a residue pair. Simply set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). The PTGL uses a setting of 1 (so if a pair has 3 B/B cotacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)
-plcc_I_max_contacts_per_type=100
+plcc_I_max_contacts_per_type=1
 
 # plcc_I_spatrel_dd_largest_antip_hh: Same as above, but for H/H (helix/helix) interactions.
 plcc_I_spatrel_dd_largest_antip_hh=-8

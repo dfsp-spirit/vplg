@@ -139,7 +139,7 @@ public class ContactMatrix {
                     
                     // This information is kept in the chain-specific geo.dat file of bet_neo in the PTGL.
                     
-                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");   
+                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");//;   
                                        // See comment above, the maximum number of contacts of a certain type that
                                        // is counted for a residue pair. Simply set it to something very large 
                                        // if you don't want any limit (Integer.MAX_VALUE comes to mind).
@@ -148,6 +148,7 @@ public class ContactMatrix {
                     Integer numc;   // just a temp var for current number of contacts
                     Integer contDist;
                     
+                    /*
                     if(Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
                         
                         contDist = rc.getBBContactDist();
@@ -205,6 +206,36 @@ public class ContactMatrix {
 
                         numc = rc.getNumContactsLL();
                         this.addContacts("LL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    */
+                     
+                                           
+                    // All checks done, these are valid contacts.
+                    numc = rc.getNumContactsBB();
+                    this.addContacts("BB", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsBC();
+                    this.addContacts("BC", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsCB();
+                    this.addContacts("CB", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsCC();
+                    this.addContacts("CC", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsLB();
+                    this.addContacts("LB", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsBL();
+                    this.addContacts("BL", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsLC();
+                    this.addContacts("LC", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsCL();
+                    this.addContacts("CL", aSSEPos, bSSEPos, Math.min(numc , mpt));
+
+                    numc = rc.getNumContactsLL();
+                    this.addContacts("LL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
                         // ***** Fill the other half of the matrix [ (y/x) instead of (x/y) ] *****
                         // We should not do this! If a residue A has a BC contact to a residue B, it does NOT mean that
@@ -238,9 +269,9 @@ public class ContactMatrix {
                         this.addContacts("LL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
                          * 
                          */
-                    }
                     
-                    contNumConsidered++;
+                        
+                        contNumConsidered++;
                 }                                
             }
             else {

@@ -354,7 +354,7 @@ class LegacyParser {
             
             
             
-            if(Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {                            
+            if(Settings.getBoolean("plcc_B_round_coordinates")) {                            
                 // PTGL style: always round them down, i.e., simply ignore the last 2 digits
                 oCoordX = Double.valueOf((curLinePDB.substring(30, 38)).trim()) * 10.0;
                 oCoordY = Double.valueOf((curLinePDB.substring(38, 46)).trim()) * 10.0;
