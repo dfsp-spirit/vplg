@@ -353,7 +353,7 @@ class LegacyParser {
             // 27 - 29 are ignored: blanks
             
             
-            
+        /*    
             if(Settings.getBoolean("plcc_B_round_coordinates")) {                            
                 // PTGL style: always round them down, i.e., simply ignore the last 2 digits
                 oCoordX = Double.valueOf((curLinePDB.substring(30, 38)).trim()) * 10.0;
@@ -382,8 +382,17 @@ class LegacyParser {
                 // now, is has become 88
                 //System.out.println("[atom#" + atomSerialNumber + "] oCoords=(" + oCoordXf + "," + oCoordYf + "," + oCoordZf + "), Coords=(" + coordX + "," + coordY + "," + coordZ + ")");
             }                        
-    
-            
+    */
+            // PLCC style: round the coordinates
+            oCoordXf = Float.valueOf((curLinePDB.substring(30, 38)).trim()) * 10;
+            oCoordYf = Float.valueOf((curLinePDB.substring(38, 46)).trim()) * 10;
+            oCoordZf = Float.valueOf((curLinePDB.substring(46, 54)).trim()) * 10;
+            coordX = Integer.valueOf(Math.round(oCoordXf));
+            coordY = Integer.valueOf(Math.round(oCoordYf));
+            coordZ = Integer.valueOf(Math.round(oCoordZf));
+                
+                // now, is has become 88
+                //System.out.println("[atom#" + atomSerialNumber + "] oCoords=(" + oCoordXf + "," + oCoordYf + "," + oCoordZf + "), Coords=(" + coordX + "," + coordY + "," + coordZ + ")");
             // 54 - 59 are ignored: occupancy
             // 60 - 65 are ignored: temp factor
             // 66 - 72 are ignored: blanks
