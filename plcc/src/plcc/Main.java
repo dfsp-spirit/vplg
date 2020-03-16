@@ -12984,11 +12984,9 @@ public class Main {
             System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
         }
 
-        // meta Data in CIF files is created while parsing the file once
-        //     -> no need to call a function to create it, just get it!
         HashMap<String, String> md = FileParser.getMetaData();
         
-        Double res = -1.0;
+        Double res;
         try {
             res = Double.valueOf(md.get("resolution"));
         } catch (Exception e) {
@@ -13006,32 +13004,33 @@ public class Main {
         }
 
         // Filter SSEs depending on the requested graph type
-        if(graphType.equals(SSEGraph.GRAPHTYPE_ALBE)) {
-            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
-            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
-        }
-        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
-            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
-        }
-        else if(graphType.equals(SSEGraph.GRAPHTYPE_BETA)) {
-            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);            
-        }
-        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
-            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
-            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
-            keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
-        }
-        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHALIG)) {
-            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
-            keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
-        }
-        else if(graphType.equals(SSEGraph.GRAPHTYPE_BETALIG)) {
-            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
-            keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
-        }
-        else {
-            System.err.println("ERROR: calculateComplexGraph(): Graph type '" + graphType + "' invalid. Skipping.");
-            return;
+        switch (graphType) {
+            case SSEGraph.GRAPHTYPE_ALBE:
+                keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+                keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
+                break;
+            case SSEGraph.GRAPHTYPE_ALPHA:
+                keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
+                break;
+            case SSEGraph.GRAPHTYPE_BETA:
+                keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+                break;
+            case SSEGraph.GRAPHTYPE_ALBELIG:
+                keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+                keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
+                keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
+                break;
+            case SSEGraph.GRAPHTYPE_ALPHALIG:
+                keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
+                keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
+                break;
+            case SSEGraph.GRAPHTYPE_BETALIG:
+                keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+                keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
+                break;
+            default:
+                System.err.println("ERROR: calculateComplexGraph(): Graph type '" + graphType + "' invalid. Skipping.");
+                return;
         }
         
         // print warning here so that it only appears once (not once per chain)
@@ -13675,8 +13674,8 @@ public class Main {
         }
         
         // This graph is still required because it is used for drawing the VPLG-style picture
-        ProtGraph cg = chainCM.toProtGraph();                        
-        cg.declareProteinGraph();      // this is declared a CG after setting info, see below.  
+        ProtGraph SseCg = chainCM.toProtGraph();                        
+        SseCg.declareProteinGraph();      // this is declared a CG after setting info, see below.  
         
         if( ! silent) {
             System.out.println("    Graph created and declared a CG.");
@@ -13687,22 +13686,22 @@ public class Main {
             if( ! silent) {
                 System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
             }
-            cg.addFullBackboneContacts();            
+            SseCg.addFullBackboneContacts();            
         }
 
         //System.out.println("    Done creating SSE-level " + graphType + " CG.");
-        cg.setInfo(pdbid, "ALL", "ALL", "complex_" + graphType);
-        cg.addMetadata(md);
-        cg.setComplexData(chainEnd, allChains);
-        cg.declareComplexGraph(true);
+        SseCg.setInfo(pdbid, "ALL", "ALL", "complex_" + graphType);
+        SseCg.addMetadata(md);
+        SseCg.setComplexData(chainEnd, allChains);
+        SseCg.declareComplexGraph(true);
             
         /*
         if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
             // ###TEST-CG-METRICS
             System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
-            ArrayList<FoldingGraph> conCompsOfCG = cg.getConnectedComponents();
-            FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
-            Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(cg, false);
+            ArrayList<FoldingGraph> conCompsOfCG = SseCg.getConnectedComponents();
+            FoldingGraph cgSubgraph = SseCg.getLargestConnectedComponent();
+            Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(SseCg, false);
             Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
             System.out.println("Largest CC has size " + cgSubgraph.getSize());
         }
@@ -13779,51 +13778,51 @@ public class Main {
         Integer numFormatsWrittenSSELevel = 0;
         if(Settings.getBoolean("plcc_B_output_compgraph_GML")) {
             String gmlfFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".gml";                       
-            if(IO.stringToTextFile(gmlfFileSSELevel, cg.toGraphModellingLanguageFormat())) {
+            if(IO.stringToTextFile(gmlfFileSSELevel, SseCg.toGraphModellingLanguageFormat())) {
                 graphFormatsWrittenSSELevel += "gml "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_TGF")) {
             String tgfFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".tgf";
-            if(IO.stringToTextFile(tgfFileSSELevel, cg.toTrivialGraphFormat())) {
+            if(IO.stringToTextFile(tgfFileSSELevel, SseCg.toTrivialGraphFormat())) {
                 graphFormatsWrittenSSELevel += "tgf "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_DOT")) {
             String dotLangFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".gv";
-            if(IO.stringToTextFile(dotLangFileSSELevel, cg.toDOTLanguageFormat())) {
+            if(IO.stringToTextFile(dotLangFileSSELevel, SseCg.toDOTLanguageFormat())) {
                 graphFormatsWrittenSSELevel += "gv "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_kavosh")) {
             String kavoshFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".kavosh";
-            if(IO.stringToTextFile(kavoshFileSSELevel, cg.toKavoshFormat())) {
+            if(IO.stringToTextFile(kavoshFileSSELevel, SseCg.toKavoshFormat())) {
                 graphFormatsWrittenSSELevel += "kavosh "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_XML")) {
             String xmlFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".xml";
-            if(IO.stringToTextFile(xmlFileSSELevel, cg.toXMLFormat())) {
+            if(IO.stringToTextFile(xmlFileSSELevel, SseCg.toXMLFormat())) {
                 graphFormatsWrittenSSELevel += "xml "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_JSON")) {
             String jsonFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".json";
-            if(IO.stringToTextFile(jsonFileSSELevel, cg.toJSONFormat())) {
+            if(IO.stringToTextFile(jsonFileSSELevel, SseCg.toJSONFormat())) {
                 graphFormatsWrittenSSELevel += "json "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_eld")) {
             String elFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".el_edges";
             String nodeTypeListFile = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".el_ntl";
-            if(IO.stringToTextFile(elFileSSELevel, cg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, cg.getNodeTypeList())) {
+            if(IO.stringToTextFile(elFileSSELevel, SseCg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, SseCg.getNodeTypeList())) {
                 graphFormatsWrittenSSELevel += "el "; numFormatsWrittenSSELevel++;
             }
         }
         // write the SSE info text file for the image (plcc graph format file)
         if(Settings.getBoolean("plcc_B_output_compgraph_plcc")) {
             plccGraphFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".plg";
-            if(IO.stringToTextFile(plccGraphFileSSELevel, cg.toVPLGGraphFormat())) {
+            if(IO.stringToTextFile(plccGraphFileSSELevel, SseCg.toVPLGGraphFormat())) {
                 graphFormatsWrittenSSELevel += "plg "; numFormatsWrittenSSELevel++;
             }
         }
@@ -13841,13 +13840,13 @@ public class Main {
                 
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, cg, new HashMap<Integer, String>(), new ArrayList<String>());
+            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, SseCg, new HashMap<Integer, String>(), new ArrayList<String>());
             if(! silent) {
                 System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
             }
             
             Map<String, String> molInfoForChains = new HashMap<>();
-            for(Chain tc : cg.getAllChains()) {               
+            for(Chain tc : SseCg.getAllChains()) {               
                 molInfoForChains.put(tc.getPdbChainID(), tc.getMacromolID());
             }
             
@@ -13877,7 +13876,7 @@ public class Main {
             //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
             try {
                 if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_cg")) {
-                    DBManager.writeComplexGraphToDB(pdbid, cg.toGraphModellingLanguageFormat(), null, cg.toXMLFormat(), null, cg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
+                    DBManager.writeComplexGraphToDB(pdbid, SseCg.toGraphModellingLanguageFormat(), null, SseCg.toXMLFormat(), null, SseCg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
                 } else {
                     DBManager.writeComplexGraphToDB(pdbid, null, null, null, null, null, null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
                 }
@@ -13892,7 +13891,7 @@ public class Main {
         } 
         
         if(Settings.getBoolean("plcc_B_compute_graph_metrics") && graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
-            GraphProperties gp = new GraphProperties(cg);
+            GraphProperties gp = new GraphProperties(SseCg);
             GraphProperties sgp = new GraphProperties(gp.getLargestConnectedComponent());
             
             
@@ -13900,11 +13899,11 @@ public class Main {
             // DEBUG ---------------
             /*
             System.out.println("??????????????????????????????");
-            System.out.println("CG size " + cg.getSize());
-            SimpleGraphInterface testCG = (SimpleGraphInterface)cg;
+            System.out.println("CG size " + SseCg.getSize());
+            SimpleGraphInterface testCG = (SimpleGraphInterface)SseCg;
             System.out.println("CG as SGI size:" + testCG.getSize());
             
-            List<FoldingGraph> lt = cg.getConnectedComponents();
+            List<FoldingGraph> lt = SseCg.getConnectedComponents();
             System.out.print("FGs:");
             for(FoldingGraph t : lt) {
                 System.out.print(t.getSize() + " ");
@@ -13965,7 +13964,7 @@ public class Main {
             }
             
             if(! silent) {
-                System.out.println("     Found " + ligandsAllChains.size() + " ligand SSEs total in the " + cg.getAllChains().size() + " chains.");
+                System.out.println("     Found " + ligandsAllChains.size() + " ligand SSEs total in the " + SseCg.getAllChains().size() + " chains.");
             }
             
             String ligimgFileNoExt, ligName;
@@ -13978,11 +13977,11 @@ public class Main {
                 ligName = ligChainName + "-" + ligRes + "-" + lign3;  // something like "A-234-ICT", meaning isocitric acid, PDB residue 234 of chainName A
                 
                 // determine all chains the ligand has contacts with (based on the SSEs it has contacts with):
-                Integer ligIndex = cg.getSSEIndex(ligandSSE);
+                Integer ligIndex = SseCg.getSSEIndex(ligandSSE);
                 List<String> ligContactChains = new ArrayList<>();
                 
                 List<String> ignoreChains = new ArrayList<>();
-                for(Chain ic : cg.getAllChains()) {
+                for(Chain ic : SseCg.getAllChains()) {
                     ignoreChains.add(ic.getPdbChainID()); // we will delete the ones we are interested in later, see below
                 }
                 
@@ -13990,10 +13989,10 @@ public class Main {
                     DP.getInstance().e("Main", "Could not get index of ligand SSE '" + ligName + "' from complex graph for ligand-centered graph computation, skipping CLG.");
                     continue;
                 }
-                List<Integer> contactSSEIndices = cg.neighborsOf(ligIndex);
+                List<Integer> contactSSEIndices = SseCg.neighborsOf(ligIndex);
                 
                 for(Integer sseIndex : contactSSEIndices) {
-                    String contactChainName = cg.getChainNameOfSSE(sseIndex);                    
+                    String contactChainName = SseCg.getChainNameOfSSE(sseIndex);                    
                     if( ! ligContactChains.contains(contactChainName)) { ligContactChains.add(contactChainName); }
                 }
                 
@@ -14005,7 +14004,7 @@ public class Main {
                 if(! silent) {
                     List<String> contactSSENames = new ArrayList<>();
                     for(Integer sseIndex : contactSSEIndices) {
-                        contactSSENames.add(cg.getChainNameOfSSE(sseIndex) + "-" + cg.getVertex(sseIndex).getSSESeqChainNum() + "-" +  cg.getVertex(sseIndex).getSSEClass());    // something like "A-1-H", meaning the first SSE of chainName A, a helix
+                        contactSSENames.add(SseCg.getChainNameOfSSE(sseIndex) + "-" + SseCg.getVertex(sseIndex).getSSESeqChainNum() + "-" +  SseCg.getVertex(sseIndex).getSSEClass());    // something like "A-1-H", meaning the first SSE of chainName A, a helix
                     }
                     if(! silent) {
                         System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
@@ -14029,9 +14028,9 @@ public class Main {
                 sseDrawLabels.put(ligIndex, lign3 + "-" + ligRes);
                 
                 // change graph info, this is so that the label on the image gets set properly
-                cg.setInfo(pdbid, "ALL", "ALL", "ligand_complex_" + lign3 + "-" + ligRes);
+                SseCg.setInfo(pdbid, "ALL", "ALL", "ligand_complex_" + lign3 + "-" + ligRes);
                 
-                HashMap<DrawTools.IMAGEFORMAT, String> outCLGImages = ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, sseDrawLabels, ignoreChains); // draw ligand-based complex graph
+                HashMap<DrawTools.IMAGEFORMAT, String> outCLGImages = ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, SseCg, sseDrawLabels, ignoreChains); // draw ligand-based complex graph
                 if(! silent) {
                     System.out.println("      Image of ligand-centered complex graph for ligand '" + ligName + "' written to base file '" + imgFileNoExt + "'.");
                 }      

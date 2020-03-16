@@ -632,6 +632,8 @@ public class FileParser {
     
     public static HashMap<String, String> getMetaData() {
         if (settingCif()) {
+            // meta Data in CIF files is created while parsing the file once
+            //     -> no need to call a function to create it, just get it!
             return CifParser.metaData;
         } else {
             return LegacyParser.getPDBMetaData();
