@@ -37,8 +37,11 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import io.DBManager;
+import io.FileParser;
 import plcc.Main;
 import plcc.Settings;
+import proteinstructure.Chain;
+import proteinstructure.Residue;
 import tools.DP;
 
 /**
@@ -80,7 +83,7 @@ public class ComplexGraph extends UAdjListGraph {
     /**
      * Constructor.
      */
-    public ComplexGraph(String pdbid) {
+    public ComplexGraph(String pdbid, List<Chain> chains) {
         this.pdbid = pdbid;
 
         numHelixHelixInteractionsMap = createEdgeMap();
@@ -103,7 +106,37 @@ public class ComplexGraph extends UAdjListGraph {
 
         lastColorStep = 0;
         neglectedEdges = 0;
+        
+        chainResAASeq = new String[chains.size()];
+        
+        createVertices(chains);
     }
+    
+    
+    /**
+     * Creates the vertices, fills corresponding maps and fills amino acid sequence.
+     * @param chains All chains of this complex graph
+     */
+    private void createVertices(List<Chain> chains) {
+        for(Integer i = 0; i < chains.size(); i++) {
+            Vertex v = createVertex();
+            proteinNodeMap.put(v, chains.get(i).getPdbChainID());
+            molMap.put(v, FileParser.getMetaInfo(pdbid, chains.get(i).getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
+
+            // get AA sequence string for each chainName
+            for(Residue resi : chains.get(i).getResidues()) {
+                
+                if ( ! Settings.get("plcc_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
+                    if (chainResAASeq[i] != null) {
+                        chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
+                    } else {
+                        chainResAASeq[i] = resi.getAAName1();
+                    }
+                }
+            }
+        }
+    }
+    
 
     public Vertex getVertexFromChain(String chainID) {
         Iterator<Vertex> vertIter = this.getVertices().iterator();

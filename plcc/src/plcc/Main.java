@@ -13096,31 +13096,7 @@ public class Main {
         }
                 
         // create vertices for all chains
-        ComplexGraph compGraph = new ComplexGraph(pdbid);
-        compGraph.chainResAASeq = new String[allChains.size()];
-        for(Integer i = 0; i < allChains.size(); i++) {
-            ComplexGraph.Vertex v = compGraph.createVertex();
-            compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
-            compGraph.molMap.put(v, FileParser.getMetaInfo(pdbid, allChains.get(i).getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
-
-            // get AA sequence string for each chainName
-            for(Residue resi : allChains.get(i).getResidues()){
-                
-                if ( ! Settings.get("plcc_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
-                    if (compGraph.chainResAASeq[i] != null) {
-                        compGraph.chainResAASeq[i] = compGraph.chainResAASeq[i] + resi.getAAName1();
-                    } else {
-                        compGraph.chainResAASeq[i] = resi.getAAName1();
-                    }
-                }
-                
-                //String existing = compGraph.chainResAASeq.get(key);
-                //String newContent = 
-                //compGraph.chainResAASeq.put(key, existing == null ? newContent : existing + newContent);
-            }
-            //System.out.println(allChains.get(i).getPdbChainID());
-        }
-
+        ComplexGraph compGraph = new ComplexGraph(pdbid, allChains);
         
         // initialize homologues matrix
         compGraph.homologueChains = new Integer[allChains.size()][allChains.size()];
