@@ -13095,28 +13095,7 @@ public class Main {
             chainSSEMap.put(c.getPdbChainID(), oneChainSSEs);
         }
                 
-        ComplexGraph compGraph = new ComplexGraph(pdbid, allChains);
-
-        // calculate sum of interchain contacts
-        for(Integer i = 0; i < resContacts.size(); i++){
-            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getMolA().getChainID());
-            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getMolB().getChainID());
-                      
-            Integer chainAint = Integer.parseInt(chainA.toString());
-            Integer chainBint = Integer.parseInt(chainB.toString());
-            
-            // We only want interchain contacts
-            if (!chainA.equals(chainB)){
-                if(compGraph.numChainInteractions[chainAint][chainBint] == null){
-                    compGraph.numChainInteractions[chainAint][chainBint] = 1;
-                    compGraph.numChainInteractions[chainBint][chainAint] = 1;
-                } else {
-                    compGraph.numChainInteractions[chainAint][chainBint]++;
-                    compGraph.numChainInteractions[chainBint][chainAint]++;
-                }
-            }
-        }
-        
+        ComplexGraph compGraph = new ComplexGraph(pdbid, allChains, resContacts);    
             
         ArrayList<String> conInfo = new ArrayList<String>();
         conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"

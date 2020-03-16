@@ -69,9 +69,9 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<List<Integer>, Integer> numSSEContacts;
     public Map<List<Integer>, List<String>> numSSEContactChainNames;
 
-    public Integer[][] numChainInteractions;
-    public Integer[][] homologueChains;
-    public String[] chainResAASeq;
+    private Integer[][] numChainInteractions;
+    private Integer[][] homologueChains;
+    private String[] chainResAASeq;
     public Integer neglectedEdges;
 
     /**
@@ -84,7 +84,7 @@ public class ComplexGraph extends UAdjListGraph {
     /**
      * Constructor.
      */
-    public ComplexGraph(String pdbid, List<Chain> chains) {
+    public ComplexGraph(String pdbid, List<Chain> chains, List<MolContactInfo> resContacts) {
         this.pdbid = pdbid;
 
         numHelixHelixInteractionsMap = createEdgeMap();
@@ -115,6 +115,8 @@ public class ComplexGraph extends UAdjListGraph {
         numChainInteractions = new Integer[chains.size()][chains.size()];
         
         createHomologueChainsMatrix(chains);
+        
+        calculateNumChainInteractions(resContacts);
     }
     
     
@@ -171,6 +173,33 @@ public class ComplexGraph extends UAdjListGraph {
                     } else {
                         homologueChains[i][j] = 0;
                     }
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * 
+     * @param resContacts 
+     */
+    private void calculateNumChainInteractions(List<MolContactInfo> resContacts) {
+    // calculate sum of interchain contacts
+        for(Integer i = 0; i < resContacts.size(); i++){
+            ComplexGraph.Vertex chainA = getVertexFromChain(resContacts.get(i).getMolA().getChainID());
+            ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
+                      
+            Integer chainAint = Integer.parseInt(chainA.toString());
+            Integer chainBint = Integer.parseInt(chainB.toString());
+            
+            // We only want interchain contacts
+            if (!chainA.equals(chainB)){
+                if(numChainInteractions[chainAint][chainBint] == null){
+                    numChainInteractions[chainAint][chainBint] = 1;
+                    numChainInteractions[chainBint][chainAint] = 1;
+                } else {
+                    numChainInteractions[chainAint][chainBint]++;
+                    numChainInteractions[chainBint][chainAint]++;
                 }
             }
         }
