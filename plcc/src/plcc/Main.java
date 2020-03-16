@@ -13095,42 +13095,8 @@ public class Main {
             chainSSEMap.put(c.getPdbChainID(), oneChainSSEs);
         }
                 
-        // create vertices for all chains
         ComplexGraph compGraph = new ComplexGraph(pdbid, allChains);
-        
-        // initialize homologues matrix
-        compGraph.homologueChains = new Integer[allChains.size()][allChains.size()];
-        compGraph.numChainInteractions = new Integer[allChains.size()][allChains.size()];
-        
-        if(! silent) {
-            System.out.println("  Computing CG contacts.");
-        }
-        
-        
-        //create homologueChains matrix
-        if (allChains.size() > 1) {
-            for (Integer i = 0; i < allChains.size(); i++) {
-                
-                for (Integer j = 0; j < allChains.size(); j++) {
 
-                    String compareChainID = allChains.get(j).getPdbChainID();
-                    // make sure no chainName is matched with itself 
-                    if (allChains.get(i).getHomologues() != null) {
-                        if ((allChains.get(i).getHomologues().contains(compareChainID)) && (!Objects.equals(i, j))) {
-                            compGraph.homologueChains[i][j] = 1;
-                            // fill bottom-left and top-right triangle of matrix (required since chains are unordered b/c of speedup)
-                            compGraph.homologueChains[j][i] = 1;
-                        } else {
-                            compGraph.homologueChains[i][j] = 0;
-                        }
-                    } else {
-                        compGraph.homologueChains[i][j] = 0;
-                    }
-                }
-            }
-        }
-
-        
         // calculate sum of interchain contacts
         for(Integer i = 0; i < resContacts.size(); i++){
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getMolA().getChainID());

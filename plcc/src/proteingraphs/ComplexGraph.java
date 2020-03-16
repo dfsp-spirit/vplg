@@ -38,6 +38,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import io.DBManager;
 import io.FileParser;
+import java.util.Objects;
 import plcc.Main;
 import plcc.Settings;
 import proteinstructure.Chain;
@@ -110,6 +111,10 @@ public class ComplexGraph extends UAdjListGraph {
         chainResAASeq = new String[chains.size()];
         
         createVertices(chains);
+        
+        numChainInteractions = new Integer[chains.size()][chains.size()];
+        
+        createHomologueChainsMatrix(chains);
     }
     
     
@@ -131,6 +136,40 @@ public class ComplexGraph extends UAdjListGraph {
                         chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
                     } else {
                         chainResAASeq[i] = resi.getAAName1();
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Creates and fills homologueChains matrix.
+     * @param chains All chains of this complex graph
+     */
+    private void createHomologueChainsMatrix(List<Chain> chains) {
+    if(! Settings.getBoolean("plcc_B_silent")) {
+            System.out.println("  Computing CG contacts.");
+        }
+    
+        homologueChains = new Integer[chains.size()][chains.size()];
+        if (chains.size() > 1) {
+            for (Integer i = 0; i < chains.size(); i++) {
+                
+                for (Integer j = 0; j < chains.size(); j++) {
+
+                    String compareChainID = chains.get(j).getPdbChainID();
+                    // make sure no chainName is matched with itself 
+                    if (chains.get(i).getHomologues() != null) {
+                        if ((chains.get(i).getHomologues().contains(compareChainID)) && (!Objects.equals(i, j))) {
+                            homologueChains[i][j] = 1;
+                            // fill bottom-left and top-right triangle of matrix (required since chains are unordered b/c of speedup)
+                            homologueChains[j][i] = 1;
+                        } else {
+                            homologueChains[i][j] = 0;
+                        }
+                    } else {
+                        homologueChains[i][j] = 0;
                     }
                 }
             }
