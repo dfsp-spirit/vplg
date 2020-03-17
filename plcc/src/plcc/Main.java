@@ -13099,42 +13099,16 @@ public class Main {
         if(Settings.getBoolean("plcc_B_useDB")) {
             if(! silent) {System.out.print("    Writing chain complex contact info to DB...");}
         
-            if(compGraph.writeChainComplexContactInfoToDB(pdbid)){
+            if(compGraph.writeChainComplexContactInfoToDB()){
                 if(! silent) { System.out.println(" successfull!");}
             } else {
                 DP.getInstance().e("Main", "Writing chain complex contact info to database FAILED!"); 
             }
-        }
-     
-        if(Settings.getBoolean("plcc_B_useDB")) {
+            
             if(! silent) {System.out.println("    Writing SSE complex contact info to DB...");}
         
             compGraph.writeSSEComplexContactInfoToDB(pdbid);
-        }        
-           
-        /*
-        if(! silent) {
-            try {
-                // Actually these are only the values of the first edge. 
-                // Tim says: NO, they are values for a random edge (maybe even a different edge in each Map), because the Map is unordered! I am removing this code, is it useless.
-                int dataLength = compGraph.numAllInteractionsMap.values().toArray().length;
-                System.out.println("    Interaction data for " + dataLength + " edges (legend: H = helix, S = strand, L = ligand, C = coil):");                
-                System.out.println("    All Interactions : " + compGraph.numAllInteractionsMap.values().toArray()[0]);
-                System.out.println("    HH Interactions  : " + compGraph.numHelixHelixInteractionsMap.values().toArray()[0]);
-                System.out.println("    HS Interactions  : " + compGraph.numHelixStrandInteractionsMap.values().toArray()[0]);
-                System.out.println("    HL Interactions  : " + compGraph.numHelixLigandInteractionsMap.values().toArray()[0]);
-                System.out.println("    HC Interactions  : " + compGraph.numHelixCoilInteractionsMap.values().toArray()[0]);
-                System.out.println("    CC Interactions  : " + compGraph.numCoilCoilInteractionsMap.values().toArray()[0]);
-                System.out.println("    LL Interactions  : " + compGraph.numLigandLigandInteractionsMap.values().toArray()[0]);
-                System.out.println("    SS Interactions  : " + compGraph.numStrandStrandInteractionsMap.values().toArray()[0]);
-                System.out.println("    SC Interactions  : " + compGraph.numStrandCoilInteractionsMap.values().toArray()[0]);
-                System.out.println("    SL Interactions  : " + compGraph.numStrandLigandInteractionsMap.values().toArray()[0]);
-                System.out.println("    CG edges / verts : " + compGraph.getEdges().size() + " / " + compGraph.getVertices().size());
-            } catch(java.lang.ArrayIndexOutOfBoundsException e) {
-                DP.getInstance().w("Main", "Exception during CG contact output: '" + e.getMessage() + "'.");
-            }
-        }
-                */
+        }     
 
         cgr.setCompGraph(compGraph);     
         

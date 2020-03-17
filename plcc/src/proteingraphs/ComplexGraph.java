@@ -723,10 +723,9 @@ public class ComplexGraph extends UAdjListGraph {
      * Separates interaction maps and associates them with a chain name then
      * calls DBManager.writeComplexContactToDB()
      *
-     * @param pdbid PDB Identifier
      * @return true if DBManager is succesfull
      */
-    public boolean writeChainComplexContactInfoToDB(String pdbid) {
+    public boolean writeChainComplexContactInfoToDB() {
 
         String chainA;
         String chainB;
@@ -1300,6 +1299,12 @@ public class ComplexGraph extends UAdjListGraph {
     
     
      public ArrayList<String> getContactInfo() {
-        return contactInfo;
+        if (createContactInfo) {
+            return contactInfo;
+        }
+        else {
+            DP.getInstance().w("Tried to get CG's contact info despite setting plcc_B_writeComplexContactCSV was off. Returning null.");
+            return null;
+        }
     }
 }
