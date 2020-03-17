@@ -221,6 +221,7 @@ public class ComplexGraph extends UAdjListGraph {
      */
     private void createEdges(List<MolContactInfo> resContacts) {
         if (createContactInfo) {
+            contactInfo = new ArrayList<>();
             contactInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
                   + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");
         }
