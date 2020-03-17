@@ -38,11 +38,13 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import io.DBManager;
 import io.FileParser;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
-import plcc.Main;
 import plcc.Settings;
 import proteinstructure.Chain;
 import proteinstructure.Residue;
+import proteinstructure.SSE;
 import tools.DP;
 
 /**
@@ -51,6 +53,7 @@ import tools.DP;
  */
 public class ComplexGraph extends UAdjListGraph {
 
+    private final int numberChains;  // Number of chains
     public Map<Edge, String[]> chainNamesInEdge;
     public Map<Edge, Integer> numHelixHelixInteractionsMap;
     public Map<Edge, Integer> numHelixStrandInteractionsMap;
@@ -68,10 +71,13 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Vertex, String> molMap;  // contains for each vertex (= protein chain) the corresponding molecule name
     public Map<List<Integer>, Integer> numSSEContacts;
     public Map<List<Integer>, List<String>> numSSEContactChainNames;
+    
+    private final Boolean createContactInfo;
+    private ArrayList<String> contactInfo;
 
     private Integer[][] numChainInteractions;
     private Integer[][] homologueChains;
-    private String[] chainResAASeq;
+    private final String[] chainResAASeq;
     public Integer neglectedEdges;
 
     /**
@@ -83,10 +89,16 @@ public class ComplexGraph extends UAdjListGraph {
 
     /**
      * Constructor.
+     * @param pdbid RSCB PDB ID
+     * @param chains
+     * @param resContacts
+     * @param createConInfo Whether contact info for writing of GML should be created. Usually pass plcc_B_writeComplexContactCSV setting.
      */
-    public ComplexGraph(String pdbid, List<Chain> chains, List<MolContactInfo> resContacts) {
+    public ComplexGraph(String pdbid, List<Chain> chains, List<MolContactInfo> resContacts, Boolean createConInfo) {
         this.pdbid = pdbid;
-
+        numberChains = chains.size();
+        createContactInfo = createConInfo;
+        
         numHelixHelixInteractionsMap = createEdgeMap();
         numHelixStrandInteractionsMap = createEdgeMap();
         numHelixCoilInteractionsMap = createEdgeMap();
@@ -108,15 +120,12 @@ public class ComplexGraph extends UAdjListGraph {
         lastColorStep = 0;
         neglectedEdges = 0;
         
-        chainResAASeq = new String[chains.size()];
+        chainResAASeq = new String[numberChains];
         
         createVertices(chains);
-        
-        numChainInteractions = new Integer[chains.size()][chains.size()];
-        
         createHomologueChainsMatrix(chains);
-        
         calculateNumChainInteractions(resContacts);
+        createEdges(resContacts);
     }
     
     
@@ -180,11 +189,11 @@ public class ComplexGraph extends UAdjListGraph {
     
     
     /**
-     * 
-     * @param resContacts 
+     * Creates and fills number of chain interactions matrix.
+     * @param resContacts Residue contacts
      */
     private void calculateNumChainInteractions(List<MolContactInfo> resContacts) {
-    // calculate sum of interchain contacts
+        numChainInteractions = new Integer[numberChains][numberChains];
         for(Integer i = 0; i < resContacts.size(); i++){
             ComplexGraph.Vertex chainA = getVertexFromChain(resContacts.get(i).getMolA().getChainID());
             ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
@@ -201,6 +210,426 @@ public class ComplexGraph extends UAdjListGraph {
                     numChainInteractions[chainAint][chainBint]++;
                     numChainInteractions[chainBint][chainAint]++;
                 }
+            }
+        }
+    }
+    
+    
+    /**
+     * Creates edges and if required contact info for csv.
+     * @param resContacts Residue contacts
+     */
+    private void createEdges(List<MolContactInfo> resContacts) {
+        if (createContactInfo) {
+            contactInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
+                  + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");
+        }
+        
+        // inform here if edge threshold is >1 (below it would result in multiple prints)
+        if (Settings.getInteger("plcc_I_cg_contact_threshold") > 1) {    
+            if (! Settings.getBoolean("plcc_B_silent")) {
+                System.out.println("  Complex graph contact threshold for edges is set to "
+                        + Settings.getInteger("plcc_I_cg_contact_threshold").toString()
+                        + ". Resulting graphs may differ from default setting '1' where all "
+                        + "edges are drawn.");
+            }
+        }
+        
+        // create edges for all contacts
+        for(Integer i = 0; i < resContacts.size(); i++) {
+            ComplexGraph.Vertex chainA = getVertexFromChain(resContacts.get(i).getMolA().getChainID());
+            ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
+            
+            Integer chainAint = Integer.parseInt(chainA.toString());
+            Integer chainBint = Integer.parseInt(chainB.toString());
+            
+            // We only want interchain contacts with a certain threshold of contacts
+            if (chainsHaveEnoughContacts(chainAint, chainBint)){
+                
+                MolContactInfo curResCon = resContacts.get(i);
+                
+                // Die Datenkrake
+                String chainAString = curResCon.getMolA().getChainID().toString();
+                String chainBString = curResCon.getMolB().getChainID().toString();
+                String resNameA = curResCon.getName3A();
+                String resNameB = curResCon.getName3B();
+                String resTypeA = curResCon.getMolA().getSSETypePlcc();
+                String resTypeB = curResCon.getMolB().getSSETypePlcc();
+                
+                String BBDist = curResCon.getBBContactDist().toString();
+                String BCDist = curResCon.getBCContactDist().toString();
+                String BLDist = curResCon.getBLContactDist().toString();
+                String CBDist = curResCon.getCBContactDist().toString();
+                String CLDist = curResCon.getCLContactDist().toString();
+                String CCDist = curResCon.getCCContactDist().toString();
+                String HB1Dist = curResCon.getHB1Dist().toString();
+                String HB2Dist = curResCon.getHB2Dist().toString();
+                String LBDist = curResCon.getLBContactDist().toString();
+                String LCDist = curResCon.getLCContactDist().toString();
+                String LLDist = curResCon.getLLContactDist().toString();
+                                
+                String numBB = curResCon.getNumContactsBB().toString();
+                String numBC = curResCon.getNumContactsBC().toString();
+                String numBL = curResCon.getNumContactsBL().toString();
+                String numCB = curResCon.getNumContactsCB().toString();
+                String numCL = curResCon.getNumContactsCL().toString();
+                String numCC = curResCon.getNumContactsCC().toString();
+                String numHB1 = curResCon.getNumContactsHB1().toString();
+                String numHB2 = curResCon.getNumContactsHB2().toString();
+                String numLB = curResCon.getNumContactsLB().toString();
+                String numLC = curResCon.getNumContactsLC().toString();
+                String numLL = curResCon.getNumContactsLL().toString();
+                
+                
+                // Only if both residues belong to a SSE..
+                if (curResCon.getMolA().getSSE() != null && curResCon.getMolB().getSSE() != null) {
+                    //.. and are of type helix or strand
+                    if ((!Objects.equals(curResCon.getMolA().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
+                            && !Objects.equals(curResCon.getMolA().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))
+                            && (!Objects.equals(curResCon.getMolB().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
+                            && !Objects.equals(curResCon.getMolB().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))) {
+
+                        Integer ResASseDsspNum = curResCon.getMolA().getSSE().getStartDsspNum();
+                        Integer ResBSseDsspNum = curResCon.getMolB().getSSE().getStartDsspNum();
+
+                        
+                        Integer tmp;
+                        String tmpName;
+                        if (ResASseDsspNum > ResBSseDsspNum) {
+                            tmp = ResBSseDsspNum;
+                            tmpName = chainBString;
+
+                            ResBSseDsspNum = ResASseDsspNum;
+                            chainBString = chainAString;
+
+                            ResASseDsspNum = tmp;
+                            chainAString = tmpName;
+                        }
+
+                        List<Integer> SSEPair = Arrays.asList(ResASseDsspNum, ResBSseDsspNum);
+                        List<String> NamePair = Arrays.asList(chainAString, chainBString);
+
+                        numSSEContactChainNames.put(SSEPair, NamePair);
+                        if (numSSEContacts.get(SSEPair) == null) {
+                            numSSEContacts.put(SSEPair, 1);
+                        } else {
+                            numSSEContacts.put(SSEPair, numSSEContacts.get(SSEPair) + 1);
+                        }
+                    }
+
+                }
+                      
+                                
+                //This is for CSV output only. Like the most of the code above.
+                if (createContactInfo) {
+                contactInfo.add(chainAString + ";" + chainBString + ";" + resNameA + ";" + resNameB + ";" + 
+                            resTypeA + ";" + resTypeB + ";" + numBB + ";" + numBC + ";" + numBL + ";" + 
+                            numCB + ";" + numCL + ";" + numCC + ";" + numHB1 + ";" + numHB2 + ";" + 
+                            numLB + ";" + numLC + ";" + numLL + ";" + BBDist + ";" + BCDist + ";" + 
+                            BLDist + ";" + CBDist + ";" + CLDist + ";" + CCDist + ";" + HB1Dist + ";" + 
+                            HB2Dist + ";" + LBDist + ";" + LCDist + ";" + LLDist);
+                }
+
+                String[] chainPair = {chainAString, chainBString};
+                
+                if (getEdge(chainA, chainB) == null){
+                    // We don't have an edge yet, but need one, so create an edge
+                    ComplexGraph.Edge e1 = createEdge(chainA, chainB);
+                    chainNamesInEdge.put(e1, chainPair);
+                    numAllInteractionsMap.put(e1, 1); // rather weird: 1 is added here, therefore the first contact is skipped later. We will have to change this and sum up the others in the end, (which of them depending on the graph type)
+                    numHelixHelixInteractionsMap.put(e1, 0);
+                    numHelixStrandInteractionsMap.put(e1, 0);
+                    numHelixCoilInteractionsMap.put(e1, 0);
+                    numHelixLigandInteractionsMap.put(e1, 0);
+                    numStrandStrandInteractionsMap.put(e1, 0);
+                    numStrandCoilInteractionsMap.put(e1, 0);
+                    numStrandLigandInteractionsMap.put(e1, 0);
+                    numCoilCoilInteractionsMap.put(e1, 0);
+                    numCoilLigandInteractionsMap.put(e1, 0);
+                    numLigandLigandInteractionsMap.put(e1, 0);
+                    
+                    
+                    if (resContacts.get(i).getMolA().getSSE()!=null){
+                        // the 1st residue of this contact belongs to a valid PTGL SSE
+                        int firstSSEClass = resContacts.get(i).getMolA().getSSE().getSSETypeInt();
+                        switch (firstSSEClass){                            
+                            case 1: // SSECLASS_HELIX
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixHelixInteractionsMap.put(e1, 1);  // we are creating a new edge, so this is the first contact
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numHelixStrandInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            //System.out.println("Ligand Contact");
+                                            numHelixLigandInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 4:
+                                            numHelixCoilInteractionsMap.put(e1, 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numHelixCoilInteractionsMap.put(e1, 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                            case 2: // SSECLASS_BETASTRAND
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixStrandInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numStrandStrandInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            numStrandLigandInteractionsMap.put(e1, 1);
+                                            //System.out.println("Ligand Contact");
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numStrandCoilInteractionsMap.put(e1, 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numStrandCoilInteractionsMap.put(e1, 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                            case 3: // SSECLASS_LIGAND
+                                //System.out.println("Ligand Contact");
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixLigandInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numStrandLigandInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            numLigandLigandInteractionsMap.put(e1, 1);
+                                            //System.out.println("Ligand Contact");
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numCoilLigandInteractionsMap.put(e1, 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numCoilLigandInteractionsMap.put(e1, 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                            case 4:
+                                //System.out.println("Other Contact");
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixCoilInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numStrandCoilInteractionsMap.put(e1, 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            numCoilLigandInteractionsMap.put(e1, 1);
+                                            //System.out.println("Ligand Contact");
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numCoilCoilInteractionsMap.put(e1, 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numCoilCoilInteractionsMap.put(e1, 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                        }
+                    }
+                    else{
+                        // the first residue of this contact does NOT belong to a valid PTGL SSE, i.e., it is a coil
+                        if (resContacts.get(i).getMolB().getSSE()!=null){
+                            int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                            switch (secondSSE){
+                                case 1: // SSECLASS_HELIX
+                                    numHelixCoilInteractionsMap.put(e1, 1);
+                                    break;
+                                case 2: // SSECLASS_BETASTRAND
+                                    numStrandCoilInteractionsMap.put(e1, 1);
+                                    break;
+                                case 3: // SSECLASS_LIGAND
+                                    //System.out.println("Ligand Contact");
+                                    numCoilLigandInteractionsMap.put(e1, 1);
+                                    break;
+                                case 4:
+                                    //System.out.println("Other Contact");
+                                    numCoilCoilInteractionsMap.put(e1, 1);
+                                    break;
+                            }
+
+                        }
+                        else{
+                            numCoilCoilInteractionsMap.put(e1, 1);
+                            //System.out.println("Loop-loop Contact");
+                        }
+                    }
+                    //System.out.println("Contact found between chainName " + resContacts.get(i).getMolA().getChainID() + " and chainName " + resContacts.get(i).getMolB().getChainID());
+                }
+                else{
+                    // We already have an edge, just adjust values
+                    numAllInteractionsMap.put(getEdge(chainA, chainB), numAllInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                    if (resContacts.get(i).getMolA().getSSE()!=null){
+                        // first residue of contact belongs to valid PTGL SSE, i.e., is NOT a coil
+                        int firstSSE = resContacts.get(i).getMolA().getSSE().getSSETypeInt();
+                        switch (firstSSE){
+                            case 1: // SSECLASS_HELIX
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixHelixInteractionsMap.put(getEdge(chainA, chainB), numHelixHelixInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numHelixStrandInteractionsMap.put(getEdge(chainA, chainB), numHelixStrandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            //System.out.println("Ligand Contact");
+                                            numHelixLigandInteractionsMap.put(getEdge(chainA, chainB), numHelixLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numHelixCoilInteractionsMap.put(getEdge(chainA, chainB), numHelixCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numHelixCoilInteractionsMap.put(getEdge(chainA, chainB), numHelixCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                            case 2: // SSECLASS_BETASTRAND
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixStrandInteractionsMap.put(getEdge(chainA, chainB), numHelixStrandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numStrandStrandInteractionsMap.put(getEdge(chainA, chainB), numStrandStrandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            //System.out.println("Ligand Contact");
+                                            numStrandLigandInteractionsMap.put(getEdge(chainA, chainB), numStrandLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numStrandCoilInteractionsMap.put(getEdge(chainA, chainB), numStrandCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numStrandCoilInteractionsMap.put(getEdge(chainA, chainB), numStrandCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                            case 3: // SSECLASS_LIGAND
+                                //System.out.println("Ligand Contact");
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixLigandInteractionsMap.put(getEdge(chainA, chainB), numHelixLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numStrandLigandInteractionsMap.put(getEdge(chainA, chainB), numStrandLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            //System.out.println("Ligand Contact");
+                                            numLigandLigandInteractionsMap.put(getEdge(chainA, chainB), numLigandLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numCoilLigandInteractionsMap.put(getEdge(chainA, chainB), numCoilLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numCoilLigandInteractionsMap.put(getEdge(chainA, chainB), numCoilLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                            case 4:
+                                //System.out.println("Other Contact");
+                                if (resContacts.get(i).getMolB().getSSE()!=null){
+                                    int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                                    switch (secondSSE){
+                                        case 1: // SSECLASS_HELIX
+                                            numHelixCoilInteractionsMap.put(getEdge(chainA, chainB), numHelixCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 2: // SSECLASS_BETASTRAND
+                                            numStrandCoilInteractionsMap.put(getEdge(chainA, chainB), numStrandCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 3: // SSECLASS_LIGAND
+                                            //System.out.println("Ligand Contact");
+                                            numCoilLigandInteractionsMap.put(getEdge(chainA, chainB), numCoilLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                        case 4:
+                                            //System.out.println("Other Contact");
+                                            numCoilCoilInteractionsMap.put(getEdge(chainA, chainB), numCoilCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                            break;
+                                    }
+                                }
+                                else{
+                                    numCoilCoilInteractionsMap.put(getEdge(chainA, chainB), numCoilCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    //System.out.println("Loop Contact");
+                                }
+                                break;
+                        }
+                    }
+                    else{   // first residue of contact does NOT belong to valid PTGL SSE, i.e., is a coil
+                        if (resContacts.get(i).getMolB().getSSE()!=null){
+                            int secondSSE = resContacts.get(i).getMolB().getSSE().getSSETypeInt();
+                            switch (secondSSE){
+                                case 1: // SSECLASS_HELIX
+                                    numHelixCoilInteractionsMap.put(getEdge(chainA, chainB), numHelixCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    break;
+                                case 2: // SSECLASS_BETASTRAND
+                                    numStrandCoilInteractionsMap.put(getEdge(chainA, chainB), numStrandCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    break;
+                                case 3: // SSECLASS_LIGAND
+                                    //System.out.println("Ligand Contact");
+                                    numCoilLigandInteractionsMap.put(getEdge(chainA, chainB), numCoilLigandInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    break;
+                                case 4:
+                                    //System.out.println("Other Contact");
+                                    numCoilCoilInteractionsMap.put(getEdge(chainA, chainB), numCoilCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                                    break;
+                            }
+                        }
+                        else{
+                            numCoilCoilInteractionsMap.put(getEdge(chainA, chainB), numCoilCoilInteractionsMap.get(getEdge(chainA, chainB)) + 1);
+                            //System.out.println("Loop Contact");
+                        }
+                    }
+                }
+                
+                // TODO: Test by Tim: maybe we should delete the edge if it has no contacts:
+                
+                if(numAllInteractionsMap.get(getEdge(chainA, chainB)) == 0) {
+                    removeEdge(getEdge(chainA, chainB));
+                }
+            } else {
+                neglectedEdges++; // TODO: so wrong...
             }
         }
     }
@@ -867,5 +1296,10 @@ public class ComplexGraph extends UAdjListGraph {
 
         }
         return allOK;
+    }
+    
+    
+     public ArrayList<String> getContactInfo() {
+        return contactInfo;
     }
 }
