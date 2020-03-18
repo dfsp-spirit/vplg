@@ -40,7 +40,9 @@ import io.DBManager;
 import io.FileParser;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import plcc.Settings;
 import proteinstructure.Chain;
 import proteinstructure.Residue;
@@ -77,15 +79,14 @@ public class ComplexGraph extends UAdjListGraph {
 
     private Integer[][] numChainInteractions;
     private Integer[][] homologueChains;
+    private final Set<String> molIDs;  // Contains the mol IDs for all chains. Used to get number of mol IDs (= size)
     private final String[] chainResAASeq;
     public Integer neglectedEdges;
 
     /**
      * The RCSB PDB id this graph is based on.
      */
-    private String pdbid;
-    private float lastColorStep;
-    private float[] savedVertexColors;
+    private final String pdbid;
 
     /**
      * Constructor.
@@ -113,11 +114,11 @@ public class ComplexGraph extends UAdjListGraph {
         numDisulfidesMap = createEdgeMap();
         proteinNodeMap = createVertexMap();
         molMap = createVertexMap();
+        molIDs = new HashSet<>();
         chainNamesInEdge = createEdgeMap();
         numSSEContacts = new HashMap<>();
         numSSEContactChainNames = new HashMap<>();
 
-        lastColorStep = 0;
         neglectedEdges = 0;
         
         chainResAASeq = new String[numberChains];
@@ -138,6 +139,7 @@ public class ComplexGraph extends UAdjListGraph {
             Vertex v = createVertex();
             proteinNodeMap.put(v, chains.get(i).getPdbChainID());
             molMap.put(v, FileParser.getMetaInfo(pdbid, chains.get(i).getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
+            molIDs.add(FileParser.getMetaInfo(pdbid, chains.get(i).getPdbChainID()).getMolName());
 
             // get AA sequence string for each chainName
             for(Residue resi : chains.get(i).getResidues()) {
@@ -780,12 +782,28 @@ public class ComplexGraph extends UAdjListGraph {
         return true;
     }
 
+    // Old color function: was insensitive to the case of many vertices and few MolIDs (Homologues)
+    /*
     private float getUniqueColor(Integer numVertices) {
         float step = 360 / (numVertices + 1); // +1 to avoid double red
         float hue = (lastColorStep + step) / 360;
-        lastColorStep += step;
+        lastColorStep += step;      
         return hue;
     }
+    */
+    
+    
+    /**
+     * Returns a hue based on the molID in relation to the total number of molIDs. Requires molIDs to be filled.
+     * All homologous chains get the same color and the colors of all Homologues are distinct with equal distance to each other. 
+     * @param molID
+     * @return 
+     */
+    public float getUniqueHue(Integer molID) {
+        //return (360f / (molIDs.size()) * molID) / 360f;
+        return 1f / molIDs.size() * (molID - 1);
+    }
+    
 
     /**
      * Draws a complex graph
@@ -977,60 +995,48 @@ public class ComplexGraph extends UAdjListGraph {
         }
 
         ig2.setFont(font);
-        // Draw the vertices as circles
-        Ellipse2D.Double circle;
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
         
-        boolean colorSet = false;
-        cg.savedVertexColors = new float[cg.getVertices().size()];
+        Iterator<Vertex> vertIter = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for getUniqueHue
+        Vertex curVert;
+        
         for (Integer i = 0; i < cg.getVertices().size(); i++) {
-            // set standard color
-            ig2.setPaint(Color.GRAY);
-            if (bw) {
-                ig2.setPaint(Color.GRAY);
-            }      // for non-protein graphs
+            curVert = vertIter.next();
 
+            // standard color: saturation and brightness will not be changed
             // set hue, saturation, brighness
             float h = (float) 0.5;
             float s = (float) 1.0; // change this for saturation (higher = more saturated)
             float b = (float) 0.8; // change this for brightness (0.0 -> Dark/Black)
             
-            for (Integer j = 0; j < cg.getVertices().size(); j++) {
-                // if chain has an homologue partner...
-                if (cg.homologueChains[i][j] != null) {
-                    if (cg.homologueChains[i][j] == 1) {
-                        // if homologue partner wasn't colored before..
-                        if (cg.savedVertexColors[i] == 0) {
-                            h = cg.getUniqueColor(numVerts); //get unique color
-
-                            for (int y = j; y < cg.homologueChains.length; y++) {
-
-                                if (cg.homologueChains[i][y] == 1) {
-                                    cg.savedVertexColors[i] = h;
-                                    cg.savedVertexColors[y] = h;
-                                }
-                            }
-
-                            colorSet = true;
-
-                        } else {
-                            h = cg.savedVertexColors[i];
-                        }
-                        ig2.setPaint(Color.getHSBColor(h, s, b));
-                        colorSet = true;
-                    }
+            if (! bw) {
+                ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert)))), s, b));
+            } else {
+                ig2.setPaint(Color.GRAY);
+            }
+            
+            // following code produces a color palette for m graphs containing n = 1..m vertices
+            //   it is best to set min_width and min_height to 1200 and 900
+            //   and turn header and footer off
+            //   you can switch between 'old' getUniqueColor and 'new' getUniqueHue
+            //   the result is saved as chain CG
+            //   Important to note: the 'old' function is insensitive to the case of many nodes and few molIDs
+            /*
+            cg.molIDs.clear();
+            for (Integer m = 1; m <= 80; m++) {
+                System.out.println("m: " + m);
+                cg.lastColorStep = 0;
+                cg.molIDs.add(m.toString());
+                for (int n = 1; n <= m; n++) {
+                    rect = new Rectangle2D.Double(0 + n * 10, 0 + m * 10, 10, 10);
+                    //ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), s, b));
+                    ig2.setPaint(Color.getHSBColor(cg.getUniqueColor(m), s, b));
+                    ig2.fill(rect);
                 }
             }
-           
-            // if no homologue chains occur
-            if (!colorSet) { 
-                h = cg.getUniqueColor(numVerts); //get unique color
-                cg.savedVertexColors[i] = h;
-                ig2.setPaint(Color.getHSBColor(h, s, b));
-            }
-            colorSet = false;
-
+            i = 1000;  // no edges and vertices
+            */
             
         // pick color depending on SSE type
 
