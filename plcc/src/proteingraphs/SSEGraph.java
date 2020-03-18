@@ -2341,14 +2341,33 @@ E	3	3	3
         return this.hasCycleInVertexSet(allIndices);
     }
     
+    /**
+     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a barrel.
+     * The vertices contain a barrel, when the graph is a connected cycle. So every vertex has degree 2.
+     * The graph is connected, because the vertices belong to a Folding Graph.
+     * @param vertexPositions the vertices to consider (by index in this graph)
+     * @return true if a barrel exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
+     */
+    public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions){
+       for (int i: vertexPositions){
+           if (this.degreeOfVertex(i) != 2){// checks if vertex i has degree 2
+              break;
+           }
+           if (i == vertexPositions.size() - 1){ //true, if all vertices have degree 2
+               return true;
+           }
+       }
+       return false;
+    }
     
+    //remove l8er
     /**
      * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle.
      * Note that this function only works if all vertices in the list are connected.
      * @param vertexPositions the vertices to consider (by index in this graph)
      * @return true if a cycle exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
      */
-    public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions) {
+    public Boolean hasCycleInVertexSetOld(ArrayList<Integer> vertexPositions) { //Liste, die so lang ist, wie Anz. SSEs, Indize entspricht Inhalt der Liste
         // enter new code here
         
         Stack<Integer> stack = new Stack<Integer>();
