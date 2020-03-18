@@ -2349,6 +2349,7 @@ E	3	3	3
      * @return true if a cycle exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
      */
     public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions) {
+        // enter new code here
         
         Stack<Integer> stack = new Stack<Integer>();
         HashSet<Integer> visited = new HashSet<Integer>();
