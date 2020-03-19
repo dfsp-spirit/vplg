@@ -2342,9 +2342,9 @@ E	3	3	3
     }
     
     /**
-     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a barrel.
+     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle (barrel).
      * The vertices contain a barrel, when the graph is a connected cycle. So every vertex has degree 2.
-     * The graph is connected, because the vertices belong to a Folding Graph.
+     * The graph is already connected, because the vertices belong to a Folding Graph.
      * @param vertexPositions the vertices to consider (by index in this graph)
      * @return true if a barrel exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
      */
@@ -2359,44 +2359,6 @@ E	3	3	3
        }
        return false;
     }
-    
-    //remove l8er
-    /**
-     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle.
-     * Note that this function only works if all vertices in the list are connected.
-     * @param vertexPositions the vertices to consider (by index in this graph)
-     * @return true if a cycle exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
-     */
-    public Boolean hasCycleInVertexSetOld(ArrayList<Integer> vertexPositions) { //Liste, die so lang ist, wie Anz. SSEs, Indize entspricht Inhalt der Liste
-        // enter new code here
-        
-        Stack<Integer> stack = new Stack<Integer>();
-        HashSet<Integer> visited = new HashSet<Integer>();
-        Integer cur;
-        int start; int end;
-        
-        stack.add(vertexPositions.get(0));
-        while(stack.size() > 0) {
-            cur = stack.remove(0);
-            if( ! visited.contains(cur)) {
-                visited.add(cur);
-                ArrayList<Integer> curNeighbors = this.neighborsOfFromSet(cur, vertexPositions);
-                start = 0;
-                end = curNeighbors.size() - 1;
-                while(start < end) {
-                    if(visited.contains(curNeighbors.get(start))) {
-                        return true;
-                    }
-                    else {
-                        stack.add(curNeighbors.get(start));
-                    }
-                    start++;
-                }
-            }
-        }
-        return false;
-    }
-    
     
     /**
      * Tests whether the given vertex set is connected, i.e., each vertex is reachable from all other vertices.
