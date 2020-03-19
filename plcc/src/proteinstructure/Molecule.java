@@ -51,6 +51,49 @@ abstract public class Molecule {
     //constructor
     //public Molecule(){this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); this.Name3=null;}
 
+    public <T extends Molecule> Boolean contactPossibleWithResidue(T m) {
+        // ugly code: instead of instanceof some generic methods should be used
+        if (m instanceof Residue) {
+            Residue r;
+            r = (Residue) m;
+            
+            Integer dist = Integer.MAX_VALUE;
+            try {
+                dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
+            } catch(Exception e) {
+                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                    DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
+                }
+                return(false);
+            }
+            Integer atomRadius;
+            if(this.isLigand() || r.isLigand()) {
+                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
+            }
+            else {
+                atomRadius = Settings.getInteger("plcc_I_atom_radius");
+            }
+
+            Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
+            Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2) + justToBeSure;
+
+            //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
+            //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
+
+            if(dist > (maxDistForContact)) {
+                return(false);
+            }
+            else {
+                return(true);
+            }
+        } else {
+            DP.getInstance().w("Tried to get distance between Molecules. Due to ugly code this is not possible atm.");
+        }
+
+        // if one of them is Molecule or RNA
+        return false;
+    }
+    
     
     /**
      * Determines whether this Molecule has at least one Atom.
@@ -426,7 +469,7 @@ abstract public class Molecule {
      * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
      * @param r the other residue
      */
-    abstract public Boolean contactPossibleWithResidue(Molecule r);
+//    abstract public Boolean contactPossibleWithResidue(Molecule r);
     // NOTE the body of this function has been moved to Residue. It could possibly be implemented here with some changes
     
     
