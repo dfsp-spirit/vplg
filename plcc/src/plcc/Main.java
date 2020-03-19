@@ -12298,7 +12298,7 @@ public class Main {
             curResidue = resList.get(i);
             curResString = curResidue.getSSEString();
             curResidue.setSSEStringDssp(curResString);
-
+            
             // If coiled regions should be included, this line keeps them from being ignored below.
             // In this case, we also assign the SSE type "coil" to all SSEs which would otherwise be
             // ignored later by the getImportantSSEs() filter function. This way, each residue of the
@@ -12311,7 +12311,7 @@ public class Main {
                 }
                 
             }
-
+            
             //System.out.println("   *At DSSP residue " + curResidue.getDsspNum() + ", PDB name is " + curResidue.getFancyName() + ", SSE string is '" + curResString + "'.");
 
             if( ! curResString.equals(lastResString)) {
@@ -12380,6 +12380,14 @@ public class Main {
             // update for next iteration of loop
             lastResString = curResString;
         }
+        
+        /*System.out.println("!!!Let's do some research");
+        for(SSE item : dsspSSElist){
+            System.out.print("SSE type: "+ item.getSseType());
+            System.out.println(", Length: " + item.getLength());
+            System.out.print("Start DSSP Num: " + item.getStartDsspNum());
+            System.out.println(", End DSSP Num: " + item.getEndDsspNum() + "\n");
+        }*/
 
         //System.out.println("      Found " + dsspSSElist.size() + " SSEs according to DSSP definition.");
         return(dsspSSElist);
@@ -12510,7 +12518,9 @@ public class Main {
         }
 
         // Let's do some pre-filtering to get all the SSEs we don't want out of there first
-        List<SSE> impSSEs = getImportantSSETypes(inputSSEs);
+        // hier könnte neue Methode aufgerufen werden, die EEB und EE_E zu einem Strand vereint
+        List<SSE> mergedSSEs = mergeDsspSSEsStrandAndBridge(inputSSEs);
+        List<SSE> impSSEs = getImportantSSETypes(mergedSSEs);
         List<SSE> consideredSSEs = removeShortSSEs(impSSEs, Settings.getInteger("plcc_I_min_SSE_length"));
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
@@ -12612,6 +12622,40 @@ public class Main {
 
         return(outputSSEs);
 
+    }
+    
+    private static List<SSE> mergeDsspSSEsStrandAndBridge(List<SSE> list){
+        List<SSE> newList = new ArrayList<SSE>();
+        System.out.println("!!!Yay! This is our new method! Say hello!");
+        
+        for(int i = 0; i < list.size() - 1; i++) {
+            if (list.get(i).getSseType() == "B" && list.get(i + 1).getSseType() == "E"){
+                if (list.get(i).getEndDsspNum() == list.get(i + 1).getStartDsspNum() + 1){
+                    System.out.println("!!!Let's merge here!");
+                    //create new SSE
+                    //SSE newSSE;
+                    //newList.add(newSSE);
+                    i++;
+                }
+                
+            }
+            else if (list.get(i).getSseType() == "E" && list.get(i + 1).getSseType() == "B"){
+                if (list.get(i).getEndDsspNum() == list.get(i + 1).getStartDsspNum() + 1){
+                    System.out.println("!!!Let's merge here!");
+                    //create new SSE
+                    //SSE newSSE;
+                    //newList.add(newSSE);
+                    i++;
+                }
+            }
+            else{
+                //newList.add(list.get(i));
+            }
+            
+        newList.add(list.get(i)); //remove l8er
+        }
+        
+        return newList;
     }
 
     
