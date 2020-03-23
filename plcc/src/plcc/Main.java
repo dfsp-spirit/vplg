@@ -957,6 +957,11 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                     if (s.equals("-T") || s.equals("--b-to-e")){
+                        argsUsed[i] = true;
+                        Settings.set("plcc_B_change_dssp_sse_b_to_e", "true");
+                    }
+                                        
                     if(s.equals("-B") || s.equals("--force-backbone")) {
                         Settings.set("plcc_B_forceBackboneContacts", "true");
                         argsUsed[i] = true;
@@ -1523,7 +1528,7 @@ public class Main {
                         Settings.set("plcc_include_rna", "true");
                     }
                     
-                    
+                   
                     
                     if(s.equals("--matrix-structure-search")) {
                         if(args.length <= i+3 ) {
@@ -11187,6 +11192,7 @@ public class Main {
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("     --draw-gml-graph <f>  : read graph in GML format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("     --props-gml-graph <f> : read graph in GML format from file <f> and compute graph properties, then exit (pdbid will be ignored)*");
+        System.out.println("-T | --b-to-e              : for all residues convert the SSE type B to SSE type E (may lead to more beta strands in the Protein graph)");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
@@ -12292,16 +12298,17 @@ public class Main {
         Residue curResidue, lastResidue;
         curResidue = lastResidue = null;
         String coil = Settings.get("plcc_S_coilSSECode");
-
+        
         for(Integer i = 0; i < resList.size(); i++) {
-
-            curResidue = resList.get(i);
-            //remove l8er
-            /*if (i == 2 || i == 40){ //ein bisschen cheaten, um die neue merge-Methode für 7tim zu überprüfen
-                curResidue.setSSEString("B");
-            }*/
             
+            curResidue = resList.get(i);
             curResString = curResidue.getSSEString();
+            
+            if (Settings.getBoolean("plcc_B_change_dssp_sse_b_to_e") && curResString.equals("B")){
+                curResString = "E";
+                curResidue.setSSEString("E");
+            }
+            
             curResidue.setSSEStringDssp(curResString);
             
             // If coiled regions should be included, this line keeps them from being ignored below.
@@ -12385,7 +12392,7 @@ public class Main {
             // update for next iteration of loop
             lastResString = curResString;
         }
-       
+        //remove l8er
         System.out.println("!!!Let's show the SSEs:");
         for(SSE item : dsspSSElist){
             System.out.print("SSE type: "+ item.getSseType());
