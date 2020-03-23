@@ -12296,6 +12296,11 @@ public class Main {
         for(Integer i = 0; i < resList.size(); i++) {
 
             curResidue = resList.get(i);
+            //remove l8er
+            if (i == 2 || i == 40){ //ein bisschen cheaten, um die neue merge-Methode für 7tim zu überprüfen
+                curResidue.setSSEString("B");
+            }
+            
             curResString = curResidue.getSSEString();
             curResidue.setSSEStringDssp(curResString);
             
@@ -12380,14 +12385,14 @@ public class Main {
             // update for next iteration of loop
             lastResString = curResString;
         }
-        
-        /*System.out.println("!!!Let's do some research");
+       
+        System.out.println("!!!Let's show the SSEs:");
         for(SSE item : dsspSSElist){
             System.out.print("SSE type: "+ item.getSseType());
             System.out.println(", Length: " + item.getLength());
             System.out.print("Start DSSP Num: " + item.getStartDsspNum());
             System.out.println(", End DSSP Num: " + item.getEndDsspNum() + "\n");
-        }*/
+        }
 
         //System.out.println("      Found " + dsspSSElist.size() + " SSEs according to DSSP definition.");
         return(dsspSSElist);
@@ -12623,36 +12628,70 @@ public class Main {
         return(outputSSEs);
 
     }
-    
+    /**
+     * Finds the two following SSEs EB or BE and merges them to one SSE, if there is no gap between them in the AA sequence.
+     * This method solves the problem that three AA with the DSSP code EEB or BEE are not recognised as one SSE.
+     * @param list input list of SSEs
+     * @return a new list with merged SSEs
+     */
     private static List<SSE> mergeDsspSSEsStrandAndBridge(List<SSE> list){
         List<SSE> newList = new ArrayList<SSE>();
         System.out.println("!!!Yay! This is our new method! Say hello!");
         
         for(int i = 0; i < list.size() - 1; i++) {
-            if (list.get(i).getSseType() == "B" && list.get(i + 1).getSseType() == "E"){
-                if (list.get(i).getEndDsspNum() == list.get(i + 1).getStartDsspNum() + 1){
-                    System.out.println("!!!Let's merge here!");
-                    //create new SSE
-                    //SSE newSSE;
-                    //newList.add(newSSE);
-                    i++;
-                }
+            //System.out.println(list.get(i).getSseType().charAt(0));
+            //these are two possible SSEs for merging
+            SSE curSSE = list.get(i);
+            SSE nextSSE = list.get(i + 1);
+            String curSSEtype = curSSE.getSseType();
+            String nextSSEtype = nextSSE.getSseType();
+            
+            //two SSEs (B and E) will be merged, when ...
+            if ( (curSSEtype.equals("B") && nextSSEtype.equals("E")) ||
+                 (curSSEtype.equals("E") && nextSSEtype.equals("B")) ) {
+                //System.out.println(list.get(i).getEndDsspNum() + " und " + list.get(i + 1).getStartDsspNum());
                 
-            }
-            else if (list.get(i).getSseType() == "E" && list.get(i + 1).getSseType() == "B"){
-                if (list.get(i).getEndDsspNum() == list.get(i + 1).getStartDsspNum() + 1){
-                    System.out.println("!!!Let's merge here!");
-                    //create new SSE
-                    //SSE newSSE;
-                    //newList.add(newSSE);
-                    i++;
+                //... there is no AA between them
+                if (curSSE.getEndDsspNum() == nextSSE.getStartDsspNum() - 1){ //checks if the two SSEs follow directls in the AA Sequence, DSSP number is an index in the AA sequence
+                    System.out.println("!!!Let's merge!");
+                    //combine curSSE and nextSSE in newSSE
+                    SSE newSSE = new SSE("E");
+                    
+                    //new residue properties for the residues of the SSE with type "B" (this can be curSSE or nextSSE)
+                    if (curSSEtype.equals("B")){
+                        for (Residue res : curSSE.getResidues()){
+                        res.setSSE(newSSE);
+                        res.setSSEString("E");
+                        }
+                    }
+                    else { //nextSSE has type "B"
+                        for (Residue res : nextSSE.getResidues()){
+                        res.setSSE(newSSE);
+                        res.setSSEString("E");
+                        }
+                    }
+                    
+                    //add residues
+                    newSSE.addResidues(curSSE.getResidues());
+                    newSSE.addResidues(nextSSE.getResidues());
+                    
+                    //set new sequential number of the SSE
+                    newSSE.setSeqSseNumDssp(newList.size() + 1);
+                    
+                    //set SSE type
+                    newSSE.setSseType("E");
+                    
+                    newList.add(newSSE);
+                    i++; //cause we already considered "nextSSE", the SSE in the next iteration
                 }
             }
             else{
-                //newList.add(list.get(i));
+                newList.add(list.get(i));
             }
-            
-        newList.add(list.get(i)); //remove l8er
+        }
+        System.out.println("new list: ");
+        for (SSE item : newList){
+            System.out.println(item.getSseType());
         }
         
         return newList;
