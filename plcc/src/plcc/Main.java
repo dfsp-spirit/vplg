@@ -12297,9 +12297,9 @@ public class Main {
 
             curResidue = resList.get(i);
             //remove l8er
-            if (i == 2 || i == 40){ //ein bisschen cheaten, um die neue merge-Methode für 7tim zu überprüfen
+            /*if (i == 2 || i == 40){ //ein bisschen cheaten, um die neue merge-Methode für 7tim zu überprüfen
                 curResidue.setSSEString("B");
-            }
+            }*/
             
             curResString = curResidue.getSSEString();
             curResidue.setSSEStringDssp(curResString);
@@ -12523,9 +12523,7 @@ public class Main {
         }
 
         // Let's do some pre-filtering to get all the SSEs we don't want out of there first
-        // hier könnte neue Methode aufgerufen werden, die EEB und EE_E zu einem Strand vereint
-        List<SSE> mergedSSEs = mergeDsspSSEsStrandAndBridge(inputSSEs);
-        List<SSE> impSSEs = getImportantSSETypes(mergedSSEs);
+        List<SSE> impSSEs = getImportantSSETypes(inputSSEs);
         List<SSE> consideredSSEs = removeShortSSEs(impSSEs, Settings.getInteger("plcc_I_min_SSE_length"));
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
@@ -12631,15 +12629,15 @@ public class Main {
     /**
      * Finds the two following SSEs EB or BE and merges them to one SSE, if there is no gap between them in the AA sequence.
      * This method solves the problem that three AA with the DSSP code EEB or BEE are not recognised as one SSE.
+     * This method is not necessary anymore, because there is a Setting that changes all SSEs "B" to "E".
      * @param list input list of SSEs
      * @return a new list with merged SSEs
      */
+    @Deprecated
     private static List<SSE> mergeDsspSSEsStrandAndBridge(List<SSE> list){
         List<SSE> newList = new ArrayList<SSE>();
-        System.out.println("!!!Yay! This is our new method! Say hello!");
         
         for(int i = 0; i < list.size() - 1; i++) {
-            //System.out.println(list.get(i).getSseType().charAt(0));
             //these are two possible SSEs for merging
             SSE curSSE = list.get(i);
             SSE nextSSE = list.get(i + 1);
@@ -12649,11 +12647,9 @@ public class Main {
             //two SSEs (B and E) will be merged, when ...
             if ( (curSSEtype.equals("B") && nextSSEtype.equals("E")) ||
                  (curSSEtype.equals("E") && nextSSEtype.equals("B")) ) {
-                //System.out.println(list.get(i).getEndDsspNum() + " und " + list.get(i + 1).getStartDsspNum());
                 
                 //... there is no AA between them
                 if (curSSE.getEndDsspNum() == nextSSE.getStartDsspNum() - 1){ //checks if the two SSEs follow directls in the AA Sequence, DSSP number is an index in the AA sequence
-                    System.out.println("!!!Let's merge!");
                     //combine curSSE and nextSSE in newSSE
                     SSE newSSE = new SSE("E");
                     
@@ -12689,11 +12685,6 @@ public class Main {
                 newList.add(list.get(i));
             }
         }
-        System.out.println("new list: ");
-        for (SSE item : newList){
-            System.out.println(item.getSseType());
-        }
-        
         return newList;
     }
 
