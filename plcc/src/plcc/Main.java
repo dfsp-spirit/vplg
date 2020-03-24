@@ -961,6 +961,11 @@ public class Main {
                         argsUsed[i] = true;
                         Settings.set("plcc_B_change_dssp_sse_b_to_e", "true");
                     }
+                    
+                     if (s.equals("-F")|| s.equals("--fill-gaps")){
+                        argsUsed[i] = true;
+                        Settings.set("plcc_B_fill_gaps", "true");
+                     }
                                         
                     if(s.equals("-B") || s.equals("--force-backbone")) {
                         Settings.set("plcc_B_forceBackboneContacts", "true");
@@ -11162,6 +11167,7 @@ public class Main {
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
         System.out.println("-E | --separate-contacts   : separate contact computation by chain (way faster but disables all functions which require inter-chain contacts (stats, complex graphs)");
         System.out.println("-f | --folding-graphs      : also handle foldings graphs and compute their linear notations. See -s if you also want them drawn.");
+        System.out.println("-F | --fill-gaps           : two DSSP strands will be considered as one strand, when there is only one AA between them (may lead to less strands).");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-G | --complex-graphs      : compute and output complex graphs. Disables contact separation (see -E) if used.");
         System.out.println("-h | --help                : show this help message and exit");
@@ -12285,6 +12291,7 @@ public class Main {
         ArrayList<SSE> dsspSSElist = new ArrayList<SSE>();
         String lastResString = "some initial value that is not a valid residue string";
         String curResString = "";           // Doesn't matter, will be overwritten before 1st comparison
+        String nextResString = "";
         SSE curSSE, lastSSE;
         curSSE = lastSSE = null;
 
@@ -12299,12 +12306,34 @@ public class Main {
         curResidue = lastResidue = null;
         String coil = Settings.get("plcc_S_coilSSECode");
         
+        Boolean findE_E;
+        //false in the first an last iteration of the next for loop to avoid an index-out-of-bound error
+        //true when we need to look at the Residues from the last and the next iteration
+        //we want to find three Residues with DSSP SSEs E _ E to unite them to one SSE E E E.
+        
         for(Integer i = 0; i < resList.size(); i++) {
             
             curResidue = resList.get(i);
             curResString = curResidue.getSSEString();
             
+            if (i != 0 && i !=  resList.size() - 1){ //we are not in the first and not in the last iteration
+                findE_E = Settings.getBoolean("plcc_B_fill_gaps");
+                //if Setting is turned on, find E_E is true and we will look for gaps between strands later
+                lastResString = resList.get(i - 1).getSSEString();
+                nextResString = resList.get(i + 1).getSSEString();
+            }
+            else {
+                findE_E = false;
+            }
+            
             if (Settings.getBoolean("plcc_B_change_dssp_sse_b_to_e") && curResString.equals("B")){
+                curResString = "E";
+                curResidue.setSSEString("E");
+            }
+            
+            if (findE_E && lastResString.equals("E") && curResString.equals(" ") && nextResString.equals("E")){
+                //we found three Residues with DSSP SSEs E _ E
+                //changing SSE of curResidue to "E" will lead to unite the three Residues into one SSE later
                 curResString = "E";
                 curResidue.setSSEString("E");
             }
@@ -12327,12 +12356,9 @@ public class Main {
             //System.out.println("   *At DSSP residue " + curResidue.getDsspNum() + ", PDB name is " + curResidue.getFancyName() + ", SSE string is '" + curResString + "'.");
 
             if( ! curResString.equals(lastResString)) {
-
                 // The SSE string is different so the old SSE has ended.
                 //System.out.println("    New SSE starts at residue " + curResidue.getFancyName() + " (may be invalid SSE though).");
-
                 
-
                 // Create a new SSE for the residue if this residue is part of any SSE (DSSP does NOT assign an SSE to all residues)
                 if( ! curResidue.getSSEString().equals(" ")) {
 
@@ -12392,15 +12418,6 @@ public class Main {
             // update for next iteration of loop
             lastResString = curResString;
         }
-        //remove l8er
-        System.out.println("!!!Let's show the SSEs:");
-        for(SSE item : dsspSSElist){
-            System.out.print("SSE type: "+ item.getSseType());
-            System.out.println(", Length: " + item.getLength());
-            System.out.print("Start DSSP Num: " + item.getStartDsspNum());
-            System.out.println(", End DSSP Num: " + item.getEndDsspNum() + "\n");
-        }
-
         //System.out.println("      Found " + dsspSSElist.size() + " SSEs according to DSSP definition.");
         return(dsspSSElist);
 
