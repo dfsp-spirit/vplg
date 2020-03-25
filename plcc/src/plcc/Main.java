@@ -956,17 +956,7 @@ public class Main {
                         Settings.set("plcc_B_include_coils", "true");
                         argsUsed[i] = true;
                     }
-                    
-                     if (s.equals("-T") || s.equals("--b-to-e")){
-                        argsUsed[i] = true;
-                        Settings.set("plcc_B_change_dssp_sse_b_to_e", "true");
-                    }
-                    
-                     if (s.equals("-F")|| s.equals("--fill-gaps")){
-                        argsUsed[i] = true;
-                        Settings.set("plcc_B_fill_gaps", "true");
-                     }
-                                        
+                                    
                     if(s.equals("-B") || s.equals("--force-backbone")) {
                         Settings.set("plcc_B_forceBackboneContacts", "true");
                         argsUsed[i] = true;
@@ -11167,7 +11157,6 @@ public class Main {
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
         System.out.println("-E | --separate-contacts   : separate contact computation by chain (way faster but disables all functions which require inter-chain contacts (stats, complex graphs)");
         System.out.println("-f | --folding-graphs      : also handle foldings graphs and compute their linear notations. See -s if you also want them drawn.");
-        System.out.println("-F | --fill-gaps           : two DSSP strands will be considered as one strand, when there is only one AA between them (may lead to less strands).");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-G | --complex-graphs      : compute and output complex graphs. Disables contact separation (see -E) if used.");
         System.out.println("-h | --help                : show this help message and exit");
@@ -11198,7 +11187,6 @@ public class Main {
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("     --draw-gml-graph <f>  : read graph in GML format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("     --props-gml-graph <f> : read graph in GML format from file <f> and compute graph properties, then exit (pdbid will be ignored)*");
-        System.out.println("-T | --b-to-e              : for all residues convert the SSE type B to SSE type E (may lead to more beta strands in the Protein graph)");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
@@ -12306,10 +12294,10 @@ public class Main {
         curResidue = lastResidue = null;
         String coil = Settings.get("plcc_S_coilSSECode");
         
+        /*false in the first an last iteration of the next for loop to avoid an index-out-of-bound error
+        true when we need to look at the Residues from the last and the next iteration
+        we want to find three Residues with DSSP SSEs E _ E to unite them to one SSE E E E.*/
         Boolean findE_E;
-        //false in the first an last iteration of the next for loop to avoid an index-out-of-bound error
-        //true when we need to look at the Residues from the last and the next iteration
-        //we want to find three Residues with DSSP SSEs E _ E to unite them to one SSE E E E.
         
         for(Integer i = 0; i < resList.size(); i++) {
             
