@@ -2341,42 +2341,24 @@ E	3	3	3
         return this.hasCycleInVertexSet(allIndices);
     }
     
-    
     /**
-     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle.
-     * Note that this function only works if all vertices in the list are connected.
+     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle (barrel).
+     * The vertices contain a barrel, when the graph is a connected cycle. So every vertex has degree 2.
+     * The graph is already connected, because the vertices belong to a Folding Graph.
      * @param vertexPositions the vertices to consider (by index in this graph)
-     * @return true if a cycle exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
+     * @return true if a barrel exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
      */
-    public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions) {
-        
-        Stack<Integer> stack = new Stack<Integer>();
-        HashSet<Integer> visited = new HashSet<Integer>();
-        Integer cur;
-        int start; int end;
-        
-        stack.add(vertexPositions.get(0));
-        while(stack.size() > 0) {
-            cur = stack.remove(0);
-            if( ! visited.contains(cur)) {
-                visited.add(cur);
-                ArrayList<Integer> curNeighbors = this.neighborsOfFromSet(cur, vertexPositions);
-                start = 0;
-                end = curNeighbors.size() - 1;
-                while(start < end) {
-                    if(visited.contains(curNeighbors.get(start))) {
-                        return true;
-                    }
-                    else {
-                        stack.add(curNeighbors.get(start));
-                    }
-                    start++;
-                }
-            }
-        }
-        return false;
+    public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions){
+       for (int i: vertexPositions){
+           if (this.degreeOfVertex(i) != 2){// checks if vertex i has degree 2
+              return false;
+           }
+           if (i == vertexPositions.size() - 1){ //true, if all vertices have degree 2
+               return true;
+           }
+       }
+       return false;
     }
-    
     
     /**
      * Tests whether the given vertex set is connected, i.e., each vertex is reachable from all other vertices.

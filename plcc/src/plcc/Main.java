@@ -956,7 +956,7 @@ public class Main {
                         Settings.set("plcc_B_include_coils", "true");
                         argsUsed[i] = true;
                     }
-                    
+                                    
                     if(s.equals("-B") || s.equals("--force-backbone")) {
                         Settings.set("plcc_B_forceBackboneContacts", "true");
                         argsUsed[i] = true;
@@ -1523,7 +1523,7 @@ public class Main {
                         Settings.set("plcc_include_rna", "true");
                     }
                     
-                    
+                   
                     
                     if(s.equals("--matrix-structure-search")) {
                         if(args.length <= i+3 ) {
@@ -12279,6 +12279,7 @@ public class Main {
         ArrayList<SSE> dsspSSElist = new ArrayList<SSE>();
         String lastResString = "some initial value that is not a valid residue string";
         String curResString = "";           // Doesn't matter, will be overwritten before 1st comparison
+        String nextResString = "";
         SSE curSSE, lastSSE;
         curSSE = lastSSE = null;
 
@@ -12292,13 +12293,41 @@ public class Main {
         Residue curResidue, lastResidue;
         curResidue = lastResidue = null;
         String coil = Settings.get("plcc_S_coilSSECode");
-
+        
+        /*false in the first an last iteration of the next for loop to avoid an index-out-of-bound error
+        true when we need to look at the Residues from the last and the next iteration
+        we want to find three Residues with DSSP SSEs E _ E to unite them to one SSE E E E.*/
+        Boolean findE_E;
+        
         for(Integer i = 0; i < resList.size(); i++) {
-
+            
             curResidue = resList.get(i);
             curResString = curResidue.getSSEString();
+            
+            if (i != 0 && i !=  resList.size() - 1){ //we are not in the first and not in the last iteration
+                findE_E = Settings.getBoolean("plcc_B_fill_gaps");
+                //if Setting is turned on, find E_E is true and we will look for gaps between strands later
+                lastResString = resList.get(i - 1).getSSEString();
+                nextResString = resList.get(i + 1).getSSEString();
+            }
+            else {
+                findE_E = false;
+            }
+            
+            if (Settings.getBoolean("plcc_B_change_dssp_sse_b_to_e") && curResString.equals("B")){
+                curResString = "E";
+                curResidue.setSSEString("E");
+            }
+            
+            if (findE_E && lastResString.equals("E") && curResString.equals(" ") && nextResString.equals("E")){
+                //we found three Residues with DSSP SSEs E _ E
+                //changing SSE of curResidue to "E" will lead to unite the three Residues into one SSE later
+                curResString = "E";
+                curResidue.setSSEString("E");
+            }
+            
             curResidue.setSSEStringDssp(curResString);
-
+            
             // If coiled regions should be included, this line keeps them from being ignored below.
             // In this case, we also assign the SSE type "coil" to all SSEs which would otherwise be
             // ignored later by the getImportantSSEs() filter function. This way, each residue of the
@@ -12311,16 +12340,13 @@ public class Main {
                 }
                 
             }
-
+            
             //System.out.println("   *At DSSP residue " + curResidue.getDsspNum() + ", PDB name is " + curResidue.getFancyName() + ", SSE string is '" + curResString + "'.");
 
             if( ! curResString.equals(lastResString)) {
-
                 // The SSE string is different so the old SSE has ended.
                 //System.out.println("    New SSE starts at residue " + curResidue.getFancyName() + " (may be invalid SSE though).");
-
                 
-
                 // Create a new SSE for the residue if this residue is part of any SSE (DSSP does NOT assign an SSE to all residues)
                 if( ! curResidue.getSSEString().equals(" ")) {
 
@@ -12380,7 +12406,6 @@ public class Main {
             // update for next iteration of loop
             lastResString = curResString;
         }
-
         //System.out.println("      Found " + dsspSSElist.size() + " SSEs according to DSSP definition.");
         return(dsspSSElist);
 
@@ -12612,6 +12637,67 @@ public class Main {
 
         return(outputSSEs);
 
+    }
+    /**
+     * Finds the two following SSEs EB or BE and merges them to one SSE, if there is no gap between them in the AA sequence.
+     * This method solves the problem that three AA with the DSSP code EEB or BEE are not recognised as one SSE.
+     * This method is not necessary anymore, because there is a Setting that changes all SSEs "B" to "E".
+     * @param list input list of SSEs
+     * @return a new list with merged SSEs
+     */
+    @Deprecated
+    private static List<SSE> mergeDsspSSEsStrandAndBridge(List<SSE> list){
+        List<SSE> newList = new ArrayList<SSE>();
+        
+        for(int i = 0; i < list.size() - 1; i++) {
+            //these are two possible SSEs for merging
+            SSE curSSE = list.get(i);
+            SSE nextSSE = list.get(i + 1);
+            String curSSEtype = curSSE.getSseType();
+            String nextSSEtype = nextSSE.getSseType();
+            
+            //two SSEs (B and E) will be merged, when ...
+            if ( (curSSEtype.equals("B") && nextSSEtype.equals("E")) ||
+                 (curSSEtype.equals("E") && nextSSEtype.equals("B")) ) {
+                
+                //... there is no AA between them
+                if (curSSE.getEndDsspNum() == nextSSE.getStartDsspNum() - 1){ //checks if the two SSEs follow directls in the AA Sequence, DSSP number is an index in the AA sequence
+                    //combine curSSE and nextSSE in newSSE
+                    SSE newSSE = new SSE("E");
+                    
+                    //new residue properties for the residues of the SSE with type "B" (this can be curSSE or nextSSE)
+                    if (curSSEtype.equals("B")){
+                        for (Residue res : curSSE.getResidues()){
+                        res.setSSE(newSSE);
+                        res.setSSEString("E");
+                        }
+                    }
+                    else { //nextSSE has type "B"
+                        for (Residue res : nextSSE.getResidues()){
+                        res.setSSE(newSSE);
+                        res.setSSEString("E");
+                        }
+                    }
+                    
+                    //add residues
+                    newSSE.addResidues(curSSE.getResidues());
+                    newSSE.addResidues(nextSSE.getResidues());
+                    
+                    //set new sequential number of the SSE
+                    newSSE.setSeqSseNumDssp(newList.size() + 1);
+                    
+                    //set SSE type
+                    newSSE.setSseType("E");
+                    
+                    newList.add(newSSE);
+                    i++; //cause we already considered "nextSSE", the SSE in the next iteration
+                }
+            }
+            else{
+                newList.add(list.get(i));
+            }
+        }
+        return newList;
     }
 
     

@@ -434,6 +434,8 @@ public class Settings {
         defSet("plcc_I_defaultModel", "1", "The default model used if multiple models exist in the PDB file");
         defSet("plcc_S_ligSSECode", "L", "The SSE code used to mark a SSE of type ligand");
         defSet("plcc_B_include_coils", "false", "Whether coils (DSSP SSE type ' ') should be considered");
+        defSet("plcc_B_change_dssp_sse_b_to_e", "false", "Whether all isolated beta bridges (DSSP SSE type: B) should be changed to betastrands (DSSP SSE type: E)");
+        defSet("plcc_B_fill_gaps", "false", "Whether two strands should be fused to one strand, when there is only one AA (with DSSP SSE ' ') between them.");
         defSet("plcc_S_coilSSECode", "C", "The amino acid code used to mark a coiled region residue");
         defSet("plcc_S_ligAACode", "J", "The amino acid code used to mark a ligand residue");
         defSet("plcc_B_uglySQLhacks", "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB");
