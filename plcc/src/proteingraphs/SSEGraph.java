@@ -2351,7 +2351,7 @@ E	3	3	3
     public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions){
        for (int i: vertexPositions){
            if (this.degreeOfVertex(i) != 2){// checks if vertex i has degree 2
-              break;
+              return false;
            }
            if (i == vertexPositions.size() - 1){ //true, if all vertices have degree 2
                return true;
