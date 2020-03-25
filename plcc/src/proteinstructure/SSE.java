@@ -162,9 +162,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         if (angleDeg <= 70) {
             return SpatRel.PARALLEL;
         } else if (angleDeg <= 110) {
-            return SpatRel.ANTIPARALLEL;
+            return SpatRel.MIXED;
         } else if (angleDeg <= 180) {
-            return SpatRel.PARALLEL;
+            return SpatRel.ANTIPARALLEL;
         } else {
             DP.getInstance().w("Got an unusual angle of " + angleDeg + " between SSEs " + this.toString() + " and " + otherSSE.toString() + "."
                     + " Assigning 'other' and try to proceed.");
