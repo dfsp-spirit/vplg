@@ -5034,8 +5034,8 @@ public class Main {
             int combinedAtomRadius = 0;
             long spaceBetweenResidues, numResToSkip;
 
-            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
-            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
+            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
+            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
 
             spaceBetweenResidues = res1.distTo(res2) - (combinedAtomRadius + res1.getSphereRadius() + res2.getSphereRadius() + justToBeSure);
 
@@ -5496,7 +5496,7 @@ public class Main {
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
 
-        Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
         
@@ -5633,7 +5633,7 @@ public class Main {
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
 
-        Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
         if( ! silent) {

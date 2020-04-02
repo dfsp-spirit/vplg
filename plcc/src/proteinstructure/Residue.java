@@ -25,16 +25,11 @@ import plcc.Settings;
  * @author ts
  */
 public class Residue extends Molecule implements java.io.Serializable {
-    
-    public static final Integer RESIDUE_TYPE_AA = 0;
-    public static final Integer RESIDUE_TYPE_LIGAND = 1;
-    public static final Integer RESIDUE_TYPE_OTHER = 2;
-    
+   
     
     // declare class vars
                              // 3 letter name
                               // 1 letter name, AAs only
-    private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
        // PDB insertion code
     
     /** The binding sites, if any, that this residue is part of (for protein residues which are part of the pocket, NOT for ligands which dock into a pocket).  */
@@ -299,7 +294,7 @@ public class Residue extends Molecule implements java.io.Serializable {
             atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
         }
         else {
-            atomRadius = 40; //Settings.getInteger("plcc_I_atom_radius");
+            atomRadius = 40; //Settings.getInteger("plcc_I_aa_atom_radius");
         }
 
         Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2);
@@ -315,55 +310,6 @@ public class Residue extends Molecule implements java.io.Serializable {
         }
     }
     
-    
-    /**
-     * This function determines whether we need to look at the atoms to check for contacts betweens
-     * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
-     * @param r the other residue
-     */
-//    public Boolean contactPossibleWithResidue(Molecule m) {
-//        // ugly code: instead of instanceof some generic methods should be used
-//        if (m instanceof Residue) {
-//            Residue r;
-//            r = (Residue) m;
-//            
-//            Integer dist = Integer.MAX_VALUE;
-//            try {
-//                dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
-//            } catch(Exception e) {
-//                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-//                    DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
-//                }
-//                return(false);
-//            }
-//            Integer atomRadius;
-//            if(this.isLigand() || r.isLigand()) {
-//                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
-//            }
-//            else {
-//                atomRadius = Settings.getInteger("plcc_I_atom_radius");
-//            }
-//
-//            Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
-//            Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2) + justToBeSure;
-//
-//            //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
-//            //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
-//
-//            if(dist > (maxDistForContact)) {
-//                return(false);
-//            }
-//            else {
-//                return(true);
-//            }
-//        } else {
-//            DP.getInstance().w("Tried to get distance between Molecules. Due to ugly code this is not possible atm.");
-//        }
-//
-//        // if one of them is Molecule or RNA
-//        return false;
-//    }
-//    
     
     /**
      * Determines whether this residue is part of any binding site.
@@ -404,7 +350,7 @@ public class Residue extends Molecule implements java.io.Serializable {
          Integer maxDistForAtom, dist = 0; // just assign a small start value
          Integer MAXDIST = Integer.MAX_VALUE;   // just assign a *very* large start value
          Integer totalMinMaxDist = MAXDIST;
-         //Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+         //Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
 
          if(atoms.size() < 1) {
              if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -579,9 +525,7 @@ public class Residue extends Molecule implements java.io.Serializable {
         }
     }
     
-    public Integer getType() {return this.type;}
-
-    
+   
     //setters
     public void setLigName(String s) { ligName = s; }
     public void setiCode(String s) { iCode = s; }
