@@ -302,6 +302,11 @@ public class Residue extends Molecule implements java.io.Serializable {
      * @return the center atom
      */
     @Override public Atom getCenterAtom() {
+
+        if((! this.isAA()) || this.getAlphaCarbonAtom() == null) {                   // For non-AAs and AAs without CA use the function in Molecule class
+            return super.getCenterAtom();                                           // equals/==
+        }
+        
     	 Atom a, b, center;
          a = b = center = null;
          Integer maxDistForAtom, dist = 0;      // just assign a small start value
@@ -319,26 +324,17 @@ public class Residue extends Molecule implements java.io.Serializable {
          // If this is an AA, use the CA.
          if(this.isAA()) {
              center = this.getAlphaCarbonAtom();
-
-//             for(Integer i = 0; i < atoms.size(); i++) {
-//                 a = atoms.get(i);
-//                 if(a.isCalphaAtom()) {
-//                     center = a;
-//                     break;
-//                 }
-//             }
-
              
-             if(center == null) {
-
-                 // Dying may be too harsh -- maybe use the ligand version if this molecule has no C alpha atom?
-                 //System.err.println("ERROR: Could not determine C alpha atom of PDB molecule " + this.pdbResNum + ", PDB file broken.");
-                 //System.exit(1);
-
-                 System.out.println("WARNING: PDB molecule  " + this.pdbNum + " has no C alpha atom, PDB file broken. Using 1st atom as center.");
-                 center = atoms.get(0);
-                 
-             }
+//             if(center == null) {
+//
+//                 // Dying may be too harsh -- maybe use the ligand version if this molecule has no C alpha atom?
+//                 //System.err.println("ERROR: Could not determine C alpha atom of PDB molecule " + this.pdbResNum + ", PDB file broken.");
+//                 //System.exit(1);
+//
+//                 System.out.println("WARNING: PDB molecule  " + this.pdbNum + " has no C alpha atom, PDB file broken. Using 1st atom as center.");
+//                 center = atoms.get(0);
+//                 
+//             }
 
              // For the return value of this function alone we would be done, but we want to set the C alpha sphere
              //  radius as well. It is the maximal distance of the center atom to any other atom of this molecule.

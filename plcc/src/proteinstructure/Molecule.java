@@ -158,7 +158,7 @@ abstract public class Molecule {
      * @return the center atom
      */
     public Atom getCenterAtom(){
-        System.out.println("geht in super");        
+//        System.out.println("geht in super");        
         Atom a, b, center = null;
         Integer maxDistForAtom, dist = 0;       // just assign a small start value
         Integer MAXDIST = Integer.MAX_VALUE;    // just assign a *very* large start value
