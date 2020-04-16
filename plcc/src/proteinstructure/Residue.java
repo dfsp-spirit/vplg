@@ -302,19 +302,12 @@ public class Residue extends Molecule implements java.io.Serializable {
      * @return the center atom
      */
     @Override public Atom getCenterAtom() {
-        
-//        if((! this.isAA()) || this.getAlphaCarbonAtom().equals(null)) {                   // For non-AAs and AAs without CA use the function in Molecule class
-//            System.out.println("geht in super");
-//            return super.getCenterAtom();
-//        }
-//        else {
-//            System.out.println("geht in else");
     	 Atom a, b, center;
          a = b = center = null;
-         Integer maxDistForAtom = 0;
-         Integer dist = 0;      // just assign a small start value
+         Integer maxDistForAtom, dist = 0;      // just assign a small start value
          Integer MAXDIST = Integer.MAX_VALUE;   // just assign a *very* large start value
          Integer totalMinMaxDist = MAXDIST;
+         //Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
 
          if(atoms.size() < 1) {
              if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -323,17 +316,17 @@ public class Residue extends Molecule implements java.io.Serializable {
              return(null);
          }
 
+         // If this is an AA, use the CA.
          if(this.isAA()) {
-//             System.out.println("ist AA");
-//             center = this.getAlphaCarbonAtom();
+             center = this.getAlphaCarbonAtom();
 
-             for(Integer i = 0; i < atoms.size(); i++) {
-                 a = atoms.get(i);
-                 if(a.isCalphaAtom()) {
-                     center = a;
-                     break;
-                 }
-             }
+//             for(Integer i = 0; i < atoms.size(); i++) {
+//                 a = atoms.get(i);
+//                 if(a.isCalphaAtom()) {
+//                     center = a;
+//                     break;
+//                 }
+//             }
 
              
              if(center == null) {
@@ -343,21 +336,19 @@ public class Residue extends Molecule implements java.io.Serializable {
                  //System.exit(1);
 
                  System.out.println("WARNING: PDB molecule  " + this.pdbNum + " has no C alpha atom, PDB file broken. Using 1st atom as center.");
-//                 return super.getCenterAtom();
-                    center = atoms.get(0);
+                 center = atoms.get(0);
                  
              }
 
              // For the return value of this function alone we would be done, but we want to set the C alpha sphere
              //  radius as well. It is the maximal distance of the center atom to any other atom of this molecule.
-//             maxDistForAtom = 0;
+             maxDistForAtom = 0;
              for(Integer j = 0; j < this.atoms.size(); j++) {
-                 System.out.println("a ist " + a + " b ist " + b + " center ist " + center);
 
                  b = this.atoms.get(j);
                  
-                 if(a.equalsAtom(b)) {
-                    continue;
+                 if(center.equalsAtom(b)) {
+                    continue; 
                  }
                  
                  dist = center.distToAtom(b);
@@ -377,11 +368,10 @@ public class Residue extends Molecule implements java.io.Serializable {
              //}
 
              // The maximal distance of the Atom we chose to any other Atom of this molecule is the C alpha/center sphere radius
-             // this.centerSphereRadius = maxDistForAtom;
+             this.centerSphereRadius = maxDistForAtom;
 
          }
          else {
-             System.out.println("ist keine AA");
 
              // If this is a ligand, calculate the center by using the atom with the
              //  minimal maximal distance to all other atoms of this molecule.      
@@ -423,7 +413,7 @@ public class Residue extends Molecule implements java.io.Serializable {
          //  no atoms within a single molecule should have such a large distance.
          // Note though that this value is not touched for AAs since the C alpha is assumed to be the center, thus
          //  we don't compare all atoms with each other for AAs. We only calculate the distance from the CA to all others.
-         if(Objects.equals(totalMinMaxDist, MAXDIST) && this.isAA()) {
+         if(Objects.equals(totalMinMaxDist, MAXDIST) && (! this.isAA())) {
              System.err.println("ERROR: MinMax distance of the atoms of PDB molecule  " + pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
              System.exit(-1);
          }
@@ -437,7 +427,7 @@ public class Residue extends Molecule implements java.io.Serializable {
          
          
          return(center);
-//        }
+
      
     }
     
