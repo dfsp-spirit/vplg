@@ -27,7 +27,7 @@ abstract public class Molecule {
     public static final Integer RESIDUE_TYPE_LIGAND = 1;
     public static final Integer RESIDUE_TYPE_OTHER = 2;
     public static final Integer RESIDUE_TYPE_RNA = 3;
-    public Integer type = null;                         // wether the type is AA, Ligand, RNA oder Other is determined in each class
+    public Integer type = null;                         // wether the type is 0:AA, 1:Ligand, 2:Other or 3:RNA is determined in each class
     // declare class vars
     public ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the molecule
     public ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the molecule
@@ -70,12 +70,6 @@ abstract public class Molecule {
     public <T extends Molecule> Integer getType(){
         return this.type;
     }
-    
-    
-    //public Boolean isLigand() { return(this.type.equals(Residue.RESIDUE_TYPE_LIGAND)); }
-    //public Boolean isAA() { return(this.type.equals(Residue.RESIDUE_TYPE_AA)); }
-    //public Boolean isOtherRes() { return(this.type.equals(Residue.RESIDUE_TYPE_OTHER)); }
-    //public Boolean isRNA() { return(this.type.equals(Residue.RESIDUE_TYPE_RNA)); }
 
 
     /**
@@ -160,9 +154,56 @@ abstract public class Molecule {
     
     /**
      * Determines the center atom of this molecule, and also sets the center sphere radius for the molecule.
+     * There is an override function for residues in the Residue class.
      * @return the center atom
      */
-    abstract public Atom getCenterAtom();
+    public Atom getCenterAtom(){
+        System.out.println("geht in super");        
+        Atom a, b, center = null;
+        Integer maxDistForAtom, dist = 0;       // just assign a small start value
+        Integer MAXDIST = Integer.MAX_VALUE;    // just assign a *very* large start value
+        Integer totalMinMaxDist = MAXDIST;
+        
+        if(atoms.size() < 1) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("getCenterAtom(): PDB molecule  " + this.pdbNum + " chain " + this.getChainID() + " of type " + getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
+            }
+            return(null);       // ---> Return null or die?
+        }
+        
+        for(Integer i = 0; i < atoms.size(); i++) {     // The center is calculated by finding the atom with the minimal maximal distance to all other atoms of this molecule.
+            a = atoms.get(i);
+            maxDistForAtom = 0;
+
+            for(Integer j = 0; j < atoms.size(); j++){
+                b = atoms.get(j);
+                dist = a.distToAtom(b);
+
+                if(dist > maxDistForAtom){
+                    maxDistForAtom = dist;
+                }
+            }
+
+            if(maxDistForAtom < totalMinMaxDist) {      // If the maxDist of the checked atom is smaller than the current maxDist, the center atom is updated.
+                totalMinMaxDist = maxDistForAtom;
+                center = a;
+            }
+        }
+
+        this.centerSphereRadius = totalMinMaxDist;
+
+        if(Objects.equals(totalMinMaxDist, MAXDIST)) {  // If totalMinMaxDist still has the original value of MAXDIST something must be wrong.
+            System.err.println("ERROR: MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
+            System.exit(-1);
+        }
+
+        if(center == null) {
+        System.err.println("ERROR: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ".");
+        System.exit(-1);        // Just die if center atom cannot be determined
+        }
+        
+        return(center);
+    }
       
         /**
      * Returns the radius of the collision sphere of this molecule. This radius doe NOT yet include the outer hull, it is the distance from the center atom to the (non-H) atom farthest away from it.
@@ -430,17 +471,8 @@ abstract public class Molecule {
      * @return True if contact is possible, false otherwise.
      */
     //abstract public Boolean interchainContactPossibleWithResidue (Class<M extends Molecule> molecule);
-    // NOTE the body of this function has been moved to Residue. It could possibly be implemented here with some changes
-    
-    
-    /**
-     * This function determines whether we need to look at the atoms to check for contacts betweens
-     * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
-     * @param r the other residue
-     */
-//    abstract public Boolean contactPossibleWithResidue(Molecule r);
-    // NOTE the body of this function has been moved to Residue. It could possibly be implemented here with some changes
-    
+    // NOTE this function was a version of contactPossibleWithResidue (now contactPossibleWithMolecule).
+    // Since there was only one if-clause added, and the function was only used once, it was replaced by contactPossibleWithMolecule.
     
     
     /**
@@ -495,69 +527,14 @@ abstract public class Molecule {
         return (Settings.getBoolean("plcc_B_centroid_method") ? this.centroidDistTo(m) : this.centerDistTo(m));
     }
     
-         /**
-     * This function determines whether we need to look at the atoms to check for contacts betweens
-     * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
-     * @param r the other residue
-     * takes CenterAtom of one Residue and looks for the Atom that is furthest away from it. Their distance is the radius in
-     * which all Atoms are located. If this distance + 2 does not overlap with the one of the compared Molecule, they cannot be in contact.
-     */
-
-//    public <T extends Molecule> Boolean contactPossibleWithResidue(T m) {
-//        // ugly code: instead of instanceof some generic methods should be used
-//        if (m instanceof Residue) {
-//            Residue r;
-//            r = (Residue) m;
-//            
-//            Integer dist = Integer.MAX_VALUE;
-//            try {
-//                dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
-//            }
-//            catch(Exception e) {
-//                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-//                    DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
-//                }
-//                return(false);
-//            }
-//            Integer atomRadius;
-//            if(this.isLigand() || r.isLigand()) {
-//                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
-//            }
-//            else if (this.isAA() || r.isAA()) {
-//                atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
-//            }
-//            else {
-//                atomRadius = Settings.getInteger("plcc_I_rna_atom_radius");
-//            }
-//
-//            Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
-//            Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  (atomRadius * 2) + justToBeSure;
-//
-//            //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
-//            //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
-//
-//            if(dist > (maxDistForContact)) {
-//                return(false);
-//            }
-//            else {
-//                return(true);
-//            }
-//        }
-//        else {
-//            DP.getInstance().w("Tried to get distance between Molecules. Due to ugly code this is not possible atm.");
-//        }
-//
-//        // if one of them is Molecule or RNA
-//        return false;
-//    }
-
-    // ugly abstract methods
-    abstract public Boolean isAA();
-    abstract public Boolean isLigand();
+    public Boolean isLigand() { return(this.type.equals(Residue.RESIDUE_TYPE_LIGAND)); }
+    public Boolean isAA() { return(this.type.equals(Residue.RESIDUE_TYPE_AA)); }
+    public Boolean isOtherRes() { return(this.type.equals(Residue.RESIDUE_TYPE_OTHER)); }
+    public Boolean isRNA() { return(this.type.equals(Residue.RESIDUE_TYPE_RNA));}
     
 
     /**
-     * Returns the type-specific atom radius of the component (type = Residue, Ligand, Other, RNA).
+     * Returns the type-specific atom radius of the component (type can be Residue, Ligand, Other, RNA).
      */
     public Integer getAtomRadius() {
         //start with instanceOf Molecule??
@@ -566,46 +543,52 @@ abstract public class Molecule {
         switch(type) {
             case 0:
                 atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
+                break;
             case 1:
-                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");       // no value for "Other" so far --> Default is AA
+                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");     // no value for "Other" so far --> Default is AA
+                break;
             case 2:
                 atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
+                break;
             case 3:
                 atomRadius = Settings.getInteger("plcc_I_rna_atom_radius");
-//          default:
-//              System.err.println("Tried to get distance between Molecules. Molecule could not be matched with an atom radius.");
+                break;
+            default:
+                atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
+                DP.getInstance().e("No Radius for this Molecule. Tried to move on with default value.");
+                break;
         }
         return atomRadius;
     }
 
     
         /**
-     * Determines whether contact is possible between two components, using the distance from this molecule to another, depending on settings.
+     * Determines whether contact is possible between two molecules, using the distance from this molecule to another, depending on settings.
      * @param r other molecule
      * @return whether contact is possible (Boolean)
      */
-    public <T extends Molecule> Boolean contactPossibleWithResidue(T r) {      // r is the component with which we want to compare our Molecule
+    public <T extends Molecule> Boolean contactPossibleWithMolecule(T r) {      // r is the molecule with which we want to compare our Molecule
            
         Integer dist = Integer.MAX_VALUE;
-            try {
-                dist = this.getCenterAtom().distToAtom(r.getCenterAtom());      // dist: actual distance between the two components
+        try {
+            dist = this.getCenterAtom().distToAtom(r.getCenterAtom());      // dist: actual distance between the two molecules
+        }
+        catch(Exception e) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
             }
-            catch(Exception e) {
-                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                    DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
-                }
-                return(false);
-            }
-            
-            Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
-            Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  this.getAtomRadius() + r.getAtomRadius() + justToBeSure;        //maxDistForContact: area in which overlapping is possible
+            return(false);
+        }
 
-            if(dist > (maxDistForContact)) {
-                return(false);
-            }
-            else {
-                return(true);
-            }
+        Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
+        Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  this.getAtomRadius() + r.getAtomRadius() + justToBeSure;        //maxDistForContact: area in which overlapping is possible
+
+        if(dist > (maxDistForContact)) {
+            return(false);
+        }
+        else {
+            return(true);
+        }
     }
    
 }
