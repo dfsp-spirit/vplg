@@ -42,9 +42,6 @@ public class RNA extends Molecule implements java.io.Serializable {
     public Boolean isLigand() { return false; }
     public Boolean isAA() { return false; }
     public Integer getType() { return 3; }
-    public Atom getCenterAtom() {
-        DP.getInstance().w("Function getCenterAtom not implemented for RNA yet. Returning null");
-        return null;
-    }
+
 //    public List<BindingSite> partOfBindingSites;          // Methods involving BindingSites have not been implemented in this class yet due to problems with BindingSites-class.
 }

@@ -154,11 +154,11 @@ abstract public class Molecule {
     
     /**
      * Determines the center atom of this molecule, and also sets the center sphere radius for the molecule.
-     * There is an override function for residues in the Residue class.
+     * There is an override function for residues in the Residue class that returns the Calpha as the center atom.
      * @return the center atom
      */
     public Atom getCenterAtom(){
-//        System.out.println("geht in super");        
+       
         Atom a, b, center = null;
         Integer maxDistForAtom, dist = 0;       // just assign a small start value
         Integer MAXDIST = Integer.MAX_VALUE;    // just assign a *very* large start value
@@ -168,10 +168,10 @@ abstract public class Molecule {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("getCenterAtom(): PDB molecule  " + this.pdbNum + " chain " + this.getChainID() + " of type " + getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
             }
-            return(null);       // ---> Return null or die?
+            return(null);
         }
-        
-        for(Integer i = 0; i < atoms.size(); i++) {     // The center is calculated by finding the atom with the minimal maximal distance to all other atoms of this molecule.
+        // The center is calculated by finding the atom with the minimal maximal distance to all other atoms of this molecule.
+        for(Integer i = 0; i < atoms.size(); i++) {
             a = atoms.get(i);
             maxDistForAtom = 0;
 
@@ -183,23 +183,23 @@ abstract public class Molecule {
                     maxDistForAtom = dist;
                 }
             }
-
-            if(maxDistForAtom < totalMinMaxDist) {      // If the maxDist of the checked atom is smaller than the current maxDist, the center atom is updated.
+            
+            // If the maxDist of the checked atom is smaller than the current maxDist, the center atom is updated.
+            if(maxDistForAtom < totalMinMaxDist) {
                 totalMinMaxDist = maxDistForAtom;
                 center = a;
             }
         }
 
         this.centerSphereRadius = totalMinMaxDist;
-
-        if(Objects.equals(totalMinMaxDist, MAXDIST)) {  // If totalMinMaxDist still has the original value of MAXDIST something must be wrong.
-            System.err.println("ERROR: MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
-            System.exit(-1);
+        
+        // If totalMinMaxDist still has the original value of MAXDIST something must be wrong.
+        if(Objects.equals(totalMinMaxDist, MAXDIST)) {
+            DP.getInstance().w("OR: MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
         }
 
         if(center == null) {
-        System.err.println("ERROR: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ".");
-        System.exit(-1);        // Just die if center atom cannot be determined
+            DP.getInstance().w("ERROR: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ". Returning null.");
         }
         
         return(center);
