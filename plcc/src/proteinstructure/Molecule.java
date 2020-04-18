@@ -151,6 +151,37 @@ abstract public class Molecule {
         return maxAltLoc;
     }
     
+    /**
+     * 
+     */
+    public ArrayList<Atom> chooseYourAltLoc() {
+        System.out.println("geht in super");
+        int numAtomsBefore = this.atoms.size();
+        if(numAtomsBefore < 1) {
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Molecule " + this.getFancyName() + " of chain " + this.getChainID() + " has NO atoms at all *before* choosing alternative location PDB field and deleting others.");
+            }
+            return new ArrayList<Atom>();
+        }                
+        ArrayList<Atom> deletedAtoms;
+    
+        String chosenAltLoc = this.getAltLocWithMostAtoms();
+        int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
+    
+        if((numAtomsWithChosenAltLoc < 1 || numAtomsWithChosenAltLoc > Main.MAX_ATOMS_PER_AA) && this.isAA()) {
+            if( ! Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
+                DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA molecule " + this.getFancyName() + ".");
+            }
+        }
+        deletedAtoms = this.deleteAtomsWithAltLocDifferentFrom(chosenAltLoc);
+                
+        if(this.atoms.size() < 1) {
+            DP.getInstance().w("Molecule  " + this.getFancyName() + " of chain " + this.getChainID() + " has no atoms after choosing alternative location PDB field (had " + numAtomsBefore + " before).");
+        }
+        
+        return deletedAtoms;
+    }
+    
     
     /**
      * Determines the center atom of this molecule, and also sets the center sphere radius for the molecule.

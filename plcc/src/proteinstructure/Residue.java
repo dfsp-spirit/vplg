@@ -73,8 +73,12 @@ public class Residue extends Molecule implements java.io.Serializable {
      * from the global atom list as well.
      * @return the list of the atoms that were deleted
      */
-    public ArrayList<Atom> chooseYourAltLoc() {
-    
+    @Override public ArrayList<Atom> chooseYourAltLoc() {
+        
+        if (! this.isAA()) {
+            return super.chooseYourAltLoc();
+        }
+        
         int numAtomsBefore = this.atoms.size();
         if(numAtomsBefore < 1) {
             if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -84,12 +88,7 @@ public class Residue extends Molecule implements java.io.Serializable {
         }                
         ArrayList<Atom> deletedAtoms;
     
-        String chosenAltLoc;
-        if(this.isAA()) {
-            chosenAltLoc = getAltLocWithAlphaCarbonAndMostAtoms();
-        } else {
-            chosenAltLoc = this.getAltLocWithMostAtoms();
-        }
+        String chosenAltLoc= getAltLocWithAlphaCarbonAndMostAtoms();
     
         int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
     
