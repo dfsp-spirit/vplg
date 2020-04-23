@@ -681,10 +681,21 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      */
     public void setSeqSseChainNum(Integer s) { this.sseSeqChainNum = s; }
 
-    public void addResidues(ArrayList<Residue> rl) {
-        for(Integer i = 0; i < rl.size(); i++) {
-            this.addResidue(rl.get(i));
+    public void addResiduesAtStart(ArrayList<Residue> rl) {
+        
+        ArrayList<Residue> rearrangedResidues = new ArrayList<>();
+  
+        // new first residues
+        for (Integer i = 0; i < rl.size(); i++) {
+            rearrangedResidues.add(rl.get(i));
         }
+        
+        // old residues
+        for (int i = 0; i < residues.size(); i++) {
+            rearrangedResidues.add(residues.get(i));
+        }
+        
+        residues = rearrangedResidues;
     }
     
     

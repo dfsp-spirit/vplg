@@ -12551,7 +12551,7 @@ public class Main {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
                                 //curSSE.addResidues(nextSSE.getResidues());
-                                nextSSE.addResidues(curSSE.getResidues());
+                                nextSSE.addResiduesAtStart(curSSE.getResidues());
                                 currentSSEmergedIntoNext = true;
                                 //i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
                             }                                                                                    
