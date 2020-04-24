@@ -152,10 +152,15 @@ abstract public class Molecule {
     }
     
     /**
-     * 
+     * Tells this molecule to choose its alternate location PDB identifier and delete all its
+     * atoms which have other AltLocs. For non-AAs, this function will always choose the AltLoc identifier which
+     * maximizes the number of atoms in this molecule. The list of deleted atoms is returned so they can be deleted
+     * from the global atom list.
+     * The function is overriden in the Residue class.
+     * @return the list of the atoms that were deleted
      */
     public ArrayList<Atom> chooseYourAltLoc() {
-        System.out.println("geht in super");
+        
         int numAtomsBefore = this.atoms.size();
         if(numAtomsBefore < 1) {
             if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -226,11 +231,11 @@ abstract public class Molecule {
         
         // If totalMinMaxDist still has the original value of MAXDIST something must be wrong.
         if(Objects.equals(totalMinMaxDist, MAXDIST)) {
-            DP.getInstance().w("OR: MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
+            DP.getInstance().w("WARNING: MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
         }
 
         if(center == null) {
-            DP.getInstance().w("ERROR: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ". Returning null.");
+            DP.getInstance().w("WARNING: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ". Returning null.");
         }
         
         return(center);
@@ -586,7 +591,7 @@ abstract public class Molecule {
                 break;
             default:
                 atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
-                DP.getInstance().e("No Radius for this Molecule. Tried to move on with default value.");
+                DP.getInstance().w("WARNING: No Radius for this Molecule. Trying to move on with default value.");
                 break;
         }
         return atomRadius;

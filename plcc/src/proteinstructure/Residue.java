@@ -97,9 +97,7 @@ public class Residue extends Molecule implements java.io.Serializable {
                 DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA molecule " + this.getFancyName() + ".");
             }
         }
-   
-        
-        
+              
         deletedAtoms = this.deleteAtomsWithAltLocDifferentFrom(chosenAltLoc);
                 
         if(this.atoms.size() < 1) {
