@@ -974,7 +974,7 @@ public class Main {
                     }
                     
                     if(s.equals("--no-ptgl")) {
-                        Settings.set("plcc_B_round_coordinates", "false");
+                        Settings.set("plcc_B_round_coordinates", "true");
                         argsUsed[i] = true;
                     }
                     

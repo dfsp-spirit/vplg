@@ -284,7 +284,7 @@ public class Settings {
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
-        defSet("plcc_B_round_coordinates", "true", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
+        defSet("plcc_B_round_coordinates", "true", "Whether 3D atom coordinates should be rounded (true) or changed so that only one decimal place remains (false).");
         defSet("plcc_B_key_use_alternate_arcs", "true", "Whether to use alternative crossover arcs in KEY notation. The alternative arcs cut through other SSEs, the default ones use a vertical central line and shift the center to avoid this.");
         defSet("plcc_B_print_notations_on_fg_images", "false", "Whether to add the notation string to the FG images.");
         
