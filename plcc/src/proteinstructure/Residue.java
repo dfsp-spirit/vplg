@@ -380,7 +380,7 @@ public class Residue extends Molecule implements java.io.Serializable {
             return(this.ligName);
         }
         else {
-            System.out.println("WARNING: getLigName() Called for non-ligand residue '" + this.getFancyName() + "'.");
+            DP.getInstance().w("getLigName() Called for non-ligand residue '" + this.getFancyName() + "'.");
             return("NOT_A_LIGAND");
         }
     }
@@ -390,7 +390,7 @@ public class Residue extends Molecule implements java.io.Serializable {
             return(this.ligFormula);
         }
         else {
-            System.err.println("WARNING: getLigFormula() Called for non-ligand residue '" + this.getFancyName() + "'.");
+            DP.getInstance().w("getLigFormula() Called for non-ligand residue '" + this.getFancyName() + "'.");
             return("NOT_A_LIGAND_SO_NO_HET_FORMULA");
         }
     }
@@ -400,7 +400,7 @@ public class Residue extends Molecule implements java.io.Serializable {
             return(this.ligSynonyms);
         }
         else {
-            System.err.println("WARNING: getLigSynonyms() Called for non-ligand residue '" + this.getFancyName() + "'.");
+            DP.getInstance().w("getLigSynonyms() Called for non-ligand residue '" + this.getFancyName() + "'.");
             return("NOT_A_LIGAND_SO_NO_HET_SYNONYMS");
         }
     }

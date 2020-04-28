@@ -231,11 +231,11 @@ abstract public class Molecule {
         
         // If totalMinMaxDist still has the original value of MAXDIST something must be wrong.
         if(Objects.equals(totalMinMaxDist, MAXDIST)) {
-            DP.getInstance().w("WARNING: MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
+            DP.getInstance().w("MinMax distance of the atoms of PDB molecule "+ pdbNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
         }
 
         if(center == null) {
-            DP.getInstance().w("WARNING: Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ". Returning null.");
+            DP.getInstance().w("Could not determine center atom of molecule  type " + this.getType() + " with PDB number " + pdbNum + ", DSSP number " + dsspNum + ". Returning null.");
         }
         
         return(center);
@@ -573,7 +573,7 @@ abstract public class Molecule {
      * Returns the type-specific atom radius of the component (type can be Residue, Ligand, Other, RNA).
      */
     public Integer getAtomRadius() {
-        //start with instanceOf Molecule??
+
         Integer atomRadius = null;
         
         switch(type) {
@@ -591,7 +591,7 @@ abstract public class Molecule {
                 break;
             default:
                 atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
-                DP.getInstance().w("WARNING: No Radius for this Molecule. Trying to move on with default value.");
+                DP.getInstance().w("No Radius for this Molecule. Trying to move on with default value.");
                 break;
         }
         return atomRadius;
