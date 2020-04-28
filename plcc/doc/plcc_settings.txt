@@ -132,8 +132,8 @@ plcc_I_img_default_font_size=18
 # plcc_B_graphtype_albelig: Determines whether alpha-beta graphs with ligands are drawn
 plcc_B_graphtype_albelig=true
 
-# plcc_B_strict_ptgl_behaviour: Whether plcc should try to strictly mimick the PTGL, including questionable stuff.
-plcc_B_strict_ptgl_behaviour=true
+# plcc_B_round_coordinates: Whether plcc should try to strictly mimick the PTGL, including questionable stuff.
+plcc_B_round_coordinates=true
 
 # plcc_I_img_legend_font_size: The legend font size used in output images.
 plcc_I_img_legend_font_size=18
