@@ -12599,7 +12599,7 @@ public class Main {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
                                 //curSSE.addResidues(nextSSE.getResidues());
-                                nextSSE.addResidues(curSSE.getResidues());
+                                nextSSE.addResiduesAtStart(curSSE.getResidues());
                                 currentSSEmergedIntoNext = true;
                                 //i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
                             }                                                                                    
@@ -13232,7 +13232,13 @@ public class Main {
             System.out.println("    SSE contact matrix calculated.");
         }
         
-        chainCM.calculateSSESpatialRelationMatrix(resContacts, false);                
+        // TODELETE
+        System.out.println("Starting spatial relation computation for SSE-CG at " + java.time.LocalTime.now());
+        
+        chainCM.calculateSSESpatialRelationMatrix(resContacts, false);  
+        
+        // TODELETE
+        System.out.println("Finished at " + java.time.LocalTime.now());
 
         if( ! silent) {
             System.out.println("    Spatial relation matrix calculated.");
