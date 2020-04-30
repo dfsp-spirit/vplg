@@ -974,7 +974,7 @@ public class Main {
                     }
                     
                     if(s.equals("--no-ptgl")) {
-                        Settings.set("plcc_B_strict_ptgl_behaviour", "false");
+                        Settings.set("plcc_B_round_coordinates", "true");
                         argsUsed[i] = true;
                     }
                     
@@ -2395,7 +2395,7 @@ public class Main {
             }
             cInfoThisChain = null;
         }
-               
+         
         if (Settings.getBoolean("plcc_B_debug_only_contact_comp")) {
             System.out.println("Exiting now as requested by settings.");
             System.exit(0);
@@ -4957,55 +4957,55 @@ public class Main {
                 b = res.get(j);
                 numResContactsChecked++;
 
-                
-                // We only need to check on atom level if the center spheres overlap
-                //if(a.contactPossibleWithResidue(b)) {                                        
-                if(a.interchainContactPossibleWithResidue(b)) {                                        
-                    numResContactsPossible++;
-                    
-                    rci = calculateAtomContactsBetweenResiduesAlternativeModel(a, b);
-                    
-                    if( rci != null) {
-                        // There were atoms contacts!
-                        contactInfo.add(rci);
-                        /* System.out.println("#!# BBHB " + rci.getNumContactsBBHB());
-                        System.out.println("#!# BBBH " + rci.getNumContactsBBBH());
-                        System.out.println("#!# IVDW " + rci.getNumContactsIVDW());
-                        System.out.println("#!# ISS " + rci.getNumContactsISS());
-                        System.out.println("#!# BCHB " + rci.getNumContactsBCHB());
-                        System.out.println("#!# BCBH " + rci.getNumContactsBCBH());
-                        System.out.println("#!# CBHB " + rci.getNumContactsCBHB());
-                        System.out.println("#!# CBBH " + rci.getNumContactsCBBH());
-                        System.out.println("#!# CCHB " + rci.getNumContactsCCHB());
-                        System.out.println("#!# CCBH " + rci.getNumContactsCCBH());
+                                                     
+                if (!a.getChainID().equals(b.getChainID())) {                           // To avoid checking a residue against itself
+                    if (a.contactPossibleWithMolecule(b)) {                             // We only need to check on atom level if the center spheres overlap 
+                        numResContactsPossible++;
+
+                        rci = calculateAtomContactsBetweenResiduesAlternativeModel(a, b);
+
+                        if (rci != null) {
+                            // There were atoms contacts!
+                            contactInfo.add(rci);
+                            /* System.out.println("#!# BBHB " + rci.getNumContactsBBHB());
+                            System.out.println("#!# BBBH " + rci.getNumContactsBBBH());
+                            System.out.println("#!# IVDW " + rci.getNumContactsIVDW());
+                            System.out.println("#!# ISS " + rci.getNumContactsISS());
+                            System.out.println("#!# BCHB " + rci.getNumContactsBCHB());
+                            System.out.println("#!# BCBH " + rci.getNumContactsBCBH());
+                            System.out.println("#!# CBHB " + rci.getNumContactsCBHB());
+                            System.out.println("#!# CBBH " + rci.getNumContactsCBBH());
+                            System.out.println("#!# CCHB " + rci.getNumContactsCCHB());
+                            System.out.println("#!# CCBH " + rci.getNumContactsCCBH());
+                            
+                            System.out.println("#!# BB " + rci.getNumContactsBB());
+                            System.out.println("#!# CB " + rci.getNumContactsCB());
+                            System.out.println("#!# BC " + rci.getNumContactsBC());
+                            System.out.println("#!# CC " + rci.getNumContactsCC());
+                            System.out.println("#!# BL " + rci.getNumContactsBL());
+                            System.out.println("#!# LB " + rci.getNumContactsLB());
+                            System.out.println("#!# CL " + rci.getNumContactsCL());
+                            System.out.println("#!# LC " + rci.getNumContactsLC());
+                            System.out.println("#!# LL " + rci.getNumContactsLL());
                         
-                        System.out.println("#!# BB " + rci.getNumContactsBB());
-                        System.out.println("#!# CB " + rci.getNumContactsCB());
-                        System.out.println("#!# BC " + rci.getNumContactsBC());
-                        System.out.println("#!# CC " + rci.getNumContactsCC());
-                        System.out.println("#!# BL " + rci.getNumContactsBL());
-                        System.out.println("#!# LB " + rci.getNumContactsLB());
-                        System.out.println("#!# CL " + rci.getNumContactsCL());
-                        System.out.println("#!# LC " + rci.getNumContactsLC());
-                        System.out.println("#!# LL " + rci.getNumContactsLL());
-                        
-                        System.out.println("#!# NHPI " + rci.getNumContactsNHPI());
-                        System.out.println("#!# PINH " + rci.getNumContactsPINH());
-                        System.out.println("#!# CAHPI " + rci.getNumContactsCAHPI());
-                        System.out.println("#!# PICAH " + rci.getNumContactsPICAH());
-                        System.out.println("#!# CNHPI " + rci.getNumContactsCNHPI());
-                        System.out.println("#!# PICNH " + rci.getNumContactsPICNH());
-                        System.out.println("#!# SHPI " + rci.getNumContactsSHPI());
-                        System.out.println("#!# PISH " + rci.getNumContactsPISH());
-                        System.out.println("#!# XOHPI " + rci.getNumContactsXOHPI());
-                        System.out.println("#!# PIXOH " + rci.getNumContactsPIXOH());
-                        System.out.println("#!# PROCDHPI " + rci.getNumContactsPROCDHPI());
-                        System.out.println("#!# PIPROCDH " + rci.getNumContactsPIPROCDH());
-                        System.out.println("#!# CCACOH " + rci.getNumContactsCCACOH());
-                        System.out.println("#!# CCOCAH " + rci.getNumContactsCCOCAH());
-                        System.out.println("#!# BCACOH " + rci.getNumContactsBCACOH());
-                        System.out.println("#!# BCOCAH " + rci.getNumContactsBCOCAH());
-                        */
+                            System.out.println("#!# NHPI " + rci.getNumContactsNHPI());
+                            System.out.println("#!# PINH " + rci.getNumContactsPINH());
+                            System.out.println("#!# CAHPI " + rci.getNumContactsCAHPI());
+                            System.out.println("#!# PICAH " + rci.getNumContactsPICAH());
+                            System.out.println("#!# CNHPI " + rci.getNumContactsCNHPI());
+                            System.out.println("#!# PICNH " + rci.getNumContactsPICNH());
+                            System.out.println("#!# SHPI " + rci.getNumContactsSHPI());
+                            System.out.println("#!# PISH " + rci.getNumContactsPISH());
+                            System.out.println("#!# XOHPI " + rci.getNumContactsXOHPI());
+                            System.out.println("#!# PIXOH " + rci.getNumContactsPIXOH());
+                            System.out.println("#!# PROCDHPI " + rci.getNumContactsPROCDHPI());
+                            System.out.println("#!# PIPROCDH " + rci.getNumContactsPIPROCDH());
+                            System.out.println("#!# CCACOH " + rci.getNumContactsCCACOH());
+                            System.out.println("#!# CCOCAH " + rci.getNumContactsCCOCAH());
+                            System.out.println("#!# BCACOH " + rci.getNumContactsBCACOH());
+                            System.out.println("#!# BCOCAH " + rci.getNumContactsBCOCAH());
+                             */
+                        }
                     }
                 }
                 else {
@@ -5034,8 +5034,8 @@ public class Main {
             int combinedAtomRadius = 0;
             long spaceBetweenResidues, numResToSkip;
 
-            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
-            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_atom_radius");
+            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
+            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
 
             spaceBetweenResidues = res1.distTo(res2) - (combinedAtomRadius + res1.getSphereRadius() + res2.getSphereRadius() + justToBeSure);
 
@@ -5146,7 +5146,7 @@ public class Main {
                     numResContactsChecked++;
 
                     // We only need to check on atom level if the center spheres overlap
-                    if (res1.contactPossibleWithResidue(res2)) {                                        
+                    if (res1.contactPossibleWithMolecule(res2)) {                                        
                         numResContactsPossible++;
 
                         rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5184,7 +5184,7 @@ public class Main {
                         numResContactsChecked++;
 
                         // We only need to check on atom level if the center spheres overlap
-                        if (res1.contactPossibleWithResidue(res2)) {                                        
+                        if (res1.contactPossibleWithMolecule(res2)) {                                        
                             numResContactsPossible++;
 
                             rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5213,7 +5213,7 @@ public class Main {
                         numResContactsChecked++;
 
                         // We only need to check on atom level if the center spheres overlap
-                        if(res1.contactPossibleWithResidue(res2)) {                                        
+                        if(res1.contactPossibleWithMolecule(res2)) {                                        
                             numResContactsPossible++;
 
                             rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5302,7 +5302,7 @@ public class Main {
                             numResContactsChecked++;
 
                             // We only need to check on atom level if the center spheres overlap
-                            if (res1.contactPossibleWithResidue(res2)) {                                        
+                            if (res1.contactPossibleWithMolecule(res2)) {                                        
                                 numResContactsPossible++;
 
                                 rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5344,7 +5344,7 @@ public class Main {
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithResidue(res2)) {                                        
+                                if (res1.contactPossibleWithMolecule(res2)) {                                        
                                     numResContactsPossible++;
 
                                     rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5377,7 +5377,7 @@ public class Main {
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithResidue(res2)) {                                        
+                                if (res1.contactPossibleWithMolecule(res2)) {                                        
                                     numResContactsPossible++;
 
                                     rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5416,7 +5416,7 @@ public class Main {
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithResidue(res2)) {                                        
+                                if (res1.contactPossibleWithMolecule(res2)) {                                        
                                     numResContactsPossible++;
 
                                     rci = calculateAtomContactsBetweenResidues(res1, res2);
@@ -5496,7 +5496,7 @@ public class Main {
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
 
-        Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
         
@@ -5534,7 +5534,7 @@ public class Main {
                 numResContactsChecked++;
 
                 // We only need to check on atom level if the center spheres overlap
-                if(a.contactPossibleWithResidue(b)) {                                        
+                if(a.contactPossibleWithMolecule(b)) {                                        
                     numResContactsPossible++;
 
                     //System.out.println("    DSSP mols# " + a.getDsspNum() + "/" + b.getDsspNum() + ": Collision spheres overlap, checking on atom level.");
@@ -5633,7 +5633,7 @@ public class Main {
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<MolContactInfo>();
 
-        Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
         if( ! silent) {
@@ -5695,7 +5695,7 @@ public class Main {
                 numResContactsChecked++;
 
                 // We only need to check on atom level if the center spheres overlap
-                if(a.contactPossibleWithResidue(b)) {                                        
+                if(a.contactPossibleWithMolecule(b)) {                                        
                     numResContactsPossible++;
 
                     //System.out.println("    DSSP res# " + a.getDsspNum() + "/" + b.getDsspNum() + ": Collision spheres overlap, checking on atom level.");

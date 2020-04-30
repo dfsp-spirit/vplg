@@ -162,7 +162,7 @@ public class Atom implements java.io.Serializable {
         Integer atomRadiusThis;
         Integer atomRadiusOther;
         
-        Integer radProt = Settings.getInteger("plcc_I_atom_radius");
+        Integer radProt = Settings.getInteger("plcc_I_aa_atom_radius");
         Integer radLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
         if(this.isLigandAtom()) {

@@ -284,7 +284,7 @@ public class Settings {
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
-        defSet("plcc_B_strict_ptgl_behaviour", "false", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
+        defSet("plcc_B_round_coordinates", "true", "Whether 3D atom coordinates should be rounded (true) or changed so that only one decimal place remains (false).");
         defSet("plcc_B_key_use_alternate_arcs", "true", "Whether to use alternative crossover arcs in KEY notation. The alternative arcs cut through other SSEs, the default ones use a vertical central line and shift the center to avoid this.");
         defSet("plcc_B_print_notations_on_fg_images", "false", "Whether to add the notation string to the FG images.");
         
@@ -469,10 +469,11 @@ public class Settings {
         
 
         // Contact definition and computation     
-        defSet("plcc_I_atom_radius", "20", "The atom radius of protein atoms in 10th part Angstroem (setting 20 here means 2A)");
+        defSet("plcc_I_aa_atom_radius", "20", "The atom radius of protein atoms in 10th part Angstroem (setting 20 here means 2A)");
+        defSet("plcc_I_rna_atom_radius", "20", "The atom radius of rna atoms in 10th part Angstroem (setting 20 here means 2A)");
         defSet("plcc_I_lig_atom_radius", "30", "The atom radius of ligand atoms in 10th part Angstroem (setting 40 here means 4A)");
         defSet("plcc_B_SSEcontactsAtom", "true", "Defines the contact level used to determine SSE contacts. If set to true, the number of atom level. contacts decides whether an SSE contact exists. If set to false, the residue level contacts are used instead.");
-        defSet("plcc_I_max_contacts_per_type", "100", "The maximum number of contacts of a certain type that is counted for a residue pair. Simply set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). The PTGL uses a setting of 1 (so if a pair has 3 B/B cotacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)");
+        defSet("plcc_I_max_contacts_per_type", "1", "The maximum number of contacts of a certain type that is counted for a residue pair. Simply set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). The PTGL uses a setting of 1 (so if a pair has 3 B/B cotacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)");
         defSet("plcc_B_forceBackboneContacts", "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone.");
         defSet("plcc_B_skip_too_large", "false", "Whether to abort if the protein has more than 'plcc_I_skip_num_atoms_threshold' atoms.");
         defSet("plcc_I_skip_num_atoms_threshold", "80000", "The maximal number of atoms per PDB file if 'plcc_B_skip_too_large' is true. In that case, PLCC will abort for PDB files with more atoms (for cluster mode).");

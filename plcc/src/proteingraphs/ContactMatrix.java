@@ -139,108 +139,51 @@ public class ContactMatrix {
                     
                     // This information is kept in the chain-specific geo.dat file of bet_neo in the PTGL.
                     
-                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");   
+                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");//;   
                                        // See comment above, the maximum number of contacts of a certain type that
-                                       // is counted for a residue pair. Simply set it to something very large 
-                                       // if you don't want any limit (Integer.MAX_VALUE comes to mind).
+                                       // is counted for a residue pair. 
                                        // The PTGL uses a setting of 1.
                     
                     Integer numc;   // just a temp var for current number of contacts
                     Integer contDist;
                     
-                    if(Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
-                        
-                        contDist = rc.getBBContactDist();
-                        if(contDist > 0) { this.addContacts("BB", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getBCContactDist();
-                        if(contDist > 0) { this.addContacts("BC", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getCBContactDist();
-                        if(contDist > 0) { this.addContacts("CB", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getCCContactDist();
-                        if(contDist > 0) { this.addContacts("CC", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getLBContactDist();
-                        if(contDist > 0) { this.addContacts("LB", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getBLContactDist();
-                        if(contDist > 0) { this.addContacts("BL", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getLCContactDist();
-                        if(contDist > 0) { this.addContacts("LC", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getCLContactDist();
-                        if(contDist > 0) { this.addContacts("CL", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getLLContactDist();
-                        if(contDist > 0) { this.addContacts("LL", aSSEPos, bSSEPos, 1); }
-                    }
-                    else {
-                        // All checks done, these are valid contacts.
-                        numc = rc.getNumContactsBB();
-                        this.addContacts("BB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                     
+                                           
+                    // All checks done, these are valid contacts.
+                    numc = rc.getNumContactsBB();
+                    this.addContacts("BB", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsBC();
-                        this.addContacts("BC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsBC();
+                    this.addContacts("BC", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsCB();
-                        this.addContacts("CB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsCB();
+                    this.addContacts("CB", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsCC();
-                        this.addContacts("CC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsCC();
+                    this.addContacts("CC", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsLB();
-                        this.addContacts("LB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsLB();
+                    this.addContacts("LB", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsBL();
-                        this.addContacts("BL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsBL();
+                    this.addContacts("BL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsLC();
-                        this.addContacts("LC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsLC();
+                    this.addContacts("LC", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsCL();
-                        this.addContacts("CL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsCL();
+                    this.addContacts("CL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsLL();
-                        this.addContacts("LL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsLL();
+                    this.addContacts("LL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
                         // ***** Fill the other half of the matrix [ (y/x) instead of (x/y) ] *****
                         // We should not do this! If a residue A has a BC contact to a residue B, it does NOT mean that
                         // B has a BC contact to A if we differentiate between BC and CB contacts!
-                        /*
-                        numc = rc.getNumContactsBB();
-                        this.addContacts("BB", bSSEPos, aSSEPos, rc.getNumContactsBB());
 
-                        numc = rc.getNumContactsBC();
-                        this.addContacts("BC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsCB();
-                        this.addContacts("CB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsCC();
-                        this.addContacts("CC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsLB();
-                        this.addContacts("LB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsBL();
-                        this.addContacts("BL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsLC();
-                        this.addContacts("LC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsCL();
-                        this.addContacts("CL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsLL();
-                        this.addContacts("LL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                         * 
-                         */
-                    }
                     
-                    contNumConsidered++;
+                        
+                        contNumConsidered++;
                 }                                
             }
             else {

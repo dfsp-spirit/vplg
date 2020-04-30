@@ -28,7 +28,7 @@ public class Comp3DTools {
         Integer maxDistForAtom, dist = 0; // just assign a small start value
         Integer MAXDIST = Integer.MAX_VALUE;   // just assign a *very* large start value
         Integer totalMinMaxDist = MAXDIST;
-        //Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        //Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
 
         if(atoms.size() < 1) {
             DP.getInstance().w("empty atom list");
