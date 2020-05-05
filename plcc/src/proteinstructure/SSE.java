@@ -160,11 +160,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             System.out.println("[DEBUG LV 3] Vector-mode angle between " + this.toString() + " and " + otherSSE.toString() + ": " + angleDeg);
         }
         
-        // TODO which spat rel?
-        //  --> start with parallel: 0 - 70, mixed: 71 - 110, antiparallel: 111-180
-        if (angleDeg <= 70) {
+        if (angleDeg <= Settings.getInteger("plcc_I_spatrel_max_deg_parallel")) {
             return SpatRel.PARALLEL;
-        } else if (angleDeg <= 110) {
+        } else if (angleDeg < Settings.getInteger("plcc_I_spatrel_min_deg_antip")) {
             return SpatRel.MIXED;
         } else if (angleDeg <= 180) {
             return SpatRel.ANTIPARALLEL;

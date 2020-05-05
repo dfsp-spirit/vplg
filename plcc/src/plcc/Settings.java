@@ -504,7 +504,9 @@ public class Settings {
         defSet("plcc_I_spatrel_dd_largest_antip_def", "-7", "Same as above, this is the default for other interactions (e.g., coil/helix).");
         defSet("plcc_I_spatrel_dd_smallest_parallel_def", "7", "Same as above, this is the default for other interactions.");
         
-        defSet("plcc_B_spatrel_use_dd", "true", "Wether to use double difference mode for spatial relation computation of SSEs. If false use vectors instead (WIP)");
+        defSet("plcc_B_spatrel_use_dd", "false", "Whether to use double difference mode for spatial relation computation of SSEs. False invokes vector-mode instead.");
+        defSet("plcc_I_spatrel_max_deg_parallel", "65", "Degrees to which SSEs are classified to be parallel in vector-mode.");
+        defSet("plcc_I_spatrel_min_deg_antip", "115", "Degrees from which SSEs are classified to be antiparallel in vector-mode.");
 
         // graphlets
         defSet("plcc_I_number_of_graphlets", "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity.");
