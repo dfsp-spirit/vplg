@@ -13,6 +13,7 @@ package proteinstructure;
 import java.util.ArrayList;
 import tools.Comp3DTools;
 import graphdrawing.IDrawableVertex;
+import plcc.Settings;
 import proteingraphs.Position3D;
 import proteingraphs.SSEGraph;
 import proteingraphs.SSEGraphVertex;
@@ -155,7 +156,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         Double angleDeg = Math.toDegrees(PiEffectCalculations.calculateAngleBetw3DVecs(doubleVectorA, doubleVectorB));
         
         // DEBUG TODELETE
-        System.out.println("Angle between " + this.toString() + " and " + otherSSE.toString() + ":\n  " + angleDeg);
+        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+            System.out.println("[DEBUG LV 3] Vector-mode angle between " + this.toString() + " and " + otherSSE.toString() + ": " + angleDeg);
+        }
         
         // TODO which spat rel?
         //  --> start with parallel: 0 - 70, mixed: 71 - 110, antiparallel: 111-180

@@ -12680,8 +12680,8 @@ public class Main {
                     }
                     
                     //add residues
-                    newSSE.addResidues(curSSE.getResidues());
-                    newSSE.addResidues(nextSSE.getResidues());
+                    newSSE.addResiduesAtStart(curSSE.getResidues());
+                    newSSE.addResiduesAtStart(nextSSE.getResidues());
                     
                     //set new sequential number of the SSE
                     newSSE.setSeqSseNumDssp(newList.size() + 1);
@@ -13232,13 +13232,7 @@ public class Main {
             System.out.println("    SSE contact matrix calculated.");
         }
         
-        // TODELETE
-        System.out.println("Starting spatial relation computation for SSE-CG at " + java.time.LocalTime.now());
-        
         chainCM.calculateSSESpatialRelationMatrix(resContacts, false);  
-        
-        // TODELETE
-        System.out.println("Finished at " + java.time.LocalTime.now());
 
         if( ! silent) {
             System.out.println("    Spatial relation matrix calculated.");

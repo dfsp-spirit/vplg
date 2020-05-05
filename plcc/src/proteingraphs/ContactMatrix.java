@@ -959,12 +959,6 @@ public class ContactMatrix {
 
             }
         }
-        
-        // TODELETE
-        for (Integer[] row : spatialSSE) {
-            System.out.println(Arrays.toString(row));
-        }
-
     }
 
 
