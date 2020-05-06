@@ -97,6 +97,15 @@ class CifParser {
     static final String[] NO_VALUE_PLACEHOLDERS = {".", "?"};  // characters that are used in mmCIFs as placeholder when no value exists
     static final String SINGLE_LINE_STRING_MARKER = "'";
     
+    public Boolean isRNA(String chainID) {
+        if (chainIdentity.get(chainID).equals("polyribonucleotide")) {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
     /**
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
      * @param pf PDB file path
@@ -673,8 +682,7 @@ class CifParser {
         // standard AAs and (some) non-standard, atm: UNK, MSE
         //   -> may be changed below if it is free (treat as ligand then)
         Boolean isAA = FileParser.isAminoacid(molNamePDB, true);
-        Boolean isRNA = FileParser.isRNAresidueName(molNamePDB);
-
+        
         // TODO: possible to ignore alt loc atoms right now?
 
         // >> DNA/RNA <<
