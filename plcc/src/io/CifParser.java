@@ -25,6 +25,7 @@ import proteinstructure.Model;
 import proteinstructure.Molecule;
 import proteinstructure.ProtMetaInfo;
 import proteinstructure.Residue;
+import proteinstructure.RNA; 
 import tools.DP;
 
 
@@ -45,6 +46,7 @@ class CifParser {
     private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
     private static String pdbID;
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
+    private static HashMap<String, String> chainIdentity = new HashMap<>();
     
     // - - - vars for parsing - - -
     private static Boolean dataBlockFound = false;  // for now only parse the first data block (stop if seeing 2nd block)
@@ -72,6 +74,7 @@ class CifParser {
     private static Residue tmpMol = null;      // used to save lastMol if getResidue returns null
     private static Chain tmpChain = null;
     private static Residue lig = null;
+    private static RNA rna = null;
 
     // - variables per (atom) line -
     private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
@@ -82,6 +85,8 @@ class CifParser {
     private static String lastChainID = ""; // s.a.
     private static String[] tmpLineData;
     private static String tmpModelID;
+    private static String chainNum = null;
+    private static String chainType = null;
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -425,18 +430,50 @@ class CifParser {
     
     /**
      * Handle a line starting with '_entity_poly.' holding entity information of polymeres.
-     * Fills, for example, the homologuesMap.
+     * Fills, for example, the homologuesMap and the chainIdentity Map which maps chain ID to its molecule type.
      */
-    private static void handleEntityPolyLine() {
+    private static void handleEntityPolyLine() {       
         if (inLoop) {
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
-            } 
-        } else {
+                
+                // Iterate through columns to match chain IDs with their type
+                for (Integer i : colHeaderPosMap.values()){
+                    if (lineData[colHeaderPosMap.get("pdbx_strand_id")] != null && lineData[colHeaderPosMap.get("type")] != null){
+                        
+                        // Multiple chains can be listed under "pdbx_strand_id" so they have to be separated and individually added to chainIdentity
+                        String[] chainList = lineData[colHeaderPosMap.get("pdbx_strand_id")].split(",");
+                        for (String s : chainList) {
+                            chainIdentity.put(s, lineData[colHeaderPosMap.get("type")]);
+                        }
+                    }
+                }
+            }
+            
+        } 
+        else {
+            if (lineData[0].equals("_entity_poly.type")) {
+                chainType = lineData[1];
+                if (chainType == null || chainType == ""){
+                    DP.getInstance().w("No chain type found. Trying to continue with null.");
+                }
+            }
             if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
+                chainNum = lineData[1];
+                if (chainNum == null || chainNum == ""){
+                    DP.getInstance().w("No chain ID found. Trying to continue with null.");
+                }
+                
+                // Multiple chains can be listed under "pdx_strand_id". But since at this point we can be sure that they have the same type, 
+                // they have to be split and can then be added to chainIdentity with the type identified above.
+                String[] chainList = chainNum.split(",");
+                for (String s : chainList) {
+                    chainIdentity.put(s, chainType);
+                }
             }
         }
+        System.out.println(chainIdentity);
     }
     
     
@@ -636,6 +673,7 @@ class CifParser {
         // standard AAs and (some) non-standard, atm: UNK, MSE
         //   -> may be changed below if it is free (treat as ligand then)
         Boolean isAA = FileParser.isAminoacid(molNamePDB, true);
+        Boolean isRNA = FileParser.isRNAresidueName(molNamePDB);
 
         // TODO: possible to ignore alt loc atoms right now?
 
@@ -1182,6 +1220,7 @@ class CifParser {
         c.setModel(m);
         c.setModelID(m.getModelID());
         m.addChain(c);
+        c.setMoleculeType(chainIdentity.get(cID));
         
         c.setHomologues(FileParser.homologuesMap.get(cID));
         //c.setMacromolID(entityID);
@@ -1195,7 +1234,7 @@ class CifParser {
         allProteinMetaInfos.add(pmi);
         return c;
     }
-    
+        
 
     protected static ProtMetaInfo getProteinMetaInfo(String pdbID, String chainID) {
         Boolean foundPMI = false;

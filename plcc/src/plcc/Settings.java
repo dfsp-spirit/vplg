@@ -508,7 +508,7 @@ public class Settings {
         defSet("plcc_I_number_of_graphlets", "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity.");
         
         // rna
-        defSet("plcc_include_rna", "false", "Whether RNA should be parsed and included in graph formalism and visualisation (WIP)");
+        defSet("plcc_B_include_rna", "false", "Whether RNA should be parsed and included in graph formalism and visualisation (WIP)");
 
         // matrix structure search
         defSet("plcc_S_linear_notation", "", "The linear notation of a PG for the matrix structure comparison");

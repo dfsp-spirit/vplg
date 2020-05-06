@@ -1520,7 +1520,7 @@ public class Main {
                    
                     if(s.equals("--include-rna"))  {
                         argsUsed[i] = true;
-                        Settings.set("plcc_include_rna", "true");
+                        Settings.set("plcc_B_include_rna", "true");
                     }
                     
                    
@@ -1607,10 +1607,10 @@ public class Main {
             }
         } else {
             // using old parser: everything that does not work with it here
-            if (Settings.getBoolean("plcc_include_rna")) {
+            if (Settings.getBoolean("plcc_B_include_rna")) {
                 DP.getInstance().w("Legacy PDB file parser and inclusion of RNA switched on, but the old parser does not suppoert this setting." +
                         " Use a mmCIF file and command line option '-I' to include RNA. Switching off RNA inclusion now to go on.");
-                Settings.set("plcc_include_rna", "false");
+                Settings.set("plcc_B_include_rna", "false");
             }
         }
         
@@ -2311,7 +2311,7 @@ public class Main {
         getAADistribution(resFromMolecules(molecules));
 
         if(! silent) {
-            if (! Settings.getBoolean("plcc_include_rna")) {
+            if (! Settings.getBoolean("plcc_B_include_rna")) {
                 // RNA off
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
                         " Residues, " + atoms.size() + " Atoms).");

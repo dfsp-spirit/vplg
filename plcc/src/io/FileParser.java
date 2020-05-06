@@ -342,7 +342,9 @@ public class FileParser {
     public static boolean isRNAresidueName(String molNamePDB) {
         
         // standard ribonucleotides
-        if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
+        ArrayList<String> RNANames = new ArrayList<>(Arrays.asList("  G", "  U", "  A", "  T", "  C", "  I", "G  ", "U  ", "A  ", "T  ", "C  ", "I  ", "G", "U", "A", "T", "C", "I"));
+//        if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
+        if (RNANames.contains(molNamePDB)){
             return true;
         }
         
@@ -387,8 +389,8 @@ public class FileParser {
     
     
     /**
-     * Returns true if AAName is standard aminoacid name (3-letter code).
-     * @param AAName Aminoacid name, 3-letter code, capitalized
+     * Returns true if RNAName is standard RNA name (1-letter code).
+     * @param RNAName RNA name, 1-letter code, capitalized
      * @return 
      */
     private static boolean isRNA(String RNAName) {
