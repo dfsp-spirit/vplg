@@ -13,10 +13,13 @@ package proteinstructure;
 import java.util.ArrayList;
 import tools.Comp3DTools;
 import graphdrawing.IDrawableVertex;
+import plcc.Settings;
 import proteingraphs.Position3D;
 import proteingraphs.SSEGraph;
 import proteingraphs.SSEGraphVertex;
 import tools.DP;
+import proteingraphs.SpatRel;
+import tools.PiEffectCalculations;
 
 /**
  * Represents a secondary structure element (SSE), e.g., an alpha-helix or a beta-strand.
@@ -81,6 +84,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     private Chain chain = null;
     private Integer seqSseNumDssp = null;
     private String betaSheetLabel = null;
+    private Integer[] orientationVector = null;  // Vector (X,Y,Z) that points from center of first to center of last residue
 
     /**
      * Constructor that sets the SSE type to 'sseType'. 
@@ -89,8 +93,99 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public SSE(String sseType) {
         super();
         this.sseType = sseType;
+        initDatastructures();
+    }
+    
+    
+     /**
+     * Constructor that sets the SSE type by the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
+     * @param sseClass the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
+     */
+    public SSE(Integer sseClass) {
+        if(sseClass.equals(SSE.SSECLASS_HELIX)) {
+            this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
+        } 
+        else if(sseClass.equals(SSE.SSECLASS_BETASTRAND)) {
+            this.sseType = SSE.SSE_TYPE_BETASTRAND;
+        }
+        else if(sseClass.equals(SSE.SSECLASS_LIGAND)) {
+            this.sseType = SSE.SSE_TYPE_LIGAND;
+        }
+        else if(sseClass.equals(SSE.SSECLASS_OTHER)) {
+            this.sseType = SSE.SSE_TYPE_OTHER;
+        }
+        else {
+            DP.getInstance().w("SSE", "<constructor>: Creating SSE of invalid class '" + sseClass + "' not possible. Assuming alpha helix.");
+            this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
+        }
+        
+        initDatastructures();
+    }
+    
+    
+    private void initDatastructures() {
         residues = new ArrayList<>();
     }
+    
+    
+    private void computeOrientationVector() {
+        orientationVector = new Integer[3];
+        if (residues.size() > 1) {
+            Residue firstRes = residues.get(0);
+            Residue lastRes = residues.get(residues.size() - 1);
+            
+            orientationVector[0] = lastRes.getCentroidCoords()[0] - firstRes.getCentroidCoords()[0];
+            orientationVector[1] = lastRes.getCentroidCoords()[1] - firstRes.getCentroidCoords()[1];
+            orientationVector[2] = lastRes.getCentroidCoords()[2] - firstRes.getCentroidCoords()[2];
+        }
+    }
+    
+    
+    public Integer angleBetweenThisAnd(SSE otherSSE) {
+        
+        Integer[] vectorA = this.getOrientationVector();
+        Integer[] vectorB = otherSSE.getOrientationVector();
+        
+        double[] doubleVectorA = new double[3];
+        double[] doubleVectorB = new double[3];
+        for (int i = 0; i < 3; i++) {
+            doubleVectorA[i] = vectorA[i].doubleValue();
+            doubleVectorB[i] = vectorB[i].doubleValue();
+        }
+        
+        Double angleDeg = Math.toDegrees(PiEffectCalculations.calculateAngleBetw3DVecs(doubleVectorA, doubleVectorB));
+        
+        // DEBUG TODELETE
+        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+            System.out.println("[DEBUG LV 3] Vector-mode angle between " + this.toString() + " and " + otherSSE.toString() + ": " + angleDeg);
+        }
+        
+        if (angleDeg <= Settings.getInteger("plcc_I_spatrel_max_deg_parallel")) {
+            return SpatRel.PARALLEL;
+        } else if (angleDeg < Settings.getInteger("plcc_I_spatrel_min_deg_antip")) {
+            return SpatRel.MIXED;
+        } else if (angleDeg <= 180) {
+            return SpatRel.ANTIPARALLEL;
+        } else {
+            DP.getInstance().w("Got an unusual angle of " + angleDeg + " between SSEs " + this.toString() + " and " + otherSSE.toString() + "."
+                    + " Assigning 'other' and try to proceed.");
+            return SpatRel.OTHER;
+        }
+    }
+    
+    
+    public Integer[] getOrientationVector() {
+        if (orientationVector == null) {
+            if (hasResidueWithAtoms()) {
+                computeOrientationVector();
+            } else {
+                DP.getInstance().w("Tried to get orientation from empty SSE " + this.toString() +"."
+                        + " This may result in missing edges! Trying to go on.");
+            }
+        }
+        return orientationVector;
+    }
+    
     
     /**
      * Returns the PTGL string notation for folding graphs for this sse type (like "e" for strand).
@@ -127,30 +222,6 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         else { return SSE.SSECLASS_OTHER; } 
     }
     
-    /**
-     * Constructor that sets the SSE type by the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
-     * @param sseClass the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
-     */
-    public SSE(Integer sseClass) {
-        if(sseClass.equals(SSE.SSECLASS_HELIX)) {
-            this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
-        } 
-        else if(sseClass.equals(SSE.SSECLASS_BETASTRAND)) {
-            this.sseType = SSE.SSE_TYPE_BETASTRAND;
-        }
-        else if(sseClass.equals(SSE.SSECLASS_LIGAND)) {
-            this.sseType = SSE.SSE_TYPE_LIGAND;
-        }
-        else if(sseClass.equals(SSE.SSECLASS_OTHER)) {
-            this.sseType = SSE.SSE_TYPE_OTHER;
-        }
-        else {
-            DP.getInstance().w("SSE", "<constructor>: Creating SSE of invalid class '" + sseClass + "' not possible. Assuming alpha helix.");
-            this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
-        }
-        residues = new ArrayList<Residue>();
-    }
-
     
     /**
      * Returns true if this SSE is a ligand SSE..
@@ -611,10 +682,21 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      */
     public void setSeqSseChainNum(Integer s) { this.sseSeqChainNum = s; }
 
-    public void addResidues(ArrayList<Residue> rl) {
-        for(Integer i = 0; i < rl.size(); i++) {
-            this.addResidue(rl.get(i));
+    public void addResiduesAtStart(ArrayList<Residue> rl) {
+        
+        ArrayList<Residue> rearrangedResidues = new ArrayList<>();
+  
+        // new first residues
+        for (Integer i = 0; i < rl.size(); i++) {
+            rearrangedResidues.add(rl.get(i));
         }
+        
+        // old residues
+        for (int i = 0; i < residues.size(); i++) {
+            rearrangedResidues.add(residues.get(i));
+        }
+        
+        residues = rearrangedResidues;
     }
     
     

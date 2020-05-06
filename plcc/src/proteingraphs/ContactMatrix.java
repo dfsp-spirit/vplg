@@ -18,6 +18,7 @@ import java.net.*;
 import java.util.List;
 import org.jgrapht.*;
 import io.DBManager;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -139,108 +140,51 @@ public class ContactMatrix {
                     
                     // This information is kept in the chain-specific geo.dat file of bet_neo in the PTGL.
                     
-                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");   
+                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");//;   
                                        // See comment above, the maximum number of contacts of a certain type that
-                                       // is counted for a residue pair. Simply set it to something very large 
-                                       // if you don't want any limit (Integer.MAX_VALUE comes to mind).
+                                       // is counted for a residue pair. 
                                        // The PTGL uses a setting of 1.
                     
                     Integer numc;   // just a temp var for current number of contacts
                     Integer contDist;
                     
-                    if(Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
-                        
-                        contDist = rc.getBBContactDist();
-                        if(contDist > 0) { this.addContacts("BB", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getBCContactDist();
-                        if(contDist > 0) { this.addContacts("BC", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getCBContactDist();
-                        if(contDist > 0) { this.addContacts("CB", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getCCContactDist();
-                        if(contDist > 0) { this.addContacts("CC", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getLBContactDist();
-                        if(contDist > 0) { this.addContacts("LB", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getBLContactDist();
-                        if(contDist > 0) { this.addContacts("BL", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getLCContactDist();
-                        if(contDist > 0) { this.addContacts("LC", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getCLContactDist();
-                        if(contDist > 0) { this.addContacts("CL", aSSEPos, bSSEPos, 1); }
-                        
-                        contDist = rc.getLLContactDist();
-                        if(contDist > 0) { this.addContacts("LL", aSSEPos, bSSEPos, 1); }
-                    }
-                    else {
-                        // All checks done, these are valid contacts.
-                        numc = rc.getNumContactsBB();
-                        this.addContacts("BB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                     
+                                           
+                    // All checks done, these are valid contacts.
+                    numc = rc.getNumContactsBB();
+                    this.addContacts("BB", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsBC();
-                        this.addContacts("BC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsBC();
+                    this.addContacts("BC", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsCB();
-                        this.addContacts("CB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsCB();
+                    this.addContacts("CB", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsCC();
-                        this.addContacts("CC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsCC();
+                    this.addContacts("CC", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsLB();
-                        this.addContacts("LB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsLB();
+                    this.addContacts("LB", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsBL();
-                        this.addContacts("BL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsBL();
+                    this.addContacts("BL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsLC();
-                        this.addContacts("LC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsLC();
+                    this.addContacts("LC", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsCL();
-                        this.addContacts("CL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsCL();
+                    this.addContacts("CL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
-                        numc = rc.getNumContactsLL();
-                        this.addContacts("LL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    numc = rc.getNumContactsLL();
+                    this.addContacts("LL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
                         // ***** Fill the other half of the matrix [ (y/x) instead of (x/y) ] *****
                         // We should not do this! If a residue A has a BC contact to a residue B, it does NOT mean that
                         // B has a BC contact to A if we differentiate between BC and CB contacts!
-                        /*
-                        numc = rc.getNumContactsBB();
-                        this.addContacts("BB", bSSEPos, aSSEPos, rc.getNumContactsBB());
 
-                        numc = rc.getNumContactsBC();
-                        this.addContacts("BC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsCB();
-                        this.addContacts("CB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsCC();
-                        this.addContacts("CC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsLB();
-                        this.addContacts("LB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsBL();
-                        this.addContacts("BL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsLC();
-                        this.addContacts("LC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsCL();
-                        this.addContacts("CL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-
-                        numc = rc.getNumContactsLL();
-                        this.addContacts("LL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                         * 
-                         */
-                    }
                     
-                    contNumConsidered++;
+                        
+                        contNumConsidered++;
                 }                                
             }
             else {
@@ -541,33 +485,43 @@ public class ContactMatrix {
 
         if(type.equals("BB")) {
             contBB[x][y] += num;
+            contBB[y][x] += num;
         }
         else if(type.equals("BC")) {
             contBC[x][y] += num;
+            contBC[y][x] += num;
         }
         else if(type.equals("CB")) {
             contCB[x][y] += num;
+            contCB[y][x] += num;
         }
         else if(type.equals("CC")) {
             contCC[x][y] += num;
+            contCC[y][x] += num;
         }
         else if(type.equals("LB")) {
             contLB[x][y] += num;
+            contLB[y][x] += num;
         }
         else if(type.equals("BL")) {
             contBL[x][y] += num;
+            contBL[y][x] += num;
         }
         else if(type.equals("LC")) {
             contLC[x][y] += num;
+            contLC[y][x] += num;
         }
         else if(type.equals("CL")) {
             contCL[x][y] += num;
+            contCL[y][x] += num;
         }
         else if(type.equals("LL")) {
             contLL[x][y] += num;
+            contLL[y][x] += num;
         }
         else if(type.equals("DISULFIDE")) {
             contDISULFIDE[x][y] += num;
+            contDISULFIDE[y][x] += num;
         }
         else {
             System.err.println("ERROR: addContacts(): Contact type '" + type + "' is not a valid contact type.");
@@ -764,46 +718,18 @@ public class ContactMatrix {
      * 
      */
     public void calculateSSESpatialRelationMatrix(List<MolContactInfo> contList, Boolean computeAll) {
-
-        // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string 
-        //   (jnw_2019: more like the number of the SSE it is part of), and as value a list of all contacts 
-        //   of that residue. This is done only once, and saves us from sequentially iterating through the 
-        //   contact list to find the ones for the current residue (|R|^2) times later.
-        Map<Integer, List<MolContactInfo>> rcMap = new HashMap<>();
-        Integer resASSEPos, resBSSEPos;
-        for(MolContactInfo rci : contList) {
-            resASSEPos = getSSEPosOfDsspResidue(rci.getMolA().getDsspNum());
-            resBSSEPos = getSSEPosOfDsspResidue(rci.getMolB().getDsspNum());
-            
-            // init lists if required
-            if( ! rcMap.containsKey(resASSEPos)) {
-                rcMap.put(resASSEPos, new ArrayList<MolContactInfo>());
-            }
-            if( ! rcMap.containsKey(resBSSEPos)) {
-                rcMap.put(resBSSEPos, new ArrayList<MolContactInfo>());
-            }
-            
-            // add data
-            // jnw_2019: only if both res are part of SSE
-            if (resASSEPos != -1 && resBSSEPos != -1) {
-                rcMap.get(resASSEPos).add(rci);
-                rcMap.get(resBSSEPos).add(rci);
-            }
-        }
         
-           
+        Integer spatRelCode;  // see SpatRel for definition. Is assigned in the end to both matrix entries (i,j and j,i)
         SSE sseA, sseB;
         Residue resA, resB;
         Molecule molA, molB;
-        molA = molB = null;
-        sseA = sseB = null;
         resA = resB = null;
+        
+        // following only used for dd method, but we cannot move it into if above sadly...
         Integer sumMax, sumMin, difMax, difMin, tmp;
         sumMax = difMax = tmp = Integer.MIN_VALUE;               // something small...
         sumMin = difMin = Integer.MAX_VALUE;               // & something laaarge :)
-        
         Integer doubleDifference = null;
-
         Integer eeLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_ee");
         Integer eeSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_ee");
         Integer hhLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_hh");
@@ -812,9 +738,41 @@ public class ContactMatrix {
         Integer heSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_he");
         Integer defLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_def");
         Integer defSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_def");
-        
         Integer largestAntip;       // used in loop below, gets assigned one of the values above
         Integer smallestParallel;
+        Map<Integer, List<MolContactInfo>> rcMap = new HashMap<>();
+        Integer resASSEPos, resBSSEPos;
+        
+        // pre-processing only for double difference required
+        if (Settings.getBoolean("plcc_B_spatrel_use_dd")) {
+            // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string 
+            //   (jnw_2019: more like the number of the SSE it is part of), and as value a list of all contacts 
+            //   of that residue. This is done only once, and saves us from sequentially iterating through the 
+            //   contact list to find the ones for the current residue (|R|^2) times later.
+            for(MolContactInfo rci : contList) {
+                resASSEPos = getSSEPosOfDsspResidue(rci.getMolA().getDsspNum());
+                resBSSEPos = getSSEPosOfDsspResidue(rci.getMolB().getDsspNum());
+
+                // init lists if required
+                if( ! rcMap.containsKey(resASSEPos)) {
+                    rcMap.put(resASSEPos, new ArrayList<MolContactInfo>());
+                }
+                if( ! rcMap.containsKey(resBSSEPos)) {
+                    rcMap.put(resBSSEPos, new ArrayList<MolContactInfo>());
+                }
+
+                // add data
+                // jnw_2019: only if both res are part of SSE
+                if (resASSEPos != -1 && resBSSEPos != -1) {
+                    rcMap.get(resASSEPos).add(rci);
+                    rcMap.get(resBSSEPos).add(rci);
+                }
+            }
+        }
+        
+
+        
+
         
         Boolean condition = false;
 
@@ -823,15 +781,15 @@ public class ContactMatrix {
 
         for(Integer i = 0; i < this.size - 1; i++) {
             sseA = this.sseList.get(i);
-
+            
             for(Integer j = (i + 1); j < this.size; j++) {
-                
+                              
                 if (Settings.getInteger("plcc_I_debug_level") >= 4) {
                         System.out.println("[DEBUG LV 4] Vertices >>" + i + "<< and >>" + j + "<<");
                     }
 
                 sseB = this.sseList.get(j);
-                
+                               
                 if(computeAll) {
                     // when computeAll is set, compute spatial relation for all SSEs which have at least a single residue level contact
                     condition = (this.getContacts("TT", i, j) > 0);
@@ -844,160 +802,163 @@ public class ContactMatrix {
                 }
 
                 if(condition) {
-                    
-                    sumMax = difMax = Integer.MIN_VALUE;
-                    sumMin = difMin = Integer.MAX_VALUE;
-
+                      
                     // Ligand always have the ligand relation because the others don't makes sense for them (they have no direction)
                     if(sseA.isLigandSSE() || sseB.isLigandSSE()) {
-                        spatialSSE[i][j] = SpatRel.LIGAND;
-                        spatialSSE[j][i] = SpatRel.LIGAND;
+                        spatRelCode = SpatRel.LIGAND;
                         //System.out.println("    SSEs " + i + " and " + j + " are ligands, skipping DD calculation.");
-                        continue;
-                    }
+                    } else {
+                        if (Settings.getBoolean("plcc_B_spatrel_use_dd")) {
+                            // use double difference mode
 
-                    // Compute the doubleDistance over all contact pairs of sseA and sseB
-                    List<MolContactInfo> contListAB = new ArrayList<>();
-                    if(rcMap.containsKey(i)) { contListAB.addAll(rcMap.get(i)); }
-                    if(rcMap.containsKey(j)) { contListAB.addAll(rcMap.get(j)); }
-                    
-                    List<MolContactInfo> usedContList = contListAB;
-                    
-                    for(Integer k = 0; k < usedContList.size(); k++) {
+                            sumMax = difMax = Integer.MIN_VALUE;
+                            sumMin = difMin = Integer.MAX_VALUE;
 
-                        molA = usedContList.get(k).getMolA();
-                        molB = usedContList.get(k).getMolB();                                                       
+                            // Compute the doubleDistance over all contact pairs of sseA and sseB
+                            List<MolContactInfo> contListAB = new ArrayList<>();
+                            if(rcMap.containsKey(i)) { contListAB.addAll(rcMap.get(i)); }
+                            if(rcMap.containsKey(j)) { contListAB.addAll(rcMap.get(j)); }
 
-                        // Get the SSEs
-                        resASSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
-                        resBSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
+                            List<MolContactInfo> usedContList = contListAB;
 
-                        // If they don't belong to any SSEs we are interested in, forget about them. Note that these
-                        //  residues may even belong to another chain.
-                        if(resASSEPos < 0 || resBSSEPos < 0) {
-                            continue;
-                        }
+                            for(Integer k = 0; k < usedContList.size(); k++) {
 
-                        // If both residues belong to (different) SSEs *of this SSE pair (i,j)*
-                        if((resASSEPos.equals(i) && resBSSEPos.equals(j)) || (resASSEPos.equals(j) && resBSSEPos.equals(i))) {
-                            
-                            // check for new sumMax
-                            tmp = usedContList.get(k).getDsspNumA() + usedContList.get(k).getDsspNumB();
-                            if(tmp > sumMax) {
-                                sumMax = tmp;
+                                molA = usedContList.get(k).getMolA();
+                                molB = usedContList.get(k).getMolB();                                                       
+
+                                // Get the SSEs
+                                resASSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
+                                resBSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
+
+                                // If they don't belong to any SSEs we are interested in, forget about them. Note that these
+                                //  residues may even belong to another chain.
+                                if(resASSEPos < 0 || resBSSEPos < 0) {
+                                    continue;
+                                }
+
+                                // If both residues belong to (different) SSEs *of this SSE pair (i,j)*
+                                if((resASSEPos.equals(i) && resBSSEPos.equals(j)) || (resASSEPos.equals(j) && resBSSEPos.equals(i))) {
+
+                                    // check for new sumMax
+                                    tmp = usedContList.get(k).getDsspNumA() + usedContList.get(k).getDsspNumB();
+                                    if(tmp > sumMax) {
+                                        sumMax = tmp;
+                                    }
+
+                                    // check for new sumMin
+                                    if(tmp < sumMin) {
+                                        sumMin = tmp;
+                                    }
+
+                                    if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                                        System.out.println("[DEBUG LV 4] Res " + resA.getDsspNum() + " + " + resB.getDsspNum());
+                                        System.out.println("  Sum: " + tmp);
+                                    }
+
+                                    // check for new difMax
+                                    tmp = Math.abs(usedContList.get(k).getDsspNumA() - usedContList.get(k).getDsspNumB());
+
+                                    if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                                        System.out.println("  Diff: " + tmp);
+                                    }
+
+                                    if(tmp > difMax) {
+                                        difMax = tmp;
+                                    }
+
+                                    // check for new difMin
+                                    if(tmp < difMin) {
+                                        difMin = tmp;
+                                    }
+
+
+
+                                }
                             }
 
-                            // check for new sumMin
-                            if(tmp < sumMin) {
-                                sumMin = tmp;
-                            }
+                            //doubleDifference = (sumMax - sumMin) - (difMax - difMin);
+                            doubleDifference = sumMax - sumMin - difMax + difMin;
 
                             if (Settings.getInteger("plcc_I_debug_level") >= 4) {
-                                System.out.println("[DEBUG LV 4] Res " + resA.getDsspNum() + " + " + resB.getDsspNum());
-                                System.out.println("  Sum: " + tmp);
+                                System.out.println("[DEBUG LV 4] Final values:");
+                                System.out.println("  sumMax: " + sumMax);
+                                System.out.println("  sumMin: " + sumMin);
+                                System.out.println("  difMax: " + difMax);
+                                System.out.println("  sumMax: " + difMin);
+                                System.out.println("  Double difference: " + doubleDifference);
                             }
+
+
+                            dblDif[i][j] = doubleDifference;
+
+                            // ----- start of DD interpretations based on the SSE types of the pair -----
+                            // check SSE types
+                            if(sseA.isBetaStrand() && sseB.isBetaStrand()) {
+                                largestAntip = eeLargestAntip;
+                                smallestParallel = eeSmallestParallel;
+                            }
+                            else if(sseA.isHelix() && sseB.isHelix()) {
+                                largestAntip = hhLargestAntip;
+                                smallestParallel = hhSmallestParallel;
+                            }
+                            else if( (sseA.isBetaStrand() && sseB.isHelix()) || (sseB.isBetaStrand() && sseA.isHelix()) ) {
+                                largestAntip = heLargestAntip;
+                                smallestParallel = heSmallestParallel;
+                            }
+                            else {
+                                // note that ligands have been handled above, this code only runs for stuff like coil/helix
+                                largestAntip = defLargestAntip;
+                                smallestParallel = defSmallestParallel;
+                            }
+
+                            // just a sanity test...
+                            //if(Objects.equals(largestAntip, smallestParallel)) {
+                            //    DP.getInstance().w("Double difference calculation borders are equal, should differ.");
+                            //}
+                            // ... and another one
+                            //if(largestAntip > smallestParallel) {
+                            //    DP.getInstance().w("Double difference calculation borders are inverted: anti-parallel value should be larger than parallel value but it is vice versa.");
+                            //}
                             
-                            // check for new difMax
-                            tmp = Math.abs(usedContList.get(k).getDsspNumA() - usedContList.get(k).getDsspNumB());
-                            
-                            if (Settings.getInteger("plcc_I_debug_level") >= 4) {
-                                System.out.println("  Diff: " + tmp);
+                            if(doubleDifference <= largestAntip) {
+                                spatRelCode = SpatRel.ANTIPARALLEL;
+                                //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                                //    System.out.println("    SSEs " + i + " and " + j + " are antiparallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
+                                //}
+                            }
+                            else if(doubleDifference >= smallestParallel) {
+                                spatRelCode = SpatRel.PARALLEL;
+                                //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                                //    System.out.println("    SSEs " + i + " and " + j + " are parallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
+                                //}
+                            }
+                            else {
+                                // DD = 0
+                                spatRelCode = SpatRel.MIXED;
+                                //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                                //    System.out.println("    SSEs " + i + " and " + j + " are mixed (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
+                                //}
                             }
 
-                            if(tmp > difMax) {
-                                difMax = tmp;
-                            }
-
-                            // check for new difMin
-                            if(tmp < difMin) {
-                                difMin = tmp;
-                            }
-
-                            
-
+                            // ----- end of DD interpretations -----
+                        } else {
+                            // use vector mode (WIP: unconfirmed results)
+                            spatRelCode = sseA.angleBetweenThisAnd(sseB);
                         }
                     }
                     
-                    //doubleDifference = (sumMax - sumMin) - (difMax - difMin);
-                    doubleDifference = sumMax - sumMin - difMax + difMin;
                     
-                    if (Settings.getInteger("plcc_I_debug_level") >= 4) {
-                        System.out.println("[DEBUG LV 4] Final values:");
-                        System.out.println("  sumMax: " + sumMax);
-                        System.out.println("  sumMin: " + sumMin);
-                        System.out.println("  difMax: " + difMax);
-                        System.out.println("  sumMax: " + difMin);
-                        System.out.println("  Double difference: " + doubleDifference);
-                    }
-                    
-                    
-                    dblDif[i][j] = doubleDifference;
-                    
-                    // ----- start of DD interpretations based on the SSE types of the pair -----
-                    // check SSE types
-                    if(sseA.isBetaStrand() && sseB.isBetaStrand()) {
-                        largestAntip = eeLargestAntip;
-                        smallestParallel = eeSmallestParallel;
-                    }
-                    else if(sseA.isHelix() && sseB.isHelix()) {
-                        largestAntip = hhLargestAntip;
-                        smallestParallel = hhSmallestParallel;
-                    }
-                    else if( (sseA.isBetaStrand() && sseB.isHelix()) || (sseB.isBetaStrand() && sseA.isHelix()) ) {
-                        largestAntip = heLargestAntip;
-                        smallestParallel = heSmallestParallel;
-                    }
-                    else {
-                        // note that ligands have been handled above, this code only runs for stuff like coil/helix
-                        largestAntip = defLargestAntip;
-                        smallestParallel = defSmallestParallel;
-                    }
-                    
-                    // just a sanity test...
-                    //if(Objects.equals(largestAntip, smallestParallel)) {
-                    //    DP.getInstance().w("Double difference calculation borders are equal, should differ.");
-                    //}
-                    // ... and another one
-                    //if(largestAntip > smallestParallel) {
-                    //    DP.getInstance().w("Double difference calculation borders are inverted: anti-parallel value should be larger than parallel value but it is vice versa.");
-                    //}
-                    
-                    
-                    if(doubleDifference <= largestAntip) {
-                        spatialSSE[i][j] = SpatRel.ANTIPARALLEL;
-                        spatialSSE[j][i] = SpatRel.ANTIPARALLEL;
-                        //if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                        //    System.out.println("    SSEs " + i + " and " + j + " are antiparallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
-                        //}
-                    }
-                    else if(doubleDifference >= smallestParallel) {
-                        spatialSSE[i][j] = SpatRel.PARALLEL;
-                        spatialSSE[j][i] = SpatRel.PARALLEL;
-                        //if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                        //    System.out.println("    SSEs " + i + " and " + j + " are parallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
-                        //}
-                    }
-                    else {
-                        // DD = 0
-                        spatialSSE[i][j] = SpatRel.MIXED;
-                        spatialSSE[j][i] = SpatRel.MIXED;
-                        //if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                        //    System.out.println("    SSEs " + i + " and " + j + " are mixed (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
-                        //}
-                    }
-                    
-                    // ----- end of DD interpretations -----
 
-                }
-                else {
+                } else {
                     // The two SSEs are not in contact.
-                    spatialSSE[i][j] = SpatRel.NONE;
-                    spatialSSE[j][i] = SpatRel.NONE;
-                }                
+                    spatRelCode = SpatRel.NONE;
+                }
+                
+                spatialSSE[i][j] = spatRelCode;
+                spatialSSE[j][i] = spatRelCode;
 
             }
         }
-
     }
 
 

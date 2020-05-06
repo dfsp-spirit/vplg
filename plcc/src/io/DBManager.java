@@ -2173,7 +2173,7 @@ connection.close();
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
-        if (Settings.getBoolean("plcc_B_compute_7tim")) {
+        if (Settings.getBoolean("plcc_B_compute_tim")) {
             if(DBManager.chainContainsMotif_TIMBarrel(chain_db_id)) {
                 motif_db_id = Motifs.MOTIFCODE__TIM_BARREL.longValue();
                 rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);

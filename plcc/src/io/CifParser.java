@@ -649,7 +649,7 @@ class CifParser {
 
         // coordX
         // for information on difference between ptgl and plcc style look in old parser
-        if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+        if (Settings.getBoolean("plcc_B_round_coordinates")) {
             oCoordX = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10.0;
             coordX = oCoordX.intValue();
         } else {
@@ -659,7 +659,7 @@ class CifParser {
 
 
         // coordY
-        if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+        if (Settings.getBoolean("plcc_B_round_coordinates")) {
             oCoordY = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10.0;
             coordY = oCoordY.intValue();
         } else {
@@ -668,7 +668,7 @@ class CifParser {
         }
 
         // coordZ
-        if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+        if (Settings.getBoolean("plcc_B_round_coordinates")) {
             oCoordZ = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10.0;
             coordZ = oCoordZ.intValue();
         } else {
