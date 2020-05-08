@@ -2147,7 +2147,7 @@ public class Main {
         }
         
         FileParser.initData(pdbFile, dsspFile);
-         
+               
         if (Settings.getBoolean("plcc_B_debug_only_parse")) {
             System.out.println("Exiting now as requested by settings.");
             System.exit(0);
@@ -3234,7 +3234,7 @@ public class Main {
         long timeDiffTotal = totalComputationEndTime.getTime() - computationStartTime.getTime();//as given
         long runtimeTotal_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiffTotal);
         int[] compTimes = splitDurationToComponentTimes(runtimeTotal_secs);
-        
+               
         if(Settings.getBoolean("plcc_B_useDB")) {
             try {
                 DBManager.updateProteinTotalRuntimeInDB(pdbid, runtimeTotal_secs);

@@ -46,7 +46,8 @@ class CifParser {
     private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
     private static String pdbID;
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
-    private static HashMap<String, String> chainIdentity = new HashMap<>();
+    protected static HashMap<String, String> chainIdentity = new HashMap<>();       // matches chain ID with its molecule type
+    private static HashMap<String, HashMap<String, String>> chemicalComponents = new HashMap<>();   // stores all information on chemical components
     
     // - - - vars for parsing - - -
     private static Boolean dataBlockFound = false;  // for now only parse the first data block (stop if seeing 2nd block)
@@ -85,8 +86,8 @@ class CifParser {
     private static String lastChainID = ""; // s.a.
     private static String[] tmpLineData;
     private static String tmpModelID;
-    private static String chainNum = null;
-    private static String chainType = null;
+    private static String chainNum = null;  // identity of the current chain i.e. A
+    private static String chainType = null; // type of the current chain i.e. RNA
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -97,14 +98,6 @@ class CifParser {
     static final String[] NO_VALUE_PLACEHOLDERS = {".", "?"};  // characters that are used in mmCIFs as placeholder when no value exists
     static final String SINGLE_LINE_STRING_MARKER = "'";
     
-    public Boolean isRNA(String chainID) {
-        if (chainIdentity.get(chainID).equals("polyribonucleotide")) {
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
     
     /**
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
@@ -268,6 +261,10 @@ class CifParser {
                 case "_atom_site":
                     // check for atom coordinate data
                     handleAtomSiteLine();
+                    break;
+                case "_chem_comp":
+                    // check for information on chemical components
+                    handleChemComp();
                     break;
                 }
                 
@@ -438,7 +435,7 @@ class CifParser {
     
     
     /**
-     * Handle a line starting with '_entity_poly.' holding entity information of polymeres.
+     * Handle a line starting with '_entity_poly.' holding entity information of polymers.
      * Fills, for example, the homologuesMap and the chainIdentity Map which maps chain ID to its molecule type.
      */
     private static void handleEntityPolyLine() {       
@@ -446,31 +443,24 @@ class CifParser {
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
                 
-                // Iterate through columns to match chain IDs with their type
-                for (Integer i : colHeaderPosMap.values()){
-                    if (lineData[colHeaderPosMap.get("pdbx_strand_id")] != null && lineData[colHeaderPosMap.get("type")] != null){
-                        
-                        // Multiple chains can be listed under "pdbx_strand_id" so they have to be separated and individually added to chainIdentity
-                        String[] chainList = lineData[colHeaderPosMap.get("pdbx_strand_id")].split(",");
-                        for (String s : chainList) {
-                            chainIdentity.put(s, lineData[colHeaderPosMap.get("type")]);
-                        }
-                    }
+                // Multiple chains can be listed under "pdbx_strand_id" so they have to be separated and individually added to chainIdentity
+                String[] chainList = lineData[colHeaderPosMap.get("pdbx_strand_id")].split(",");
+                for (String s : chainList) {
+                    chainIdentity.put(s, lineData[colHeaderPosMap.get("type")]);
                 }
             }
-            
         } 
         else {
             if (lineData[0].equals("_entity_poly.type")) {
                 chainType = lineData[1];
-                if (chainType == null || chainType == ""){
+                if (chainType == null){
                     DP.getInstance().w("No chain type found. Trying to continue with null.");
                 }
             }
             if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
                 chainNum = lineData[1];
-                if (chainNum == null || chainNum == ""){
+                if (chainNum == null){
                     DP.getInstance().w("No chain ID found. Trying to continue with null.");
                 }
                 
@@ -482,7 +472,6 @@ class CifParser {
                 }
             }
         }
-        System.out.println(chainIdentity);
     }
     
     
@@ -709,6 +698,17 @@ class CifParser {
                 return;  // do not use that atom
             }
         }
+        
+        // >>RNA<<
+        
+        // check through chainID whether it is RNA
+//        System.out.println(numLine);
+//        System.out.println("  " + lineData[colHeaderPosMap.get("auth_asym_id")]);
+//        System.out.println("  " + FileParser.isRNA(lineData[colHeaderPosMap.get("auth_asym_id")]));
+//        if (FileParser.isRNA(lineData[colHeaderPosMap.get("auth_asym_id")])){
+//            System.out.println(numLine + ": ist RNA " + lineData[colHeaderPosMap.get("auth_asym_id")]);
+//        }
+
 
         // >> AA <<
         // update lastMol (only if needed) 
@@ -942,6 +942,33 @@ class CifParser {
                 FileParser.s_atoms.add(a);
             }
         }  
+    }
+    
+    /**
+     * 
+     */
+    private static void handleChemComp(){
+        String cat = null;
+        String val = null;
+        String chemName = null;
+        for (String category : colHeaderPosMap.keySet()){
+            cat = category;
+            val = lineData[colHeaderPosMap.get(category)];
+            if (cat == "id"){
+                chemName = val;
+            }
+//            System.out.println("S IST " + category);            //TODELETE
+//            System.out.println("DATA IST " + lineData[colHeaderPosMap.get(category)]);
+//            System.out.println("NAME IST " + lineData[colHeaderPosMap.get("id")]);
+//            System.out.println("COLHEADER VALUES IST " + colHeaderPosMap.values());
+//            for (Integer i : colHeaderPosMap.values()){
+//              System.out.println(colHeaderPosMap.keySet());
+              if (cat != val) {
+                chemicalComponents.put(lineData[colHeaderPosMap.get("id")], new HashMap<String, String>());
+                chemicalComponents.get("id").put(cat, val);
+            }
+        }
+        System.out.println(chemicalComponents);
     }
     
     

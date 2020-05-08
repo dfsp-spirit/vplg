@@ -389,17 +389,12 @@ public class FileParser {
     
     
     /**
-     * Returns true if RNAName is standard RNA name (1-letter code).
-     * @param RNAName RNA name, 1-letter code, capitalized
+     * Returns true if chainIdentity equals polyribonucleotide.
+     * @param chainID Name of the chain i.e. A
      * @return 
      */
-    private static boolean isRNA(String RNAName) {
-        String[] standardAANames = {"A", "G", "C", "G"};
-        if (Arrays.asList(standardAANames).contains(RNAName)) {
-            return true;
-        } else {
-            return false;
-        }
+    protected static boolean isRNA(String chainID) {
+        return (CifParser.chainIdentity.get(chainID).equals("polyribonucleotide") ? true : false);
     }
     
 
