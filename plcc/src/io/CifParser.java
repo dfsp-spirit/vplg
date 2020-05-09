@@ -945,30 +945,19 @@ class CifParser {
     }
     
     /**
-     * 
+     * Handles lines starting with _chem_comp by filling the chemicalComponents HashMap.
+     * Entries can look like this: MET={name=METHIONINE, pdbx_synonyms=?, formula=C5 H11 N O2 S, id=MET, type=L-peptide linking, formula_weight=149.211}}
      */
     private static void handleChemComp(){
         String cat = null;
         String val = null;
-        String chemName = null;
+        HashMap<String, String> tmpComponent = new HashMap<>();
         for (String category : colHeaderPosMap.keySet()){
             cat = category;
             val = lineData[colHeaderPosMap.get(category)];
-            if (cat == "id"){
-                chemName = val;
-            }
-//            System.out.println("S IST " + category);            //TODELETE
-//            System.out.println("DATA IST " + lineData[colHeaderPosMap.get(category)]);
-//            System.out.println("NAME IST " + lineData[colHeaderPosMap.get("id")]);
-//            System.out.println("COLHEADER VALUES IST " + colHeaderPosMap.values());
-//            for (Integer i : colHeaderPosMap.values()){
-//              System.out.println(colHeaderPosMap.keySet());
-              if (cat != val) {
-                chemicalComponents.put(lineData[colHeaderPosMap.get("id")], new HashMap<String, String>());
-                chemicalComponents.get("id").put(cat, val);
-            }
+            tmpComponent.put(cat, val);
+            chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);
         }
-        System.out.println(chemicalComponents);
     }
     
     
