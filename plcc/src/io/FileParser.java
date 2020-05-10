@@ -343,7 +343,6 @@ public class FileParser {
         
         // standard ribonucleotides
         ArrayList<String> RNANames = new ArrayList<>(Arrays.asList("  G", "  U", "  A", "  T", "  C", "  I", "G  ", "U  ", "A  ", "T  ", "C  ", "I  ", "G", "U", "A", "T", "C", "I"));
-//        if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
         if (RNANames.contains(molNamePDB)){
             return true;
         }
@@ -370,7 +369,7 @@ public class FileParser {
      * @param includeNonStandard allows additional to 20 standard amino acids: UNK
      * @return 
      */
-    protected static boolean isAminoacid(String AAName, Boolean includeNonStandard) {
+    protected static boolean isAminoacidName(String AAName, Boolean includeNonStandard) {
         ArrayList<String> AANames = new ArrayList<>(Arrays.asList("ALA", "ARG", "ASN", "ASP", "CYS", 
             "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
             "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"));
@@ -393,7 +392,7 @@ public class FileParser {
      * @param chainID Name of the chain i.e. A
      * @return 
      */
-    protected static boolean isRNA(String chainID) {
+    protected static boolean isRNAchain(String chainID) {
         return (CifParser.chainIdentity.get(chainID).equals("polyribonucleotide") ? true : false);
     }
     

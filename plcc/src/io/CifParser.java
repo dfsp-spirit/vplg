@@ -47,7 +47,7 @@ class CifParser {
     private static String pdbID;
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
     protected static HashMap<String, String> chainIdentity = new HashMap<>();       // matches chain ID with its molecule type
-    private static HashMap<String, HashMap<String, String>> chemicalComponents = new HashMap<>();   // stores all information on chemical components
+    protected static HashMap<String, HashMap<String, String>> chemicalComponents = new HashMap<>();   // stores all information on chemical components
     
     // - - - vars for parsing - - -
     private static Boolean dataBlockFound = false;  // for now only parse the first data block (stop if seeing 2nd block)
@@ -670,7 +670,8 @@ class CifParser {
 
         // standard AAs and (some) non-standard, atm: UNK, MSE
         //   -> may be changed below if it is free (treat as ligand then)
-        Boolean isAA = FileParser.isAminoacid(molNamePDB, true);
+        Boolean isAA = FileParser.isAminoacidName(molNamePDB, true);
+        System.out.println(isLigand());
         
         // TODO: possible to ignore alt loc atoms right now?
 
@@ -1287,6 +1288,43 @@ class CifParser {
         }
         lastIndexProtMetaInfos = currentIndex;
         return pmi;
+    }
+    
+    /**
+     * Returns true if the molecule type contains 'RNA' in the chemical components map.
+     * @return 
+     */
+    protected static Boolean isRNA(){
+        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+        int intIndex = chemType.indexOf("RNA");
+        if(intIndex == - 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * Returns true if the molecule type contains 'peptide' in the chemical components map.
+     * @return 
+     */
+    protected static Boolean isAA(){
+        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+        int intIndex = chemType.indexOf("peptide");
+        if(intIndex == - 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    
+    /**
+     * Returns true if the molecule type is neither 'RNA' nor 'peptide' in the chemical components map.
+     * @return 
+     */
+    protected static Boolean isLigand(){
+        return (isRNA() == false && isAA() == false) ? true : false;
     }
       
 }
