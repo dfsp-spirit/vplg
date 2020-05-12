@@ -671,7 +671,6 @@ class CifParser {
         // standard AAs and (some) non-standard, atm: UNK, MSE
         //   -> may be changed below if it is free (treat as ligand then)
         Boolean isAA = FileParser.isAminoacidName(molNamePDB, true);
-        System.out.println(isLigand());
         
         // TODO: possible to ignore alt loc atoms right now?
 
@@ -701,6 +700,10 @@ class CifParser {
         }
         
         // >>RNA<<
+        
+        if (isRNA()){
+            
+        }
         
         // check through chainID whether it is RNA
 //        System.out.println(numLine);
@@ -1318,9 +1321,26 @@ class CifParser {
         }
     }
     
+    /**
+     * Returns true if the molecule type contains 'DNA' in the chemical components map.
+     * Right now only added for completeness, as handling DNA is not implemented yet.
+     * @return 
+     */
+    
+    protected static Boolean isDNA(){
+        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+        int intIndex = chemType.indexOf("DNA");
+        if(intIndex == - 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     
     /**
      * Returns true if the molecule type is neither 'RNA' nor 'peptide' in the chemical components map.
+     * 'isDNA()' to be added once handling DNA is implemented
      * @return 
      */
     protected static Boolean isLigand(){
