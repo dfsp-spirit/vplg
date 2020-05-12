@@ -67,6 +67,7 @@ class CifParser {
     
     // - - atom_site - -
     private static int ligandsTreatedNum = 0;
+    private static int RNATreatedNum = 0;
     private static int numberAtoms = 0;
     
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
@@ -719,20 +720,20 @@ class CifParser {
         //     -> enables getting DsspResNum for atom from res
         // match res <-> chain here 
         // also decide here if modified amino acids is free (no DSSP entry -> not in s_residue) and needs to be treated as ligand
-        if (isAA) {
+//        if (isAA) {
             // we no start with lastMol is first residue from s_residues, so no check for null required!
             // load new Residue into lastMol if we approached next Residue
             if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
                 tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
                 // check that a peptid residue could be found                   
                 if (tmpMol == null || tmpMol.isLigand()) {
-                    // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
+                    // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand TOCHANGE
                     if (! silent) {
                         // print note only once
                         if (! molNumPDB.equals(lastLigandNumPDB))
-                        System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand.");
+                        System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand."); // or RNA!! TOCHANGE
                     }
-                    isAA = false;
+//                    isAA = false;
                 } else {
                     lastMol = tmpMol;
                     lastMol.setModelID(m.getModelID());
@@ -743,11 +744,11 @@ class CifParser {
                     lastMol.setName3(molNamePDB);
                 }
             }
-        }
+//        }
 
         Atom a = new Atom();
 
-        // handle stuff that's different between ATOMs (AA) and HETATMs (ligand)
+        // handle stuff that's different between ATOMs (AA) and HETATMs (ligand) TOCHANGE
         if(isAA) {
             // >> AA <<
             if (FileParser.isIgnoredAtom(chemSym)) {
@@ -771,12 +772,29 @@ class CifParser {
                 a.setDsspResNum(lastMol.getDsspNum());
             }
 
-            /*if(  Settings.getBoolean("plcc_B_include_rna")) {
-                a.setAtomtype(Atom.ATOMTYPE_RNA);
-            }*/
-
-
-        } else {
+        }
+        
+        if (isRNA()){
+            if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
+                rna = new RNA();
+                rna.setPdbNum(molNumPDB);
+                rna.setType(Molecule.RESIDUE_TYPE_RNA);                
+                
+                RNATreatedNum++;
+                int resNumDSSP = DsspParser.lastUsedDsspNum + RNATreatedNum; //TOCHANGE kann man das so machen? Wozu ist die DSSP Nummer?
+                
+                rna.setDsspNum(resNumDSSP);
+                rna.setChainID(chainID);
+                rna.setiCode(iCode);
+//                rna.setName3(); TOCHANGE geht scheinbar nicht für RNA --> wieso?
+                rna.setAAName1(molNamePDB);
+                rna.setChain(FileParser.getChainByPdbChainID(chainID));
+                rna.setModelID(m.getModelID());
+//                rna.setSSEString(); TOCHANGE Nic fragen was hier rein soll
+            }       
+        }
+        
+        if (isLigand()){
             // >> LIG <<
 
             // idea: add always residue (for consistency) but atom only if needed

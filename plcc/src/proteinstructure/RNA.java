@@ -37,6 +37,9 @@ public class RNA extends Molecule implements java.io.Serializable {
         this.sseStringDssp = Mol.getSSEStringDssp();
         this.isPartOfDsspSse = Mol.getDsspSseState();
     }
+    
+    public void setType(Integer i) { type = i;}
+    public void setiCode(String s) { iCode = s; }
 
 //    public List<BindingSite> partOfBindingSites;          // Methods involving BindingSites have not been implemented in this class yet due to problems with BindingSites-class.
 }
