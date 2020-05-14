@@ -874,7 +874,6 @@ class CifParser {
                 }
             }
 
-
             if(FileParser.isIgnoredLigRes(molNamePDB)) {
                 a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
@@ -891,11 +890,8 @@ class CifParser {
                 a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
                 //a.setDsspResNum(getDsspResNumForPdbFields(molNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
             }
-
-
         }
 
-        // >> AA + LIG <<
         // now create the new Atom
 
         // lastMol may be NULL
@@ -923,31 +919,37 @@ class CifParser {
             a.setModel(getModelByModelID(curModelID));
         }
         */
-
-            if (lastMol == null) {
-                DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
-                return;
-            } else {
-                if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
-                    lastMol.addHydrogenAtom(a);
-                }
-                else {
-                    FileParser.s_atoms.add(a);
-                    if (isAA()){
-                        a.setAtomtype(Atom.ATOMTYPE_AA);
-                        lastMol.addAtom(a);
-                    }
-                    if (isRNA()){
-                        a.setAtomtype(Atom.ATOMTYPE_RNA);
-                        lastMol.addAtom(a);
+        
+            if (isRNA() || isAA()){
+                if (lastMol == null) {
+                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                    return;
+                } else {
+                    if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+                        lastMol.addHydrogenAtom(a);
                     }
                     else {
-//                        lig.addAtom(a);
-                        a.setMolecule(lig);
+                        FileParser.s_atoms.add(a);
+                        if (isAA()){
+                            a.setAtomtype(Atom.ATOMTYPE_AA);
+                            lastMol.addAtom(a);
+                        }
+                        if (isRNA()){
+                            a.setAtomtype(Atom.ATOMTYPE_RNA);
+                            lastMol.addAtom(a);
+                        }
                     }
                 }
-            }  
+            }
+            else {
+                if (! (lig == null)){
+                    lig.addAtom(a);
+                    a.setMolecule(lig);
+                }
+
+            }
     }
+            
     
     /**
      * Handles lines starting with _chem_comp by filling the chemicalComponents HashMap.
