@@ -679,7 +679,7 @@ class CifParser {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
             }
-            return;  // do not use that atom
+            return;  // atom is not used
         }
 
         if( ! Settings.getBoolean("plcc_B_include_rna")) {
@@ -687,12 +687,12 @@ class CifParser {
                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                 }
-                return;  // do not use that atom
+                return;  // atom is not used
             }
         }
 
         // >> AA <<
-        // update lastMol (only if needed) 
+        // update lastMol if the atom in the current line belongs to a new molecule than the previous line 
         //     -> enables getting DsspResNum for atom from res
         // match res <-> chain here
         // load new Residue into lastMol if we approached next Residue, otherwise only add new atom
@@ -741,8 +741,10 @@ class CifParser {
         }
         
         
-        // >> RNA <<
         if (isRNA()){
+            // >> RNA <<
+            // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
+            // otherwise, a new RNA molecule is created
             if( ! ( molNumPDB.equals(lastRnaNumPDB) && chainID.equals(lastChainID) ) ) {
                 rna = new RNA();
                 rna.setPdbNum(molNumPDB);
@@ -761,6 +763,8 @@ class CifParser {
                 rna.setSSEString("plcc_S_rnaSSECode");
                                 
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
+                    // RNA chains can contain ligands that should be ignored such as water
+                    // In this case, no new atom needs to be saved
                     RnaTreatedNum--;
                     a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);
                     return;
@@ -811,9 +815,11 @@ class CifParser {
 
                 // add ligand to list of residues if it not on the ignore list
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
-                    ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but
-                                    //  this ligand won't be stored so decrement to previous value.
-                    //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + molNumPDB + "' at PDB line " + pLineNum + ".");
+                    ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but this ligand won't be stored so decrement to previous value.
+
+                    if(Settings.getInteger("plcc_I_debug_level") > 0){
+                        System.out.println("    PDB: Ignored ligand '" + molNamePDB + "-" + molNumPDB + "' at PDB line " + molNumPDB + ".");
+                    }
                 } else {
 
                     // ignore this for now: needs parsing of two more loops (_pdbx_nonpoly_scheme, _chem_comp)   	 
@@ -929,14 +935,14 @@ class CifParser {
                         lastMol.addHydrogenAtom(a);
                     }
                     else {
+                        // add Atom to list of atoms of current molecule as well as list of all atoms
+                        lastMol.addAtom(a);
                         FileParser.s_atoms.add(a);
                         if (isAA()){
                             a.setAtomtype(Atom.ATOMTYPE_AA);
-                            lastMol.addAtom(a);
                         }
                         if (isRNA()){
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
-                            lastMol.addAtom(a);
                         }
                     }
                 }
@@ -956,14 +962,14 @@ class CifParser {
      * Entries can look like this: MET={name=METHIONINE, pdbx_synonyms=?, formula=C5 H11 N O2 S, id=MET, type=L-peptide linking, formula_weight=149.211}}
      */
     private static void handleChemComp(){
-        String cat = null;
-        String val = null;
-        HashMap<String, String> tmpComponent = new HashMap<>();
+        String cat = null;              // categories such as type, name
+        String val = null;              // values such as peptide, Methionine 
+        HashMap<String, String> tmpComponent = new HashMap<>();     // stores categories and values for current component
         for (String category : colHeaderPosMap.keySet()){
             cat = category;
             val = lineData[colHeaderPosMap.get(category)];
             tmpComponent.put(cat, val);
-            chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);
+            chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);      // matches one component with all its cat/val pairings
         }
     }
     
