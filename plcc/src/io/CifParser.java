@@ -73,7 +73,7 @@ class CifParser {
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
     private static Model m = null;
     private static Molecule lastMol = null;    // starts as first residue and is always the actual one
-    private static Residue tmpMol = null;      // used to save lastMol if getResidue returns null
+    private static Molecule tmpMol = null;      // used to save lastMol if getResidue returns null
     private static Chain tmpChain = null;
     private static Residue lig = null;
     private static RNA rna = null;
@@ -672,18 +672,8 @@ class CifParser {
 
         // standard AAs and (some) non-standard, atm: UNK, MSE
         //   -> may be changed below if it is free (treat as ligand then)
-        Boolean isAA = FileParser.isAminoacidName(molNamePDB, true);
-        
-        // TODO: possible to ignore alt loc atoms right now?
 
-        // >> DNA/RNA <<
-        // ignore atm 
-        /*if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(resNamePDB, 3))) {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
-            }
-            continue; // do not use that atom
-        }*/
+        // TODO: possible to ignore alt loc atoms right now?
 
         if(FileParser.isDNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -700,78 +690,58 @@ class CifParser {
                 return;  // do not use that atom
             }
         }
-        
-        // >>RNA<<
-        
-        
-        // check through chainID whether it is RNA
-//        System.out.println(numLine);
-//        System.out.println("  " + lineData[colHeaderPosMap.get("auth_asym_id")]);
-//        System.out.println("  " + FileParser.isRNA(lineData[colHeaderPosMap.get("auth_asym_id")]));
-//        if (FileParser.isRNA(lineData[colHeaderPosMap.get("auth_asym_id")])){
-//            System.out.println(numLine + ": ist RNA " + lineData[colHeaderPosMap.get("auth_asym_id")]);
-//        }
-
 
         // >> AA <<
         // update lastMol (only if needed) 
         //     -> enables getting DsspResNum for atom from res
-        // match res <-> chain here 
-        // also decide here if modified amino acids is free (no DSSP entry -> not in s_residue) and needs to be treated as ligand
-//        if (isAA) {
-            // we no start with lastMol is first residue from s_residues, so no check for null required!
-            // load new Residue into lastMol if we approached next Residue
-            if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
-                tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
-                // check that a peptid residue could be found                   
-                if (tmpMol == null || tmpMol.isLigand()) {
-                    // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand TOCHANGE
-                    if (! silent) {
-                        // print note only once
-                        if (! molNumPDB.equals(lastLigandNumPDB))
-                        System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand."); // or RNA!! TOCHANGE
-                    }
-//                    isAA = false;
-                } else {
-                    lastMol = tmpMol;
-                    lastMol.setModelID(m.getModelID());
-                    lastMol.setChain(tmpChain);
-                    tmpChain.addMolecule(lastMol);
-
-                    // assign PDB res name (which differs in case of modifed residues)
-                    lastMol.setName3(molNamePDB);
+        // match res <-> chain here
+        // load new Residue into lastMol if we approached next Residue, otherwise only add new atom
+        if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
+            tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
+            // check that a peptid residue could be found                   
+            if (tmpMol == null || tmpMol.isLigand()) {
+                // residue is not in DSSP file -> must be free (modified) amino acid, ligand of RNA
+                if (! silent) {
+                    // print note only once
+                    if (! molNumPDB.equals(lastLigandNumPDB))
+                        if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand or RNA.");
+                        }
                 }
+
+            } else {
+                lastMol = tmpMol;
+                lastMol.setModelID(m.getModelID());
+                lastMol.setChain(tmpChain);
+                tmpChain.addMolecule(lastMol);
+
+                // assign PDB res name (which differs in case of modifed residues)
+                lastMol.setName3(molNamePDB);
             }
-//        }
+        }
 
         Atom a = new Atom();
 
-        // handle stuff that's different between ATOMs (AA) and HETATMs (ligand) TOCHANGE
-        if(isAA) {
-            // >> AA <<
-            if (FileParser.isIgnoredAtom(chemSym)) {
-                if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
-                    if (Settings.getInteger("plcc_I_debug_level") > 0) {
-                        System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
-                                " as it is either in ignored list or handle_hydrogens turned off.");
-                    }
-                    return;
+        if (FileParser.isIgnoredAtom(chemSym)) {
+            if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                if (Settings.getInteger("plcc_I_debug_level") > 0) {
+                    System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
+                            " as it is either in ignored list or handle_hydrogens turned off.");
                 }
+                return;
             }
+        }
 
-            // set atom type
-            a.setAtomtype(Atom.ATOMTYPE_AA);
-
-            // only ATOMs, not HETATMs, have a DSSP entry
-            if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
-                a.setDsspResNum(null);
-            }
-            else {
-                a.setDsspResNum(lastMol.getDsspNum());
-            }
-
+        // only ATOMs, not HETATMs, have a DSSP entry
+        if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+            a.setDsspResNum(null);
+        }
+        else {
+            a.setDsspResNum(lastMol.getDsspNum());
         }
         
+        
+        // >> RNA <<
         if (isRNA()){
             if( ! ( molNumPDB.equals(lastRnaNumPDB) && chainID.equals(lastChainID) ) ) {
                 rna = new RNA();
@@ -954,8 +924,6 @@ class CifParser {
         }
         */
 
-        if (isAA()) {
-            // >> AA <<
             if (lastMol == null) {
                 DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                 return;
@@ -964,35 +932,21 @@ class CifParser {
                     lastMol.addHydrogenAtom(a);
                 }
                 else {
-                    lastMol.addAtom(a);
                     FileParser.s_atoms.add(a);
+                    if (isAA()){
+                        a.setAtomtype(Atom.ATOMTYPE_AA);
+                        lastMol.addAtom(a);
+                    }
+                    if (isRNA()){
+                        a.setAtomtype(Atom.ATOMTYPE_RNA);
+                        lastMol.addAtom(a);
+                    }
+                    else {
+//                        lig.addAtom(a);
+                        a.setMolecule(lig);
+                    }
                 }
-            }
-        }
-        if (isRNA()){
-            // >> RNA <<
-            if (lastMol == null) {
-                DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
-                return;
-            } else {
-                if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
-                    lastMol.addHydrogenAtom(a);
-                }
-                else {
-                    a.setAtomtype(Atom.ATOMTYPE_RNA);
-                    lastMol.addAtom(a);
-                    FileParser.s_atoms.add(a);
-                }
-            }
-        }
-        else {
-            // >> LIG <<
-            if (! (lig == null)) {
-                lig.addAtom(a);
-                a.setMolecule(lig);
-                FileParser.s_atoms.add(a);
-            }
-        }  
+            }  
     }
     
     /**
