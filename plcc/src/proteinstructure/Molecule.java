@@ -451,6 +451,8 @@ abstract public class Molecule {
     public void setAAName1(String s) { AAName1 = s; }
     public void setPdbNum(Integer i) { pdbNum = i; }
     public void setDsspNum(Integer i) { dsspNum = i; }
+    public void setiCode(String s) { iCode = s; }
+    public void setType(Integer i) { type = i;}
     
     /**
      * Returns information on all atoms of this molecule (used for debugging only).

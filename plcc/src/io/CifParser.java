@@ -67,7 +67,7 @@ class CifParser {
     
     // - - atom_site - -
     private static int ligandsTreatedNum = 0;
-    private static int RNATreatedNum = 0;
+    private static int RnaTreatedNum = 0;
     private static int numberAtoms = 0;
     
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
@@ -85,6 +85,7 @@ class CifParser {
     private static Float oCoordXf, oCoordYf, oCoordZf;
     private static int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
     private static String lastChainID = ""; // s.a.
+    private static int lastRnaNumPDB = 0;
     private static String[] tmpLineData;
     private static String tmpModelID;
     private static String chainNum = null;  // identity of the current chain i.e. A
@@ -702,9 +703,6 @@ class CifParser {
         
         // >>RNA<<
         
-        if (isRNA()){
-            
-        }
         
         // check through chainID whether it is RNA
 //        System.out.println(numLine);
@@ -775,29 +773,44 @@ class CifParser {
         }
         
         if (isRNA()){
-            if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
+            if( ! ( molNumPDB.equals(lastRnaNumPDB) && chainID.equals(lastChainID) ) ) {
                 rna = new RNA();
                 rna.setPdbNum(molNumPDB);
                 rna.setType(Molecule.RESIDUE_TYPE_RNA);                
                 
-                RNATreatedNum++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + RNATreatedNum; //TOCHANGE kann man das so machen? Wozu ist die DSSP Nummer?
-                
+                RnaTreatedNum++;
+                int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum;
                 rna.setDsspNum(resNumDSSP);
+                
                 rna.setChainID(chainID);
                 rna.setiCode(iCode);
-//                rna.setName3(); TOCHANGE geht scheinbar nicht für RNA --> wieso?
+                rna.setName3(molNamePDB);
                 rna.setAAName1(molNamePDB);
                 rna.setChain(FileParser.getChainByPdbChainID(chainID));
                 rna.setModelID(m.getModelID());
-//                rna.setSSEString(); TOCHANGE Nic fragen was hier rein soll
+                rna.setSSEString("plcc_S_rnaSSECode");
+                                
+                if(FileParser.isIgnoredLigRes(molNamePDB)) {
+                    RnaTreatedNum--;
+                    a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);
+                    return;
+                } else {                    
+                    lastRnaNumPDB = molNumPDB;
+                    lastChainID = chainID;
+                    FileParser.s_molecules.add(rna);
+
+                    Integer rnaIndex = FileParser.s_molecules.size() - 1;
+                    FileParser.s_residueIndices.add(rnaIndex);
+
+                    FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
+                }
             }       
         }
         
         if (isLigand()){
             // >> LIG <<
 
-            // idea: add always residue (for consistency) but atom only if needed
+            // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
             // currently not used
             // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
@@ -813,7 +826,7 @@ class CifParser {
 
                 // assign fake DSSP Num increasing with each seen ligand
                 ligandsTreatedNum ++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
+                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum + RnaTreatedNum; // assign an unused fake DSSP residue number
 
                 lig.setDsspNum(resNumDSSP);
                 lig.setChainID(chainID);
@@ -941,13 +954,12 @@ class CifParser {
         }
         */
 
-        if (isAA) {
+        if (isAA()) {
             // >> AA <<
             if (lastMol == null) {
                 DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                 return;
             } else {
-
                 if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
                     lastMol.addHydrogenAtom(a);
                 }
@@ -956,7 +968,24 @@ class CifParser {
                     FileParser.s_atoms.add(a);
                 }
             }
-        } else {
+        }
+        if (isRNA()){
+            // >> RNA <<
+            if (lastMol == null) {
+                DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                return;
+            } else {
+                if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+                    lastMol.addHydrogenAtom(a);
+                }
+                else {
+                    a.setAtomtype(Atom.ATOMTYPE_RNA);
+                    lastMol.addAtom(a);
+                    FileParser.s_atoms.add(a);
+                }
+            }
+        }
+        else {
             // >> LIG <<
             if (! (lig == null)) {
                 lig.addAtom(a);
@@ -1331,7 +1360,7 @@ class CifParser {
      */
     protected static Boolean isAA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-        int intIndex = chemType.indexOf("peptide");
+        int intIndex = chemType.indexOf("peptide"); // TOCHANGE Nic fragen ob die Liste aus diesem CifDict oder was das war vollständig ist
         if(intIndex == - 1) {
             return false;
         } else {
