@@ -43,7 +43,7 @@ class CifParser {
     // data structures
     protected static HashMap<String, String> metaData;
     private static ArrayList<ProtMetaInfo> allProteinMetaInfos = new ArrayList<>();
-    private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
+    private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, e.g., in the same order they were added
     private static String pdbID;
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
     protected static HashMap<String, String> chainIdentity = new HashMap<>();       // matches chain ID with its molecule type
@@ -88,8 +88,8 @@ class CifParser {
     private static int lastRnaNumPDB = 0;
     private static String[] tmpLineData;
     private static String tmpModelID;
-    private static String chainNum = null;  // identity of the current chain i.e. A
-    private static String chainType = null; // type of the current chain i.e. RNA
+    private static String chainNum = null;  // identity of the current chain e.g. A
+    private static String chainType = null; // type of the current chain e.g. RNA
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -760,13 +760,17 @@ class CifParser {
                 rna.setAAName1(molNamePDB);
                 rna.setChain(FileParser.getChainByPdbChainID(chainID));
                 rna.setModelID(m.getModelID());
-                rna.setSSEString("plcc_S_rnaSSECode");
+                rna.setSSEString("plcc_S_rnaSseCode");
                                 
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
                     // RNA chains can contain ligands that should be ignored such as water
                     // In this case, no new atom needs to be saved
                     RnaTreatedNum--;
                     a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);
+                    
+                    if(Settings.getInteger("plcc_I_debug_level") > 0){
+                        DP.getInstance().w("Ignored RNA-Ligand found at PDB line " + molNumPDB + ". Name: " + molNamePDB);
+                    }
                     return;
                 } else {                    
                     lastRnaNumPDB = molNumPDB;
@@ -777,6 +781,10 @@ class CifParser {
                     FileParser.s_residueIndices.add(rnaIndex);
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
+                    
+                    if(Settings.getInteger("plcc_I_debug_level") > 2){
+                        DP.getInstance().d("New RNA molecule added in PDB line " + molNumPDB);
+                    }
                 }
             }       
         }
@@ -962,14 +970,14 @@ class CifParser {
      * Entries can look like this: MET={name=METHIONINE, pdbx_synonyms=?, formula=C5 H11 N O2 S, id=MET, type=L-peptide linking, formula_weight=149.211}}
      */
     private static void handleChemComp(){
-        String cat = null;              // categories such as type, name
-        String val = null;              // values such as peptide, Methionine 
+        String category = null;              // categories such as type, name
+        String value = null;              // values such as peptide, Methionine 
         HashMap<String, String> tmpComponent = new HashMap<>();     // stores categories and values for current component
-        for (String category : colHeaderPosMap.keySet()){
-            cat = category;
-            val = lineData[colHeaderPosMap.get(category)];
-            tmpComponent.put(cat, val);
-            chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);      // matches one component with all its cat/val pairings
+        for (String cat : colHeaderPosMap.keySet()){
+            category = cat;
+            value = lineData[colHeaderPosMap.get(cat)];
+            tmpComponent.put(category, value);
+            chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);      // matches one component with all its category/value pairings
         }
     }
     
@@ -1302,6 +1310,7 @@ class CifParser {
         return pmi;
     }
     
+    
     /**
      * Returns true if the molecule type contains 'RNA' in the chemical components map.
      * @return 
@@ -1309,12 +1318,9 @@ class CifParser {
     protected static Boolean isRNA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         int intIndex = chemType.indexOf("RNA");
-        if(intIndex == - 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return (intIndex == -1) ? false : true;
     }
+    
     
     /**
      * Returns true if the molecule type contains 'peptide' in the chemical components map.
@@ -1323,27 +1329,19 @@ class CifParser {
     protected static Boolean isAA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         int intIndex = chemType.indexOf("peptide"); // TOCHANGE Nic fragen ob die Liste aus diesem CifDict oder was das war vollständig ist
-        if(intIndex == - 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return (intIndex == -1) ? false : true;
     }
+    
     
     /**
      * Returns true if the molecule type contains 'DNA' in the chemical components map.
      * Right now only added for completeness, as handling DNA is not implemented yet.
      * @return 
      */
-    
     protected static Boolean isDNA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         int intIndex = chemType.indexOf("DNA");
-        if(intIndex == - 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return (intIndex == -1) ? false : true;
     }
     
     
