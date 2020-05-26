@@ -1006,7 +1006,7 @@ class CifParser {
     
     
     /**
-     * Returns an array of 'words' seperated by an arbitrary amount of spaces. Considers in-line strings.
+     * Returns an array of 'words' separated by an arbitrary amount of spaces. Considers in-line strings.
      * @param handleSpecialCharacters whether single and double quotation should be considered.
      *   Should be false whenever a combined multi-line string is provided and true otherwise.
      * @param line
@@ -1317,7 +1317,8 @@ class CifParser {
      */
     protected static Boolean isRNA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-        int intIndex = chemType.indexOf("RNA");
+        String chemTypeLowerCase = chemType.toLowerCase();
+        int intIndex = chemTypeLowerCase.indexOf("RNA");
         return (intIndex == -1) ? false : true;
     }
     
@@ -1328,7 +1329,8 @@ class CifParser {
      */
     protected static Boolean isAA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-        int intIndex = chemType.indexOf("peptide"); // TOCHANGE Nic fragen ob die Liste aus diesem CifDict oder was das war vollständig ist
+        String chemTypeLowerCase = chemType.toLowerCase();
+        int intIndex = chemTypeLowerCase.indexOf("peptide");
         return (intIndex == -1) ? false : true;
     }
     
@@ -1340,7 +1342,8 @@ class CifParser {
      */
     protected static Boolean isDNA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-        int intIndex = chemType.indexOf("DNA");
+        String chemTypeLowerCase = chemType.toLowerCase();
+        int intIndex = chemTypeLowerCase.indexOf("DNA");
         return (intIndex == -1) ? false : true;
     }
     
