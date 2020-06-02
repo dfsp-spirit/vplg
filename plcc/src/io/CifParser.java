@@ -778,7 +778,7 @@ class CifParser {
                     FileParser.s_molecules.add(rna);
 
                     Integer rnaIndex = FileParser.s_molecules.size() - 1;
-                    FileParser.s_residueIndices.add(rnaIndex);
+                    FileParser.s_rnaIndices.add(rnaIndex);
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
@@ -936,7 +936,7 @@ class CifParser {
         
             if (isRNA() || isAA()){
                 if (lastMol == null) {
-                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
                 } else {
                     if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
@@ -944,13 +944,14 @@ class CifParser {
                     }
                     else {
                         // add Atom to list of atoms of current molecule as well as list of all atoms
-                        lastMol.addAtom(a);
                         FileParser.s_atoms.add(a);
                         if (isAA()){
                             a.setAtomtype(Atom.ATOMTYPE_AA);
+                            lastMol.addAtom(a);
                         }
                         if (isRNA()){
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
+                            rna.addAtom(a);
                         }
                     }
                 }

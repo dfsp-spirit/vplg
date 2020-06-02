@@ -2401,6 +2401,15 @@ public class Main {
             System.exit(0);
         }
         
+        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+            for (MolContactInfo mol : cInfo){
+                String mci = mol.toString();
+                String MolA = mol.getMolA().toString();
+                String MolB = mol.getMolB().toString();
+                System.out.println("A ist " + MolA + ". B ist " + MolB);
+            }
+        }
+        
         // DEBUG: compare computed contacts with those from a geom_neo file
         if(compareResContacts) {
             if(separateContactsByChain) {
