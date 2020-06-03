@@ -122,7 +122,7 @@ class CifParser {
         silent = FileParser.settingSilent();
         
         if(parseData()) {
-            dataInitDone = true;            
+            dataInitDone = true;
             return(true);
         }
         else {
@@ -683,7 +683,7 @@ class CifParser {
         }
 
         if( ! Settings.getBoolean("plcc_B_include_rna")) {
-            if(FileParser.isRNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
+            if(isRNA()) {
                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                 }
@@ -740,7 +740,6 @@ class CifParser {
             a.setDsspResNum(lastMol.getDsspNum());
         }
         
-        
         if (isRNA()){
             // >> RNA <<
             // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
@@ -767,6 +766,7 @@ class CifParser {
                     // In this case, no new atom needs to be saved
                     RnaTreatedNum--;
                     a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);
+                    FileParser.ignoredLigands += 1;
                     
                     if(Settings.getInteger("plcc_I_debug_level") > 0){
                         DP.getInstance().w("Ignored RNA-Ligand found at PDB line " + molNumPDB + ". Name: " + molNamePDB);
@@ -819,11 +819,12 @@ class CifParser {
                 // still just assigning default model 1
                 lig.setModelID(m.getModelID());
                 lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
-
-
+                
+                
                 // add ligand to list of residues if it not on the ignore list
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
                     ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but this ligand won't be stored so decrement to previous value.
+                    FileParser.ignoredLigands += 1;
 
                     if(Settings.getInteger("plcc_I_debug_level") > 0){
                         System.out.println("    PDB: Ignored ligand '" + molNamePDB + "-" + molNumPDB + "' at PDB line " + molNumPDB + ".");
@@ -873,6 +874,8 @@ class CifParser {
                     lastChainID = chainID;
 
                     FileParser.s_molecules.add(lig);
+                    Integer ligandIndex = FileParser.s_molecules.size() - 1;
+                    FileParser.s_ligandIndices.add(ligandIndex);
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(lig);
 
@@ -951,6 +954,7 @@ class CifParser {
                         }
                         if (isRNA()){
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
+                            a.setMolecule(rna);
                             rna.addAtom(a);
                         }
                     }
@@ -960,6 +964,7 @@ class CifParser {
                 if (! (lig == null)){
                     lig.addAtom(a);
                     a.setMolecule(lig);
+                    FileParser.s_atoms.add(a);
                 }
 
             }
@@ -1319,7 +1324,7 @@ class CifParser {
     protected static Boolean isRNA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         String chemTypeLowerCase = chemType.toLowerCase();
-        int intIndex = chemTypeLowerCase.indexOf("RNA");
+        int intIndex = chemTypeLowerCase.indexOf("rna");
         return (intIndex == -1) ? false : true;
     }
     
@@ -1344,7 +1349,7 @@ class CifParser {
     protected static Boolean isDNA(){
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         String chemTypeLowerCase = chemType.toLowerCase();
-        int intIndex = chemTypeLowerCase.indexOf("DNA");
+        int intIndex = chemTypeLowerCase.indexOf("dna");
         return (intIndex == -1) ? false : true;
     }
     

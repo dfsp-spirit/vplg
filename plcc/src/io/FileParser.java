@@ -50,6 +50,8 @@ public class FileParser {
     static ArrayList<Chain> s_chains = null;
     static ArrayList<Integer> s_residueIndices = null;
     static ArrayList<Integer> s_rnaIndices = null;
+    static ArrayList<Integer> s_ligandIndices = null; // a list of all non-ignored ligand indices
+    static Integer ignoredLigands = 0;
     static ArrayList<Atom> s_atoms = null;
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
     static HashMap<String, ArrayList<String>> homologuesMap = null;
@@ -119,6 +121,7 @@ public class FileParser {
         s_molecules = new ArrayList <Molecule> ();
         s_residueIndices = new ArrayList<>();
         s_rnaIndices = new ArrayList<>();
+        s_ligandIndices = new ArrayList<>();
         s_atoms = new ArrayList<Atom>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
