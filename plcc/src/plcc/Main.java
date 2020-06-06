@@ -2309,17 +2309,33 @@ public class Main {
         }
         // ... and fill in the frequencies of all AAs in this protein.
         getAADistribution(resFromMolecules(molecules));
+        
+        Integer atomCountRes = 0;
+        Integer atomCountRna = 0;
+        Integer atomCountLig = 0;
+        
+        for (Atom a : atoms){
+            if (a.isProteinAtom()){
+                atomCountRes += 1;
+            }
+            if (a.isRNA()){
+                atomCountRna += 1;
+            }
+            if (a.isLigandAtom()){
+                atomCountLig += 1;
+            }
+        }
 
         if(! silent) {
             if (! Settings.getBoolean("plcc_B_include_rna")) {
                 // RNA off
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
-                        " Residues, " + atoms.size() + " Atoms).");
+                        " Residues, " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountLig + " Ligand Atoms)).");
             } else {
                 // RNA on
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
                         " Molecules (" + resFromMolecules(molecules).size() + " Residues and " + rnaFromMolecules(molecules).size() +
-                        " RNAs), " + atoms.size() + " Atoms).");
+                        " RNAs), " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountRna + " RNA Atoms, " + atomCountLig + " Ligand Atoms)).");
             }
         }
 
