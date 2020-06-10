@@ -148,7 +148,7 @@ class CifParser {
     private static Boolean parseData() {
         
         createResidues();
-        lastMol = FileParser.s_molecules.get(0);  // just start with first one ( we check below if it really matches)
+        lastMol = new Residue(); // create artificial molecule to fill so there is no NullPointerException, it will be overridden once atoms are parsed
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(FileParser.pdbFile));
