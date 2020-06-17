@@ -2422,7 +2422,7 @@ public class Main {
                 String mci = mol.toString();
                 String MolA = mol.getMolA().toString();
                 String MolB = mol.getMolB().toString();
-                System.out.println("A ist " + MolA + ". B ist " + MolB);
+                System.out.println("    DEBUG LV 1: A ist " + MolA + ". B ist " + MolB);
             }
         }
         

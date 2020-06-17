@@ -396,7 +396,7 @@ public class FileParser {
      * @return 
      */
     protected static boolean isRNAchain(String chainID) {
-        return (CifParser.chainIdentity.get(chainID).equals("polyribonucleotide") ? true : false);
+        return (CifParser.chainIdentity.get(chainID).equals("polyribonucleotide"));
     }
     
 

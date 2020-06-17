@@ -408,7 +408,6 @@ public class Residue extends Molecule implements java.io.Serializable {
    
     //setters
     public void setLigName(String s) { ligName = s; }
-//    public void setiCode(String s) { iCode = s; }
     public void setLigFormula(String s) { ligFormula = s; }
     public void setLigSynonyms(String s) { ligSynonyms = s; }
     public void setPhi(Float f) { phi = f; }

@@ -88,7 +88,7 @@ class CifParser {
     private static int lastRnaNumPDB = 0;
     private static String[] tmpLineData;
     private static String tmpModelID;
-    private static String chainNum = null;  // identity of the current chain e.g. A
+    private static String chainNum = null;  // identifier of the current chain e.g. A
     private static String chainType = null; // type of the current chain e.g. RNA
 
     // - variables for already printed warnings -
@@ -143,7 +143,7 @@ class CifParser {
     private static Boolean parseData() {
         
         createResidues();
-        lastMol = FileParser.s_molecules.get(0);  // just start with first one ( we check below if it really matches)
+        lastMol = new Residue(); // create artificial molecule to fill so there is no NullPointerException, it will be overridden once atoms are parsed
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(FileParser.pdbFile));
@@ -683,7 +683,7 @@ class CifParser {
         }
 
         if( ! Settings.getBoolean("plcc_B_include_rna")) {
-            if(isRNA()) {
+            if(checkType(Molecule.RESIDUE_TYPE_RNA)) {
                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                 }
@@ -740,7 +740,7 @@ class CifParser {
             a.setDsspResNum(lastMol.getDsspNum());
         }
         
-        if (isRNA()){
+        if (checkType(Molecule.RESIDUE_TYPE_RNA)){
             // >> RNA <<
             // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
             // otherwise, a new RNA molecule is created
@@ -789,7 +789,7 @@ class CifParser {
             }       
         }
         
-        if (isLigand()){
+        if (checkType(Molecule.RESIDUE_TYPE_LIGAND)){
             // >> LIG <<
 
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
@@ -804,7 +804,7 @@ class CifParser {
                 lig = new Residue();
 
                 lig.setPdbNum(molNumPDB);
-                lig.setType(Residue.RESIDUE_TYPE_LIGAND);
+                lig.setType(Molecule.RESIDUE_TYPE_LIGAND);
 
                 // assign fake DSSP Num increasing with each seen ligand
                 ligandsTreatedNum ++;
@@ -937,7 +937,7 @@ class CifParser {
         }
         */
         
-            if (isRNA() || isAA()){
+            if (checkType(Molecule.RESIDUE_TYPE_RNA) || checkType(Molecule.RESIDUE_TYPE_AA)){
                 if (lastMol == null) {
                     DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
@@ -948,11 +948,11 @@ class CifParser {
                     else {
                         // add Atom to list of atoms of current molecule as well as list of all atoms
                         FileParser.s_atoms.add(a);
-                        if (isAA()){
+                        if (checkType(Molecule.RESIDUE_TYPE_AA)){
                             a.setAtomtype(Atom.ATOMTYPE_AA);
                             lastMol.addAtom(a);
                         }
-                        if (isRNA()){
+                        if (checkType(Molecule.RESIDUE_TYPE_RNA)){
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
                             a.setMolecule(rna);
                             rna.addAtom(a);
@@ -1317,50 +1317,77 @@ class CifParser {
     }
     
     
+//    /**
+//     * Returns true if the molecule type contains 'RNA' in the chemical components map.
+//     * @return 
+//     */
+//    protected static Boolean isRNA(){
+//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+//        String chemTypeLowerCase = chemType.toLowerCase();
+//        int intIndex = chemTypeLowerCase.indexOf("rna");
+//        return (intIndex == -1) ? false : true;
+//    }
+//    
+//    
+//    /**
+//     * Returns true if the molecule type contains 'peptide' in the chemical components map.
+//     * @return 
+//     */
+//    protected static Boolean isAA(){
+//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+//        String chemTypeLowerCase = chemType.toLowerCase();
+//        int intIndex = chemTypeLowerCase.indexOf("peptide");
+//        return (intIndex == -1) ? false : true;
+//    }
+//    
+//    
+//    /**
+//     * Returns true if the molecule type contains 'DNA' in the chemical components map.
+//     * Right now only added for completeness, as handling DNA is not implemented yet.
+//     * @return 
+//     */
+//    protected static Boolean isDNA(){
+//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+//        String chemTypeLowerCase = chemType.toLowerCase();
+//        int intIndex = chemTypeLowerCase.indexOf("dna");
+//        return (intIndex == -1) ? false : true;
+//    }
+//    
+//    
+//    /**
+//     * Returns true if the molecule type is neither 'RNA' nor 'peptide' in the chemical components map.
+//     * 'isDNA()' to be added once handling DNA is implemented
+//     * @return 
+//     */
+//    protected static Boolean isLigand(){
+//        return (isRNA() == false && isAA() == false) ? true : false;
+//    }
+    
     /**
-     * Returns true if the molecule type contains 'RNA' in the chemical components map.
-     * @return 
+     * Returns whether the molecule type matches the requested one.
+     * Checks whether the the molecule type in the chemical components map corresponds to the requested one.
+     * @param requestedType integer of the type you are looking for (0 for AA, 1 for ligand, 3 for RNA)
      */
-    protected static Boolean isRNA(){
+    protected static Boolean checkType(Integer requestedType){
+        Integer actualType = 1;
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         String chemTypeLowerCase = chemType.toLowerCase();
         int intIndex = chemTypeLowerCase.indexOf("rna");
-        return (intIndex == -1) ? false : true;
-    }
-    
-    
-    /**
-     * Returns true if the molecule type contains 'peptide' in the chemical components map.
-     * @return 
-     */
-    protected static Boolean isAA(){
-        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-        String chemTypeLowerCase = chemType.toLowerCase();
-        int intIndex = chemTypeLowerCase.indexOf("peptide");
-        return (intIndex == -1) ? false : true;
-    }
-    
-    
-    /**
-     * Returns true if the molecule type contains 'DNA' in the chemical components map.
-     * Right now only added for completeness, as handling DNA is not implemented yet.
-     * @return 
-     */
-    protected static Boolean isDNA(){
-        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-        String chemTypeLowerCase = chemType.toLowerCase();
-        int intIndex = chemTypeLowerCase.indexOf("dna");
-        return (intIndex == -1) ? false : true;
-    }
-    
-    
-    /**
-     * Returns true if the molecule type is neither 'RNA' nor 'peptide' in the chemical components map.
-     * 'isDNA()' to be added once handling DNA is implemented
-     * @return 
-     */
-    protected static Boolean isLigand(){
-        return (isRNA() == false && isAA() == false) ? true : false;
+        if (intIndex != -1){
+            actualType = 3;
+        }
+        else{
+            intIndex = chemTypeLowerCase.indexOf("peptide");
+            if (intIndex != -1){
+                actualType = 0;
+            }
+        }
+        if (actualType == requestedType){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
       
 }
