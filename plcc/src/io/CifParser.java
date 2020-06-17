@@ -1366,9 +1366,13 @@ class CifParser {
     /**
      * Returns whether the molecule type matches the requested one.
      * Checks whether the the molecule type in the chemical components map corresponds to the requested one.
-     * @param requestedType integer of the type you are looking for (0 for AA, 1 for ligand, 3 for RNA)
+     * @param requestedType integer of the type one is looking for (0 for AA, 1 for ligand, 3 for RNA)
      */
     protected static Boolean checkType(Integer requestedType){
+        if (! (requestedType == 0 || requestedType == 1 || requestedType == 2 || requestedType == 3)){
+            DP.getInstance().w("Tried to check molecule type, but requested type was not recognized. Trying to move on without checking the type.");
+            return false;
+        }
         Integer actualType = 1;
         String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
         String chemTypeLowerCase = chemType.toLowerCase();
@@ -1382,12 +1386,7 @@ class CifParser {
                 actualType = 0;
             }
         }
-        if (actualType == requestedType){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return (actualType == requestedType) ? true : false;
     }
       
 }
