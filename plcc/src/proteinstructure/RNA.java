@@ -39,4 +39,7 @@ public class RNA extends Molecule implements java.io.Serializable {
     }
 
 //    public List<BindingSite> partOfBindingSites;          // Methods involving BindingSites have not been implemented in this class yet due to problems with BindingSites-class.
+    @Override public String toString() {
+        return("[RNA] PDB# " + pdbNum + ", DSSP# " + dsspNum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + Name3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
+    }
 }

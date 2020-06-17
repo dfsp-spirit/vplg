@@ -43,10 +43,11 @@ class CifParser {
     // data structures
     protected static HashMap<String, String> metaData;
     private static ArrayList<ProtMetaInfo> allProteinMetaInfos = new ArrayList<>();
-    private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, i.e., in the same order they were added
+    private static int lastIndexProtMetaInfos = 0;  // used to traverse allProteinMetaInfos quicker for sucessive request, e.g., in the same order they were added
     private static String pdbID;
     private static HashMap<String, HashMap<String, String>> entityInformation = new HashMap<>();  // <entity ID, <column head, data>>
-    private static HashMap<String, String> chainIdentity = new HashMap<>();
+    protected static HashMap<String, String> chainIdentity = new HashMap<>();       // matches chain ID with its molecule type
+    protected static HashMap<String, HashMap<String, String>> chemicalComponents = new HashMap<>();   // stores all information on chemical components
     
     // - - - vars for parsing - - -
     private static Boolean dataBlockFound = false;  // for now only parse the first data block (stop if seeing 2nd block)
@@ -66,12 +67,13 @@ class CifParser {
     
     // - - atom_site - -
     private static int ligandsTreatedNum = 0;
+    private static int RnaTreatedNum = 0;
     private static int numberAtoms = 0;
     
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
     private static Model m = null;
     private static Molecule lastMol = null;    // starts as first residue and is always the actual one
-    private static Residue tmpMol = null;      // used to save lastMol if getResidue returns null
+    private static Molecule tmpMol = null;      // used to save lastMol if getResidue returns null
     private static Chain tmpChain = null;
     private static Residue lig = null;
     private static RNA rna = null;
@@ -83,10 +85,11 @@ class CifParser {
     private static Float oCoordXf, oCoordYf, oCoordZf;
     private static int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
     private static String lastChainID = ""; // s.a.
+    private static int lastRnaNumPDB = 0;
     private static String[] tmpLineData;
     private static String tmpModelID;
-    private static String chainNum = null;
-    private static String chainType = null;
+    private static String chainNum = null;  // identifier of the current chain e.g. A
+    private static String chainType = null; // type of the current chain e.g. RNA
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -97,14 +100,6 @@ class CifParser {
     static final String[] NO_VALUE_PLACEHOLDERS = {".", "?"};  // characters that are used in mmCIFs as placeholder when no value exists
     static final String SINGLE_LINE_STRING_MARKER = "'";
     
-    public Boolean isRNA(String chainID) {
-        if (chainIdentity.get(chainID).equals("polyribonucleotide")) {
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
     
     /**
      * Calls hidden FileParser method initVariables and inits additional CIF Parser variables.
@@ -127,7 +122,7 @@ class CifParser {
         silent = FileParser.settingSilent();
         
         if(parseData()) {
-            dataInitDone = true;            
+            dataInitDone = true;
             return(true);
         }
         else {
@@ -268,6 +263,10 @@ class CifParser {
                 case "_atom_site":
                     // check for atom coordinate data
                     handleAtomSiteLine();
+                    break;
+                case "_chem_comp":
+                    // check for information on chemical components
+                    handleChemComp();
                     break;
                 }
                 
@@ -438,7 +437,7 @@ class CifParser {
     
     
     /**
-     * Handle a line starting with '_entity_poly.' holding entity information of polymeres.
+     * Handle a line starting with '_entity_poly.' holding entity information of polymers.
      * Fills, for example, the homologuesMap and the chainIdentity Map which maps chain ID to its molecule type.
      */
     private static void handleEntityPolyLine() {       
@@ -446,31 +445,24 @@ class CifParser {
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
                 
-                // Iterate through columns to match chain IDs with their type
-                for (Integer i : colHeaderPosMap.values()){
-                    if (lineData[colHeaderPosMap.get("pdbx_strand_id")] != null && lineData[colHeaderPosMap.get("type")] != null){
-                        
-                        // Multiple chains can be listed under "pdbx_strand_id" so they have to be separated and individually added to chainIdentity
-                        String[] chainList = lineData[colHeaderPosMap.get("pdbx_strand_id")].split(",");
-                        for (String s : chainList) {
-                            chainIdentity.put(s, lineData[colHeaderPosMap.get("type")]);
-                        }
-                    }
+                // Multiple chains can be listed under "pdbx_strand_id" so they have to be separated and individually added to chainIdentity
+                String[] chainList = lineData[colHeaderPosMap.get("pdbx_strand_id")].split(",");
+                for (String s : chainList) {
+                    chainIdentity.put(s, lineData[colHeaderPosMap.get("type")]);
                 }
             }
-            
         } 
         else {
             if (lineData[0].equals("_entity_poly.type")) {
                 chainType = lineData[1];
-                if (chainType == null || chainType == ""){
+                if (chainType == null){
                     DP.getInstance().w("No chain type found. Trying to continue with null.");
                 }
             }
             if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
                 chainNum = lineData[1];
-                if (chainNum == null || chainNum == ""){
+                if (chainNum == null){
                     DP.getInstance().w("No chain ID found. Trying to continue with null.");
                 }
                 
@@ -482,7 +474,6 @@ class CifParser {
                 }
             }
         }
-        System.out.println(chainIdentity);
     }
     
     
@@ -681,101 +672,127 @@ class CifParser {
 
         // standard AAs and (some) non-standard, atm: UNK, MSE
         //   -> may be changed below if it is free (treat as ligand then)
-        Boolean isAA = FileParser.isAminoacid(molNamePDB, true);
-        
-        // TODO: possible to ignore alt loc atoms right now?
 
-        // >> DNA/RNA <<
-        // ignore atm 
-        /*if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(resNamePDB, 3))) {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
-            }
-            continue; // do not use that atom
-        }*/
+        // TODO: possible to ignore alt loc atoms right now?
 
         if(FileParser.isDNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
             }
-            return;  // do not use that atom
+            return;  // atom is not used
         }
 
         if( ! Settings.getBoolean("plcc_B_include_rna")) {
-            if(FileParser.isRNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
+            if(checkType(Molecule.RESIDUE_TYPE_RNA)) {
                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                 }
-                return;  // do not use that atom
+                return;  // atom is not used
             }
         }
 
         // >> AA <<
-        // update lastMol (only if needed) 
+        // update lastMol if the atom in the current line belongs to a new molecule than the previous line 
         //     -> enables getting DsspResNum for atom from res
-        // match res <-> chain here 
-        // also decide here if modified amino acids is free (no DSSP entry -> not in s_residue) and needs to be treated as ligand
-        if (isAA) {
-            // we no start with lastMol is first residue from s_residues, so no check for null required!
-            // load new Residue into lastMol if we approached next Residue
-            if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
-                tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
-                // check that a peptid residue could be found                   
-                if (tmpMol == null || tmpMol.isLigand()) {
-                    // residue is not in DSSP file -> must be free (modified) amino acid, treat as ligand
-                    if (! silent) {
-                        // print note only once
-                        if (! molNumPDB.equals(lastLigandNumPDB))
-                        System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand.");
-                    }
-                    isAA = false;
-                } else {
-                    lastMol = tmpMol;
-                    lastMol.setModelID(m.getModelID());
-                    lastMol.setChain(tmpChain);
-                    tmpChain.addMolecule(lastMol);
-
-                    // assign PDB res name (which differs in case of modifed residues)
-                    lastMol.setName3(molNamePDB);
+        // match res <-> chain here
+        // load new Residue into lastMol if we approached next Residue, otherwise only add new atom
+        if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
+            tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
+            // check that a peptid residue could be found                   
+            if (tmpMol == null || tmpMol.isLigand()) {
+                // residue is not in DSSP file -> must be free (modified) amino acid, ligand of RNA
+                if (! silent) {
+                    // print note only once
+                    if (! molNumPDB.equals(lastLigandNumPDB))
+                        if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand or RNA.");
+                        }
                 }
+
+            } else {
+                lastMol = tmpMol;
+                lastMol.setModelID(m.getModelID());
+                lastMol.setChain(tmpChain);
+                tmpChain.addMolecule(lastMol);
+
+                // assign PDB res name (which differs in case of modifed residues)
+                lastMol.setName3(molNamePDB);
             }
         }
 
         Atom a = new Atom();
 
-        // handle stuff that's different between ATOMs (AA) and HETATMs (ligand)
-        if(isAA) {
-            // >> AA <<
-            if (FileParser.isIgnoredAtom(chemSym)) {
-                if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
-                    if (Settings.getInteger("plcc_I_debug_level") > 0) {
-                        System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
-                                " as it is either in ignored list or handle_hydrogens turned off.");
+        if (FileParser.isIgnoredAtom(chemSym)) {
+            if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                if (Settings.getInteger("plcc_I_debug_level") > 0) {
+                    System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
+                            " as it is either in ignored list or handle_hydrogens turned off.");
+                }
+                return;
+            }
+        }
+
+        // only ATOMs, not HETATMs, have a DSSP entry
+        if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+            a.setDsspResNum(null);
+        }
+        else {
+            a.setDsspResNum(lastMol.getDsspNum());
+        }
+        
+        if (checkType(Molecule.RESIDUE_TYPE_RNA)){
+            // >> RNA <<
+            // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
+            // otherwise, a new RNA molecule is created
+            if( ! ( molNumPDB.equals(lastRnaNumPDB) && chainID.equals(lastChainID) ) ) {
+                rna = new RNA();
+                rna.setPdbNum(molNumPDB);
+                rna.setType(Molecule.RESIDUE_TYPE_RNA);                
+                
+                RnaTreatedNum++;
+                int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum;
+                rna.setDsspNum(resNumDSSP);
+                
+                rna.setChainID(chainID);
+                rna.setiCode(iCode);
+                rna.setName3(molNamePDB);
+                rna.setAAName1(molNamePDB);
+                rna.setChain(FileParser.getChainByPdbChainID(chainID));
+                rna.setModelID(m.getModelID());
+                rna.setSSEString("plcc_S_rnaSseCode");
+                                
+                if(FileParser.isIgnoredLigRes(molNamePDB)) {
+                    // RNA chains can contain ligands that should be ignored such as water
+                    // In this case, no new atom needs to be saved
+                    RnaTreatedNum--;
+                    a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);
+                    FileParser.ignoredLigands += 1;
+                    
+                    if(Settings.getInteger("plcc_I_debug_level") > 0){
+                        DP.getInstance().w("Ignored RNA-Ligand found at PDB line " + molNumPDB + ". Name: " + molNamePDB);
                     }
                     return;
+                } else {                    
+                    lastRnaNumPDB = molNumPDB;
+                    lastChainID = chainID;
+                    FileParser.s_molecules.add(rna);
+
+                    Integer rnaIndex = FileParser.s_molecules.size() - 1;
+                    FileParser.s_rnaIndices.add(rnaIndex);
+
+                    FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
+                    
+                    if(Settings.getInteger("plcc_I_debug_level") > 2){
+                        DP.getInstance().d("New RNA molecule added in PDB line " + molNumPDB);
+                    }
                 }
-            }
-
-            // set atom type
-            a.setAtomtype(Atom.ATOMTYPE_AA);
-
-            // only ATOMs, not HETATMs, have a DSSP entry
-            if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
-                a.setDsspResNum(null);
-            }
-            else {
-                a.setDsspResNum(lastMol.getDsspNum());
-            }
-
-            /*if(  Settings.getBoolean("plcc_B_include_rna")) {
-                a.setAtomtype(Atom.ATOMTYPE_RNA);
-            }*/
-
-
-        } else {
+            }       
+        }
+        
+        if (checkType(Molecule.RESIDUE_TYPE_LIGAND)){
             // >> LIG <<
 
-            // idea: add always residue (for consistency) but atom only if needed
+            // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
             // currently not used
             // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
@@ -787,11 +804,11 @@ class CifParser {
                 lig = new Residue();
 
                 lig.setPdbNum(molNumPDB);
-                lig.setType(Residue.RESIDUE_TYPE_LIGAND);
+                lig.setType(Molecule.RESIDUE_TYPE_LIGAND);
 
                 // assign fake DSSP Num increasing with each seen ligand
                 ligandsTreatedNum ++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
+                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum + RnaTreatedNum; // assign an unused fake DSSP residue number
 
                 lig.setDsspNum(resNumDSSP);
                 lig.setChainID(chainID);
@@ -802,13 +819,16 @@ class CifParser {
                 // still just assigning default model 1
                 lig.setModelID(m.getModelID());
                 lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
-
-
+                
+                
                 // add ligand to list of residues if it not on the ignore list
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
-                    ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but
-                                    //  this ligand won't be stored so decrement to previous value.
-                    //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + molNumPDB + "' at PDB line " + pLineNum + ".");
+                    ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but this ligand won't be stored so decrement to previous value.
+                    FileParser.ignoredLigands += 1;
+
+                    if(Settings.getInteger("plcc_I_debug_level") > 0){
+                        System.out.println("    PDB: Ignored ligand '" + molNamePDB + "-" + molNumPDB + "' at PDB line " + molNumPDB + ".");
+                    }
                 } else {
 
                     // ignore this for now: needs parsing of two more loops (_pdbx_nonpoly_scheme, _chem_comp)   	 
@@ -854,6 +874,8 @@ class CifParser {
                     lastChainID = chainID;
 
                     FileParser.s_molecules.add(lig);
+                    Integer ligandIndex = FileParser.s_molecules.size() - 1;
+                    FileParser.s_ligandIndices.add(ligandIndex);
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(lig);
 
@@ -868,7 +890,6 @@ class CifParser {
 
                 }
             }
-
 
             if(FileParser.isIgnoredLigRes(molNamePDB)) {
                 a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
@@ -886,11 +907,8 @@ class CifParser {
                 a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
                 //a.setDsspResNum(getDsspResNumForPdbFields(molNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
             }
-
-
         }
 
-        // >> AA + LIG <<
         // now create the new Atom
 
         // lastMol may be NULL
@@ -918,30 +936,55 @@ class CifParser {
             a.setModel(getModelByModelID(curModelID));
         }
         */
-
-        if (isAA) {
-            // >> AA <<
-            if (lastMol == null) {
-                DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
-                return;
-            } else {
-
-                if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
-                    lastMol.addHydrogenAtom(a);
+        
+            if (checkType(Molecule.RESIDUE_TYPE_RNA) || checkType(Molecule.RESIDUE_TYPE_AA)){
+                if (lastMol == null) {
+                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                    return;
+                } else {
+                    if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+                        lastMol.addHydrogenAtom(a);
+                    }
+                    else {
+                        // add Atom to list of atoms of current molecule as well as list of all atoms
+                        FileParser.s_atoms.add(a);
+                        if (checkType(Molecule.RESIDUE_TYPE_AA)){
+                            a.setAtomtype(Atom.ATOMTYPE_AA);
+                            lastMol.addAtom(a);
+                        }
+                        if (checkType(Molecule.RESIDUE_TYPE_RNA)){
+                            a.setAtomtype(Atom.ATOMTYPE_RNA);
+                            a.setMolecule(rna);
+                            rna.addAtom(a);
+                        }
+                    }
                 }
-                else {
-                    lastMol.addAtom(a);
+            }
+            else {
+                if (! (lig == null)){
+                    lig.addAtom(a);
+                    a.setMolecule(lig);
                     FileParser.s_atoms.add(a);
                 }
+
             }
-        } else {
-            // >> LIG <<
-            if (! (lig == null)) {
-                lig.addAtom(a);
-                a.setMolecule(lig);
-                FileParser.s_atoms.add(a);
-            }
-        }  
+    }
+            
+    
+    /**
+     * Handles lines starting with _chem_comp by filling the chemicalComponents HashMap.
+     * Entries can look like this: MET={name=METHIONINE, pdbx_synonyms=?, formula=C5 H11 N O2 S, id=MET, type=L-peptide linking, formula_weight=149.211}}
+     */
+    private static void handleChemComp(){
+        String category = null;              // categories such as type, name
+        String value = null;              // values such as peptide, Methionine 
+        HashMap<String, String> tmpComponent = new HashMap<>();     // stores categories and values for current component
+        for (String cat : colHeaderPosMap.keySet()){
+            category = cat;
+            value = lineData[colHeaderPosMap.get(cat)];
+            tmpComponent.put(category, value);
+            chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);      // matches one component with all its category/value pairings
+        }
     }
     
     
@@ -969,7 +1012,7 @@ class CifParser {
     
     
     /**
-     * Returns an array of 'words' seperated by an arbitrary amount of spaces. Considers in-line strings.
+     * Returns an array of 'words' separated by an arbitrary amount of spaces. Considers in-line strings.
      * @param handleSpecialCharacters whether single and double quotation should be considered.
      *   Should be false whenever a combined multi-line string is provided and true otherwise.
      * @param line
@@ -1271,6 +1314,79 @@ class CifParser {
         }
         lastIndexProtMetaInfos = currentIndex;
         return pmi;
+    }
+    
+    
+//    /**
+//     * Returns true if the molecule type contains 'RNA' in the chemical components map.
+//     * @return 
+//     */
+//    protected static Boolean isRNA(){
+//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+//        String chemTypeLowerCase = chemType.toLowerCase();
+//        int intIndex = chemTypeLowerCase.indexOf("rna");
+//        return (intIndex == -1) ? false : true;
+//    }
+//    
+//    
+//    /**
+//     * Returns true if the molecule type contains 'peptide' in the chemical components map.
+//     * @return 
+//     */
+//    protected static Boolean isAA(){
+//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+//        String chemTypeLowerCase = chemType.toLowerCase();
+//        int intIndex = chemTypeLowerCase.indexOf("peptide");
+//        return (intIndex == -1) ? false : true;
+//    }
+//    
+//    
+//    /**
+//     * Returns true if the molecule type contains 'DNA' in the chemical components map.
+//     * Right now only added for completeness, as handling DNA is not implemented yet.
+//     * @return 
+//     */
+//    protected static Boolean isDNA(){
+//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+//        String chemTypeLowerCase = chemType.toLowerCase();
+//        int intIndex = chemTypeLowerCase.indexOf("dna");
+//        return (intIndex == -1) ? false : true;
+//    }
+//    
+//    
+//    /**
+//     * Returns true if the molecule type is neither 'RNA' nor 'peptide' in the chemical components map.
+//     * 'isDNA()' to be added once handling DNA is implemented
+//     * @return 
+//     */
+//    protected static Boolean isLigand(){
+//        return (isRNA() == false && isAA() == false) ? true : false;
+//    }
+    
+    /**
+     * Returns whether the molecule type matches the requested one.
+     * Checks whether the the molecule type in the chemical components map corresponds to the requested one.
+     * @param requestedType integer of the type one is looking for (0 for AA, 1 for ligand, 3 for RNA)
+     */
+    protected static Boolean checkType(Integer requestedType){
+        if (! (requestedType == 0 || requestedType == 1 || requestedType == 2 || requestedType == 3)){
+            DP.getInstance().w("Tried to check molecule type, but requested type was not recognized. Trying to move on without checking the type.");
+            return false;
+        }
+        Integer actualType = 1;
+        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
+        String chemTypeLowerCase = chemType.toLowerCase();
+        int intIndex = chemTypeLowerCase.indexOf("rna");
+        if (intIndex != -1){
+            actualType = 3;
+        }
+        else{
+            intIndex = chemTypeLowerCase.indexOf("peptide");
+            if (intIndex != -1){
+                actualType = 0;
+            }
+        }
+        return (actualType == requestedType) ? true : false;
     }
       
 }
