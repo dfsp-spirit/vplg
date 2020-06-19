@@ -1,7 +1,8 @@
 # Visualization of Protein-Ligand Graphs (VPLG)
 
 This package includes software for the analysis of protein structure topologies.
-Its main part is the computation of topology graphs based on three-dimensional structures from the Protein Data Bank (PDB) and the secondary structure assignment from Define Secondary Structure of Proteins (DSSP).
+The main part of this package is the computation of topology graphs based on three-dimensional structures from the Protein Data Bank (PDB) and the secondary structure assignment from Define Secondary Structure of Proteins (DSSP).
+This software is able to read in legacy PDB files and macromolecular Crystallographic Information Files (mmCIFs) and therefore able to process large structures of > 62 chains or >99,999 atoms.
 The software is used to fill the Protein Topology Graph Library (PTGL).
 
 ## Included software
