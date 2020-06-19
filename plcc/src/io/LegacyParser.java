@@ -441,6 +441,7 @@ class LegacyParser {
 
             if(FileParser.isIgnoredLigRes(resNamePDB)) {
                 a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
+                FileParser.ignoredLigands += 1;
 
                 // We do not need these atoms and they may lead to trouble later on, so
                 //  just return without adding the new Atom to any Residue here so this line

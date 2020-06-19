@@ -50,6 +50,8 @@ public class FileParser {
     static ArrayList<Chain> s_chains = null;
     static ArrayList<Integer> s_residueIndices = null;
     static ArrayList<Integer> s_rnaIndices = null;
+    static ArrayList<Integer> s_ligandIndices = null; // a list of all non-ignored ligand indices
+    static Integer ignoredLigands = 0;
     static ArrayList<Atom> s_atoms = null;
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
     static HashMap<String, ArrayList<String>> homologuesMap = null;
@@ -119,6 +121,7 @@ public class FileParser {
         s_molecules = new ArrayList <Molecule> ();
         s_residueIndices = new ArrayList<>();
         s_rnaIndices = new ArrayList<>();
+        s_ligandIndices = new ArrayList<>();
         s_atoms = new ArrayList<Atom>();
         s_ptglSSEs = new ArrayList<SSE>();
         s_sites = new ArrayList<>();
@@ -343,7 +346,6 @@ public class FileParser {
         
         // standard ribonucleotides
         ArrayList<String> RNANames = new ArrayList<>(Arrays.asList("  G", "  U", "  A", "  T", "  C", "  I", "G  ", "U  ", "A  ", "T  ", "C  ", "I  ", "G", "U", "A", "T", "C", "I"));
-//        if(molNamePDB.equals("  G") || molNamePDB.equals("  U") || molNamePDB.equals("  A") || molNamePDB.equals("  T") || molNamePDB.equals("  C") || molNamePDB.equals("  I")) {
         if (RNANames.contains(molNamePDB)){
             return true;
         }
@@ -370,7 +372,7 @@ public class FileParser {
      * @param includeNonStandard allows additional to 20 standard amino acids: UNK
      * @return 
      */
-    protected static boolean isAminoacid(String AAName, Boolean includeNonStandard) {
+    protected static boolean isAminoacidName(String AAName, Boolean includeNonStandard) {
         ArrayList<String> AANames = new ArrayList<>(Arrays.asList("ALA", "ARG", "ASN", "ASP", "CYS", 
             "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
             "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"));
@@ -389,17 +391,12 @@ public class FileParser {
     
     
     /**
-     * Returns true if RNAName is standard RNA name (1-letter code).
-     * @param RNAName RNA name, 1-letter code, capitalized
+     * Returns true if chainIdentity equals polyribonucleotide.
+     * @param chainID Name of the chain i.e. A
      * @return 
      */
-    private static boolean isRNA(String RNAName) {
-        String[] standardAANames = {"A", "G", "C", "G"};
-        if (Arrays.asList(standardAANames).contains(RNAName)) {
-            return true;
-        } else {
-            return false;
-        }
+    protected static boolean isRNAchain(String chainID) {
+        return (CifParser.chainIdentity.get(chainID).equals("polyribonucleotide"));
     }
     
 

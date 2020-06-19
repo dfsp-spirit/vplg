@@ -96,18 +96,11 @@ public class Chain implements java.io.Serializable {
     
     
     public ArrayList<Residue> getAllLigandResidues() {
-        ArrayList<Residue> ligands = new ArrayList<>();
-        if (this.molecules.size() > 0) {
-            if ((this.molecules.get(0)) instanceof RNA) {
-                return null;
-            }
-        }
-        
+        ArrayList<Residue> ligands = new ArrayList<>();     
         Residue r;
-        
         for(Molecule m : this.molecules) 
-            if(m.isLigand()) {
-                r = (Residue) m;
+            if(m.isLigand() && m instanceof Residue) {
+                r = (Residue) m;    // Ligand has to stay an instance of Residue for handling in Main
                 ligands.add(r);
             }
         return ligands;

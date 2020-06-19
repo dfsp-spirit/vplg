@@ -27,9 +27,9 @@ abstract public class Molecule {
     public static final Integer RESIDUE_TYPE_LIGAND = 1;
     public static final Integer RESIDUE_TYPE_OTHER = 2;
     public static final Integer RESIDUE_TYPE_RNA = 3;
-    public Integer type = null;                         // wether the type is 0:AA, 1:Ligand, 2:Other or 3:RNA is determined in each class
+    public Integer type = null;                         // whether the type is 0:AA, 1:Ligand, 2:Other or 3:RNA is determined in each class
     // declare class vars
-    public ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the molecule
+    public ArrayList<Atom> atoms = new ArrayList<Atom>();                         // a list of all (non-H) Atoms of the molecule
     public ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the molecule
     public Chain chain = null;                             // the Chain this molecule belongs to
     public String chainID = null;
@@ -451,6 +451,8 @@ abstract public class Molecule {
     public void setAAName1(String s) { AAName1 = s; }
     public void setPdbNum(Integer i) { pdbNum = i; }
     public void setDsspNum(Integer i) { dsspNum = i; }
+    public void setiCode(String s) { iCode = s; }
+    public void setType(Integer i) { type = i;}
     
     /**
      * Returns information on all atoms of this molecule (used for debugging only).
