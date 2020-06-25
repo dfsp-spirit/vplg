@@ -14,19 +14,35 @@
 				        
 					<li  class="navbarFont">
 						<a href="index.php">Search</a>
-					</li>
-					
-					<li class="navbarFont">
-						<a href="about.php">About</a>
-					</li>						
-					<li class="navbarFont">
-						<a href="index.php#UserGuide">User Guide</a>
-					</li>
+					</li>		
+
+					<li class="dropdown">
+						<!-- <strong>caret</strong> creates the little triangle/arrow -->
+						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> About <strong class="caret"></strong></a>
+						<ul class="dropdown-menu">
+						    <li>
+								<a href="about.php"><i class="fa fa-question-circle"></i> What is PTGL </a>
+							</li>
+
+							<li>
+								<a href="guide.php"><i class="fa fa-question-circle"></i> Step-by-step guide </a>
+							</li>
+
+							<li>
+								<a href="biomedical_examples.php"><i class="fa fa-question-circle"></i> Biomedial questions </a>
+							</li>
+
+							<li>
+								<a href="help.php"><i class="fa fa-question-circle"></i> Help</a>
+							</li>							
+						</ul><!-- end dropdown menu -->
+					</li><!-- end dropdown -->
+
 					<li class="dropdown">
 						<!-- <strong>caret</strong> creates the little triangle/arrow -->
 						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Retrieve <strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
-						        <li>
+						    <li>
 								<a href="proteingraphs.php"><i class="fa fa-briefcase"></i> All protein graphs (PGs) of a chain</a>
 							</li>
 							<li>
@@ -47,6 +63,7 @@
 							
 						</ul><!-- end dropdown menu -->
 					</li><!-- end dropdown -->
+
 					<li class="dropdown">
 						<!-- <strong>caret</strong> creates the little triangle/arrow -->
 						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Database <strong class="caret"></strong></a>

@@ -43,7 +43,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
 		</noscript>
 		<div class="wrapper">
-		
+
 		<?php include('navbar.php'); ?>
 		
 		
@@ -166,7 +166,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			});
 			
 			$('.downloadOption').click( function (){
-				
+
 				var downloadType = this.value;
 				var proteins = new Array();
 				
@@ -180,14 +180,22 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					
 					if(proteins.length > 0) {
 					  var dataToSend = {'downloadType' : downloadType, 'proteins[]': proteins};	
+					  
 					  $.ajax({
 						  type: "POST",
 						  url: "./backend/createZip.php",
 						  data: dataToSend,
 						  cache: false,
+						  // jnw2020: success means doing the following on success. html means 
+						  //          treat the answer as html. We get a download link (dl) back or a
+						  //          error message.
 						  success: function(html){	
 							  console.log(html);
-							  window.location = './backend/downloadZip.php?dl='+html;
+							  if (! html.includes("[ERROR]")) {
+							  	window.location = './backend/downloadZip.php?dl='+html;
+							  } else {
+							  	alert(html + ". Please report this error to the site administrator.")
+							  }
 						  }
 					  });
 					} else {

@@ -43,417 +43,604 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	</noscript>
 	<div class="wrapper">
 		<?php include('navbar.php'); ?>
-	<div class="container" id="about">
-		<h2> About </h2>
-		<h3> Table of contents </h3>
-		<ul>
-			<li class="noBullets"> <a href="#ptgl">What is <?php echo "$SITE_TITLE"; ?>?</a> </li>
-			<li class="noBullets">
+
+		<div class="container" id="about">
+			<h2> What is PTGL? </h2>
+			<h3> Table of contents </h3>
+			<ul>
+				<li class="noBullets">  <a href="#overview">Overview</a> </li>
+				<li class="noBullets">  <a href="#contactDefinition">Contact definition</a> </li>
+				<li class="noBullets">  <a href="#proteinGraph">Protein Graphs</a> </li>
 				<ul>
-					<li class="noBullets">  <a href="#proteinGraph">Protein graphs</a> </li>
-					<ul>
-					    <li class="noBullets">  <a href="#contacts">Atom and SSE contacts</a> </li>
-					    <li class="noBullets">  <a href="#graphTypes">Graph types</a> </li>
-					</ul>
-					<li class="noBullets">  <a href="#explainImages">Interpreting the graph images</a> </li>
-					<li class="noBullets">  <a href="#exampleGraphTypes">An example for the graph types</a> </li>
-					<li class="noBullets">
-						<ul>
-							<li class="noBullets">  <a href="#alphaGraph">Alpha</a> </li>
-							<li class="noBullets">  <a href="#betaGraph">Beta</a> </li>
-							<li class="noBullets">  <a href="#alphaBetaGraph">Alpha-Beta</a> </li>
-							<li class="noBullets">  <a href="#alphaLigGraph">Alpha-Ligand</a> </li>
-							<li class="noBullets">  <a href="#betaLigGraph">Beta-Ligand</a> </li>
-							<li class="noBullets">  <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand</a> </li>
-						</ul>
-						
-					
-					<li  class="noBullets">  <a href="#foldingGraph">Folding Graphs</a> </li>
-					<li class="noBullets">  <a href="#linearNot">Linear Notation</a> </li>
-					<ul>
-						<li class="noBullets">  <a href="#adj">Adjacent notation</a> </li>
-						<li class="noBullets">  <a href="#red">Reduced notation</a> </li>
-						<li class="noBullets">  <a href="#key">Key notation</a> </li>
-						<li class="noBullets">  <a href="#seq">Sequence notation</a> </li>
-					</ul>
-						<li class="noBullets">  <a href="#complexGraph">Complex graphs</a> </li>
-					</li>
+				    <li class="noBullets">  <a href="#pgVisualization">Visualization</a> </li>
+				    <li class="noBullets">  <a href="#graphTypes">Graph types</a> </li>
 				</ul>
-			<li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
-			<li class="noBullets"> <a href="#api">The <?php echo "$SITE_TITLE"; ?> REST API</a> </li>
-			<li class="noBullets"> <a href="#help"> Help </a> </li>
-		</ul>
 
-		<br>
-		<br>	
-		<a class="anchor" id="ptgl"></a>
-		<h3> What is <?php echo "$SITE_TITLE"; ?>? </h3>
+				<li class="noBullets">  <a href="#foldingGraph">Folding Graphs</a> </li>
+				<ul>
+					<li class="noBullets">  <a href="#fgVisualization">Visualization</a> </li>
+					<li class="noBullets">  <a href="#linearNot">Linear notation</a> </li>
+					<li class="noBullets">  <a href="#fgGraphTypes">Notation types</a> </li>
+				</ul>
 
-		<p>
-		<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis of protein topologies. It uses a graph-based model to describe the structure
-		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
-		a PDB file and the secondary structure assignments of the DSSP algorithm. The computation of the protein graph is done by our software <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">Visualization of Protein-Ligand Graphs (VPLG)</a>. In a protein graph, vertices represent secondary
-		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
-		them. The result is an undirected, labelled graph for a single protein chain.
-		<br /><br /></p>
-		
-		<p class="imgCenter"><img src="./images/how_vplg_works.png" alt="Protein graph computation" title="Protein graph computation" class="img-responsive imgFormAboutphp"/></p>
-		
-		<br/>
-		
-		<!--
-		The most common and important SSEs in proteins are alpha helices and beta strands, and some structures in the PDB also contain ligands.
-		So the PTGL contains 6 different graph types, which differ in the considered secondary structure elements (SSE). The three base graph types are the <a href="#alphaGraph">Alpha graph</a>, the <a href="#betaGraph">Beta graph</a>,
-		and the <a href="#alphaBetaGraph">Alpha-Beta graph</a>. If you are interested in the ligands as well, you can also use the <a href="#alphaLigGraph">Alpha-Ligand graph</a>, the <a href="#betaLigGraph">Beta-Ligand graph</a>,
-		and the <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand graph</a>
-		-->
-		
-		<!--
-		The connected components of the <a href="#proteinGraph">Protein graph</a> form <a href="#foldingGraph">Folding graphs</a>. A <a href="#proteinGraph">Protein graph</a> can consist of one or more
-		<a href="#foldingGraph">Folding graphs</a>. The three graph types were defined for each protein of the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>. For each graph type exists four <a href="#linearNot">linear notations</a> with
-		corresponding graphic representations. In PTGL all <a href="#foldingGraph">Folding graphs</a>, all SSEs, and additional protein information are stored for every
-		protein structure annotated in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> for which SSEs according DSSP are defined, which is not a NMR structure, has a resolution less than 3.5
-		Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
-		topologies and subtopologies using the <a href="#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		-->
+				<li class="noBullets">  <a href="#complexGraph">Complex Graphs</a> </li>
+				<li class="noBullets">  <a href="#motifs">Motifs</a> </li>
+					<ul>
+						<li class="noBullets"> <a href="#motifsAlpha">Alpha motifs</a> </li>
+						<li class="noBullets"> <a href="#motifsBeta">Beta motifs</a> </li>
+					</ul>
 
-		<br>
-		<a class="anchor" id="proteinGraph"></a>
-		<h3> Protein Graphs </h3>
+				<li class="noBullets">  <a href="#publications">Publications</a> </li>
+			</ul>
 
-		<p>Using the 3D structure data from the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>, the SSEs are defined according to
-		the assignment of the <a href="http://swift.cmbi.ru.nl/gv/dssp/" target="_blank">DSSP</a> algorithm with some 
-		modifications. Then, the spatial
-		contacts between the SSEs are computed according to <a href="publications.php">Koch <i>et al.</i>, 2013</a>. For the ligand versions, the explanation can
-		be found in <a href="publications.php">Sch&auml;fer <i>et al.</i>, 2012</a>. This information forms the basis for the description of protein structures as
-		graphs.</p>
-		
-		<p>
-		A Protein graph is defined as labeled, undirected graph. The vertices correspond to the SSEs or ligands, and they are labeled with
-		the SSE type (alpha helix, beta strand or ligand). The vertices of the Protein graph are enumerated as they occur in the sequence from the N- to the C-terminus.
-		
-		
-		<!--
-		According to the type of atoms forming the contact, there are backbone-backbone-contacts, sidechain-sidechain-contacts, and sidechain-backbone
-		contacts. Two vertices are connected, if there are at least two backbone-backbone-contacts or two sidechain-backbone-contacts or three
-		sidechain-sidechain contacts.-->
-		</p>
-		
-		<p>
-		The edges of the Protein graph represent spatial adjacencies of SSEs. These adjacencies are defined through atom contacts between SSEs, based on the van-der-Waals radius.
-		According to this direction two spatial neighboured SSEs, which are connected, could have a parallel (p), anti-parallel (a), or mixed (m)
-		neighbourhood. 
-		</p>
-		
-		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp2"/></p>
-		
-		
-		<br/>
-		<a class="anchor" id="contacts"></a>
-		<h4> Atom contacts and SSE contacts </h4>
-		<p>
-		Protein graphs are based on contacts between SSEs. Here, we explain how an SSE contact is defined in the PTGL. The computation of SSE contacts is a 2-step process: first, the atom contacts for the residues are computed, and the residues are assigned to SSEs. Then, a ruleset is used to determine whether enough atom contacts exist between a pair of SSEs to define this as a contact on the SSE level.		
-		</p>
+			<br>	
+			<a class="anchor" id="overview"></a>
+			<h3> Overview </h3>
 
-		
-		<b>Atom level contacts</b><br/>
-		We use a hard-sphere model to compute atom contacts. Atom positions are parsed from PDB files, and a collision sphere with radius 2 Angstroem is assigned to each protein atom (hydrogens are ignored). For ligand atoms, the radius is 3 Angstroem.
-		If the collision spheres of 2 atoms from different residues overlap, this is considered an atom level contact.
-		<br/>
-		The different atoms of a residue are backbone atoms or side chain atoms. Based on this differentation, each atom level contact is assigned to one of the following types:
-		
-		<ul>
-		  <li>BB: backbone - backbone contact</li>
-		  <li>BC: backbone - side chain contact</li>
-		  <li>CC: side chain - side chain contact</li>
-		  <li>LB: ligand - backbone contact</li>
-		  <li>LC: ligand - side chain contact</li>
-		  <li>LL: ligand - ligand contact</li>
-		  <li>LX: ligand - non-ligand contact, i.e., LX = LB or LC</li>
-		</ul>
-		
-		</p>
-		
-		<b>SSE level contacts</b><br/>
-		Based on the atom level contacts, a rule set is applied to decide whether or not a pair of SSEs is in contact. The rules depend on the SSE types, and are as follows:
-		<table border="1px" padding="15px">
-		<tr><th>SSE 1 type</th><th>SSE 2 type</th><th>Required contacts</th><tr>
-		<tr><td>Beta strand</td><td>Beta strand</td><td>BB &gt; 1 or CC &gt; 2</td><tr>
-		<tr><td>Helix</td><td>Beta strand</td><td>(BB &gt; 1 and BC &gt; 3) or CC &gt; 3</td><tr>
-		<tr><td>Helix</td><td>Helix</td><td>BC &gt; 3 or CC &gt; 3</td><tr>
-		<tr><td>Ligand</td><td><i>Any type</i></td><td>LX &gt;= 1</td><tr>
-		</table>
-		</p>
-		
-		<p>		
-		For more details on the contact definition, please see the following publication: <b>Schäfer T, May P, Koch I (2012). <i>Computation and Visualization of Protein Topology Graphs Including Ligand Information.</i> German Conference on Bioinformatics 2012; 108-118</b>.
-		</p>
-		
-		
-		
-		<br/>
-		<a class="anchor" id="graphTypes"></a>
-		<h4> Graph Types </h4>
-		
-		<p>		
-		If only a certain SSE type is of interest, the graph modelling allows to exclude the non-interesting SSE types.
-		According to the SSE type of interest, the Protein graph can be defined as an <a href="#alphaGraph">Alpha graph</a>, <a href="#betaGraph">Beta graph</a>, or <a href="#alphaBetaGraph">Alpha-Beta graph</a>.
-		If you are interested in the ligands as well, you can also use the <a href="#alphaLigGraph">Alpha-Ligand graph</a>, the <a href="#betaLigGraph">Beta-Ligand graph</a>,
-		and the <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand graph</a>.</p>
-		
-		<p>
-		The Alpha graph only contains alpha helices and the contacts between them. The Alpha-Beta graph contains alpha helices, beta strands and the contacts betweem them. And so on.
-		</p>
-		
-		<a class="anchor" id="explainImages"></a>
-		<h3>Interpreting the graph images</h3>
+			<!-- include the introduction snippet -->
+			<?php 
+				include("snippets/introduction.php");
+			?>
 
-		<p>
-		In the graph visualizations available on the PTGL server, the SSEs
-		are ordered as red circles (helices), black quadrats (strands), or magenta rings (ligands) on a straight line according to their sequential order from the N- to
-		the C-terminus. The spatial neighbourhoods are drawn as arcs between SSEs. The edges are coloured according to their labelling, red for
-		parallel, green for mixed, blue for anti-parallel, and magenta for ligand neighbourhood. Here is the key for the images:
-		</p>
-		
-		<p class="imgCenter"><img src="./images/vplg_legend.png" alt="PTGL graph image key" title="PTGL graph image key" class="img-responsive imgFormAboutphp2"/></p>
-		
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+			<br>	
+			<p class="imgCenter">
+				<img src="./images/how_vplg_works.png" alt="Protein Graph computation" title="Protein Graph computation" class="img-responsive imgFormAboutphp"/>
+			</p>
 
-		<a class="anchor" id="exampleGraphTypes"></a>
-		<h4>PDB 7TIM as an example for the different graph types</h4>
-		
-		<br>
-		<br>
-		<a class="anchor" id="alphaGraph"></a>
-		<h5> <u>Alpha Graph</u> </h5>
-		The Alpha-Graph of the protein 7TIM chain A consisting only of 13 helices.
-		<p class="imgCenter"><img src="./images/7tim_A_alpha_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>		
+			<p>
+				<center>
+					a) Sphere-style, b) stick-style and c) cartoon-style three-dimensional protein structure representation. d) Red and black circles denote helices and strands, respectively. e) Lines connecting the circles denote spatial neighborhood. f) Protein Graph visualization.
+				</center>
+			</p> 
 
 
-		<br>
-		<br>
-		<a class="anchor" id="betaGraph"></a>
-		<h5> <u>Beta Graph</u> </h5>
-		The Beta-Graph of the protein 7TIM chain A consisting only of 8 strands.  Note the beta barrel in the protein, which is clearly visible as a circle of parallel beta-strands in this graph.
-		<p class="imgCenter"><img src="./images/7tim_A_beta_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>
-
-		<br>
-		<br>
-		<a class="anchor" id="alphaBetaGraph"></a>
-		<h5> <u>Alpha-Beta Graph</u> </h5>
-		The Alpha-Beta Graph of the protein 7TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
-		<p class="imgCenter"><img class="img-responsive imgFormAboutphp2" src="./images/7tim_A_albe_PG.png" alt="Alpha-Beta Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
-		
-		<br>
-		<br>
-		<a class="anchor" id="alphaLigGraph"></a>
-		<h5> <u>Alpha-Ligand Graph</u> </h5>
-		The Alpha-Ligand Graph of the protein 7TIM chain A consisting of 13 helices and 1 ligand.
-		<p class="imgCenter"><img src="./images/7tim_A_alphalig_PG.png" alt="Alpha-Ligand Graph of 7timA" title="Alpha-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 
-		<br>
-		<br>
-		<a class="anchor" id="betaLigGraph"></a>
-		<h5> <u>Beta-Ligand Graph</u> </h5>
-		The Beta-Ligand-Graph of the protein 7TIM chain A consisting of 8 strands and 1 ligand.
-		<p class="imgCenter"><img src="./images/7tim_A_betalig_PG.png" alt="Beta-Ligand Graph of 7timA" title="Beta Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>
+			<br>
+			<a class="anchor" id="contactDefinition"></a>
+			<h3> Contact definition </h3>
 
-		<br>
-		<br>
-		<a class="anchor" id="alphaBetaLigGraph"></a>
-		<h5> <u>Alpha-Beta-Ligand Graph</u> </h5>
-		The Alpha-Beta-Ligand Graph of the protein 7TIM chain A consisting of 22 SSEs (13 helices, 8 strands and 1 ligand). 
-		<p class="imgCenter"><img class="img-responsive imgFormAboutphp2" src="./images/7tim_A_albelig_PG.png" alt="Alpha-Beta-Ligand Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
-		
-		
-		
-		
-		
+			<p>
+				We define contacts on different levels of abstraction or scales, respectively.
 
-		
-		
-		
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		
-		
-		<br>
-		<br>
-		<a class="anchor" id="foldingGraph"></a>
-		<h4>Folding Graphs</h4>
-		<p>A connected component of the <a href="#proteinGraph">Protein graph</a> is called Folding graph. Folding graphs are denoted with capital letters in alphabetical order
-		according to their occurrence in the sequence, beginning at the N-terminus.</p>
+				<h4> Atom </h4>
+				Atoms are modelled as hard spheres with a radius of 2 Å for atoms of amino acids and of 3 Å for ligand atoms.
+				An atom-atom contact is defined if two hard spheres overlap.
+				For atoms of amino acids the contact is differentiated depending on the position of the involved atoms in the amino acid backbone or side chain.
+				This yields atom level contacts of the following types:
 
-		<p><a href="#proteinGraph">Protein graphs</a> are built of one or more Folding graphs. Below, you find the <a href="#rasmolbec">schematic representation</a> of the antigen receptor protein 1BEC. Helices are coloured red and strands blue. 1BEC is a transport membrane protein
-		that detects foreign molecules at the cell surface. It has two domains, which are represented by the Folding graphs A and E, which are mainly
-		built by strands. The protein consists of one chain A and exhibits six Folding graphs. Two large Folding graphs (Folding graphs 1BEC_A and
-		1BEC_E), and four Folding graphs 1BEC_B, 1BEC_C, 1BEC_D, and 1BEC_F consisting only of a single helix (see <href="#alphaBeta1bec">Protein graph of 1bec</a>: helices 9,
-		11, 14, and 22). Folding graphs consisting of only one SSE are found mostly at the protein surface and not in the protein core.</p>
-		Especially in beta-sheet containing Folding graphs, the maximal vertex degree of the Folding graphs is rarely larger than two. Thus, we distinguish
-		between so-called bifurcated and non-bifurcated topological structures. A <a href="#proteinGraph">Protein graph</a> or a Folding graph is called bifucated, if there is any
-		vertex degree greater than 2, if not, the graph is non- bifurcated. 
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		<br>
-		<br>
-		<a class="anchor" id="rasmolbec"></a>
-		<h5> 3D structure of 1BEC: </h5>
-			<p><img src="./images/1bec.gif" alt="3D structure of 1BEC" title="3D structure of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
+				<ul>
+				  <li>BB: backbone - backbone contact</li>
+				  <li>BC: backbone - side chain contact</li>
+				  <li>CC: side chain - side chain contact</li>
+				  <li>LB: ligand - backbone contact</li>
+				  <li>LC: ligand - side chain contact</li>
+				  <li>LL: ligand - ligand contact</li>
+				  <li>LX: ligand - non-ligand contact, i.e., LX = LB or LC</li>
+				</ul>
+
+				<h4> Residue </h4>
+				A residue-residue contact is defined if two residues share an atom contact.
+
+				<h4> Secondary structure element </h4>
+				Depending on the type of the secondary structure elements (SSEs), we applied a rule set:
+				<table border="1px" padding="15px">
+				<tr><th>SSE 1 type</th><th>SSE 2 type</th><th>Required contacts</th><tr>
+				<tr><td>Beta strand</td><td>Beta strand</td><td>BB &gt; 1 or BC &gt; 2</td><tr>
+				<tr><td>Helix</td><td>Beta strand</td><td>BB &gt; 1 or BC &gt; 3 or CC &gt; 3</td><tr>
+				<tr><td>Helix</td><td>Helix</td><td>BC &gt; 3 or CC &gt; 3</td><tr>
+				<tr><td>Ligand</td><td><i>Any type</i></td><td>LX &gt;= 1</td><tr>
+				</table>
+
+				For more details on the contact definition, please see the following publication: <b>Schäfer T, May P, Koch I (2012). <i>Computation and Visualization of Protein Topology Graphs Including Ligand Information.</i> German Conference on Bioinformatics 2012; 108-118</b>.
+
+				<h4> Chain </h4>
+				A chain-chain contact is defined if two chains share atleat one residue-residue contact-
+
+			</p>
 
 
-		<a class="anchor" id="alphaBeta1bec"></a>
-		<h5> Alpha-Beta Protein graph of 1BEC: </h5>
-			<p><img src="./images/1becA_albe.0.png" alt="Alpha-Beta Protein graph of 1BEC" title="Alpha-Beta Protein graph of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
-		<h5> Alpha-Beta Folding graph A of 1BEC: </h5>
-			<p><img src="./images/1becAAa_al.0.png" alt="Alpha-Beta Folding graph A of 1BEC" title="Alpha-Beta Folding graph A of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
-		<h5> Alpha-Beta Folding graph B of 1BEC: </h5>
-			<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		<br>
-		<br>
-		<a class="anchor" id="linearNot"></a>
-		<h4>Linear Notations </h4>
-		<p>A notation serves as a unique, canonical, and linear description and classification of structures. The notations for Folding graphs reveal to
-		the feature of protein structure as a linear sequence of amino acids, and describe the arrangement of SSEs correctly and completely.</p>
-		<p>There are two possibilities of representing Protein graphs: first, one can order the SSEs in one line according to their occurrence in sequence,
-		or second, according to their occurrence in space. In the first case, the <a href="#adj">adjacent</a> notation, ADJ, the <a href="#red">reduced</a> notation, RED, and the <a href="#seq">sequence</a>
-		notation, SEQ, SSEs are ordered as points on a straight line according to their sequential order from the N- to the C-terminus.</p>
-		<p>It is difficult to draw the spatial arrangements of the SSEs in a straight line, because in most proteins SSEs exhibit more than two spatial
-		neighbours. Therefore, the second description type, the <a href="#key">key</a> notation, KEY, can be drawn only for non-bifurcated Folding graphs. Helices and
-		strands are represented by cylinders and arrows, respectively. The sequential neighbourhood is described by arcs between arrows and cylinders.</p>
-		The notations are written in different brackets: [] denote non-bifurcated, {} bifurcated folding graphs, and () indicate barrel structures. 
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		<br>
-		<br>
-		<a class="anchor" id="adj"></a>
-		<a class="anchor" id="red"></a>
-		<h5> <u>The adjacent and reduced notation</u> </h5>
-		<p>All vertices of the <a href="#proteinGraph">Protein graph</a> are considered in the adjacent (ADJ) notation of a Folding graph. SSEs of the Folding graph are ordered
-		according to their occurrence in the sequence. Beginning with the first SSE and following the spatial neighbourhoods the sequential distances
-		are noted followed by the neighbourhood type.</p>
-		The reduced (RED) notation is the same as for ADJ notation, but only those SSEs of the considered Folding graph count. See below, the ADJ and
-		RED notations of the Beta-Folding graph E in human alpha thrombin chain B(1D3T). The beta sheet consists of six strands arranged both in
-		parallel with one additional mixed edge to helix 12.<br><br>
-
-		<h5> ADJ Notation </h5>
-			<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp2"/></p>
-		<h5> RED Notation </h5>
-			<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp2"/></p>
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-
-		<br>
-		<br>
-		<a class="anchor" id="key"></a>
-		<h5> KEY Notation </h5>
-		The KEY notation is very close to the topology diagrams of biologists, e.g. Brändén and Tooze (1999). Topologies are described by diagrams of
-		arrows for strands and cylinders for helices. As in the <a href="#red">RED</a> notation SSEs of the considered Folding graph are taken into account. SSEs are
-		ordered spatially and are connected in sequential order. Beginning with the first SSE in the sequence and following the sequential edges,
-		the spatial distances are noted; in <a href="#alphaBetaGraph">Alpha-Beta</a> graphs followed by the type of the SSE, h for a helix and e for a strand. If the arrangement
-		of SSEs is parallel an x is noted (Richardson(1977)). In this case the protein chain moves on the other side of the sheet by crossing the
-		sheet (cross over). Antiparallel arrangements are called same end, and are more stable, Chothia and Finkelstein (1990). Mixed arrangements
-		are defined as same end. The notation starts with the type of the first SSE. See the KEY notation of the <a href="#alphaBetaGraph">Alpha-Beta</a> <a href="#foldingGraph">Folding graph</a> B chain
-		B of the histocompatibility antigen (1IEB). The Folding graph consists of 3 helices and 4 strands. This topology exhibits one cross over
-		connection from helix 6 to helix 7 and forms an <a href="#alphaBetaGraph">Alpha-Beta</a> barrel structure. 
-
-		<p><img src="./images/1iebBk.png" alt="Key notation" title="Key notation" class="img-responsive imgFormAboutphp2"/></p>
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		<br>
-		<br>
-		<a class="anchor" id="seq"></a>
-		<h5> SEQ Notation </h5>
-		This notation is the same as the <a href="#adj">ADJ</a> notation, but the sequential differences are counted. Although the SEQ notation is trivial, the notation
-		can be useful, for example, searching for ψ-loops requires a special SEQ notation. 
-
-		<p><img src="./images/1ars_Bs_beta.png" alt="Sequence notation" title="Sequence notation" class="img-responsive imgFormAboutphp2"/></p>
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		<br>
-		<br>
-		
-		The linear notations enable you to search the <?php echo "$SITE_TITLE"; ?> for protein motifs (and arbitruary other 3D arrangements of SSEs). When you search for a motif, SQL-based string matching in the linear notation strings is used to find all folding graphs which match a query.
-		
-                <br>
-		<br>
-		
-		
-		<a class="anchor" id="complexGraph"></a>
-		<h4>Complex Graphs</h4>
-		<p>A Complex graph is defined as undirected graph. The vertices correspond to protein chains and are named by their author-provided chain ID from the PDB file. Edges denote a spatial contact and the edge weight corresponds to the number of residue-residue contacts.</p>
-
-		<p><img src="./images/4a97_CG.png" alt="Complex graph" title="Complex graph" class="img-responsive imgFormAboutphp2"/></p>
-
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		
-		
-		
-		<a class="anchor" id="linking"></a>
-		<h3>Linking <?php echo "$SITE_TITLE"; ?></h3>
-		<p>You can link <?php echo "$SITE_TITLE"; ?> in several ways, depending on the kind of data you want:</p>
-		
-		<ul>
-		    <li>Link to all protein graphs of a chain:</li>
-		    <ul>
-		        <li>Format: <?php echo "$SITE_BASE_URL"; ?>/results.php?q=&lt;pdbid&gt;&lt;chain&gt;</li>
-		        <li>The allowed values for the parameters are:</li>
-		        <ul>
-		        <li>&lt;pdbid&gt;: a PDB identifier</li>
-		        <li>&lt;chain&gt;: a PDB chain name</li>
-		        </ul>
-		        <li>Example for PDB 7tim, chain A: <?php echo "$SITE_BASE_URL"; ?>/results.php?q=7timA</li>
-		    </ul>
-		    <li>Link to all folding graph linear notations of a protein graph:</li>
-		    <ul>
-		        <li>Format: <?php echo "$SITE_BASE_URL"; ?>/foldinggraphs.php?pdbchain=&lt;pdbid&gt;&lt;chain&gt;&amp;graphtype_int=&lt;graphtype_code&gt;&amp;notationtype=&lt;notation&gt;</li>
-		        <li>The allowed values for the parameters are:</li>
-		        <ul>
-		        <li>&lt;pdbid&gt;: a PDB identifier</li>
-		        <li>&lt;chain&gt;: a PDB chain name</li>
-		        <li>&lt;graphtype_code&gt;: 1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig</li>
-		        <li>&lt;notation&gt;: a notaion: adj, red, seq or key</li>
-		        </ul>
-		        <li>Example for the ADJ notation folding graphs of the alpha protein graph of PDB 7tim chain A: <?php echo "$SITE_BASE_URL"; ?>foldinggraphs.php?pdbchain=7timA&amp;graphtype_int=1&amp;notationtype=adj</li>
-		    </ul>
-		    
-		</ul>
-		
-		
-		
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		
-		
-		<a class="anchor" id="api"></a>
-		<h3>The <?php echo "$SITE_TITLE"; ?> REST API</h3>
-		<p>We are offering a REST API for programmers. Please see the <a href="./api/" target="_blank">API documentation</a> for details.</p>
-		
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
-		
-		<a class="anchor" id="help"></a>
-		<h3>Help</h3>
-		<h4>Why is there no result for my PDB ID?</h4>
-		<ul>
-			<li> Check if the entered PDB ID (4 characters) is correct </li>
-			<li> PTGL is currently updated annually, check that the structure is not too new (<a href="http://ptgl.uni-frankfurt.de/content.php">Content</a>) </li>
-			<li> Structures with a resolution worse than 4.5 Angstroem are excluded </li>
-			<li> Structures containing too few residues are excluded </li>
-			<li> If nothing of the above applies, you can <a href="http://ptgl.uni-frankfurt.de/contact.php">Contact</a> us </li>
-			<li> You can compute your own results with the open source <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/">VPLG</a> software
-		</ul>
-
-		<br>
-
-		<h4>Why is there no graph image?</h4>
-		<b>PNG</b>
-		<p>Large images, i.e. many SSEs in case of PGs or many chains in case of CGs, often need some time until the browser can display them. Sometimes they are not even displayed at all, because of the required memory. You can still download the graph images via the respective buttons. However, even offline viewers may not display such large images correctly or at all due to the memory requirement.</p>
-		<br>
-		<b>SVG</b>
-		<p>Sometimes SVG images are missing, because of errors generating them. If available, you can just download the the respective PNG file instead, or download the GML file and create your own graph images.</p>		
-
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 
-		<br><br><br>
+			<br>
+			<a class="anchor" id="proteinGraph"></a>
+			<h3> Protein Graphs </h3>
+			
+			<p>
+			A Protein Graph is defined as labeled, undirected graph. The vertices correspond to the secondary structure elements or ligands, and they are labeled with
+			the secondary structure element type (alpha helix, beta strand or ligand). The vertices of the Protein Graph are enumerated as they occur in the sequence from the N- to the C-terminus.
+			</p>
+			
+			<p>
+			The edges of the Protein Graph represent spatial adjacencies of secondary structure elements (see <a href="#contactDefinition">contact definition</a>).
+			According to the direction of the spatical adjacent SEEs, their orientation to each other can be parallel (p), anti-parallel (a), or mixed (m). 
+			</p>
 
-	</div><!-- end container and contentText -->
-</div><!-- end wrapper -->
+			<br>
+			<a class="anchor" id="pgVisualization"></a>
+			<h4> Visualization </h4>
+
+			<p>
+				In the graph visualizations available on the PTGL server, the secondary structure elements are ordered as red circles (helices), black quadrats (strands), or magenta rings (ligands) on a straight line according to their sequential order from the N- to	the C-terminus.
+				The spatial neighborhoods are drawn as arcs between secondary structure elements.
+				The edges are colored according to their labeling as parallel (red), anti-parallel (blue), mixed (green) or ligand (magenta).
+				This is the key for the images:
+			</p>
+			
+			<p class="imgCenter"><img src="./images/vplg_legend.png" alt="PTGL graph image key" title="PTGL graph image key" class="img-responsive imgFormAboutphp2"/></p>
+
+			<p>
+				Below the vertices there are the numbers of the secondary structure elements for this type of Protein Graph (PG) and for the occurrence in the sequence of the whole list of secondary structure elements (SQ).
+			</p>
+			
+			<!--
+				Old PG image, not removed so far from img folder and css style file
+			<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein Graph" title="Protein Graph" class="img-responsive imgFormAboutphp2"/></p>
+			-->
+			
+			<br>
+			<a class="anchor" id="graphTypes"></a>
+			<h4> Graph types </h4>
+			
+			<p>		
+			If only a certain secondary structure element type is of interest, the graph modelling allows to exclude the non-interesting secondary structure element types.
+			According to the secondary structure element type of interest, the Protein Graph can be defined as an <a href="#alphaGraph">Alpha graph</a>, <a href="#betaGraph">Beta graph</a>, or <a href="#alphaBetaGraph">Alpha-Beta graph</a>.
+			If you are interested in the ligands as well, you can also use the <a href="#alphaLigGraph">Alpha-Ligand graph</a>, the <a href="#betaLigGraph">Beta-Ligand graph</a>,
+			and the <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand graph</a>.</p>
+			
+			<p>
+			The Alpha graph contains only alpha helices and the contacts between them. The Alpha-Beta graph contains alpha helices, beta strands and the contacts betweem them, and so on.
+			</p>
+
+			<p>
+				As an example for Protein Graphs and their graph types, we present the structure with PDB ID 7tim [Davenport et al., 1991, Biochemistry].
+			</p>
+
+			<br>
+			<a class="anchor" id="alphaGraph"></a>
+			<h5> <b>Alpha Graph </b></h5>
+			The Alpha-Graph of the protein 7tim chain A consisting of 13 helices.
+
+			<!-- 7timA alpha PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/ti/7tim/A/7tim_A_alpha_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<br>
+			<a class="anchor" id="betaGraph"></a>
+			<h5><b> Beta Graph </b></h5>
+			The Beta-Graph of the protein 7tim chain A consisting of 8 strands.  Note the beta barrel in the protein, which is clearly visible as a circle of parallel beta-strands in this graph.
+
+			<!-- 7timA beta PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/ti/7tim/A/7tim_A_beta_PG.png" alt="Beta Graph of 7timA" title="Beta Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<br>
+			<a class="anchor" id="alphaBetaGraph"></a>
+			<h5><b> Alpha-Beta Graph </b></h5>
+			The Alpha-Beta Graph of the protein 7tim chain A consisting of 21 secondary structure elements (13 helices and 8 strands). 
+
+			<!-- 7timA albe PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/ti/7tim/A/7tim_A_albe_PG.png" alt="Alpha-Beta Graph of 7timA" title="Alpha-Beta Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+			
+			<br>
+			<a class="anchor" id="alphaLigGraph"></a>
+			<h5><b> Alpha-Ligand Graph </b></h5>
+			The Alpha-Ligand Graph of the protein 7tim chain A consisting of 13 helices and 1 ligand.
+			
+			<!-- 7timA alphalig PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/ti/7tim/A/7tim_A_alphalig_PG.png" alt="Alpha-Ligand Graph of 7timA" title="Alpha-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<br>
+			<a class="anchor" id="betaLigGraph"></a>
+			<h5><b> Beta-Ligand Graph </b></h5>
+			The Beta-Ligand-Graph of the protein 7tim chain A consisting of 8 strands and 1 ligand.
+
+			<!-- 7timA betalig PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/ti/7tim/A/7tim_A_betalig_PG.png" alt="Beta-Ligand Graph of 7timA" title="Beta-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<br>
+			<a class="anchor" id="alphaBetaLigGraph"></a>
+			<h5><b> Alpha-Beta-Ligand Graph </b></h5>
+			The Alpha-Beta-Ligand Graph of the protein 7tim chain A consisting of 22 secondary structure elements (13 helices, 8 strands and 1 ligand). 
+
+			<!-- 7timA albelig PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/ti/7tim/A/7tim_A_albelig_PG.png" alt="Alpha-Beta-Ligand Graph of 7timA" title="Alpha-Beta-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+			
+			
+			<br>
+			<a class="anchor" id="foldingGraph"></a>
+			<h3>Folding Graphs</h3>
+
+			<p>
+				A connected component of a <a href="#proteinGraph">Protein Graph</a> is called Folding Graph.
+				Folding Graphs are denoted with capital letters in alphabetical order according to their occurrence in the sequence, beginning at the N-terminus.
+				Folding Graphs consisting of only one secondary structure element are found mostly at the protein surface and not in the protein core.
+				Especially in beta-sheet containing Folding Graphs, the maximal vertex degree of the Folding Graphs is rarely larger than two.
+				Thus, we distinguish between so-called bifurcated and non-bifurcated topological structures.
+				A <a href="#proteinGraph">Protein Graph</a> or a Folding Graph is called bifurcated, if the vertex degree is greater than two, and called non- bifurcated otherwise.
+			</p>
+
+			<br>
+			<a class="anchor" id="fgVisualization"></a>
+			<h4> Visualization </h4>
+
+			<p>
+				In the graph visualizations available on the PTGL server, Folding Graphs follow the <a href="#pgVisualization">Protein Graph visualization</a>. The footer additionally contains the number of the secondary structure element in the Folding Graph (FG).
+			</p>
+
+			<p>
+				As an example we present an antigen receptor protein structure with PDB ID 1bec [Bentley et al., 1995, Science].
+				1bec is a transport membrane protein that detects foreign molecules at the cell surface.
+				The protein consists of one chain A and exhibits three Folding Graphs.
+				It has two domains, which are represented by the Folding Graphs A and C, which are mainly built by strands.
+				Two Folding Graphs (Folding Graphs 1bec_A and 1bec_C) are large enough to be of interest, and one Folding Graph (1bec_B) consists only of a single helix (see <a href="#alphaBeta1bec">Protein Graph of 1bec</a>: helix 13).
+			</p>
+			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+			<br>
+			<a class="anchor" id="rasmolbec"></a>
+			<h5><b> 3D structure of 1bec: </b></h5>
+			<p class="imgCenter"><img src="./images/1bec_structure.png" alt="3D structure of 1bec" title="3D structure of 1bec" class="img-responsive imgFormAboutphp2"/></p>
+
+			<a class="anchor" id="alphaBeta1bec"></a>
+			<h5><b> Alpha-Beta Protein Graph of 1bec: </b></h5>
+			<!-- 1bec albe PG -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/be/1bec/A/1bec_A_albe_PG.png" alt="Alpha-Beta Protein Graph of 1becA" title="Alpha-Beta Protein Graph of 1becA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+			
+			<h5><b> Alpha-Beta Folding Graph A of 1bec: </b></h5>
+			<!-- 1bec albe RED FG#0 -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/be/1bec/A/1bec_A_albe_FG_0_RED.png" alt="Alpha-Beta Folding Graph A of 1becA" title="Alpha-Beta Folding Graph A of 1becA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>		
+
+			<h5><b> Alpha-Beta Folding Graph C of 1bec: </b></h5>
+			<!-- 1bec albe RED FG#2 -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/be/1bec/A/1bec_A_albe_FG_2_RED.png" alt="Alpha-Beta Folding Graph C of 1becA" title="Alpha-Beta Folding Graph C of 1becA" class="img-responsive imgFormAboutphp2"/></p>');
+			?>	
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+
+			<br>
+			<a class="anchor" id="linearNot"></a>
+			<h4>Linear Notations </h4>
+
+			<p>
+				A notation serves as a unique, canonical, and linear description and classification of structures.
+				The notations for Folding Graphs resemble a protein structure as a linear sequence of secondary structure elements and describe the arrangement of secondary structure elements uniquely.
+				Linear notations enable you to search the <?php echo "$SITE_TITLE"; ?> for protein motifs.
+				Searching for a structure, SQL-based string matching in the linear notation strings is used to find all folding graphs which match the query.
+			</p>
+
+			<p>
+				The linear notations are written in different brackets:
+				<ul>
+					<li> [] denote <a href="#foldingGraph">non-bifurcated Folding Graphs</a>, </li>
+					<li> {} denote <a href="#foldingGraph">bifurcated Folding Graphs</a>, and </li>
+					<li> () denote barrel structures. </li>
+				</ul>
+			</p>
+
+			<p>
+				Secondary structure elements are denoted by single characters:
+				<ul>
+					<li> h denotes helices, </li>
+					<li> e denotes strands, and </li>
+					<li> l denotes ligands. </li>
+				</ul>
+
+				For alpha or beta Folding Graphs, the characters of secondary structure elements not described are left out.
+			</p>
+
+			<p>
+				Edges are completely described by the start and end vertex and their label, i.e., parallel, antiparallel, mixed or ligand.
+				The start and end vertex are saved implicitly as the linear notation traverses the graph and only saves in which direction, i.e. "+" towards C-terminus and "-" towards N-terminus, the edge goes.
+				Edge labels are denoted by single characters:
+				<ul>
+					<li> p denotes parallel, </li>
+					<li> a denotes antiparallel, </li>
+					<li> m denotes mixed, and </li>
+					<li> j denotes ligand edges. </li>
+				</ul>
+
+			
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+
+			<br>
+			<a class="anchor" id="fgGraphTypes"></a>
+			<h4> Notation types </h4>
+
+			<p>
+				There are two possibilities of representing Folding Graphs: first, one can order the secondary structure elements in one line according to their occurrence in sequence, or second, according to their occurrence in space.
+				In the first case, the <a href="#adj">adjacent</a> (ADJ), the <a href="#red">reduced</a> (RED), and the <a href="#seq">sequence</a> (SEQ) Folding Graphs, secondary structure elements are ordered as points on a straight line according to their sequential order from the N- to the C-terminus.
+				In the second case, the <a href="#key">key</a> (KEY) Folding Graph, secondary structure elements are represented as red rectangles and black arrows for helices and strands, respectively. They are ordered in a straight line corresponding to their spatial arrangement.
+				This is difficult, because in most proteins, secondary structure elements exhibit more than two spatial neighbours.
+				Therefore, KEY Folding Graphs can only be drawn for <a href="#foldingGraph">non-bifurcated Folding Graphs</a>.
+			</p>
+
+			<p>
+				Folding Graphs for the different <a href="#graphTypes">graph types</a> can be derived from the different <a href="#proteinGraph">Protein Graph</a> types: alpha, beta, alpha-beta, alpha-ligand, beta-ligand and alpha-beta-ligand.
+			</p>
+
+			<br>
+			<a class="anchor" id="fgGraphTypesADJ"></a>
+			<h5><b> Adjacent (ADJ) Folding Graphs</b></h5>
+
+			<p>
+				Secondary structure elements are ordered by their occurence in the sequence, from N- to C-terminus. 
+				All vertices of the <a href="#proteinGraph">Protein Graph</a> are considered in the adjacent notation of a Folding Graph.
+				This means that adjacent Folding Graphs account for secondary structure elements laying between the secondary structure elements of the Folding Graph without being connected to one of them.
+				Vertices of the Protein Graph that are unconnected to vertices of the Folding Graph are colored grey.
+			</p>
+
+			<!-- 1d3tB albe ADJ FG#0 -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/d3/1d3t/B/1d3t_B_albe_FG_0_ADJ.png" alt="ADJ Alpha-Beta Folding Graph of 1d3tB" title="ADJ Alpha-Beta Folding Graph of 1d3tB" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<!-- 1d3tB albe ADJ FG#0 linnot -->
+			<p><center>
+				Adjacent <a href="#linearNot">linear notation</a>: 
+				<?php
+					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1d3t/B/albe/0/adj/json';
+					$curl = curl_init();
+					curl_setopt($curl, CURLOPT_URL, $url_linnot);
+					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+
+					$result = curl_exec($curl);
+
+					if(curl_errno($curl)) {
+					    // handle error
+					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
+					}
+					else {
+					    // result
+					    echo json_decode($result);
+					}
+				?>
+			</center></p>
+
+			<br>
+			<a class="anchor" id="fgGraphTypesRED"></a>
+			<h5><b> Reduced (RED) Folding Graphs </b></h5>
+
+			<p>
+				Secondary structure elements are ordered by their occurence in the sequence, from N- to C-terminus.
+				Reduced Folding Graphs are the same as adjacent Folding Graphs, but only those secondary structure elements part of the Folding Graph are considered.
+			</p>
+
+			<!-- 1d3tB albe RED FG#0 -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/d3/1d3t/B/1d3t_B_albe_FG_0_RED.png" alt="ADJ Alpha-Beta Folding Graph of 1d3tB" title="ADJ Alpha-Beta Folding Graph of 1d3tB" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<!-- 1d3tB albe RED FG#0 linnot -->
+			<p><center>
+				Reduced <a href="#linearNot">linear notation</a>: 
+				<?php
+					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1d3t/B/albe/0/red/json';
+					$curl = curl_init();
+					curl_setopt($curl, CURLOPT_URL, $url_linnot);
+					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+
+					$result = curl_exec($curl);
+
+					if(curl_errno($curl)) {
+					    // handle error
+					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
+					}
+					else {
+					    // result
+					    echo json_decode($result);
+					}
+				?>
+			</center></p>
+
+			<br>
+			<a class="anchor" id="fgGraphTypesSEQ"></a>
+			<h5><b> Sequential (SEQ) Folding Graphs </b></h5>
+
+			<p>
+				Secondary structure elements are ordered by their occurence in the sequence, from N- to C-terminus.
+				Sequential Folding Graphs are the same as adjacent Folding Graphs, but the edges stand for sequential instead of spatial neighborhood.
+				Because vertices from the Protein Graph that are unconnected to vertices of the Folding Graph are included, but left out from the sequential neighborhood consideration, they are bypassed in the sequence of edges.
+			</p>
+
+			<p>
+				Although the sequence notation is trivial, the graphs can be useful, for example, searching for ψ-loops requires a special SEQ notation.
+			</p>
+
+			<!-- 1d3tB albe SEQ FG#0 -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/d3/1d3t/B/1d3t_B_albe_FG_0_SEQ.png" alt="ADJ Alpha-Beta Folding Graph of 1d3tB" title="ADJ Alpha-Beta Folding Graph of 1d3tB" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<!-- 1d3tB albe SEQ FG#0 linnot -->
+			<p><center>
+				Sequential <a href="#linearNot">linear notation</a>: 
+				<?php
+					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1d3t/B/albe/0/seq/json';
+					$curl = curl_init();
+					curl_setopt($curl, CURLOPT_URL, $url_linnot);
+					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+
+					$result = curl_exec($curl);
+
+					if(curl_errno($curl)) {
+					    // handle error
+					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
+					}
+					else {
+					    // result
+					    echo json_decode($result);
+					}
+				?>
+			</center></p>
+
+			<br>
+			<a class="anchor" id="fgGraphTypesKEY"></a>
+			<h5><b> KEY Folding Graphs </b></h5>
+
+			<p>
+				KEY Folding Graphs can only be created for <a href="#foldingGraph">non-bifurcated Folding Graphs</a>.
+				KEY Folding Grapgs are very close to the topology diagrams of biologists, e.g. Brändén and Tooze (1999).
+				Topologies are described by diagrams of	black arrows for strands and red rectangles for helices.
+				As in <a href="#red">reduced</a> Folding Graphs, only secondary structure elements of the Folding Graph are considered.
+				Secondary structure elements are ordered spatially and connected in sequential order.
+				See the KEY Folding Graph of the <a href="#alphaBetaGraph">Alpha-Beta</a> <a href="#foldingGraph">Folding Graph</a> B of a histocompatibility antigen 1iebB.
+				The Folding Graph consists of three helices and four strands. This topology exhibits one cross-over connection from helix 6 to helix 7 and forms an <a href="#alphaBetaGraph">Alpha-Beta</a> barrel structure. 
+			</p>
+
+			<p>
+				<b>Linear notation characteristics</b>: If the arrangement of secondaray structure elements is parallel, an x is noted (Richardson, 1977).
+				In this case, the protein chain moves to the other side of the sheet by crossing the sheet (cross over).
+				Antiparallel arrangements are called same end and are more stable (Chothia and Finkelstein , 1990). Mixed arrangements are defined as same end.
+			</p>
+
+			<!-- 3j9yO albe KEY FG#1 -->
+			<?php 
+				echo('<p class="imgCenter"><img src="'.$IMG_ROOT_PATH.'/j9/3j9y/O/3j9y_O_albe_FG_1_KEY.png" alt="KEY Alpha-Beta Folding Graph of 3j9yO" title="AKEY Alpha-Beta Folding Graph of 3j9yO" class="img-responsive imgFormAboutphp2"/></p>');
+			?>
+
+			<!-- 3j9yO albe KEY FG#1 linnot -->
+			<p><center>
+				KEY <a href="#linearNot">linear notation</a>: 
+				<?php
+					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/3j9y/O/albe/1/key/json';
+					$curl = curl_init();
+					curl_setopt($curl, CURLOPT_URL, $url_linnot);
+					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+
+					$result = curl_exec($curl);
+
+					if(curl_errno($curl)) {
+					    // handle error
+					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
+					}
+					else {
+					    // result
+					    echo json_decode($result);
+					}
+				?>
+			</center></p>
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+			<br>
+			<a class="anchor" id="complexGraph"></a>
+			<h3> Complex Graphs </h3>
+			<p>
+				A Complex Graph is defined as undirected graph.
+				The vertices correspond to protein chains and are named by their author-provided chain ID from the PDB file.
+				Edges denote a spatial contact and the edge weight corresponds to the number of residue-residue contacts.
+				Below the graph there is a label per vertex for the number of the vertex (C#), chain name (CN) and its molecule identifier (ML).
+			</p>
+
+			<p><img src="./images/4a97_CG.png" alt="Complex Graph" title="Complex Graph" class="img-responsive imgFormAboutphp2"/></p>
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+
+			<br>
+			<a class="anchor" id="motifs"></a>
+			<h3> Motifs </h3>
+
+			<!-- receives meta info from db about motifs -->
+			<?php include('backend/get_motif_meta-info.php'); ?>
+			
+			<p>
+				A motif is a common supersecondary structure.
+				A motif consists of only a few secondary structure elements, and it may occur with very different functions.
+				<?php echo "$SITE_TITLE"; ?> implements motif detection in <a href="#proteinGraph">Protein Graphs</a> for some chosen motifs based on the <a href="#linearNot">linear notations</a> of <a href="#foldingGraph">folding graphs</a>.
+				This enables the search for all chains containing one of the predefined motifs.
+				If you want to search for an arbitrary arrangement of secondary structure elements, use the <a href="guide.php#guideLinnot">linear notation search</a>.
+			</p>
+
+			<!-- Description of single motifs including example image -->
+			<?php include("motif_info.php"); ?>
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+			<!-- Step-by-step guide  -> now an own page
+			<br>
+			<a class="anchor" id="guide"></a>
+			<h2>Step-by-step guide</h2>
+
+			<?php 
+				/* now an own page 
+				include("guide.php"); 
+				*/
+			?>
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+			-->
+			
+			<!-- Biomedical examples -> now an own page
+			<br>
+			<a class="anchor" id="bioExamples"></a>
+			<h2>Biomedically relevant examples</h2>
+
+			 
+			<?php
+				/* now an own page
+				include("biomedical_examples.php");
+				*/
+			?>
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+			-->
+
+			<br>
+			<a class="anchor" id="publications"></a>
+			<h3> Publications </h3>
+
+			<!-- Description of single motifs including example image -->
+			<?php include("snippets/publication_list.php"); ?>
+
+
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+			<br>
+			<div class="sectionPointerBox">
+				<p>
+					Next section <br>
+					<a href="/guide.php"><i class="glyphicon glyphicon-arrow-down"></i> Step-by-step guide <i class="glyphicon glyphicon-arrow-down"></i></a>
+				</p>
+			</div>
+			<br>
+
+		</div><!-- end container and contentText -->
+	</div><!-- end wrapper -->
 
 
 <?php include('footer.php'); ?>
