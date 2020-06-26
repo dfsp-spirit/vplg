@@ -129,7 +129,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<br>
 
 			<h4> Why is there no graph image? </h4>
-			<p> PTGL is optimized to process large structures. In rare cases, images of secondary structure element level Complex Graphs may be missing (PNG and SVG files). This can be the case for really large structures, when their size gets too enormous for most browsers and applications to handle.</p>
+			<p>
+				PTGL is optimized to process large structures.
+				In rare cases, images of secondary structure element-level Complex Graphs may be missing (PNG and SVG files).
+				This can be the case for really large structures, when their size gets too enormous for most browsers and applications to handle.
+				For example, the secondary structure element-level Complex Graph of 3j3q would have a width 832,256 and a height of 208,512 pixels.
+			</p>
 
 			<ul>
 				<li> 
@@ -142,7 +147,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			</ul>
 
 			<b> What can I do about it? </b>
-			<p>In the rare case of a missing graph image, you can download the GML file instead and open it with a viewer for GML files, for example, <a href="https://cytoscape.org/">Cytoscape</a>.</p>
+			<p>
+				In the rare case of a missing graph image, you can download the GML file instead and open it with a viewer for GML files, for example, <a href="https://cytoscape.org/">Cytoscape</a>.
+			</p>
 
 
 			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
