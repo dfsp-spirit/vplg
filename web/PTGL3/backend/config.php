@@ -44,6 +44,7 @@ $CHECK_INSTALL_ON_FRONTPAGE = TRUE;
 $CHECK_INSTALL_ON_MAINTENANCEPAGE = TRUE;
 $SHOW_MAINTENANCE_MESSAGE_ON_FRONTPAGE = FALSE;
 $MAINTENANCE_MESSAGE = "<b>INFO:</b> We are currently doing some maintenance on this server. If you experience problems, please try again when this message has been removed.";
+$PAGE_ERROR_PREFIX = "ERROR: Please inform the site administrator about this error with message ";  # prefix for errors that may show up as text on pages
 
 //---- File settings ----//
 $BUILD_FILE_PATH	= FALSE;

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <?php 
 	include('./backend/config.php'); 
+	include('./backend/get_linnots_of_foldinggraph.php');  # used for the linnots
+	include('./backend/get_motif_meta-info.php');  # used for the number of up-and-down barrels 
 
 	$SECTION_COUNTER = 0;  # used to increment the sections without having to do it yourself
 
@@ -123,22 +125,7 @@
 			<p><center>
 				Reduced <a href="about.php#linearNot">linear notation</a>: 
 				<?php
-					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1a8s/A/beta/0/red/json';
-					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, $url_linnot);
-					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-
-					$result = curl_exec($curl);
-
-					if(curl_errno($curl)) {
-					    // handle error
-					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
-					}
-					else {
-					    // result
-					    echo json_decode($result);
-					}
+					echo(get_linnot("1a8s", "A", "beta", "0", "red"));
 				?>
 			</center></p>
 
@@ -211,6 +198,7 @@
 
 			<!-- count of chains exhibiting (up-and-down beta-)barrel -->
 			<?php
+				/*
 				$url_linnot = "$SITE_BASE_URL" . '/api/index.php/pdbchains_containing_motif/barrel/json';
 				$curl = curl_init();
 				curl_setopt($curl, CURLOPT_URL, $url_linnot);
@@ -228,11 +216,12 @@
 				} else {
 					$chains_barrel_count = substr_count($result, ",") + 1;  # count in json list comma and add one results in number of chains exhibiting motif
 				}
+				*/
 			?>
 
 			<ol>
 				<li>
-					The motif search yields <?php echo $chains_barrel_count; ?> protein chains, e.g., odorant binding protein from nasal mucosa from <i>Sus scrofa</i> (1a3y), retinol-binding protein from <i>Sus scrofa domesticus</i> (1aqb), egg-white avidin from <i>Gallus gallus</i> (1avd), egg-white apo-avidin from <i>Gallus gallus</i> 1ave, beta-lactoglobulin from <i>Bos taurus</i> (1b8e).
+					The motif search yields <?php echo $all_motif_counts['barrel']; ?> protein chains, e.g., odorant binding protein from nasal mucosa from <i>Sus scrofa</i> (1a3y), retinol-binding protein from <i>Sus scrofa domesticus</i> (1aqb), egg-white avidin from <i>Gallus gallus</i> (1avd), egg-white apo-avidin from <i>Gallus gallus</i> 1ave, beta-lactoglobulin from <i>Bos taurus</i> (1b8e).
 				</li>
 
 				<li>

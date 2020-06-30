@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php 
-include('./backend/config.php'); 
+include('./backend/config.php');
+include("backend/get_linnots_of_foldinggraph.php");
 
 $title = "About";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
@@ -403,22 +404,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p><center>
 				Adjacent <a href="#linearNot">linear notation</a>: 
 				<?php
-					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1d3t/B/albe/0/adj/json';
-					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, $url_linnot);
-					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-
-					$result = curl_exec($curl);
-
-					if(curl_errno($curl)) {
-					    // handle error
-					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
-					}
-					else {
-					    // result
-					    echo json_decode($result);
-					}
+					echo(get_linnot("1d3t", "B", "albe", "0", "adj"));
 				?>
 			</center></p>
 
@@ -440,22 +426,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p><center>
 				Reduced <a href="#linearNot">linear notation</a>: 
 				<?php
-					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1d3t/B/albe/0/red/json';
-					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, $url_linnot);
-					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-
-					$result = curl_exec($curl);
-
-					if(curl_errno($curl)) {
-					    // handle error
-					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
-					}
-					else {
-					    // result
-					    echo json_decode($result);
-					}
+					echo(get_linnot("1d3t", "B", "albe", "0", "red"));
 				?>
 			</center></p>
 
@@ -482,22 +453,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p><center>
 				Sequential <a href="#linearNot">linear notation</a>: 
 				<?php
-					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/1d3t/B/albe/0/seq/json';
-					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, $url_linnot);
-					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-
-					$result = curl_exec($curl);
-
-					if(curl_errno($curl)) {
-					    // handle error
-					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
-					}
-					else {
-					    // result
-					    echo json_decode($result);
-					}
+					echo(get_linnot("1d3t", "B", "albe", "0", "seq"));
 				?>
 			</center></p>
 
@@ -530,22 +486,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p><center>
 				KEY <a href="#linearNot">linear notation</a>: 
 				<?php
-					$url_linnot = "$SITE_BASE_URL" . '/api/index.php/linnot/3j9y/O/albe/1/key/json';
-					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, $url_linnot);
-					curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-					curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-
-					$result = curl_exec($curl);
-
-					if(curl_errno($curl)) {
-					    // handle error
-					    echo "ERROR: Please inform the site administrator about this error with message '" . curl_error($curl) . "'";
-					}
-					else {
-					    // result
-					    echo json_decode($result);
-					}
+					echo(get_linnot("3j9y", "O", "albe", "1", "key"));
 				?>
 			</center></p>
 
