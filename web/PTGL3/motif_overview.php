@@ -70,13 +70,6 @@ function get_motif_fullname($db, $motiv_abbreviation) {
 
 	<div class="container" id="publications">
 
-		<!-- DEBUG TODELETE -->
-		<p> DEBUG </p>
-		<?php 
-			echo( implode(", ", $motif_names) . "<br>");
-			echo( implode(", ", $all_motif_counts) );
-		?>
-
 		<h2><?php print "$SITE_TITLE"; ?> Structural motif overview</h2>
 		<br>
 		
@@ -96,8 +89,7 @@ function get_motif_fullname($db, $motiv_abbreviation) {
 		<tr>
 		    <th>Motif</th><th>Type</th><th>Motif abbreviation</th><th>Chains with motif in the database (of <?php print get_total_chains_count($db);?> chains total)</th><th>Short info on motif</th>
 		</tr>
-		<?php		  		
-	          
+		<?php		  	
 	          foreach($motif_names as $motif) {
 	          
 	            if( ! $ENABLE_MOTIF_SEARCH_ALPHABETA) {
@@ -105,7 +97,9 @@ function get_motif_fullname($db, $motiv_abbreviation) {
 	              if($motif === "plait" || $motif === "ubi" || $motif === "tim" || $motif === "rossman") {
 	                  continue;
 	              }
-	            }      	            	            
+	            }   
+
+	            $motif_data = get_motif_data($db, $motif);  # get the data for one specific motif
 	            
 	            if(isset($motif_data['motif_name']) && ( ! empty($motif_data['motif_name']))) {
 	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motiftype_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?st=motif&motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";

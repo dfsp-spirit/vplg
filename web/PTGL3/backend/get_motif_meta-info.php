@@ -34,6 +34,9 @@
 			    continue;
 			}
 		}
+
+		$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
+		$db = pg_connect($conn_string);
 		            
 		$motif_data = get_motif_data($db, $motif);
 		$all_motif_counts[$motif] = 0;	      	            	            
