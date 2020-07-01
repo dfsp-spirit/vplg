@@ -1317,52 +1317,6 @@ class CifParser {
     }
     
     
-//    /**
-//     * Returns true if the molecule type contains 'RNA' in the chemical components map.
-//     * @return 
-//     */
-//    protected static Boolean isRNA(){
-//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-//        String chemTypeLowerCase = chemType.toLowerCase();
-//        int intIndex = chemTypeLowerCase.indexOf("rna");
-//        return (intIndex == -1) ? false : true;
-//    }
-//    
-//    
-//    /**
-//     * Returns true if the molecule type contains 'peptide' in the chemical components map.
-//     * @return 
-//     */
-//    protected static Boolean isAA(){
-//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-//        String chemTypeLowerCase = chemType.toLowerCase();
-//        int intIndex = chemTypeLowerCase.indexOf("peptide");
-//        return (intIndex == -1) ? false : true;
-//    }
-//    
-//    
-//    /**
-//     * Returns true if the molecule type contains 'DNA' in the chemical components map.
-//     * Right now only added for completeness, as handling DNA is not implemented yet.
-//     * @return 
-//     */
-//    protected static Boolean isDNA(){
-//        String chemType = ((chemicalComponents.get(molNamePDB)).get("type"));
-//        String chemTypeLowerCase = chemType.toLowerCase();
-//        int intIndex = chemTypeLowerCase.indexOf("dna");
-//        return (intIndex == -1) ? false : true;
-//    }
-//    
-//    
-//    /**
-//     * Returns true if the molecule type is neither 'RNA' nor 'peptide' in the chemical components map.
-//     * 'isDNA()' to be added once handling DNA is implemented
-//     * @return 
-//     */
-//    protected static Boolean isLigand(){
-//        return (isRNA() == false && isAA() == false) ? true : false;
-//    }
-    
     /**
      * Returns whether the molecule type matches the requested one.
      * Checks whether the the molecule type in the chemical components map corresponds to the requested one.
