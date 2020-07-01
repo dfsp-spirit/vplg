@@ -92,8 +92,38 @@ function get_path_to($pdbid, $chain) {
 
 function get_folding_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number) {
   $path = get_path_to($pdbid, $chain);
-  $fname = get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number);
+  $fname = get_folding_graph_file_name_no_ext($pdbid, $chain_id, $graphtype_string, $fg_number, $linnot_type_string);
   return $path . $fname;
+}
+
+function get_linnot($pdbid, $chain_id, $graphtype_string, $fg_number, $linnot_type_string) {
+	// error handling
+	global $PAGE_ERROR_PREFIX;
+	$FUN_TAG = "[get_linnot]";
+
+	// check if using denormalized fields
+	global $USE_DENORMALIZED_DB_FIELDS; 
+	if($USE_DENORMALIZED_DB_FIELDS) {
+	    $query = "SELECT li.ptgl_linnot_" . $linnot_type_string . " FROM plcc_fglinnot AS li, plcc_foldinggraph AS fg WHERE li.linnot_foldinggraph_id = fg.foldinggraph_id AND li.denorm_pdb_id = '" . $pdbid . "' AND li.denorm_chain_name = '" . $chain_id . "' AND li.denorm_graph_type_string ='" . $graphtype_string . "' AND fg.fg_number = " . $fg_number . ";";
+	} else {
+	    return $PAGE_ERROR_PREFIX . "'" . $FUN_TAG . " Denormalized setting on, but not implemented for this function.'";
+	}
+
+	// connect to DB
+	global $DB_HOST, $DB_PORT, $DB_NAME, $DB_USER, $DB_PASSWORD;
+	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
+	$db = pg_connect($conn_string);
+	if($db === FALSE) { return $PAGE_ERROR_PREFIX . "'" . $FUN_TAG . " Failed to connect to database'"; }
+
+	// retrieve result
+	$result = pg_query($db, $query);	
+	if(! $result) { return $PAGE_ERROR_PREFIX . "'" . $FUN_TAG . " Database query failed: '" . pg_last_error($db) . "'"; }
+	$all_rows = pg_fetch_row($result);
+	if($all_rows) {
+		return $all_rows[0];
+	} else {
+		return $PAGE_ERROR_PREFIX . "'" . $FUN_TAG . " Could not find linear notation for " . $pdbid . $chain_id . " in database'";
+	}	
 }
 
 $pageload_was_search = FALSE;
@@ -185,7 +215,7 @@ if($valid_values){
 		$img_seq = $arr['filepath_linnot_image_seq_png'];
 		$img_key = $arr['filepath_linnot_image_key_png'];
 		
-		$str_def = $arr['ptgl_linnot_adj'];
+		$str_def = $arr['ptgl_linnot_def'];
 		$str_adj = $arr['ptgl_linnot_adj'];
 		$str_red = $arr['ptgl_linnot_red'];
 		$str_seq = $arr['ptgl_linnot_seq'];

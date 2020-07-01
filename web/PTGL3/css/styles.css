@@ -5,7 +5,8 @@ My Custom CSS
 ==============
 
 Author:		Andreas Scheck, Daniel Bruness
-Updated:	February 2014
+Changed by:     Jan Niclas Wolf
+Updated:	June 2020
 Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 
 */
@@ -72,6 +73,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	.topLink {
 		text-align: right;
 	}
+	
+	
+	/* General */
+        .first-li-tab { margin-left: 40px; }
 	
 	
 	
@@ -472,6 +477,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#searchInputMain {
 		width: 301px;
 	}
+	
+	#searchComplex {
+                width: 301px;
+        }
 		
 	
 	.col-centered {
@@ -620,6 +629,11 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	#flipArrow6 {
+		margin-left: 3px;
+		transform: rotate(-90deg);
+	}
+	
+	#flipArrowComplex {
 		margin-left: 3px;
 		transform: rotate(-90deg);
 	}
@@ -913,7 +927,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 
 	.imgFormAboutphp {
-		width: 650px;
+		/* width: 650px; */
+                width: 100%;
+                min-width: 450px;
+                max-width: 1000px;
 		border: solid;
 		border-width: 1px;
 		margin: 10px;
@@ -924,12 +941,26 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		border: solid;
 		border-width: 1px;
 		margin: 10px;
-		}       
-	
+		}    
+		
+        .imgScreenshot {
+		width: 100%;
+                min-width: 450px;
+                max-width: 850px;
+		border: solid;
+		border-width: 1px;
+		margin: 10px;
+		}
 	
 	.imgCenter {
 		text-align: center;
 		}
+		
+        .sectionPointerBox {
+            text-align: center;
+            border: solid;
+            border-width: 2px;
+            }
 	
 	#aboutTable {
 		background: rgba(255, 255, 255, 0.4);
