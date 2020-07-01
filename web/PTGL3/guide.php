@@ -60,7 +60,7 @@
 			<h2> Step-by-step guide </h2>
 
 			<p>
-				Download this guide as: <?php echo ("<a href=$SITE_BASE_PATH/files/PTGL_step-by-step_guide.pdf>[PDF]</a>"); ?>.
+				Download this guide as: <?php echo ("<a href=files/PTGL_step-by-step_guide.pdf>[PDF]</a>"); ?>.
 			</p>
 
 			<h3> Table of contents </h3>
