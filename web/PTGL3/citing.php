@@ -75,7 +75,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<!-- BiBTex Entry Tim -->
 
 	<p>
-		The most recent and recommended citation of the PTGL and its underlying software, VPLG, is:<br>
+		For citation of the PTGL or its underlying software, VPLG, please use:<br>
 		<br>
 		Koch I and Schäfer T (2018). Protein super-secondary structure and quaternary structure topology: theoretical description and application. <i>Current opinions in structural biology</i>, 50, 134-143 (<a href="https://www.sciencedirect.com/science/article/abs/pii/S0959440X1730115X" target="_blank">article at sciencedirect</a>).
 		<br>
