@@ -2411,7 +2411,21 @@ public class Main {
             }
             cInfoThisChain = null;
         }
-         
+        
+        // for debug lv >= 1 print list of molecules and molecule contact infos
+        if (Settings.getInteger("plcc_I_debug_level") >= 1) {
+            System.out.println("[DEBUG LV 1] List of parsed molecules:");
+            ArrayList<Molecule> allMols = FileParser.getMolecule();
+            for (Molecule m : allMols) {
+                System.out.println("  " + m.toString());
+            }
+            
+            System.out.println("[DEBUG LV 1] List of molecule contact infos:");
+            for (MolContactInfo mi : cInfo) {
+                System.out.println("  " + mi.toString());
+            }
+        }
+
         if (Settings.getBoolean("plcc_B_debug_only_contact_comp")) {
             System.out.println("Exiting now as requested by settings.");
             System.exit(0);

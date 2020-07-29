@@ -641,30 +641,30 @@ class CifParser {
         // coordX
         // for information on difference between ptgl and plcc style look in old parser
         if (Settings.getBoolean("plcc_B_round_coordinates")) {
-            oCoordX = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10.0;
-            coordX = oCoordX.intValue();
-        } else {
             oCoordXf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10;
             coordX = Math.round(oCoordXf);
-        }
+        } else {
+            oCoordX = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10.0;
+            coordX = oCoordX.intValue();
+         }
 
 
         // coordY
         if (Settings.getBoolean("plcc_B_round_coordinates")) {
-            oCoordY = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10.0;
-            coordY = oCoordY.intValue();
-        } else {
             oCoordYf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10;
             coordY = Math.round(oCoordYf);
+        } else {
+            oCoordY = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10.0;
+            coordY = oCoordY.intValue();
         }
 
         // coordZ
         if (Settings.getBoolean("plcc_B_round_coordinates")) {
-            oCoordZ = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10.0;
-            coordZ = oCoordZ.intValue();
-        } else {
             oCoordZf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10;
             coordZ = Math.round(oCoordZf);
+        } else {
+            oCoordZ = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10.0;
+            coordZ = oCoordZ.intValue();            
         }
 
         // chemical symbol
