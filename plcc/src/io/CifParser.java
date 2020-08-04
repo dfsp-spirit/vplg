@@ -273,6 +273,15 @@ class CifParser {
                 case "_entity_src_gen":
                     handleEntitySrcGen();
                     break;
+                case "_struct":
+                    handleStructLine();
+                    break;
+                case "_struct_keywords":
+                    handleStructKeywords();
+                    break;
+                case "_pdbx_database_status":
+                    handlePdbxDatabaseStatus();
+                    break;
                 }
                 
                 // reset here, b/c we only get here when a (combined) line was treated
@@ -397,6 +406,40 @@ class CifParser {
         }
     }
     
+    
+    /**
+     * Handles lines starting with '_struct'.
+     * Saves the title of the PDB File.
+     */
+    private static void handleStructLine(){
+        if (lineData[0].equals("title")){
+            metaData.put("title", lineData[1]);
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with '_struct_keywords'.
+     */
+    private static void handleStructKeywords(){
+        if (lineData[0].equals("_struct_keywords.text")){
+            metaData.put("keywords", lineData[1]);
+        }
+        if (lineData[0].equals("_struct_keywords.pdbx_keywords")){
+            metaData.put("header", lineData[1]);
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with '_pdbx_database_status'.
+     * 
+     */
+    private static void handlePdbxDatabaseStatus(){
+        if (lineData[0].equals("_pdbx_database_status.recvd_initial_deposition_date")){
+            metaData.put("date", lineData[1]);
+        }
+    }
     
     /**
      * Handles a line starting with '_reflns.d_resolution_high', '_reflns.d_res_high' or '_refine.ls_d_res_high'
