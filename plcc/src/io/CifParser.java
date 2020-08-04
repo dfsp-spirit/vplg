@@ -90,6 +90,8 @@ class CifParser {
     private static String tmpModelID;
     private static String chainNum = null;  // identifier of the current chain e.g. A
     private static String chainType = null; // type of the current chain e.g. RNA
+    private static String nameOrgCommon;
+    private static String nameOrgScientific;
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -267,6 +269,9 @@ class CifParser {
                 case "_chem_comp":
                     // check for information on chemical components
                     handleChemComp();
+                    break;
+                case "_entity_src_gen":
+                    handleEntitySrcGen();
                     break;
                 }
                 
@@ -794,9 +799,6 @@ class CifParser {
 
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
-            // currently not used
-            // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
-
             // check if we have created ligand residue for s_residue
             if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
 
@@ -831,45 +833,10 @@ class CifParser {
                     }
                 } else {
 
-                    // ignore this for now: needs parsing of two more loops (_pdbx_nonpoly_scheme, _chem_comp)   	 
-
-                    /*                                        
-                    // add info from PDB HET fields (HET, HETNAM, HETSYN, FORMUL)
-                    // Note: we now use prepared statements so any strange chars do no longer lead to irritations or security trouble
-                    Boolean removeStuff = Settings.getBoolean("plcc_B_uglySQLhacks");
-                    lf = getLigFormula(resNamePDB);
-                    if(removeStuff) {
-                        lf = lf.replaceAll("\\s", "");               // remove all whitespace
-                        lf = lf.replaceAll("~", "");                 // remove tilde char (it causes SQL trouble during DB insert)
-                        lf = lf.replaceAll("\\\\", "");              // remove all backslashes (it causes SQL WARNING 'nonstandard use of escape in a string literal' during DB insert)
-                        lf = lf.replaceAll("'", "");              // remove all ticks (obviously SQL trouble)
-                    }
-
-                    ln = getLigName(resNamePDB);
-                    if(removeStuff) {
-                        ln = ln.replaceAll(" ", "_");                // replace spaces with underscores
-                        ln = ln.replaceAll("\\s", "");               // remove all other whitespace
-                        ln = ln.replaceAll("~", "");
-                        ln = ln.replaceAll("\\\\", "");
-                        ln = ln.replaceAll("'", "");
-                    }
-
-                    ls = getLigSynonyms(resNamePDB);
-                    if(removeStuff) {
-                        ls = ls.replaceAll(" ", "_");
-                        ls = ls.replaceAll("\\s", "");
-                        ls = ls.replaceAll("~", "");
-                        ls = ls.replaceAll(";", ".");
-                        ls = ls.replaceAll("\\\\", "");
-                        ls = ls.replaceAll("'", "");
-                    }
-
-                    lig.setLigFormula(lf);
-                    lig.setLigName(ln);
-                    lig.setLigSynonyms(ls);
-
-                    */
-
+                    lig.setLigName((chemicalComponents.get(molNamePDB)).get("name"));
+                    lig.setLigFormula((chemicalComponents.get(molNamePDB)).get("formula"));
+                    lig.setLigSynonyms((chemicalComponents.get(molNamePDB)).get("pdbx_synonyms"));
+                    
                     lastLigandNumPDB = molNumPDB;
                     lastChainID = chainID;
 
@@ -984,6 +951,20 @@ class CifParser {
             value = lineData[colHeaderPosMap.get(cat)];
             tmpComponent.put(category, value);
             chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);      // matches one component with all its category/value pairings
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with _entity_src_gen.
+     * Assigns the common and the scientific name of the molecule to variables that are later transferred to ProtMetaInfo.
+     */
+    private static void handleEntitySrcGen(){
+        if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
+            nameOrgCommon = lineData[1];
+        }
+        if (lineData[0].equals("_entity_src_gen.pdbx_gene_src_scientific_name")){
+            nameOrgScientific = lineData[1];
         }
     }
     
@@ -1149,6 +1130,9 @@ class CifParser {
             if (tmpValue != null) {
                 pmi.setECNumber(tmpValue);
             }
+            
+            pmi.setOrgCommon(nameOrgCommon);
+            pmi.setOrgScientific(nameOrgScientific);
             
             // FileParser.homologuesMap -> allMolChains
             //   seems like this is never used, but cant hurt to fill it, since we have the information
