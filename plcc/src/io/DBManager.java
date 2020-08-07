@@ -11356,7 +11356,6 @@ connection.close();
             //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            System.out.println("State " + state);
             statement.setBoolean(1, state);
             statement.setString(2, pdbid);
                                 
