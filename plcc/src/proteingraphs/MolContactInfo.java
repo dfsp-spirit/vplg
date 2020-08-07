@@ -186,18 +186,18 @@ public class MolContactInfo {
     }
 
     @Override public String toString() {
-        return("[RCI] TypeA " + getResTypeStringA() + ", TypeB " + getResTypeStringB() + ", ResA "+ getDsspNumA() + ", ResB " + getDsspNumB());
+        return("[MCI] TypeA " + getResTypeStringA() + ", TypeB " + getResTypeStringB() + ", DsspNumA "+ getDsspNumA() + ", DsspNumB " + getDsspNumB());
     }
 
 
-    /** Returns a string indicating whether residue A is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
-     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").  
+    /** Returns a string indicating whether residue A is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
+     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").  
      */
-    public String getResTypeStringA() {  if(this.molA.isAA()) { return("PRT"); } else if(this.molA.isLigand()) { return("LIG"); } else { return("OTH"); } }
-    /** Returns a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
-     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
+    public String getResTypeStringA() {  if(this.molA.isAA()) { return("PRT"); } else if(this.molA.isLigand()) { return("LIG"); } else if(this.molA.isRNA()) { return("RNA"); } else { return("OTH"); } }
+    /** Returns a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
+     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
      */
-    public String getResTypeStringB() {  if(this.molB.isAA()) { return("PRT"); } else if(this.molB.isLigand()) { return("LIG"); } else { return("OTH"); } }
+    public String getResTypeStringB() {  if(this.molB.isAA()) { return("PRT"); } else if(this.molB.isLigand()) { return("LIG"); } else if(this.molB.isRNA()) { return("RNA"); } else { return("OTH"); } }
 
 
     // getters required for writing the <pdbid>.geo file

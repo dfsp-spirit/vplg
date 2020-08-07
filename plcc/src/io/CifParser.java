@@ -90,6 +90,8 @@ class CifParser {
     private static String tmpModelID;
     private static String chainNum = null;  // identifier of the current chain e.g. A
     private static String chainType = null; // type of the current chain e.g. RNA
+    private static String nameOrgCommon;
+    private static String nameOrgScientific;
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -268,6 +270,18 @@ class CifParser {
                     // check for information on chemical components
                     handleChemComp();
                     break;
+                case "_entity_src_gen":
+                    handleEntitySrcGen();
+                    break;
+                case "_struct":
+                    handleStructLine();
+                    break;
+                case "_struct_keywords":
+                    handleStructKeywords();
+                    break;
+                case "_pdbx_database_status":
+                    handlePdbxDatabaseStatus();
+                    break;
                 }
                 
                 // reset here, b/c we only get here when a (combined) line was treated
@@ -392,6 +406,40 @@ class CifParser {
         }
     }
     
+    
+    /**
+     * Handles lines starting with '_struct'.
+     * Saves the title of the PDB File.
+     */
+    private static void handleStructLine(){
+        if (lineData[0].equals("title")){
+            metaData.put("title", lineData[1]);
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with '_struct_keywords'.
+     */
+    private static void handleStructKeywords(){
+        if (lineData[0].equals("_struct_keywords.text")){
+            metaData.put("keywords", lineData[1]);
+        }
+        if (lineData[0].equals("_struct_keywords.pdbx_keywords")){
+            metaData.put("header", lineData[1]);
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with '_pdbx_database_status'.
+     * 
+     */
+    private static void handlePdbxDatabaseStatus(){
+        if (lineData[0].equals("_pdbx_database_status.recvd_initial_deposition_date")){
+            metaData.put("date", lineData[1]);
+        }
+    }
     
     /**
      * Handles a line starting with '_reflns.d_resolution_high', '_reflns.d_res_high' or '_refine.ls_d_res_high'
@@ -641,30 +689,30 @@ class CifParser {
         // coordX
         // for information on difference between ptgl and plcc style look in old parser
         if (Settings.getBoolean("plcc_B_round_coordinates")) {
-            oCoordX = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10.0;
-            coordX = oCoordX.intValue();
-        } else {
             oCoordXf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10;
             coordX = Math.round(oCoordXf);
-        }
+        } else {
+            oCoordX = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10.0;
+            coordX = oCoordX.intValue();
+         }
 
 
         // coordY
         if (Settings.getBoolean("plcc_B_round_coordinates")) {
-            oCoordY = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10.0;
-            coordY = oCoordY.intValue();
-        } else {
             oCoordYf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10;
             coordY = Math.round(oCoordYf);
+        } else {
+            oCoordY = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10.0;
+            coordY = oCoordY.intValue();
         }
 
         // coordZ
         if (Settings.getBoolean("plcc_B_round_coordinates")) {
-            oCoordZ = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10.0;
-            coordZ = oCoordZ.intValue();
-        } else {
             oCoordZf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10;
             coordZ = Math.round(oCoordZf);
+        } else {
+            oCoordZ = Double.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10.0;
+            coordZ = oCoordZ.intValue();            
         }
 
         // chemical symbol
@@ -794,9 +842,6 @@ class CifParser {
 
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
-            // currently not used
-            // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
-
             // check if we have created ligand residue for s_residue
             if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
 
@@ -831,45 +876,10 @@ class CifParser {
                     }
                 } else {
 
-                    // ignore this for now: needs parsing of two more loops (_pdbx_nonpoly_scheme, _chem_comp)   	 
-
-                    /*                                        
-                    // add info from PDB HET fields (HET, HETNAM, HETSYN, FORMUL)
-                    // Note: we now use prepared statements so any strange chars do no longer lead to irritations or security trouble
-                    Boolean removeStuff = Settings.getBoolean("plcc_B_uglySQLhacks");
-                    lf = getLigFormula(resNamePDB);
-                    if(removeStuff) {
-                        lf = lf.replaceAll("\\s", "");               // remove all whitespace
-                        lf = lf.replaceAll("~", "");                 // remove tilde char (it causes SQL trouble during DB insert)
-                        lf = lf.replaceAll("\\\\", "");              // remove all backslashes (it causes SQL WARNING 'nonstandard use of escape in a string literal' during DB insert)
-                        lf = lf.replaceAll("'", "");              // remove all ticks (obviously SQL trouble)
-                    }
-
-                    ln = getLigName(resNamePDB);
-                    if(removeStuff) {
-                        ln = ln.replaceAll(" ", "_");                // replace spaces with underscores
-                        ln = ln.replaceAll("\\s", "");               // remove all other whitespace
-                        ln = ln.replaceAll("~", "");
-                        ln = ln.replaceAll("\\\\", "");
-                        ln = ln.replaceAll("'", "");
-                    }
-
-                    ls = getLigSynonyms(resNamePDB);
-                    if(removeStuff) {
-                        ls = ls.replaceAll(" ", "_");
-                        ls = ls.replaceAll("\\s", "");
-                        ls = ls.replaceAll("~", "");
-                        ls = ls.replaceAll(";", ".");
-                        ls = ls.replaceAll("\\\\", "");
-                        ls = ls.replaceAll("'", "");
-                    }
-
-                    lig.setLigFormula(lf);
-                    lig.setLigName(ln);
-                    lig.setLigSynonyms(ls);
-
-                    */
-
+                    lig.setLigName((chemicalComponents.get(molNamePDB)).get("name"));
+                    lig.setLigFormula((chemicalComponents.get(molNamePDB)).get("formula"));
+                    lig.setLigSynonyms((chemicalComponents.get(molNamePDB)).get("pdbx_synonyms"));
+                    
                     lastLigandNumPDB = molNumPDB;
                     lastChainID = chainID;
 
@@ -984,6 +994,20 @@ class CifParser {
             value = lineData[colHeaderPosMap.get(cat)];
             tmpComponent.put(category, value);
             chemicalComponents.put(lineData[colHeaderPosMap.get("id")], tmpComponent);      // matches one component with all its category/value pairings
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with _entity_src_gen.
+     * Assigns the common and the scientific name of the molecule to variables that are later transferred to ProtMetaInfo.
+     */
+    private static void handleEntitySrcGen(){
+        if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
+            nameOrgCommon = lineData[1];
+        }
+        if (lineData[0].equals("_entity_src_gen.pdbx_gene_src_scientific_name")){
+            nameOrgScientific = lineData[1];
         }
     }
     
@@ -1149,6 +1173,9 @@ class CifParser {
             if (tmpValue != null) {
                 pmi.setECNumber(tmpValue);
             }
+            
+            pmi.setOrgCommon(nameOrgCommon);
+            pmi.setOrgScientific(nameOrgScientific);
             
             // FileParser.homologuesMap -> allMolChains
             //   seems like this is never used, but cant hurt to fill it, since we have the information
