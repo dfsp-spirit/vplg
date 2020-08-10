@@ -64,6 +64,7 @@ class CifParser {
     //     therefore always use auth columns unless you explicitly want the PDB ones
     private static HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
     private static Boolean columnsChecked = false;
+    private static ArrayList<String> currentLineValues = new ArrayList<String>();    //stores values of non-loop-blocks so they can be parsed as "fake-loops"
     
     // - - atom_site - -
     private static int ligandsTreatedNum = 0;
@@ -145,7 +146,7 @@ class CifParser {
     private static Boolean parseData() {
         
         createResidues();
-        lastMol = new Residue(); // create artificial molecule to fill so there is no NullPointerException, it will be overridden once atoms are parsed
+        lastMol = new Residue(); // create artificial molecule to fill so there is no NullPointerException, it will be overwritten once atoms are parsed
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(FileParser.pdbFile));
@@ -177,6 +178,7 @@ class CifParser {
                     currentCategory = null;
                     inString = false;
                     interruptedLine = "";
+                    currentLineValues.clear();
                     continue;  // nothing else to do / parse here
                 }
                 // from now on: line does not start with '#' (is no comment)
@@ -222,6 +224,15 @@ class CifParser {
                         addColumnHeaderToMap(line);
                         continue;  // nothing else to parse here
                     }
+                    else {
+                        String[] elementsSeperatedByDotAndTab = line.split("\\.| ");
+                        colHeaderPosMap.put(elementsSeperatedByDotAndTab[1].trim(), colHeaderPosMap.size());
+//                        System.out.println("colheader: " + colHeaderPosMap); //TODELETE
+                        String value = (line.substring(line.indexOf(' ')+1)).trim();
+//                        System.out.println(value.trim()); // TODELETE
+                        currentLineValues.add(value);
+//                        System.out.println(currentLineValues);
+                    }
                 }
                 // from now on: not in loop column header definition
                 
@@ -231,7 +242,12 @@ class CifParser {
                     line = interruptedLine + " " + line;
                     interruptedLine = "";
                 }
-                lineData = lineToArray(line);
+                
+                if (inLoop) {
+                    lineData = lineToArray(line);
+                } else {
+                    lineData = currentLineValues.toArray(new String[0]);
+                }
                 
                 // check for minimum lenght of lineData (2 for non-loop and #header for loop) and merge with coming line if not
                 if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 2)) {
@@ -412,8 +428,9 @@ class CifParser {
      * Saves the title of the PDB File.
      */
     private static void handleStructLine(){
-        if (lineData[0].equals("title")){
+        if (lineData[0].equals("_struct.title")){
             metaData.put("title", lineData[1]);
+            System.out.println("title: " + lineData[1]); //TODELETE
         }
     }
     
@@ -489,7 +506,7 @@ class CifParser {
      * Fills, for example, the homologuesMap and the chainIdentity Map which maps chain ID to its molecule type.
      */
     private static void handleEntityPolyLine() {       
-        if (inLoop) {
+//        if (inLoop) {
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
                 
@@ -500,29 +517,29 @@ class CifParser {
                 }
             }
         } 
-        else {
-            if (lineData[0].equals("_entity_poly.type")) {
-                chainType = lineData[1];
-                if (chainType == null){
-                    DP.getInstance().w("No chain type found. Trying to continue with null.");
-                }
-            }
-            if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
-                FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
-                chainNum = lineData[1];
-                if (chainNum == null){
-                    DP.getInstance().w("No chain ID found. Trying to continue with null.");
-                }
-                
-                // Multiple chains can be listed under "pdx_strand_id". But since at this point we can be sure that they have the same type, 
-                // they have to be split and can then be added to chainIdentity with the type identified above.
-                String[] chainList = chainNum.split(",");
-                for (String s : chainList) {
-                    chainIdentity.put(s, chainType);
-                }
-            }
-        }
-    }
+//        else {
+//            if (lineData[0].equals("_entity_poly.type")) {
+//                chainType = lineData[1];
+//                if (chainType == null){
+//                    DP.getInstance().w("No chain type found. Trying to continue with null.");
+//                }
+//            }
+//            if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
+//                FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
+//                chainNum = lineData[1];
+//                if (chainNum == null){
+//                    DP.getInstance().w("No chain ID found. Trying to continue with null.");
+//                }
+//                
+//                // Multiple chains can be listed under "pdx_strand_id". But since at this point we can be sure that they have the same type, 
+//                // they have to be split and can then be added to chainIdentity with the type identified above.
+//                String[] chainList = chainNum.split(",");
+//                for (String s : chainList) {
+//                    chainIdentity.put(s, chainType);
+//                }
+//            }
+//        }
+//    }
     
     
     /**
@@ -986,8 +1003,10 @@ class CifParser {
      * Entries can look like this: MET={name=METHIONINE, pdbx_synonyms=?, formula=C5 H11 N O2 S, id=MET, type=L-peptide linking, formula_weight=149.211}}
      */
     private static void handleChemComp(){
+//        System.out.println("col: " + colHeaderPosMap); //TODELETE
+//        System.out.println("lineData0: " + lineData[0] + "    lineData1: " + lineData[1]); //TODELETE
         String category = null;              // categories such as type, name
-        String value = null;              // values such as peptide, Methionine 
+        String value = null;              // values such as peptide, Methionine
         HashMap<String, String> tmpComponent = new HashMap<>();     // stores categories and values for current component
         for (String cat : colHeaderPosMap.keySet()){
             category = cat;
@@ -1003,6 +1022,8 @@ class CifParser {
      * Assigns the common and the scientific name of the molecule to variables that are later transferred to ProtMetaInfo.
      */
     private static void handleEntitySrcGen(){
+//        System.out.println("col: " + colHeaderPosMap);
+//        System.out.println("lineData0: " + lineData[0] + "    lineData1: " + lineData[1]); //TODELETE
         if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
             nameOrgCommon = lineData[1];
         }
@@ -1010,7 +1031,7 @@ class CifParser {
             nameOrgScientific = lineData[1];
         }
     }
-    
+
     
     /**
      * Checks the string value for being not null, empty or an mmCIF placeholder.
@@ -1238,16 +1259,29 @@ class CifParser {
      * @param line 
      */
     private static void addColumnHeaderToMap(String line) {
-        String[] elementsSeperatedByDot = line.split("\\.");
-        
-        if (elementsSeperatedByDot.length < 2) {
-            DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
-                numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
-            return;
+        if (inLoop){
+            String[] elementsSeperatedByDot = line.split("\\.");
+
+            if (elementsSeperatedByDot.length < 2) {
+                DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
+                    numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
+                return;
+            }
+            // from now on elementsSeperatedByDot has at least two elements
+
+            colHeaderPosMap.put(elementsSeperatedByDot[1].trim(), colHeaderPosMap.size());
         }
-        // from now on elementsSeperatedByDot has at least two elements
-        
-        colHeaderPosMap.put(elementsSeperatedByDot[1].trim(), colHeaderPosMap.size());
+//        else{
+//            String[] elementsSeperatedByDotAndTab = line.split("\\.| ");
+//            
+//            if (elementsSeperatedByDotAndTab.length < 2) {
+//                DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
+//                    numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
+//                return;
+//            }
+//            
+//            colHeaderPosMap.put(elementsSeperatedByDotAndTab[1].trim(), colHeaderPosMap.size());
+//        }
     }
 
     
