@@ -196,7 +196,7 @@ class CifParser {
                 
                 // check if line is part of a multi-line string
                 if (inString) {
-                    interruptedLine += line;  // keep the semicolon to hide special characters inside. reset is done after switch/case treating a (combined) line
+                        interruptedLine += line;  // keep the semicolon to hide special characters inside. reset is done after switch/case treating a (combined) line
                     continue;  // only parse combined line, nothing else to parse here
                 }
                 // from now on: cannot be inString and line should always hold all data items (not splitted), despite when new line and single quotation string
@@ -226,12 +226,9 @@ class CifParser {
                     }
                     else {
                         String[] elementsSeperatedByDotAndTab = line.split("\\.| ");
-                        colHeaderPosMap.put(elementsSeperatedByDotAndTab[1].trim(), colHeaderPosMap.size());
-//                        System.out.println("colheader: " + colHeaderPosMap); //TODELETE
+                        colHeaderPosMap.put(elementsSeperatedByDotAndTab[1].trim(), colHeaderPosMap.size());  // add header to colHeaderPosMap
                         String value = (line.substring(line.indexOf(' ')+1)).trim();
-//                        System.out.println(value.trim()); // TODELETE
-                        currentLineValues.add(value);
-//                        System.out.println(currentLineValues);
+                        currentLineValues.add(value);  // save value in currentLineValues
                     }
                 }
                 // from now on: not in loop column header definition
@@ -239,7 +236,15 @@ class CifParser {
                 // get the data items
                 if (! interruptedLine.equals("")) {
                     // we want to combine the line with previous line(s)
-                    line = interruptedLine + " " + line;
+                    if (inLoop){
+                        line = interruptedLine + " " + line;
+                    }
+                    else {
+                        // since a value is always added to currentLineValues (even if it is empty) when filling the colHeaderPosMap, 
+                        // the empty value has to be deleted to be replaced by the interruptedLine
+                        currentLineValues.remove(currentLineValues.size() -1);
+                        currentLineValues.add(interruptedLine);
+                    }
                     interruptedLine = "";
                 }
                 
@@ -249,16 +254,17 @@ class CifParser {
                     lineData = currentLineValues.toArray(new String[0]);
                 }
                 
-                // check for minimum lenght of lineData (2 for non-loop and #header for loop) and merge with coming line if not
-                if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 2)) {
-                    interruptedLine += line;
-                    continue;
+                // check for minimum length of lineData (2 for non-loop and #header for loop) and merge with coming line if not
+                if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 1)) {
+                        interruptedLine += line;
+                        continue;
                 }
-                if ((inLoop && lineData.length > colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length > 2)) {
+                
+                if (lineData.length > colHeaderPosMap.keySet().size()) {
                     DP.getInstance().w("FP_CIF", "Line " + numLine + " (together with previous if combined) seems to be too long. Trying to ignore it, but may miss data.");
                 }
                 // from now on: line contains expected lenght of data items
-                       
+
                 switch(currentCategory) {
                 case "_exptl":
                     // check for experimental method
@@ -411,26 +417,23 @@ class CifParser {
     
     
     /**
-     * Handles a line starting with '_exptl.method' defining the experimental method.
+     * Handles a line starting with '_exptl.' defining the experimental method.
      * Saves the value in metaData.
      */
     private static void handleExptlLine() {
-        if (lineData[0].equals("_exptl.method")) {
-            if (valueIsAssigned(lineData[1])) {
-                metaData.put("experiment", lineData[1]);
-            }
+        if (colHeaderPosMap.get("method") != null ){
+            metaData.put("experiment", lineData[colHeaderPosMap.get("method")]);
         }
     }
     
     
     /**
-     * Handles lines starting with '_struct'.
+     * Handles lines starting with '_struct.'.
      * Saves the title of the PDB File.
      */
     private static void handleStructLine(){
-        if (lineData[0].equals("_struct.title")){
-            metaData.put("title", lineData[1]);
-            System.out.println("title: " + lineData[1]); //TODELETE
+        if (colHeaderPosMap.get("title") != null ){
+            metaData.put("title", lineData[colHeaderPosMap.get("title")]);
         }
     }
     
@@ -439,12 +442,18 @@ class CifParser {
      * Handles lines starting with '_struct_keywords'.
      */
     private static void handleStructKeywords(){
-        if (lineData[0].equals("_struct_keywords.text")){
-            metaData.put("keywords", lineData[1]);
+        if (colHeaderPosMap.get("text") != null ){
+            metaData.put("keywords", lineData[colHeaderPosMap.get("text")]);
         }
-        if (lineData[0].equals("_struct_keywords.pdbx_keywords")){
-            metaData.put("header", lineData[1]);
+        if (colHeaderPosMap.get("pdbx_keywords") != null ){
+            metaData.put("header", lineData[colHeaderPosMap.get("pdbx_keywords")]);
         }
+//        if (lineData[0].equals("_struct_keywords.text")){
+//            metaData.put("keywords", lineData[1]);
+//        }
+//        if (lineData[0].equals("_struct_keywords.pdbx_keywords")){
+//            metaData.put("header", lineData[1]);
+//        }
     }
     
     
@@ -453,31 +462,38 @@ class CifParser {
      * 
      */
     private static void handlePdbxDatabaseStatus(){
-        if (lineData[0].equals("_pdbx_database_status.recvd_initial_deposition_date")){
-            metaData.put("date", lineData[1]);
+        if (colHeaderPosMap.get("recvd_initial_deposition_date") != null ){
+            metaData.put("date", lineData[colHeaderPosMap.get("recvd_initial_deposition_date")]);
         }
+//        if (lineData[0].equals("_pdbx_database_status.recvd_initial_deposition_date")){
+//            metaData.put("date", lineData[1]);
+//        }
     }
     
+    
     /**
-     * Handles a line starting with '_reflns.d_resolution_high', '_reflns.d_res_high' or '_refine.ls_d_res_high'
+     * Handles a line starting with '_refine'.
      * defining the resolution. Saves the value in metaData. Is probably not the best way to extract the resolution.
      */
     private static void handleResolutionLine() {
-        if (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high")) {
-            if (valueIsAssigned(lineData[1])) {
-                metaData.put("resolution", lineData[1]);
-            }
+        if (colHeaderPosMap.get("ls_d_res_high") != null ){
+            metaData.put("resolution", lineData[colHeaderPosMap.get("ls_d_res_high")]);
         }
+//        if (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high")) {
+//            if (valueIsAssigned(lineData[1])) {
+//                metaData.put("resolution", lineData[1]);
+//            }
+//        }
     }
     
     
     /**
-     * 
+     * Handles a line starting with '_entity.'.
      */
     private static void handleEntityLine() {
         String tmpValue;
         
-        if (inLoop) {
+//        if (inLoop) {
             String tmpEntityID = lineData[0];
             entityInformation.put(tmpEntityID, new HashMap<String, String>());
                         
@@ -487,16 +503,16 @@ class CifParser {
                     tmpValue = (valueIsAssigned(lineData[colHeaderPosMap.get(colHeader)]) ? lineData[colHeaderPosMap.get(colHeader)] : null);  // assign value or null
                     entityInformation.get(tmpEntityID).put(colHeader, (valueIsAssigned(tmpValue) ? tmpValue : ""));
                 }
-            }
-        } else {
-            // no loop just category.item and data per line
-            if (lineData[0].equals("_entity.id")) {
-                entityInformation.put(lineData[1], new HashMap<String, String>());
-            } else {
-                // we only have one entity, so add the information to the only entity ID
-                tmpValue = (valueIsAssigned(lineData[1]) ? lineData[1] : null);  // assign value or null
-                entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0].split("\\.")[1], tmpValue);
-            }
+//            }
+//        } else {
+//            // no loop just category.item and data per line
+//            if (lineData[0].equals("_entity.id")) {
+//                entityInformation.put(lineData[1], new HashMap<String, String>());
+//            } else {
+//                // we only have one entity, so add the information to the only entity ID
+//                tmpValue = (valueIsAssigned(lineData[1]) ? lineData[1] : null);  // assign value or null
+//                entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0].split("\\.")[1], tmpValue);
+//            }
         }
     }
     
@@ -1003,8 +1019,6 @@ class CifParser {
      * Entries can look like this: MET={name=METHIONINE, pdbx_synonyms=?, formula=C5 H11 N O2 S, id=MET, type=L-peptide linking, formula_weight=149.211}}
      */
     private static void handleChemComp(){
-//        System.out.println("col: " + colHeaderPosMap); //TODELETE
-//        System.out.println("lineData0: " + lineData[0] + "    lineData1: " + lineData[1]); //TODELETE
         String category = null;              // categories such as type, name
         String value = null;              // values such as peptide, Methionine
         HashMap<String, String> tmpComponent = new HashMap<>();     // stores categories and values for current component
@@ -1022,14 +1036,18 @@ class CifParser {
      * Assigns the common and the scientific name of the molecule to variables that are later transferred to ProtMetaInfo.
      */
     private static void handleEntitySrcGen(){
-//        System.out.println("col: " + colHeaderPosMap);
-//        System.out.println("lineData0: " + lineData[0] + "    lineData1: " + lineData[1]); //TODELETE
-        if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
-            nameOrgCommon = lineData[1];
+        if (colHeaderPosMap.get("gene_src_common_name") != null ){
+            nameOrgCommon = lineData[colHeaderPosMap.get("gene_src_common_name")];
         }
-        if (lineData[0].equals("_entity_src_gen.pdbx_gene_src_scientific_name")){
-            nameOrgScientific = lineData[1];
+        if (colHeaderPosMap.get("pdbx_gene_src_scientific_name") != null ){
+            nameOrgScientific = lineData[colHeaderPosMap.get("pdbx_gene_src_scientific_name")];
         }
+//        if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
+//            nameOrgCommon = lineData[1];
+//        }
+//        if (lineData[0].equals("_entity_src_gen.pdbx_gene_src_scientific_name")){
+//            nameOrgScientific = lineData[1];
+//        }
     }
 
     
@@ -1271,17 +1289,6 @@ class CifParser {
 
             colHeaderPosMap.put(elementsSeperatedByDot[1].trim(), colHeaderPosMap.size());
         }
-//        else{
-//            String[] elementsSeperatedByDotAndTab = line.split("\\.| ");
-//            
-//            if (elementsSeperatedByDotAndTab.length < 2) {
-//                DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
-//                    numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
-//                return;
-//            }
-//            
-//            colHeaderPosMap.put(elementsSeperatedByDotAndTab[1].trim(), colHeaderPosMap.size());
-//        }
     }
 
     
