@@ -91,8 +91,10 @@ class CifParser {
     private static String tmpModelID;
     private static String chainNum = null;  // identifier of the current chain e.g. A
     private static String chainType = null; // type of the current chain e.g. RNA
-    private static String nameOrgCommon;
-    private static String nameOrgScientific;
+    private static String nameOrgCommon = "";
+    private static String nameOrgScientific = "";
+    private static String nameOrgCommonSource = "";  // line that an orgName comes from
+    private static String nameOrgScientificSource = "";  // line that an orgName comes from
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -251,7 +253,7 @@ class CifParser {
                 if (inLoop) {
                     lineData = lineToArray(line);
                 } else {
-                    lineData = currentLineValues.toArray(new String[0]);
+                    lineData = trimSpecialChars(currentLineValues);
                 }
                 
                 // check for minimum length of lineData (2 for non-loop and #header for loop) and merge with coming line if not
@@ -271,6 +273,8 @@ class CifParser {
                     handleExptlLine();
                     break;
                 case "_reflns":
+                    handleReflnsLine();
+                    break;
                 case "_refine":
                     // check for resolution (meta data)
                     // TODO: really the best attribute(s) to do this?
@@ -294,6 +298,12 @@ class CifParser {
                     break;
                 case "_entity_src_gen":
                     handleEntitySrcGen();
+                    break;
+                case "_entity_src_nat":
+                    handleEntitySrcNat();
+                    break;
+                case "_pdbx_entity_src_syn":
+                    handlePdbxEntitySrcSyn();
                     break;
                 case "_struct":
                     handleStructLine();
@@ -422,7 +432,12 @@ class CifParser {
      */
     private static void handleExptlLine() {
         if (colHeaderPosMap.get("method") != null ){
-            metaData.put("experiment", lineData[colHeaderPosMap.get("method")]);
+            if (! lineData[colHeaderPosMap.get("method")].equals("?")){
+                metaData.put("experiment", lineData[colHeaderPosMap.get("method")]);
+            }
+        }
+        else{
+            metaData.put("experiment", "");
         }
     }
     
@@ -433,7 +448,12 @@ class CifParser {
      */
     private static void handleStructLine(){
         if (colHeaderPosMap.get("title") != null ){
-            metaData.put("title", lineData[colHeaderPosMap.get("title")]);
+            if (! lineData[colHeaderPosMap.get("title")].equals("?")){
+                metaData.put("title", lineData[colHeaderPosMap.get("title")]);
+            }
+        }
+        else{
+            metaData.put("title", "");
         }
     }
     
@@ -443,10 +463,20 @@ class CifParser {
      */
     private static void handleStructKeywords(){
         if (colHeaderPosMap.get("text") != null ){
-            metaData.put("keywords", lineData[colHeaderPosMap.get("text")]);
+            if (! lineData[colHeaderPosMap.get("text")].equals("?")){
+                metaData.put("keywords", lineData[colHeaderPosMap.get("text")]);
+            }
+        }
+        else{
+            metaData.put("keywords", "");
         }
         if (colHeaderPosMap.get("pdbx_keywords") != null ){
-            metaData.put("header", lineData[colHeaderPosMap.get("pdbx_keywords")]);
+            if (! lineData[colHeaderPosMap.get("pdbx_keywords")].equals("?")){
+                metaData.put("header", lineData[colHeaderPosMap.get("pdbx_keywords")]);
+            }
+        }
+        else{
+            metaData.put("header", "");
         }
 //        if (lineData[0].equals("_struct_keywords.text")){
 //            metaData.put("keywords", lineData[1]);
@@ -463,7 +493,12 @@ class CifParser {
      */
     private static void handlePdbxDatabaseStatus(){
         if (colHeaderPosMap.get("recvd_initial_deposition_date") != null ){
-            metaData.put("date", lineData[colHeaderPosMap.get("recvd_initial_deposition_date")]);
+            if (! lineData[colHeaderPosMap.get("recvd_initial_deposition_date")].equals("?")){
+                metaData.put("date", lineData[colHeaderPosMap.get("recvd_initial_deposition_date")]);
+            }
+        }
+        else{
+            metaData.put("date", "");
         }
 //        if (lineData[0].equals("_pdbx_database_status.recvd_initial_deposition_date")){
 //            metaData.put("date", lineData[1]);
@@ -472,18 +507,42 @@ class CifParser {
     
     
     /**
-     * Handles a line starting with '_refine'.
+     * Handles a line starting with '_refine.'.
      * defining the resolution. Saves the value in metaData. Is probably not the best way to extract the resolution.
      */
     private static void handleResolutionLine() {
         if (colHeaderPosMap.get("ls_d_res_high") != null ){
-            metaData.put("resolution", lineData[colHeaderPosMap.get("ls_d_res_high")]);
+            if (! lineData[colHeaderPosMap.get("ls_d_res_high")].equals("?")){
+                metaData.put("resolution", lineData[colHeaderPosMap.get("ls_d_res_high")]);
+            }
+        }
+        else{
+            if (! metaData.containsKey("resolution")) {
+                metaData.put("resolution", "");
+            }
         }
 //        if (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high")) {
 //            if (valueIsAssigned(lineData[1])) {
 //                metaData.put("resolution", lineData[1]);
 //            }
 //        }
+    }
+    
+    /**
+     * Handles a line starting with '_reflns.'.
+     * 
+     */
+    private static void handleReflnsLine() {
+        if (! metaData.containsKey("resolution") && colHeaderPosMap.get("d_resolution_high") != null) {
+            if (! lineData[colHeaderPosMap.get("resolution")].equals("?")){
+                metaData.put("resolution", lineData[colHeaderPosMap.get("ls_d_res_high")]);
+            }
+        }
+        else{
+            if (! metaData.containsKey("resolution")){
+                metaData.put("resolution", "");
+            }
+        }
     }
     
     
@@ -1032,22 +1091,60 @@ class CifParser {
     
     
     /**
-     * Handles lines starting with _entity_src_gen.
+     * Handles lines starting with '_entity_src_gen'.
      * Assigns the common and the scientific name of the molecule to variables that are later transferred to ProtMetaInfo.
      */
     private static void handleEntitySrcGen(){
         if (colHeaderPosMap.get("gene_src_common_name") != null ){
-            nameOrgCommon = lineData[colHeaderPosMap.get("gene_src_common_name")];
+            if (! lineData[colHeaderPosMap.get("gene_src_common_name")].equals("?")){
+                nameOrgCommon = lineData[colHeaderPosMap.get("gene_src_common_name")];
+                nameOrgCommonSource = "_entity_src_gen";
+            }
         }
         if (colHeaderPosMap.get("pdbx_gene_src_scientific_name") != null ){
-            nameOrgScientific = lineData[colHeaderPosMap.get("pdbx_gene_src_scientific_name")];
+            if (! lineData[colHeaderPosMap.get("pdbx_gene_src_scientific_name")].equals("?")){
+                nameOrgScientific = lineData[colHeaderPosMap.get("pdbx_gene_src_scientific_name")];
+                nameOrgScientificSource = "_entity_src_gen";
+            }
         }
-//        if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
-//            nameOrgCommon = lineData[1];
-//        }
-//        if (lineData[0].equals("_entity_src_gen.pdbx_gene_src_scientific_name")){
-//            nameOrgScientific = lineData[1];
-//        }
+    }
+    
+    
+    /**
+     * Handles Lines starting with '_entity_src_nat.'.
+     */
+    private static void handleEntitySrcNat(){
+        if (colHeaderPosMap.get("common_name") != null && ! nameOrgCommonSource.equals("_entity_src_gen")){
+            if (! lineData[colHeaderPosMap.get("common_name")].equals("?")){
+                nameOrgCommon = lineData[colHeaderPosMap.get("common_name")];
+                nameOrgCommonSource = "_entity_src_nat";
+            }
+        }
+        if (colHeaderPosMap.get("pdbx_organism_scientific") != null && ! nameOrgScientificSource.equals("_entity_src_gen")){
+            if (! lineData[colHeaderPosMap.get("pdbx_organism_scientific")].equals("?")){
+                nameOrgScientific = lineData[colHeaderPosMap.get("pdbx_organism_scientific")];
+                nameOrgScientificSource = "_entity_src_nat";
+            }
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with '_pdbx_entity_src_syn'.
+     */
+    private static void handlePdbxEntitySrcSyn(){
+        if (colHeaderPosMap.get("organism_common_name") != null && ! nameOrgCommon.equals("")){
+            if (! lineData[colHeaderPosMap.get("organism_common_name")].equals("?")){
+                nameOrgCommon = lineData[colHeaderPosMap.get("organism_common_name")];
+                nameOrgCommonSource = "_pdbx_entity_src_syn";
+            }
+        }
+        if (colHeaderPosMap.get("organism_scientific") != null && ! nameOrgScientific.equals("")){
+            if (! lineData[colHeaderPosMap.get("organism_scientific")].equals("?")){
+                nameOrgScientific = lineData[colHeaderPosMap.get("organism_scientific")];
+                nameOrgScientificSource = "_pdbx_entity_src_syn";
+            }
+        }
     }
 
     
@@ -1071,6 +1168,30 @@ class CifParser {
             }
         }
         return true;
+    }
+    
+    
+    /**
+     * Trims '.
+     * 
+     */
+    private static String[] trimSpecialChars(ArrayList<String> stringList) {
+        ArrayList<String> charsToDelete = new ArrayList<>(Arrays.asList((";"), ("\'")));
+        String[] returnList = new String[stringList.size()];
+        String element;
+        for (int i = 0; i < stringList.size(); i++) {
+            element = stringList.get(i);  // start with respective element
+            if (stringList.get(i).length() > 0) {
+                if (charsToDelete.contains(String.valueOf(stringList.get(i).charAt(0))) && charsToDelete.contains(String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)))){
+                    element = stringList.get(i).substring(1, stringList.get(i).length() - 1);
+                }
+                if (String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)).equals("\n")){
+                    element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
+                }
+            }
+            returnList[i] = element;
+        }
+        return returnList;
     }
     
     
