@@ -146,8 +146,8 @@ if(isset($_GET["next"])) {
 		$limit_start = $_GET["next"];
 		$st = $_SESSION["st"];
                 $keyword = $_SESSION["keyword"];
-		$pdbid = $_SESSION["pdbid"];
-		$title = $_SESSION["title"];
+		$pdbid = strtolower($_SESSION["pdbid"]);  // PDB IDs are always lowercase internally
+    $title = $_SESSION["title"];
 		$hasligand = $_SESSION["hasligand"];
 		$ligandname = $_SESSION["ligandname"];
 		$molecule = $_SESSION["molecule"];
@@ -183,7 +183,7 @@ if(isset($_GET)) {
 	} 
     
 	if(isset($_GET["pdbid"])) {
-		$pdbid = $_GET["pdbid"];
+		$pdbid = strtolower($_GET["pdbid"]);  // PDB IDs are always lowercase internally
 		$_SESSION["pdbid"] = $pdbid;
 	}
 	
