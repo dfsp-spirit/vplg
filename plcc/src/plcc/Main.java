@@ -1550,7 +1550,7 @@ public class Main {
                     
                     if (s.equals("--settingsfile")) {
                         // as this may overwrite comman line arguments, this sould always preceed command lines
-                        if (i > 0) {
+                        if (i > 1) {
                             DP.getInstance().w("Command line argument '--settingsfile' should always be first argument, as it may overwrite settings "
                                     + "from previous command line options.", 2);
                         }

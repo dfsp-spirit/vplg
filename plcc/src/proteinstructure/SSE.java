@@ -155,16 +155,18 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         
         Double angleDeg = Math.toDegrees(PiEffectCalculations.calculateAngleBetw3DVecs(doubleVectorA, doubleVectorB));
         
-        // DEBUG TODELETE
         if (Settings.getInteger("plcc_I_debug_level") >= 3) {
             System.out.println("[DEBUG LV 3] Vector-mode angle between " + this.toString() + " and " + otherSSE.toString() + ": " + angleDeg);
         }
         
         if (angleDeg <= Settings.getInteger("plcc_I_spatrel_max_deg_parallel")) {
+            if (Settings.getInteger("plcc_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning parallel orientation"); }
             return SpatRel.PARALLEL;
         } else if (angleDeg < Settings.getInteger("plcc_I_spatrel_min_deg_antip")) {
+            if (Settings.getInteger("plcc_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning mixed orientation"); }
             return SpatRel.MIXED;
         } else if (angleDeg <= 180) {
+            if (Settings.getInteger("plcc_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning antiparallel orientation"); }
             return SpatRel.ANTIPARALLEL;
         } else {
             DP.getInstance().w("Got an unusual angle of " + angleDeg + " between SSEs " + this.toString() + " and " + otherSSE.toString() + "."
