@@ -1271,6 +1271,7 @@ public class ComplexGraph extends UAdjListGraph {
 
         });
        
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_all_res_res_contacts", numAllInteractionsMap));  // same as label but as int = without '"' // only underscore allowed (by Cytoscape)
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));
