@@ -534,8 +534,8 @@ class CifParser {
      */
     private static void handleReflnsLine() {
         if (! metaData.containsKey("resolution") && colHeaderPosMap.get("d_resolution_high") != null) {
-            if (! lineData[colHeaderPosMap.get("resolution")].equals("?")){
-                metaData.put("resolution", lineData[colHeaderPosMap.get("ls_d_res_high")]);
+            if (! lineData[colHeaderPosMap.get("d_resolution_high")].equals("?")){
+                metaData.put("resolution", lineData[colHeaderPosMap.get("d_resolution_high")]);
             }
         }
         else{

@@ -259,11 +259,16 @@ public class DsspParser {
                     iCode = dLine.substring(10, 11);                    
                     // with PDB mmCIF files things got more difficult: 4-character chain ids
                     //     prioritize AUTHCHAIN > CHAIN
-                    if (! isCIF) {
-                        dsspChainID = dLine.substring(11, 12);
-                    } else {
+                    if (dLine.length() >= 164){
                         dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
+                    } else {
+                        dLine.substring(149, 153);
                     }
+//                    if (! isCIF) {
+//                        dsspChainID = dLine.substring(11, 12);
+//                    } else {
+//                        dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
+//                    }
                     
                     // 12 is ignored: blank
                     resName1Letter = dLine.substring(13, 14);
