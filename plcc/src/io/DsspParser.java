@@ -262,13 +262,8 @@ public class DsspParser {
                     if (dLine.length() >= 164){
                         dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
                     } else {
-                        dLine.substring(149, 153);
+                        dLine.substring(149, 153);  // PDBCHAIN column
                     }
-//                    if (! isCIF) {
-//                        dsspChainID = dLine.substring(11, 12);
-//                    } else {
-//                        dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
-//                    }
                     
                     // 12 is ignored: blank
                     resName1Letter = dLine.substring(13, 14);

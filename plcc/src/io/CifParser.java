@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import plcc.Settings;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
@@ -81,7 +82,7 @@ class CifParser {
 
     // - variables per (atom) line -
     private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
-    private static String atomRecordName, atomName, chainID, chemSym, altLoc, iCode, molNamePDB;
+    private static String atomRecordName, atomName, chainID, altChainID, chemSym, altLoc, iCode, molNamePDB;
     private static Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
     private static Float oCoordXf, oCoordYf, oCoordZf;
     private static int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
@@ -727,7 +728,8 @@ class CifParser {
         oCoordXf = oCoordYf = oCoordZf = null;
 
         // chain name
-        chainID = lineData[colHeaderPosMap.get("auth_asym_id")];
+        chainID = lineData[colHeaderPosMap.get("auth_asym_id")];      // chain ID as set by author --> preferably use this one for all kinds of tasks
+        altChainID = lineData[colHeaderPosMap.get("label_asym_id")];  // chain ID computed by the PDB
 
         // PDBx field alias atom record name
         if (colHeaderPosMap.get("group_PDB") != null) {
@@ -838,9 +840,9 @@ class CifParser {
         // load new Residue into lastMol if we approached next Residue, otherwise only add new atom
         if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
             tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
-            // check that a peptid residue could be found                   
-            if (tmpMol == null || tmpMol.isLigand()) {
-                // residue is not in DSSP file -> must be free (modified) amino acid, ligand of RNA
+            // check that a peptide residue could be found                   
+            if (tmpMol == null || checkType(tmpMol.RESIDUE_TYPE_LIGAND)) {
+                // residue is not in DSSP file -> must be free (modified) amino acid, ligand or RNA
                 if (! silent) {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
@@ -1461,7 +1463,8 @@ class CifParser {
         c.setModelID(m.getModelID());
         m.addChain(c);
         c.setMoleculeType(chainIdentity.get(cID));
-        
+        c.setAltChainID(altChainID);
+                
         c.setHomologues(FileParser.homologuesMap.get(cID));
         //c.setMacromolID(entityID);
         pmi.setMacromolID(entityID);
