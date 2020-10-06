@@ -506,6 +506,7 @@ public class Settings {
         defSet("plcc_I_spatrel_dd_smallest_parallel_def", "7", "Same as above, this is the default for other interactions.");
         
         defSet("plcc_B_spatrel_use_dd", "false", "Whether to use double difference mode for spatial relation computation of SSEs. False invokes vector-mode instead.");
+        defSet("plcc_I_spatrel_vector_num_res_centroids", "4", "How many residues to use for centroid of start and end point of vector for SSE.");
         defSet("plcc_I_spatrel_max_deg_parallel", "65", "Degrees to which SSEs are classified to be parallel in vector-mode.");
         defSet("plcc_I_spatrel_min_deg_antip", "115", "Degrees from which SSEs are classified to be antiparallel in vector-mode.");
 

@@ -1578,6 +1578,7 @@ public class Main {
         }
         
 
+        // ****************************************************    check / apply settings    **********************************************************
         
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
@@ -1628,6 +1629,13 @@ public class Main {
                 DP.getInstance().w("Centroid method switched on with chain sphere speedup turned off. The centroid method is optimized for the chain " +
                     "sphere speedup and may produce wrong results without it!");
             }
+        }
+        
+        // check that plcc_I_spatrel_vector_num_res_centroids >= 1
+        if (! Settings.getBoolean("plcc_B_spatrel_use_dd") && Settings.getInteger("plcc_I_spatrel_vector_num_res_centroids") < 1) {
+            Settings.set("plcc_I_spatrel_vector_num_res_centroids", "1");
+            DP.getInstance().w("Using vector mode instead of double distance for SSE orientation, but plcc_I_spatrel_vector_num_res_centroids cannot be negative."
+                    + " Setting it to 1 and proceeding.");
         }
         
         // This check is rather useless and it will break PDB files that were split into multiple files (one for each

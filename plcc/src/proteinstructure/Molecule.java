@@ -8,12 +8,12 @@
 package proteinstructure;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import plcc.Main;
 import plcc.Settings;
-import proteinstructure.SSE;
 import tools.DP;
 
 /**
@@ -29,13 +29,13 @@ abstract public class Molecule {
     public static final Integer RESIDUE_TYPE_RNA = 3;
     public Integer type = null;                         // whether the type is 0:AA, 1:Ligand, 2:Other or 3:RNA is determined in each class
     // declare class vars
-    public ArrayList<Atom> atoms = new ArrayList<Atom>();                         // a list of all (non-H) Atoms of the molecule
-    public ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the molecule
+    public ArrayList<Atom> atoms = new ArrayList<Atom>();  // a list of all (non-H) Atoms of the molecule
+    public ArrayList<Atom> hydrogenatoms = null;           // a list of all hydrogen Atoms of the molecule
     public Chain chain = null;                             // the Chain this molecule belongs to
     public String chainID = null;
     public String modelID = null;
     public String iCode = null; 
-    public Integer pdbNum = null;                       // pdb molecule number
+    public Integer pdbNum = null;                          // pdb molecule number
     public Integer dsspNum = null;   
     public String Name3 = null; // guess what
     public String AAName1 = null;
@@ -45,8 +45,9 @@ abstract public class Molecule {
     public String plccSSEType = "N";                       // not part of any PLCC SSE by default
     public Boolean isPartOfDsspSse = false;                // whether this molecule is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* molecules)
     protected Integer centerSphereRadius = null;
-    private Integer[] centroidCoords = null;                // x,y,z coordinates of residue centroid
-    private Integer centroidSphereRadius = null; // distance from centroid to farthest atom (= radius of sphere around centroid encompassing all atoms)
+    private Integer[] centroidCoords = null;               // x,y,z coordinates of residue centroid
+    private Integer centroidSphereRadius = null;           // distance from centroid to farthest atom (= radius of sphere around centroid encompassing all atoms)
+    private Integer[] backboneCentroidCoords = null;       // x,y,z coordinates of residue centroid of backbone atoms only
 
     
     //constructor
@@ -302,6 +303,15 @@ abstract public class Molecule {
     }
     
     
+    public Integer[] getBackboneCentroidCoords () {
+        // calculate if called for 1st time
+        if (this.backboneCentroidCoords == null) {
+            this.calculateCentroid();
+        }
+        return this.backboneCentroidCoords;
+    }
+    
+    
     /**
      * Returns the sphere radius of this residue depending on the settings.
      * @return sphere radius as 10th of Angström
@@ -473,11 +483,32 @@ abstract public class Molecule {
      */
     private void calculateCentroid() {
         Integer[] centroid = {0,0,0};
+        Integer[] backboneCentroid = {0,0,0};
+        int numBackboneAtoms = 0;  // should be four, but you can never know if atoms are missing
         
-        for (Atom a : this.atoms) {
+        for (int i = 0; i < atoms.size(); i++) {
+            Atom a = atoms.get(i);
+            
             centroid[0] += a.getCoordX();
             centroid[1] += a.getCoordY();
             centroid[2] += a.getCoordZ();
+            
+            // compute backbone centroid only for amino acids
+            if (this.isAA()) {
+                // we expect the first four atoms to be backbone atoms
+                if (i <= 3) {
+                    // apply a simple name check as well
+                    if (Atom.BACKBONE_ATOM_NAMES.contains(a.getAtomName().strip())) {
+                        numBackboneAtoms++;
+                        backboneCentroid[0] += a.getCoordX();
+                        backboneCentroid[1] += a.getCoordY();
+                        backboneCentroid[2] += a.getCoordZ();
+                    } else {
+                        DP.getInstance().w("Trying to compute backbone centroid of " + this.toString() + ". " + a.toString() + " seems not to be a backbone atom. "
+                                + "Ignoring it and proceeding.");
+                    }
+                }
+            }
         }
         
         centroid[0] = (int) (Math.round((double) centroid[0] / this.atoms.size()));
@@ -485,6 +516,26 @@ abstract public class Molecule {
         centroid[2] = (int) (Math.round((double) centroid[2] / this.atoms.size()));
         
         this.centroidCoords = centroid;
+        
+        // assign normal centroid for non-amino acids
+        if (this.isAA()) {
+            backboneCentroid[0] = (int) (Math.round((double) backboneCentroid[0] / numBackboneAtoms));
+            backboneCentroid[1] = (int) (Math.round((double) backboneCentroid[1] / numBackboneAtoms));
+            backboneCentroid[2] = (int) (Math.round((double) backboneCentroid[2] / numBackboneAtoms));
+        } else {
+            backboneCentroid[0] = centroid[0];
+            backboneCentroid[1] = centroid[1];
+            backboneCentroid[2] = centroid[2];
+        }
+        
+        
+        this.backboneCentroidCoords = backboneCentroid;
+        
+        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+            System.out.println("[DEBUG LV 3] " + this.toString());
+            System.out.println("    [DEBUG LV 3] centroid: " + Arrays.toString(this.centroidCoords));
+            System.out.println("    [DEBUG LV 3] backbone centroid: " + Arrays.toString(this.backboneCentroidCoords));
+        }
     }
     
     /**

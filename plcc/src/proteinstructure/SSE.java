@@ -130,14 +130,39 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     private void computeOrientationVector() {
         orientationVector = new Integer[3];
-        if (residues.size() > 1) {
-            Residue firstRes = residues.get(0);
-            Residue lastRes = residues.get(residues.size() - 1);
-            
-            orientationVector[0] = lastRes.getCentroidCoords()[0] - firstRes.getCentroidCoords()[0];
-            orientationVector[1] = lastRes.getCentroidCoords()[1] - firstRes.getCentroidCoords()[1];
-            orientationVector[2] = lastRes.getCentroidCoords()[2] - firstRes.getCentroidCoords()[2];
+        Integer[] startPoint = {0,0,0};
+        Integer[] endPoint = {0,0,0};
+        
+        if (residues.isEmpty()) {
+            DP.getInstance().w("Tried to compute vector for orientation of an SSE without residue: " + this.toString() + ". "
+                    + "Returning zero vector and trying to proceed.");
+            orientationVector[0] = orientationVector[1] = orientationVector[2] = 0;
+            return;
+        }  // from now on: atleast one residue present
+        
+        // use requested number of residues for the centroid computation or #res - 1 if SSE is not long enough
+        int numResForCentroid = Math.min(Settings.getInteger("plcc_I_spatrel_vector_num_res_centroids"), this.getLength() - 1);
+        
+        // compute start and end point with respect to the number of residues contributing to each
+        // 1) sum up values
+        for (int i = 0; i < numResForCentroid; i++) {            
+            startPoint = tools.MathTools.elementWiseSum(startPoint, this.getResidues().get(0 + i).getBackboneCentroidCoords());
+            endPoint = tools.MathTools.elementWiseSum(endPoint, this.getResidues().get(this.getResidues().size() - 1 - i).getBackboneCentroidCoords());
         }
+        
+        // 2) divide values by number of residues and round
+        for (int j = 0; j <= 2; j++) {
+            startPoint[j] = Math.round(startPoint[j] / numResForCentroid);
+            endPoint[j] = Math.round(endPoint[j] / numResForCentroid);
+        }
+
+        //System.out.println("startPoint: " + Arrays.toString(startPoint));
+        //System.out.println("endPoint: " + Arrays.toString(endPoint));
+        
+        // last, create the orientation vector
+        orientationVector[0] = endPoint[0] - startPoint[0];
+        orientationVector[1] = endPoint[1] - startPoint[1];
+        orientationVector[2] = endPoint[2] - startPoint[2];
     }
     
     

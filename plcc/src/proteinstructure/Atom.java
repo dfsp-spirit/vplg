@@ -10,6 +10,8 @@ package proteinstructure;
 
 // imports
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import proteingraphs.Position3D;
 import plcc.Settings;
@@ -39,6 +41,8 @@ public class Atom implements java.io.Serializable {
     private Integer pdbLineNum = null;
     private Chain chain = null;
     private String altLoc = null;
+    
+    public static final ArrayList<String> BACKBONE_ATOM_NAMES = new ArrayList<>(Arrays.asList("N", "CA", "C", "O"));  // PDB names of atoms that are backbone atoms
     
     public static final Integer ATOMTYPE_AA = 0;
     public static final Integer ATOMTYPE_LIGAND = 1;
