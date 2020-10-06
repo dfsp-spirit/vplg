@@ -1186,6 +1186,9 @@ class CifParser {
             if (stringList.get(i).length() > 0) {
                 if (charsToDelete.contains(String.valueOf(stringList.get(i).charAt(0))) && charsToDelete.contains(String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)))){
                     element = stringList.get(i).substring(1, stringList.get(i).length() - 1);
+                    if (element.endsWith("\n")){
+                        element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
+                    }
                 }
                 if (String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)).equals("\n")){
                     element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
