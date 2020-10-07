@@ -839,7 +839,7 @@ class CifParser {
         // match res <-> chain here
         // load new Residue into lastMol if we approached next Residue, otherwise only add new atom
         if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
-            tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
+            tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);  // null if not in DSSP data -> ligand/free AA
             // check that a peptide residue could be found                   
             if (tmpMol == null || checkType(tmpMol.RESIDUE_TYPE_LIGAND)) {
                 // residue is not in DSSP file -> must be free (modified) amino acid, ligand or RNA
@@ -931,7 +931,7 @@ class CifParser {
             }       
         }
         
-        if (checkType(Molecule.RESIDUE_TYPE_LIGAND)){
+        if (checkType(Molecule.RESIDUE_TYPE_LIGAND) || tmpMol == null){  // If a molecule is not parsed at this point, it has to be a ligand
             // >> LIG <<
 
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
@@ -1174,7 +1174,7 @@ class CifParser {
     
     
     /**
-     * Trims '.
+     * Trims ' or ; when they exist as first an last char, then removes \n.
      * 
      */
     private static String[] trimSpecialChars(ArrayList<String> stringList) {
@@ -1184,13 +1184,15 @@ class CifParser {
         for (int i = 0; i < stringList.size(); i++) {
             element = stringList.get(i);  // start with respective element
             if (stringList.get(i).length() > 0) {
+                // First check if there are special chars around the line
                 if (charsToDelete.contains(String.valueOf(stringList.get(i).charAt(0))) && charsToDelete.contains(String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)))){
                     element = stringList.get(i).substring(1, stringList.get(i).length() - 1);
                     if (element.endsWith("\n")){
+                        // Secondly, check if there is still a newline char at the end of the line
                         element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
                     }
                 }
-                if (String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)).equals("\n")){
+                if (String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)).equals("\n")){ // could probably be removed
                     element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
                 }
             }

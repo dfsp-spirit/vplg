@@ -599,6 +599,7 @@ public class FileParser {
         if (settingCif()) {
             CifParser.initData(pdbFile);
         } else {
+            DP.getInstance().w("Legacy-Parser chosen: This parser is no longer kept up to date, results might not be correct anymore. If possible, use Cif-Parser in the future.");
             LegacyParser.initData(pdbFile);
         }
     }
