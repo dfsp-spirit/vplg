@@ -13,7 +13,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import tools.DP;
 
