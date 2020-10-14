@@ -39,6 +39,7 @@ public class DsspParser {
     
     static boolean dataInitDone = false;
     static boolean silent;
+    public static ArrayList<Integer> chainBreakDssps = new ArrayList<Integer>();
     
     
     /**
@@ -225,6 +226,7 @@ public class DsspParser {
             // offset = Math.max(dLine.split(" ")[0].length() - 5, 0);  // typically first 5 columns code for res num, but if exceeded add offset
 
             if(dLine.substring(13, 14).equals("!")) {       // chain brake
+                chainBreakDssps.add(Integer.valueOf(dLine.substring(0, 5).trim()));
                 if(! silent) {
                     if (! Settings.getBoolean("plcc_B_no_chain_break_info")) {
                         System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
