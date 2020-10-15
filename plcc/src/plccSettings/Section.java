@@ -58,9 +58,16 @@ public class Section {
      * Should only be called when the name of the section is set.
      */
     private void init() {
+        settings = new ArrayList<>();
         switch(name) {
-            case "dummy":
-                // init corresponding settings
+            case "General settings":
+                settings.add(new Setting("plcc_B_use_mmCIF_parser", 'B', "false", "Whether the mmCIF parser should be used on the provided PDB coordinates file."));
+                settings.add(new Setting("plcc_S_output_dir", 'S', ".", "Output directory for all created files."));
+                settings.add(new Setting("plcc_B_calc_draw_graphs", 'B', "true", "Whether graphs are computed and output."));
+                settings.add(new Setting("plcc_B_draw_graphs", 'B', "true", "Whether graphs are output."));
+                settings.add(new Setting("plcc_B_force_chain", 'B', "false", "Whether to force parsing and processing only a certain PDB chain."));
+                settings.add(new Setting("plcc_S_forced_chain_id", 'S', "A", "The forced chain ID, only used when plcc_B_force_chain is true."));
+            // TODO add rest
         }
     }
 }

@@ -237,7 +237,7 @@ public class Settings {
         //  used automatically though, it's just a reminder.
 
         defSet("plcc_B_consider_all_ligands_for_each_chain", "true", "Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with. WARNING: This setting is ignored and off atm.");
-        defSet("plcc_B_draw_ligandcomplexgraphs", "true", "Whether to draw ligand-centered complex graphs. This means one graph for each ligans in a PDB file, each showing all SSEs (regardless of chain) the ligand is in contact with. Experimental.");
+        defSet("plcc_B_draw_ligandcomplexgraphs", "true", "Whether to draw ligand-centered complex graphs. This means one graph for each ligand in a PDB file, each showing all SSEs (regardless of chain) the ligand is in contact with. Experimental.");
         // Output and performance
         defSet("plcc_B_separate_contacts_by_chain", "false", "Whether to compute atom contacts separated by chain. Faster but does not detect contacts between different chains and thus cannot be used for complex graph computation.");
         defSet("plcc_B_no_warn", "false", "Whether to suppress all warnings. The default is to print them.");
@@ -481,7 +481,7 @@ public class Settings {
         defSet("plcc_B_alternate_aminoacid_contact_model_with_ligands", "false", "Use alternate residue contact model including ligands by Andreas. Skips all computations except AA graphs. EXP.");
         defSet("plcc_B_quit_after_aag", "false", "Whether to quit the program after computation of amino acid graphs, prevents further work.");
         defSet("plcc_B_chain_spheres_speedup", "true", "Whether to use contact computation speedup based on comparison of chain spheres.");
-        defSet("plcc_B_centroid_method", "true", "Whether to use centroid of atoms instead if C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup.");
+        defSet("plcc_B_centroid_method", "true", "Whether to use centroid of atoms instead of C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup.");
         
         // SSE definitions
         defSet("plcc_I_min_SSE_length", "3", "the minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)");
