@@ -198,6 +198,14 @@ public class Section {
                 settings.add(new Setting("plcc_B_AAgraph_allchainscombined", 'B', "false", "Whether to compute and output combined amino acid graphs (one for all chains) as well."));
                 settings.add(new Setting("plcc_B_AAgraph_perchain", 'B', "false", "Whether to compute and output amino acid graphs per chain as well."));
                 
+            case "Database (DB) connection":
+                settings.add(new Setting("plcc_B_useDB", 'B', "false", "Whether to write any data to the PostgreSQL database."));
+                settings.add(new Setting("plcc_S_db_name", 'S', "vplg", "Database name"));
+                settings.add(new Setting("plcc_S_db_host", 'S', "127.0.0.1", "Hostname or IP of the DB server"));
+                settings.add(new Setting("plcc_I_db_port", 'I', "5432", "DB server port"));
+                settings.add(new Setting("plcc_S_db_username", 'S', "vplg", "DB username"));
+                settings.add(new Setting("plcc_S_db_password", 'S', "", "DB password (empty if local is TRUST for this user)"));
+                
             // TODO add rest
                 
             default:
