@@ -190,6 +190,14 @@ public class Section {
                         + "The PTGL uses a setting of 1 (so if a pair has 3 B/B contacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)"));
                 settings.add(new Setting("plcc_B_forceBackboneContacts", 'B', "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone."));
                 
+            case "AAG":
+                settings.add(new Setting("plcc_I_aag_min_residue_seq_distance_for_contact", 'I', "0", "If set to a value greater than zero, only contacts from residues more than or exactly this value apart in the sequence can have a contact."
+                        + "Can be used to force network of long-range contacts, ignoring backbone connections. Contacts between residues from different chains always are accepted. This will split the graph into many connected components."));
+                settings.add(new Setting("plcc_I_aag_max_residue_seq_distance_for_contact", 'I', "0", "If set to a value greater than zero, only contacts from residues less than or exactly this value apart in the sequence can for a contact. "
+                        + "Can be used to force network of short-range contacts, ignoring long-range connections. Also ignores all contacts to residues from other chains."));
+                settings.add(new Setting("plcc_B_AAgraph_allchainscombined", 'B', "false", "Whether to compute and output combined amino acid graphs (one for all chains) as well."));
+                settings.add(new Setting("plcc_B_AAgraph_perchain", 'B', "false", "Whether to compute and output amino acid graphs per chain as well."));
+                
             // TODO add rest
                 
             default:
