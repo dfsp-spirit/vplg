@@ -70,19 +70,19 @@ public class Section {
                 break;
                 
             case "Amino Acid Graphs (AAG)":
-                settings.add(new Setting("plcc_B_draw_aag", 'B', "false", "Whether amino acid graph visualizations are output. Uses grid visualization."));
-                settings.add(new Setting("plcc_B_aminoacidgraphs_include_ligands", 'B', "false", "Whether amino acid graphs should include ligands."));
-                settings.add(new Setting("plcc_B_quit_after_aag", 'B', "false", "Whether to quit the program after computation of amino acid graphs."));
-                settings.add(new Setting("plcc_B_img_AAG_output_format_PNG", 'B', "false", "Whether to write amino acid graph visualizations in PNG format."));
-                settings.add(new Setting("plcc_B_img_AAG_output_format_PDF", 'B', "false", "Whether to write amino acid graph visualizations in PDF format."));
+                settings.add(new Setting("plcc_B_draw_aag", 'B', "false", "Whether Amino Acid Graph visualizations are output. Uses grid visualization."));
+                settings.add(new Setting("plcc_B_aminoacidgraphs_include_ligands", 'B', "false", "Whether Amino Acid Graphs should include ligands."));
+                settings.add(new Setting("plcc_B_quit_after_aag", 'B', "false", "Whether to quit the program after computation of Amino Acid Graphs."));
+                settings.add(new Setting("plcc_B_img_AAG_output_format_PNG", 'B', "false", "Whether to write Amino Acid Graph visualizations in PNG format."));
+                settings.add(new Setting("plcc_B_img_AAG_output_format_PDF", 'B', "false", "Whether to write Amino Acid graph visualizations in PDF format."));
                 // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
                 //settings.add(new Setting("plcc_B_img_AAG_output_format_SVG", 'B', "true", "Whether to write amino acid graph visualizations in PDF format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
                 break;
             
             case "Protein Graph (PG)":
-                settings.add(new Setting("plcc_B_skip_empty_chains", 'B', "true", "Whether to skip chains without any DSSP SSEs (i.e., contain only ligands) in PGs."));
-                settings.add(new Setting("plcc_B_img_output_format_PNG", 'B', "true", "Whether to write protein graph visualizations in PNG format."));
-                settings.add(new Setting("plcc_B_img_output_format_PDF", 'B', "false", "Whether to write protein graph visualizations in PDF format."));
+                settings.add(new Setting("plcc_B_skip_empty_chains", 'B', "true", "Whether to skip chains without any DSSP SSEs (i.e., contain only ligands) in Protein Graphs."));
+                settings.add(new Setting("plcc_B_img_output_format_PNG", 'B', "true", "Whether to write Protein Graph visualizations in PNG format."));
+                settings.add(new Setting("plcc_B_img_output_format_PDF", 'B', "false", "Whether to write Protein Graph visualizations in PDF format."));
                 // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
                 //settings.add(new Setting("plcc_B_img_output_format_SVG", 'B', "true", "Whether to write protein graph visualizations in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
                 break;
@@ -96,7 +96,24 @@ public class Section {
                 settings.add(new Setting("plcc_B_graphtype_betalig", 'B', "true", "Whether beta graphs with ligands are output."));
                 break;
                 
+            case "Folding Graph (FG)":
+                settings.add(new Setting("plcc_B_folding_graphs", 'B', "false", "Whether Folding Graphs (connected components of a Protein Graph) are computed. This does NOT mean they are drawn."));
+                settings.add(new Setting("plcc_B_draw_folding_graphs", 'B', "true", "Whether Folding Graphs visualizations are output."));
+                settings.add(new Setting("plcc_B_img_FG_output_format_PNG", 'B', "true", "Whether to write Folding Graph visualizations in PNG format."));
+                settings.add(new Setting("plcc_B_img_FG_output_format_PDF", 'B', "false", "Whether to write Folding Graph visualizations in PDF format."));
+                // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
+                //settings.add(new Setting("plcc_B_img_FG_output_format_SVG", 'B', "true", "Whether to write Folding Graph visualizations in PNG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
+                settings.add(new Setting("plcc_B_foldgraphtype_KEY", 'B', "true", "Whether KEY notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
+                settings.add(new Setting("plcc_B_foldgraphtype_ADJ", 'B', "true", "Whether ADJ notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
+                settings.add(new Setting("plcc_B_foldgraphtype_RED", 'B', "true", "Whether RED notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
+                settings.add(new Setting("plcc_B_foldgraphtype_SEQ", 'B', "true", "Whether SEQ notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
+                settings.add(new Setting("plcc_B_foldgraphtype_DEF", 'B', "false", "Whether DEF notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
+                break;
+
             // TODO add rest
+                
+            default:
+                DP.getInstance().e(Settings.PACKAGE_TAG, "Settings section with name '" + name + "' not implemented. Please contact a developer.");
         }
     }
 }
