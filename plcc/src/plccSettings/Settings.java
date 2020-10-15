@@ -27,6 +27,7 @@ public class Settings {
         ArrayList<Section> tmpSections = new ArrayList<>();
         
         // add new sections here
+        // USER SECTIONS
         tmpSections.add(new Section("General settings", "user"));
         tmpSections.add(new Section("Amino Acid Graphs (AAG)", "user"));
         tmpSections.add(new Section("Protein Graph (PG)", "user"));
@@ -34,6 +35,30 @@ public class Settings {
         tmpSections.add(new Section("Folding Graph (FG)", "user"));
         tmpSections.add(new Section("Complex Graph (CG)", "user"));
         tmpSections.add(new Section("Structure visualization", "user"));
+        
+        // ADVANCED SECTIONS
+        tmpSections.add(new Section("Prints / Error handling", "advanced"));
+        tmpSections.add(new Section("Performance", "advanced"));
+        tmpSections.add(new Section("Parser", "advanced"));
+        tmpSections.add(new Section("Secondary Structure Element (SSE)", "advanced"));
+        tmpSections.add(new Section("SSE orientation", "advanced"));
+        tmpSections.add(new Section("Contact definition", "advanced"));
+        tmpSections.add(new Section("AAG", "advanced"));
+        tmpSections.add(new Section("Database (DB) connection", "advanced"));
+        tmpSections.add(new Section("DB settings", "advanced"));
+        tmpSections.add(new Section("DB structure search", "advanced"));
+        tmpSections.add(new Section("FG", "advanced"));
+        tmpSections.add(new Section("PG", "advanced"));
+        tmpSections.add(new Section("CG", "advanced"));
+        tmpSections.add(new Section("Motifs", "advanced"));
+        tmpSections.add(new Section("Cluster mode", "advanced"));
+        tmpSections.add(new Section("DB: representative chains", "advanced"));
+        tmpSections.add(new Section("Image settings", "advanced"));
+        tmpSections.add(new Section("Output settings", "advanced"));
+        tmpSections.add(new Section("DB: similarity search", "advanced"));
+        
+        
+        // DEVELOPER SECTIONS
         
         return tmpSections;
     }

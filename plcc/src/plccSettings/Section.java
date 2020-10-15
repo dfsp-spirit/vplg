@@ -121,6 +121,18 @@ public class Section {
             case "Structure visualization":
                 settings.add(new Setting("plcc_B_Jmol_graph_vis_commands", 'B', "true", "Whether to compute and print Jmol commands to visualize Protein Graphs in 3D."));
                 settings.add(new Setting("plcc_B_Jmol_graph_vis_resblue_commands", 'B', "false", "Whether to compute and print Jmol commands to color the residues of Protein Graphs blue in 3D."));
+            
+            case "Prints / Error handling":
+                settings.add(new Setting("plcc_B_silent", 'B', "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage."));
+                settings.add(new Setting("plcc_B_only_essential_output", 'B', "true", "Whether to print only high-level status information."));
+                settings.add(new Setting("plcc_B_print_contacts", 'B', "false", "Whether to print residue contacts to stdout (slower)"));
+                settings.add(new Setting("plcc_B_no_warn", 'B', "false", "Whether to suppress all warnings."));
+                settings.add(new Setting("plcc_B_no_parse_warn", 'B', "true", "Whether to suppress all warnings related to parsing of atoms and other data from the PDB and DSSP input files."));
+                settings.add(new Setting("plcc_B_no_not_impl_warn", 'B', "true", "Whether to suppress all warnings related to not implemented function."));
+                settings.add(new Setting("plcc_B_no_chain_break_info", 'B', "false", "Whether to suppress chain break info while parsing DSSP file (handy for some DSSP files for CIF data)."));
+                settings.add(new Setting("plcc_B_print_silent_notice", 'B', "true", "Whether to print a single line informing the user that silent mode is set in silent mode (includes PDB ID of current file)."));
+                settings.add(new Setting("plcc_B_warn_cfg_fallback_to_default", 'B', "true", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used."));
+                settings.add(new Setting("plcc_B_split_dsspfile_warning", 'B', "false", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file."));
                 
             // TODO add rest
                 
