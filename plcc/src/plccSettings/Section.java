@@ -205,6 +205,21 @@ public class Section {
                 settings.add(new Setting("plcc_I_db_port", 'I', "5432", "DB server port"));
                 settings.add(new Setting("plcc_S_db_username", 'S', "vplg", "DB username"));
                 settings.add(new Setting("plcc_S_db_password", 'S', "", "DB password (empty if local is TRUST for this user)"));
+                settings.add(new Setting("plcc_B_db_use_autocommit", 'B', "false", "Whether the DB connection gets set to autocommit when created."));
+                
+            case "DB settings":
+                settings.add(new Setting("plcc_S_graph_image_base_path", 'S', "/srv/www/htdocs/vplgweb/data/", "[DEPRECATED] The base path for graph visualizations for the database. The relative path to the path given here is used to locate the graph image on disk."));
+                settings.add(new Setting("plcc_B_db_use_batch_inserts", 'B', "false", "Whether inserts into the database should use batch mode instead of many single queries whenever possible. Only implemented for a few queries for which it may make sense."));
+                settings.add(new Setting("plcc_B_write_graphstrings_to_database_pg", 'B', "false", "[DEPRECATED] Whether to write the protein graph strings to the database in the different formats like XML, GML, TGF, etc. "
+                        + "They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm."));
+                settings.add(new Setting("plcc_B_write_graphstrings_to_database_fg", 'B', "false", "[DEPRECATED] Whether to write the folding graph strings to the database in the different formats like XML, GML, TGF, etc. "
+                        + "They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm."));
+                settings.add(new Setting("plcc_B_write_graphstrings_to_database_cg", 'B', "false", "[DEPRECATED] Whether to write the complex graph strings to the database in the different formats like XML, GML, TGF, etc. "
+                        + "They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm."));
+                settings.add(new Setting("plcc_B_write_graphstrings_to_database_aag", 'B', "false", "[DEPRECATED] Whether to write the amino acid graph strings to the database in the different formats like XML, GML, TGF, etc. "
+                        + "They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm."));
+                settings.add(new Setting("plcc_B_report_db_proteins", 'B', "false", "Write a list of PDB IDs which are currently in the database to the file 'db_content_proteins.txt', then exit."));
+                settings.add(new Setting("plcc_B_uglySQLhacks", 'B', "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB."));
                 
             // TODO add rest
                 
