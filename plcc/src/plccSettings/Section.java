@@ -221,6 +221,13 @@ public class Section {
                 settings.add(new Setting("plcc_B_report_db_proteins", 'B', "false", "Write a list of PDB IDs which are currently in the database to the file 'db_content_proteins.txt', then exit."));
                 settings.add(new Setting("plcc_B_uglySQLhacks", 'B', "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB."));
                 
+            case "DB structure search":
+                settings.add(new Setting("plcc_B_matrix_structure_search", 'B', "vplg", "Search a linear notation (input) in a proteinstructure (input)"));
+                settings.add(new Setting("plcc_B_matrix_structure_search_db", 'B', "vplg", "Search a linear notation (input) in the database, ignores any given proteinstructure as input"));
+                settings.add(new Setting("plcc_S_linear_notation", 'S', "", "The linear notation of a PG for the matrix structure comparison."));
+                settings.add(new Setting("plcc_S_linear_notation_type", 'S', "", "The type of linear notation (adj or red) for matrix structure comparison."));
+                settings.add(new Setting("plcc_S_linear_notation_graph_type", 'S', "", "alpha, beta or albe = The graph type of the PG graph of the linear notation."));
+                
             // TODO add rest
                 
             default:
