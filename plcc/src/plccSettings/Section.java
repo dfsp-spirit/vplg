@@ -64,9 +64,17 @@ public class Section {
                 settings.add(new Setting("plcc_B_use_mmCIF_parser", 'B', "false", "Whether the mmCIF parser should be used on the provided PDB coordinates file."));
                 settings.add(new Setting("plcc_S_output_dir", 'S', ".", "Output directory for all created files."));
                 settings.add(new Setting("plcc_B_calc_draw_graphs", 'B', "true", "Whether graphs are computed and output."));
-                settings.add(new Setting("plcc_B_draw_graphs", 'B', "true", "Whether graphs are output."));
+                settings.add(new Setting("plcc_B_draw_graphs", 'B', "true", "Whether graph visualizations are output."));
                 settings.add(new Setting("plcc_B_force_chain", 'B', "false", "Whether to force parsing and processing only a certain PDB chain."));
                 settings.add(new Setting("plcc_S_forced_chain_id", 'S', "A", "The forced chain ID, only used when plcc_B_force_chain is true."));
+            case "Amino Acid Graphs (AAG)":
+                settings.add(new Setting("plcc_B_draw_aag", 'B', "false", "Whether amino acid graph visualizations are output. Uses grid visualization."));
+                settings.add(new Setting("plcc_B_aminoacidgraphs_include_ligands", 'B', "false", "Whether amino acid graphs should include ligands."));
+                settings.add(new Setting("plcc_B_quit_after_aag", 'B', "false", "Whether to quit the program after computation of amino acid graphs."));
+                settings.add(new Setting("plcc_B_img_AAG_output_format_PNG", 'B', "false", "Whether to write amino acid graph visualizations in PNG format."));
+                settings.add(new Setting("plcc_B_img_AAG_output_format_PDF", 'B', "false", "Whether to write amino acid graph visualizations in PDF format."));
+                // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
+                // settings.add(new Setting("plcc_B_img_AAG_output_format_SVG", 'B', "true", "Whether to write amino acid graph visualizations in PDF format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
             // TODO add rest
         }
     }
