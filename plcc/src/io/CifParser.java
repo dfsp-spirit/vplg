@@ -881,12 +881,8 @@ class CifParser {
         else {
             a.setDsspResNum(lastMol.getDsspNum());
         }
-//        System.out.println("name " + molNamePDB);  //TODELETE
-//        System.out.println("tmpmol " + tmpMol);
-//        System.out.println("type );
         
         if (checkType(Molecule.RESIDUE_TYPE_RNA)){
-//            System.out.println("in rna"); //TODELETE
             // >> RNA <<
             // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
             // otherwise, a new RNA molecule is created
@@ -906,6 +902,8 @@ class CifParser {
                 rna.setChain(FileParser.getChainByPdbChainID(chainID));
                 rna.setModelID(m.getModelID());
                 rna.setSSEString("plcc_S_rnaSseCode");
+                
+                lastMol = rna;
                                 
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
                     // RNA chains can contain ligands that should be ignored such as water
@@ -935,8 +933,7 @@ class CifParser {
         
         else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) || tmpMol == null){  // If a molecule is not parsed at this point, it has to be a ligand
             // >> LIG <<
-//            System.out.println("in ligand"); //TODELETE
-
+            
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
             // check if we have created ligand residue for s_residue
@@ -962,6 +959,7 @@ class CifParser {
                 lig.setModelID(m.getModelID());
                 lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                 
+                lastMol = lig;
                 
                 // add ligand to list of residues if it not on the ignore list
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {

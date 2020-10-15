@@ -12480,7 +12480,7 @@ public class Main {
      * @return a list of all ligand SSEs that are created from the ligand residues in the residue list.
      */
     private static List<SSE> createAllLigandSSEsFromResidueList(List<Residue> resList, List<SSE> dsspSSElist) {
-
+        
         List<SSE> ligSSElist = new ArrayList<SSE>();
         Residue r;
         SSE s;
