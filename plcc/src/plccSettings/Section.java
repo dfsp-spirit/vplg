@@ -181,6 +181,14 @@ public class Section {
                 settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_he", 'I', "6", "Double difference mode: Same as above, but for H/E or E/H interactions."));
                 settings.add(new Setting("plcc_I_spatrel_dd_largest_antip_def", 'I', "-7", "Double difference mode: Same as above, this is the default for other interactions (e.g., coil/helix)."));
                 settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_def", 'I', "7", "Double difference mode: Same as above, this is the default for other interactions."));
+            
+            case "Contact definition":
+                settings.add(new Setting("plcc_I_aa_atom_radius", 'I', "20", "The atom radius of protein atoms in 10th part Angstroem (setting 20 here means 2 A)"));
+                settings.add(new Setting("plcc_I_rna_atom_radius", 'I', "20", "The atom radius of RNA atoms in 10th part Angstroem (setting 20 here means 2 A)"));
+                settings.add(new Setting("plcc_I_lig_atom_radius", 'I', "30", "The atom radius of ligand atoms in 10th part Angstroem (setting 30 here means 3 A)"));
+                settings.add(new Setting("plcc_I_max_contacts_per_type", 'I', "1", "The maximum number of contacts of a certain type that is counted for a residue pair. Set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). "
+                        + "The PTGL uses a setting of 1 (so if a pair has 3 B/B contacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)"));
+                settings.add(new Setting("plcc_B_forceBackboneContacts", 'B', "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone."));
                 
             // TODO add rest
                 
