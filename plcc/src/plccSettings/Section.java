@@ -134,6 +134,20 @@ public class Section {
                 settings.add(new Setting("plcc_B_warn_cfg_fallback_to_default", 'B', "true", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used."));
                 settings.add(new Setting("plcc_B_split_dsspfile_warning", 'B', "false", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file."));
                 
+            case "Performance":
+                settings.add(new Setting("plcc_B_separate_contacts_by_chain", 'B', "false", "Whether to compute atom contacts separated by chain. Faster but does not detect contacts between different chains and thus cannot be used for Complex Graph computation."));
+                settings.add(new Setting("plcc_F_abort_if_pdb_resolution_worse_than", 'F', "10.0", "Abort all processing of PDB files with worse resolution than provided "
+                        + "with this setting in Angstroem as a float. If set to 20.0, the program will terminate and NOT further process a PDB file which is detected to have a resolution of more than 20 A. "
+                        + "Set to a negative value like -1.0 to disable this, and thus parse all PDB files, no matter the resolution."));
+                settings.add(new Setting("plcc_I_abort_if_num_molecules_below", 'I', "30", "Abort all processing of PDB files with too few molecules as defined by the given value of the setting as integer. "
+                        + "If set to 30, the program will terminate and NOT further process a PDB file which is detected to have less than 30 molecules. "
+                        + "Set to a negative value like -1 to disable this, and thus parse all PDB files, no matter the molecule count."));
+                settings.add(new Setting("plcc_B_skip_too_large", 'B', "false", "Whether to abort if the protein has more than 'plcc_I_skip_num_atoms_threshold' atoms."));
+                settings.add(new Setting("plcc_I_skip_num_atoms_threshold", 'I', "80000", "The maximal number of atoms per PDB file if 'plcc_B_skip_too_large' is true. In that case, PLCC will abort for PDB files with more atoms."));
+                settings.add(new Setting("plcc_B_chain_spheres_speedup", 'B', "true", "Whether to use contact computation speedup based on comparison of chain spheres."));
+                settings.add(new Setting("plcc_B_centroid_method", 'B', "true", "Whether to use centroid of atoms instead of C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup."));
+                settings.add(new Setting("plcc_S_temp_dir", 'S', ".", "The directory where temporary files can be created. You need write access to it, of course."));
+                
             // TODO add rest
                 
             default:
