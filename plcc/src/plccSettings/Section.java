@@ -67,6 +67,8 @@ public class Section {
                 settings.add(new Setting("plcc_B_draw_graphs", 'B', "true", "Whether graph visualizations are output."));
                 settings.add(new Setting("plcc_B_force_chain", 'B', "false", "Whether to force parsing and processing only a certain PDB chain."));
                 settings.add(new Setting("plcc_S_forced_chain_id", 'S', "A", "The forced chain ID, only used when plcc_B_force_chain is true."));
+                break;
+                
             case "Amino Acid Graphs (AAG)":
                 settings.add(new Setting("plcc_B_draw_aag", 'B', "false", "Whether amino acid graph visualizations are output. Uses grid visualization."));
                 settings.add(new Setting("plcc_B_aminoacidgraphs_include_ligands", 'B', "false", "Whether amino acid graphs should include ligands."));
@@ -75,12 +77,25 @@ public class Section {
                 settings.add(new Setting("plcc_B_img_AAG_output_format_PDF", 'B', "false", "Whether to write amino acid graph visualizations in PDF format."));
                 // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
                 //settings.add(new Setting("plcc_B_img_AAG_output_format_SVG", 'B', "true", "Whether to write amino acid graph visualizations in PDF format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
+                break;
+            
             case "Protein Graph (PG)":
                 settings.add(new Setting("plcc_B_skip_empty_chains", 'B', "true", "Whether to skip chains without any DSSP SSEs (i.e., contain only ligands) in PGs."));
                 settings.add(new Setting("plcc_B_img_output_format_PNG", 'B', "true", "Whether to write protein graph visualizations in PNG format."));
                 settings.add(new Setting("plcc_B_img_output_format_PDF", 'B', "false", "Whether to write protein graph visualizations in PDF format."));
                 // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
                 //settings.add(new Setting("plcc_B_img_output_format_SVG", 'B', "true", "Whether to write protein graph visualizations in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
+                break;
+            
+            case "Graph types":
+                settings.add(new Setting("plcc_B_graphtype_albe", 'B', "true", "Whether alpha-beta graphs are output."));
+                settings.add(new Setting("plcc_B_graphtype_albelig", 'B', "true", "Whether alpha-beta graphs with ligands are output."));
+                settings.add(new Setting("plcc_B_graphtype_alpha", 'B', "true", "Whether alpha graphs are output."));
+                settings.add(new Setting("plcc_B_graphtype_alphalig", 'B', "true", "Whether alpha graphs with ligands are output."));
+                settings.add(new Setting("plcc_B_graphtype_beta", 'B', "true", "Whether beta graphs are output."));
+                settings.add(new Setting("plcc_B_graphtype_betalig", 'B', "true", "Whether beta graphs with ligands are output."));
+                break;
+                
             // TODO add rest
         }
     }
