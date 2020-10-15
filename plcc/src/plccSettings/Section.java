@@ -109,6 +109,14 @@ public class Section {
                 settings.add(new Setting("plcc_B_foldgraphtype_SEQ", 'B', "true", "Whether SEQ notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
                 settings.add(new Setting("plcc_B_foldgraphtype_DEF", 'B', "false", "Whether DEF notation of Folding Graphs is computed and output (only applies if 'plcc_B_folding_graphs' is 'true')."));
                 break;
+                
+            case "Complex Graph (CG)":
+                settings.add(new Setting("plcc_B_complex_graphs", 'B', "false", "Whether Complex Graphs are computed and drawn."));
+                settings.add(new Setting("plcc_I_cg_contact_threshold", 'I', "1", "The lowest number of interchain residue contacts where an edge in Complex Graphs is drawn."));
+                settings.add(new Setting("plcc_B_img_CG_output_format_PNG", 'B', "true", "Whether to write Complex Graph visualizations in PNG format."));
+                settings.add(new Setting("plcc_B_img_CG_output_format_PDF", 'B', "false", "Whether to write Complex Graph visualizations in PDF format."));
+                // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
+                //settings.add(new Setting("plcc_B_img_CG_output_format_SVG", 'B', "true", "Whether to write Complex Graph visualizations in SVG format.  Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
 
             // TODO add rest
                 
