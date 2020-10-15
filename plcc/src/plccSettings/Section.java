@@ -155,7 +155,19 @@ public class Section {
                 settings.add(new Setting("plcc_S_ligAACode", 'S', "J", "The amino acid code used to mark a ligand residue."));
                 settings.add(new Setting("plcc_I_lig_min_atoms", 'I', "1", "The minimum number of atoms a ligand needs to consist of to count as an SSE."));
                 settings.add(new Setting("plcc_I_lig_max_atoms", 'I', "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited."));
-                
+            
+            case "Secondary Structure Element (SSE)":
+                settings.add(new Setting("plcc_S_ligSSECode", 'S', "L", "The SSE code used to mark an SSE of type ligand."));
+                settings.add(new Setting("plcc_S_rnaSseCode", 'S', "R", "The SSE code used to mark an SSE of type RNA"));
+                settings.add(new Setting("plcc_I_min_SSE_length", 'I', "3", "The minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)"));
+                settings.add(new Setting("plcc_B_change_dssp_sse_b_to_e", 'B', "true", "Whether all isolated beta bridges (DSSP SSE type: B) should be changed to betastrands (DSSP SSE type: E)"));
+                settings.add(new Setting("plcc_B_fill_gaps", 'B', "true", "Whether two strands should be fused to one strand, when there is only one AA (with DSSP SSE ' ') between them."));
+                settings.add(new Setting("plcc_B_include_coils", 'B', "false", "Whether coils (DSSP SSE type ' ') should be considered as own vertices."));
+                settings.add(new Setting("plcc_S_coilSSECode", 'S', "C", "The amino acid code used to mark a coiled region residue."));
+                settings.add(new Setting("plcc_B_merge_helices", 'B', "true", "whether to merge different helix types if they are adjacent in the primary structure."));
+                settings.add(new Setting("plcc_I_merge_helices_max_dist", 'I', "false", "The maximal distance in amino acids of the primary sequence where helices are merged when 'plcc_B_merge_helices' is true. "
+                        + "The (default) value 0 means only directly adjacent SSEs are merged."));
+             
             // TODO add rest
                 
             default:
