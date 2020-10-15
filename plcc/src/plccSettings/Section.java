@@ -118,6 +118,10 @@ public class Section {
                 // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.
                 //settings.add(new Setting("plcc_B_img_CG_output_format_SVG", 'B', "true", "Whether to write Complex Graph visualizations in SVG format.  Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG."));
 
+            case "Structure visualization":
+                settings.add(new Setting("plcc_B_Jmol_graph_vis_commands", 'B', "true", "Whether to compute and print Jmol commands to visualize Protein Graphs in 3D."));
+                settings.add(new Setting("plcc_B_Jmol_graph_vis_resblue_commands", 'B', "false", "Whether to compute and print Jmol commands to color the residues of Protein Graphs blue in 3D."));
+                
             // TODO add rest
                 
             default:
