@@ -168,6 +168,20 @@ public class Section {
                 settings.add(new Setting("plcc_I_merge_helices_max_dist", 'I', "false", "The maximal distance in amino acids of the primary sequence where helices are merged when 'plcc_B_merge_helices' is true. "
                         + "The (default) value 0 means only directly adjacent SSEs are merged."));
              
+            case "SSE orientation":
+                settings.add(new Setting("plcc_B_spatrel_use_dd", 'B', "false", "Whether to use double difference mode for computation of orientation of SSEs. False invokes vector-mode instead."));
+                settings.add(new Setting("plcc_I_spatrel_vector_num_res_centroids", 'I', "4", "Vector mode: How many residues to use for centroid computation of start and end point of vector for SSE."));
+                settings.add(new Setting("plcc_I_spatrel_max_deg_parallel", 'I', "65", "Vector mode: Degrees to which SSEs are classified to be parallel."));
+                settings.add(new Setting("plcc_I_spatrel_min_deg_antip", 'I', "115", "Vector mode: Degrees from which SSEs are classified to be antiparallel in vector mode."));
+                settings.add(new Setting("plcc_I_spatrel_dd_largest_antip_ee", 'I', "0", "Double difference mode: All values <= the one given here are considered antiparallel. This is for E/E (strand/strand) interactions."));
+                settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_ee", 'I', "1", "Double difference mode: All values >= the one given here are considered parallel. This is for E/E (strand/strand) interactions. Note that the range in between these 2 values is considered mixed (none in the case of E/E)."));
+                settings.add(new Setting("plcc_I_spatrel_dd_largest_antip_hh", 'I', "-8", "Double difference mode: Same as above, but for H/H (helix/helix) interactions."));
+                settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_hh", 'I', "8", "Double difference mode: Same as above, but for H/H (helix/helix) interactions."));
+                settings.add(new Setting("plcc_I_spatrel_dd_largest_antip_he", 'I', "-6", "Double difference mode: Same as above, but for H/E or E/H interactions."));
+                settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_he", 'I', "6", "Double difference mode: Same as above, but for H/E or E/H interactions."));
+                settings.add(new Setting("plcc_I_spatrel_dd_largest_antip_def", 'I', "-7", "Double difference mode: Same as above, this is the default for other interactions (e.g., coil/helix)."));
+                settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_def", 'I', "7", "Double difference mode: Same as above, this is the default for other interactions."));
+                
             // TODO add rest
                 
             default:
