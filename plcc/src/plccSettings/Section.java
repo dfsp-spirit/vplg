@@ -227,6 +227,119 @@ public class Section {
                 settings.add(new Setting("plcc_S_linear_notation", 'S', "", "The linear notation of a PG for the matrix structure comparison."));
                 settings.add(new Setting("plcc_S_linear_notation_type", 'S', "", "The type of linear notation (adj or red) for matrix structure comparison."));
                 settings.add(new Setting("plcc_S_linear_notation_graph_type", 'S', "", "alpha, beta or albe = The graph type of the PG graph of the linear notation."));
+            
+            case "FG":
+                settings.add(new Setting("plcc_I_min_fgraph_size_draw", 'I', "3", "The minimum size of a Folding Graph to be drawn. Setting this to 1 or 0 draws all of them, including isolated vertices."));
+                settings.add(new Setting("plcc_I_min_fgraph_size_write_to_db", 'I', "1", "The minimum size of a Folding Graph to be written to the database. Setting this to 1 or 0 saves all of them, including isolated vertices."));
+                settings.add(new Setting("plcc_I_min_fgraph_size_write_to_file", 'I', "3", "The minimum size of a Folding Graph to be written to a file in formats like GML. Setting this to 1 or 0 exports all of them to files, including isolated vertices."));
+                settings.add(new Setting("plcc_B_key_use_alternate_arcs", 'B', "true", "Whether to use alternative crossover arcs in KEY notation. The alternative arcs cut through other SSEs, the default ones use a vertical central line and shift the center to avoid this."));
+                settings.add(new Setting("plcc_B_print_notations_on_fg_images", 'B', "false", "Whether to add the notation string to the FG images."));
+                settings.add(new Setting("plcc_B_output_fg_linear_notations_to_file", 'B', "true", "Whether to save linear notations of Folding Graphs to a text file."));
+                settings.add(new Setting("plcc_B_special_linnot_rules_for_bifurcated_adj_and_red", 'B', "true", "Whether special rules should be used for computing the ADJ and RED notations of FGs. These special rules were not used in the latest PTGL version by PM, but it seems in older versions."));
+                
+            case "PG":
+                settings.add(new Setting("plcc_B_output_GML", 'B', "true", "Whether to save Protein Graphs to text files in Graph Modelling Language (GML) format."));
+                settings.add(new Setting("plcc_B_output_TGF", 'B', "false", "Whether to save Protein Graphs to text files in Trivial Graph Format (TGF)."));
+                settings.add(new Setting("plcc_B_output_DOT", 'B', "false", "Whether to save Protein Graphs to text files in DOT language format)."));
+                settings.add(new Setting("plcc_B_output_kavosh", 'B', "false", "Whether to save Protein Graphs to text files in Kavosh format."));
+                settings.add(new Setting("plcc_B_kavosh_format_directed", 'B', "true", "Whether to treat the graphs as directed for the Kavosh output. If set to true, each edge (a, b) will appear twice in the output file: once as (a, b) and again as (b, a)."));
+                settings.add(new Setting("plcc_B_output_eld", 'B', "false", "Whether to save Protein Graphs to text files in edge list format with a vertex type list file."));
+                settings.add(new Setting("plcc_B_output_plcc", 'B', "false", "Whether to save Protein Graphs to text files in PLCC format."));
+                settings.add(new Setting("plcc_B_output_perlfg", 'B', "false", "Whether to save Protein Graphs to text files in the PTGL format used by the Perl script to compute Folding Graph notations."));
+                settings.add(new Setting("plcc_B_output_json", 'B', "true", "Whether to save Protein Graphs to text files in JSON format."));
+                settings.add(new Setting("plcc_B_output_xml", 'B', "true", "Whether to save Protein Graphs to text files in XML format."));
+                settings.add(new Setting("plcc_B_output_gexf", 'B', "false", "Whether to save Protein Graphs to text files in GEXF format."));
+                settings.add(new Setting("plcc_S_gexf_format_version", 'S', "1.1", "The version of the GEFX file format to use. Supported are '1.1' and '1.2'."));
+                settings.add(new Setting("plcc_B_output_msvg", 'B', "true", "Whether to save Protein Graphs to text files in SVG format for interactive mode."));
+                settings.add(new Setting("plcc_B_output_cytoscapejs", 'B', "false", "Whether to save Protein Graphs to text files in CytoscapeJS format."));
+                settings.add(new Setting("plcc_S_graph_metadata_splitstring", 'S', "|", "The field separator used when writing meta data to exported graphs."));
+                settings.add(new Setting("plcc_B_add_metadata_comments_GML", 'B', "false", "Whether to add meta data to exported GML format graphs in comments. Note: Not all programs parse comments correctly."));
+                settings.add(new Setting("plcc_B_add_metadata_comments_DOT", 'B', "false", "Whether to add meta data to exported DOT format graphs in comments. Note: Not all programs parse comments correctly."));
+                settings.add(new Setting("plcc_B_compute_graph_metrics", 'B', "false", "Whether to compute graph metrics such as cluster coefficient for PGs. Slower!"));
+                
+            case "CG":
+                settings.add(new Setting("plcc_B_output_compgraph_GML", 'B', "true", "Whether to save Complex Graphs (including SSE info) to a text file in Graph Modelling Language (GML) format."));
+                settings.add(new Setting("plcc_B_output_compgraph_TGF", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in Trivial Graph Format (TGF) format."));
+                settings.add(new Setting("plcc_B_output_compgraph_DOT", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in DOT format."));
+                settings.add(new Setting("plcc_B_output_compgraph_kavosh", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in Kavosh format."));
+                settings.add(new Setting("plcc_B_output_compgraph_eld", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in edge list format with a vertex type list file."));
+                settings.add(new Setting("plcc_B_output_compgraph_plcc", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in PLCC format."));
+                settings.add(new Setting("plcc_B_output_compgraph_JSON", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in JSON format."));
+                settings.add(new Setting("plcc_B_output_compgraph_XML", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in XGMML format."));
+                settings.add(new Setting("plcc_B_writeComplexContactCSV", 'B', "false", "Whether to write a CSV file containing all contacts used for Complex Graph computation."));
+                
+            case "Motifs":
+                settings.add(new Setting("plcc_B_compute_motifs", 'B', "true", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB)."));
+                settings.add(new Setting("plcc_B_compute_tim", 'B', "false", "Whether to search for tim barrel motif in FGs if plcc_B_compute_motifs is true."));
+                
+            case "Cluster mode":
+                settings.add(new Setting("plcc_B_clustermode", 'B', "false", "Whether to write extra output files used only in cluster mode, like GML albe graph file list."));
+                settings.add(new Setting("plcc_B_output_images_dir_tree", 'B', "false", "Whether to write output images to a PDB-style sub directory structure under the output directory instead of writing them in there directly. "
+                        + "This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. "
+                        + "The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc."));
+                settings.add(new Setting("plcc_B_output_textfiles_dir_tree", 'B', "false", "Whether to write output graph text files to a PDB-style sub directory structure under the output directory instead of writing them in there directly. "
+                        + "This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. "
+                        + "The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc."));
+                settings.add(new Setting("plcc_B_output_textfiles_dir_tree_html", 'B', "false", "Whether to write HTML navigation files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well."));
+                settings.add(new Setting("plcc_B_output_textfiles_dir_tree_core_html", 'B', "false", "Whether to write the core VPLGweb HTML files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well. "
+                        + "These are the main page, search form and other stuff which is only needed once for the whole website."));
+                settings.add(new Setting("plcc_B_html_add_complex_graph_data", 'B', "true", "Whether to write data on the complex graph to the protein result HTML webpage (if available)."));
+
+            case "DB: representative chains":
+                settings.add(new Setting("plcc_B_set_pdb_representative_chains_pre", 'B', "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file. "
+                        + "Should be run BEFORE filling on a therefore empty database."));
+                settings.add(new Setting("plcc_B_set_pdb_representative_chains_remove_old_labels_pre", 'B', "true", "Whether the old labels should be removed from all chains in the info table before the new ones are applied. Removed means all chains are considered NOT part of the representative set."));
+                settings.add(new Setting("plcc_B_set_pdb_representative_chains_post", 'B', "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file. "
+                        + "Should be run AFTER filling on a therefore non-empty database."));
+                settings.add(new Setting("plcc_B_set_pdb_representative_chains_remove_old_labels_post", 'B', "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set."));
+                settings.add(new Setting("plcc_S_representative_chains_xml_file", 'S', "representatives.xml", "The path to the XML file containing the representative PDB chains from the PDB. You can get the file from the RCSB PDB REST web service."));
+                
+            case "Output settings":
+                settings.add(new Setting("plcc_B_ptgl_text_output", 'B', "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated."));
+                settings.add(new Setting("plcc_B_ptgl_geodat_output", 'B', "false", "Whether the PTGL text files geo.dat for SSE level contacts are written to a text file."));
+                settings.add(new Setting("plcc_B_ramachandran_plot", 'B', "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower)."));
+                
+            case "Image settings":
+                settings.add(new Setting("plcc_B_graphimg_header", 'B', "true", "Whether the graph images are created with header line with info on the graph type, PDB and chain ID."));
+                settings.add(new Setting("plcc_B_graphimg_footer", 'B', "true", "Whether the graph images are created with footer line with info on the vertices."));
+                settings.add(new Setting("plcc_B_graphimg_legend", 'B', "true", "Whether the graph images are created with a legend that explains the color codes and SSE symbols. This is part of the footer."));
+                settings.add(new Setting("plcc_B_graphimg_legend_always_all", 'B', "false", "Whether the legend should contain all possible edge and vertex types, i.e., even those not occurring in the current image."));
+                settings.add(new Setting("plcc_B_graphimg_add_linnot_start_vertex", 'B', "false", "Whether the start vertex index of the linear notation in the parent graph is written to the image."));
+                settings.add(new Setting("plcc_I_img_margin_left", 'I', "80", "Size of the left image margin in pixels."));
+                settings.add(new Setting("plcc_I_img_margin_top", 'I', "40", "Size of the top image margin in pixels."));
+                settings.add(new Setting("plcc_I_img_margin_right", 'I', "40", "Size of the right image margin in pixels."));
+                settings.add(new Setting("plcc_I_img_margin_bottom", 'I', "40", "Size of the bottom image margin in pixels."));
+                settings.add(new Setting("plcc_I_img_vert_dist", 'I', "50", "The distance between two consecutive vertices in the output image, in pixels."));
+                settings.add(new Setting("plcc_I_img_vert_radius", 'I', "10", "The radius of a vertex in the output image, in pixels."));
+                settings.add(new Setting("plcc_I_img_header_height", 'I', "40", "The height of the header area in the output image, in pixels."));
+                settings.add(new Setting("plcc_I_img_footer_height", 'I', "180", "The height of the footer area in the output image, in pixels. The footer is used to print the legend."));
+                settings.add(new Setting("plcc_S_img_default_font", 'S', "TimesRoman", "The default font used in output image labels. This has to be a valid font name, of course."));
+                settings.add(new Setting("plcc_I_img_default_font_size", 'I', "16", "The default font size used in output images."));
+                settings.add(new Setting("plcc_I_img_legend_font_size", 'I', "16", "The legend font size used in output images."));
+                settings.add(new Setting("plcc_I_img_text_line_height", 'I', "40", "The vertical distance between two lines of text in the image, e.g., in the footer."));
+                settings.add(new Setting("plcc_I_img_min_img_height", 'I', "160", "The minimum size of the image area where the graph is drawn."));
+                settings.add(new Setting("plcc_I_img_min_arc_height", 'I', "100", "The minimum size of the arc area within the image area."));
+                settings.add(new Setting("plcc_I_img_minPageWidth", 'I', "800", "The minimum image width in pixels, used in output images."));
+                settings.add(new Setting("plcc_I_img_minPageHeight", 'I', "600", "The minimum image height in pixels, used in output images."));
+                settings.add(new Setting("plcc_S_img_output_fileext", 'S', ".png", "[DEPRECATED] File extension of images. Not used for graph images anymore; applies to Ramaplot etc only."));
+                
+            case "DB: similarity search":
+                settings.add(new Setting("plcc_B_search_similar", 'B', "false", "[EXPERIMENTAL] Whether to search for the most similar protein."));
+                settings.add(new Setting("plcc_S_search_similar_PDBID", 'S', "8icd", "Used only when plcc_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search."));
+                settings.add(new Setting("plcc_S_search_similar_chainID", 'S', "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search."));
+                settings.add(new Setting("plcc_S_search_similar_graphtype", 'S', "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search."));
+                settings.add(new Setting("plcc_I_search_similar_num_results", 'I', "5", "Used only when plcc_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB)."));
+                settings.add(new Setting("plcc_S_search_similar_method", 'S', "string_sse", "Used only when plcc_B_search_similar is true. The similarity measure to use, valid settings: string_sse, graph_set, graph_compat"));
+                settings.add(new Setting("plcc_B_compute_graphlet_similarities", 'B', "false", "Whether to compute graphlet similarities in the DB and then exit. It depends on other settings which graphlet sims are actually computed."));
+                settings.add(new Setting("plcc_S_search_similar_graphlet_scoretype", 'S', "RGF", "The method used to compute a similarity score from a pair of graphlet vectors. Valid options are: RGF=relative graphlet frequency distance, CUS=custom."));
+                settings.add(new Setting("plcc_B_compute_graphlet_similarities_pg", 'B', "false", "Whether to compute graphlet similarities for Protein Graphs. Only used if plcc_B_compute_graphlet_similarities is true."));
+                settings.add(new Setting("plcc_B_compute_graphlet_similarities_cg", 'B', "false", "Whether to compute graphlet similarities for Complex Graphs. Only used if plcc_B_compute_graphlet_similarities is true."));
+                settings.add(new Setting("plcc_B_compute_graphlet_similarities_aag", 'B', "false", "Whether to compute graphlet similarities for Amino Acid Graphs. Only used if plcc_B_compute_graphlet_similarities is true."));
+                settings.add(new Setting("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db", 'I', "25", "The number of the most similar protein chain to store in the database after graphlet similarity computation. Set to n to store the n most similar for each chain."));
+                settings.add(new Setting("plcc_I_compute_all_graphlet_similarities_start_graphlet_index", 'I', "0", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the first (start) graphlet used. Do not forget to also set the end index properly. This is inclusive."));
+                settings.add(new Setting("plcc_I_compute_all_graphlet_similarities_end_graphlet_index", 'I', "29", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the last (end) graphlet used. Do not forget to also set the start index properly. This is inclusive."));
+                settings.add(new Setting("plcc_I_number_of_graphlets", 'I', "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity."));
+                settings.add(new Setting("plcc_B_write_chains_file", 'B', "false", "Whether to write a chains file containing all chain names of the currently handled PDB file. Can be used by GraphletAnalyzer later to construct graph file names for all chains."));
                 
             // TODO add rest
                 
