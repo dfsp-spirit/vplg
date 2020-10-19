@@ -146,6 +146,7 @@ public class Section {
                 settings.add(new Setting("plcc_I_skip_num_atoms_threshold", 'I', "80000", "The maximal number of atoms per PDB file if 'plcc_B_skip_too_large' is true. In that case, PLCC will abort for PDB files with more atoms."));
                 settings.add(new Setting("plcc_B_chain_spheres_speedup", 'B', "true", "Whether to use contact computation speedup based on comparison of chain spheres."));
                 settings.add(new Setting("plcc_B_centroid_method", 'B', "true", "Whether to use centroid of atoms instead of C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup."));
+                settings.add(new Setting("plcc_B_round_coordinates", 'B', "true", "Whether 3D atom coordinates should be rounded or truncated one decimal place."));
                 settings.add(new Setting("plcc_S_temp_dir", 'S', ".", "The directory where temporary files can be created. You need write access to it, of course."));
             
             case "Parser":
@@ -258,6 +259,7 @@ public class Section {
                 settings.add(new Setting("plcc_B_compute_graph_metrics", 'B', "false", "Whether to compute graph metrics such as cluster coefficient for PGs. Slower!"));
                 
             case "CG":
+                settings.add(new Setting("plcc_B_draw_ligandcomplexgraphs", 'B', "false", "[EXPERIMENTAL] Whether to draw ligand-centered Complex Graphs. This means one graph for each ligand in a PDB file, each showing all SSEs (regardless of chain) the ligand is in contact with."));
                 settings.add(new Setting("plcc_B_output_compgraph_GML", 'B', "true", "Whether to save Complex Graphs (including SSE info) to a text file in Graph Modelling Language (GML) format."));
                 settings.add(new Setting("plcc_B_output_compgraph_TGF", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in Trivial Graph Format (TGF) format."));
                 settings.add(new Setting("plcc_B_output_compgraph_DOT", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in DOT format."));
@@ -341,7 +343,26 @@ public class Section {
                 settings.add(new Setting("plcc_I_number_of_graphlets", 'I', "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity."));
                 settings.add(new Setting("plcc_B_write_chains_file", 'B', "false", "Whether to write a chains file containing all chain names of the currently handled PDB file. Can be used by GraphletAnalyzer later to construct graph file names for all chains."));
                 
-            // TODO add rest
+            case "Debug":
+                settings.add(new Setting("plcc_I_debug_level", 'I', "0", "Debug level. Higher value means more output."));
+                settings.add(new Setting("plcc_B_debug_compareSSEContacts", 'B', "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied."));
+                settings.add(new Setting("plcc_S_debug_compareSSEContactsFile", 'S', "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison."));
+                settings.add(new Setting("plcc_B_contact_debug_dysfunct", 'B', "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!"));
+                settings.add(new Setting("plcc_B_debug_only_parse", 'B', "false", "Exit after parsing. WARNING: When this is true, plcc will abort after parsing and not produce results!"));
+                settings.add(new Setting("plcc_B_debug_only_contact_comp", 'B', "false", "Exit after contact computation. WARNING: When this is true, plcc will abort after contact computation and not produce results!"));
+                
+            case "Disabled":
+                settings.add(new Setting("plcc_B_parse_binding_sites", 'B', "false", "[DISABLED] Whether to parse binding site data from the REMARK 800 and SITE lines of legacy PDB file."));
+                settings.add(new Setting("plcc_B_write_lig_geolig", 'B', "false", "[DISABLED] Determines whether ligand contacts are included in the <pdbid>.geolig file."));
+                settings.add(new Setting("plcc_B_consider_all_ligands_for_each_chain", 'B', "false", "[DISABLED] Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with. WARNING: This setting is ignored and off atm."));
+                settings.add(new Setting("plcc_B_complex_graph_same", 'B', "0", "[DISABLED] Determines whether the complex graph is drawn with all nodes of the same type."));
+                settings.add(new Setting("plcc_B_complex_graph_mere", 'B', "0", "[DISABLED] Determines whether the complex graph is drawn with nodes of different type for each mere."));
+                settings.add(new Setting("plcc_I_ligSAS", 'I', "20", "[DISABLED] The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)"));
+                
+            case "Alternate AAG":
+                settings.add(new Setting("plcc_B_handle_hydrogen_atoms_from_reduce", 'B', "false", "[EXPERIMENTAL] Whether to parse hydrogen atoms added to PDB files by the external Reduce software."));
+                settings.add(new Setting("plcc_B_alternate_aminoacid_contact_model", 'B', "false", "[EXPERIMENTAL] Whether to use alternate residue contact model by A. Scheck. Skips all computations except AA graphs."));
+                settings.add(new Setting("plcc_B_alternate_aminoacid_contact_model_with_ligands", 'B', "false", "[EXPERIMENTAL] Whether to use alternate residue contact model including ligands by A. Scheck. Skips all computations except AA graphs."));
                 
             default:
                 DP.getInstance().e(Settings.PACKAGE_TAG, "Settings section with name '" + name + "' not implemented. Please contact a developer.");

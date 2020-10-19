@@ -55,10 +55,12 @@ public class Settings {
         tmpSections.add(new Section("DB: representative chains", "advanced"));
         tmpSections.add(new Section("Image settings", "advanced"));
         tmpSections.add(new Section("Output settings", "advanced"));
-        tmpSections.add(new Section("DB: similarity search", "advanced"));
-        
+        tmpSections.add(new Section("DB: similarity search", "advanced"));        
         
         // DEVELOPER SECTIONS
+        tmpSections.add(new Section("Debug", "developer"));
+        tmpSections.add(new Section("Disabled", "developer"));
+        tmpSections.add(new Section("Alternate AAG", "developer"));
         
         return tmpSections;
     }
