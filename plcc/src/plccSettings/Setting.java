@@ -18,9 +18,9 @@ import tools.DP;
 class Setting {
     final String name;  // name of the setting, should have format: plcc_D_NAME, where D is the data type
     final char dataType;  // values can only be saved as string, so we need to know, which data type they should have, capital letter
-    final String defaultValue;  // hard coded default value
+    final private String defaultValue;  // hard coded default value
     final String documentation;  // documentation string
-    private String currentValue;  // the value of the setting that can be changed by the user via a settings file or command line options
+    private String overwrittenValue = "";  // the value of the setting that can be changed by the user via a settings file or command line options
     
     // contains the allowed data types for the check in the constructor as capital letters
     static final ArrayList<Character> ALLOWED_DATA_TYPES = new ArrayList<Character>() {
@@ -58,7 +58,20 @@ class Setting {
     }
     
     
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
+    void setOverwrittenValue(String value) {
+        this.overwrittenValue = value;
     }
+    
+    
+    /**
+     * Returns the value set by the user and otherwise the default value.
+     * @return value as String
+     */
+    String getValue() {
+        return (overwrittenValue.equals("") ? defaultValue : overwrittenValue);
+        
+        // TODO warn fallback to default
+    }
+    
+    String getDefaultValue() { return defaultValue; }
 }

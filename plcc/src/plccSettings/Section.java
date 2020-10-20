@@ -15,7 +15,7 @@ import tools.DP;
  *
  * @author jnw
  */
-public class Section {
+class Section {
     
     String name;  // name of the section
     String type;  // either user, advanced or developer
@@ -23,9 +23,9 @@ public class Section {
     
     static final ArrayList<String> ALLOWED_TYPES = new ArrayList<String>() {
         {
-            add("user");
-            add("advanced");
-            add("developer");
+            add("User");
+            add("Advanced");
+            add("Developer");
         }
     };
     
@@ -61,7 +61,7 @@ public class Section {
         settings = new ArrayList<>();
         switch(name) {
             case "General settings":
-                settings.add(new Setting("plcc_B_use_mmCIF_parser", 'B', "false", "Whether the mmCIF parser should be used on the provided PDB coordinates file."));
+                settings.add(new Setting("plcc_B_use_mmCIF_parser", 'B', "true", "Whether the mmCIF parser should be used on the provided PDB coordinates file."));
                 settings.add(new Setting("plcc_S_output_dir", 'S', ".", "Output directory for all created files."));
                 settings.add(new Setting("plcc_B_calc_draw_graphs", 'B', "true", "Whether graphs are computed and output."));
                 settings.add(new Setting("plcc_B_draw_graphs", 'B', "true", "Whether graph visualizations are output."));
@@ -121,7 +121,8 @@ public class Section {
             case "Structure visualization":
                 settings.add(new Setting("plcc_B_Jmol_graph_vis_commands", 'B', "true", "Whether to compute and print Jmol commands to visualize Protein Graphs in 3D."));
                 settings.add(new Setting("plcc_B_Jmol_graph_vis_resblue_commands", 'B', "false", "Whether to compute and print Jmol commands to color the residues of Protein Graphs blue in 3D."));
-            
+                break;
+                
             case "Prints / Error handling":
                 settings.add(new Setting("plcc_B_silent", 'B', "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage."));
                 settings.add(new Setting("plcc_B_only_essential_output", 'B', "true", "Whether to print only high-level status information."));
@@ -133,6 +134,7 @@ public class Section {
                 settings.add(new Setting("plcc_B_print_silent_notice", 'B', "true", "Whether to print a single line informing the user that silent mode is set in silent mode (includes PDB ID of current file)."));
                 settings.add(new Setting("plcc_B_warn_cfg_fallback_to_default", 'B', "true", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used."));
                 settings.add(new Setting("plcc_B_split_dsspfile_warning", 'B', "false", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file."));
+                break;
                 
             case "Performance":
                 settings.add(new Setting("plcc_B_separate_contacts_by_chain", 'B', "false", "Whether to compute atom contacts separated by chain. Faster but does not detect contacts between different chains and thus cannot be used for Complex Graph computation."));
@@ -148,7 +150,8 @@ public class Section {
                 settings.add(new Setting("plcc_B_centroid_method", 'B', "true", "Whether to use centroid of atoms instead of C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup."));
                 settings.add(new Setting("plcc_B_round_coordinates", 'B', "true", "Whether 3D atom coordinates should be rounded or truncated one decimal place."));
                 settings.add(new Setting("plcc_S_temp_dir", 'S', ".", "The directory where temporary files can be created. You need write access to it, of course."));
-            
+                break;
+                
             case "Parser":
                 settings.add(new Setting("plcc_B_include_rna", 'B', "false", "Whether RNA should be parsed and included in graph formalism and visualisation (WIP)."));
                 settings.add(new Setting("plcc_B_convert_models_to_chains", 'B', "false", "Whether the PDB file should be checked for multiple models and if so convert those models to chains."));
@@ -156,7 +159,8 @@ public class Section {
                 settings.add(new Setting("plcc_S_ligAACode", 'S', "J", "The amino acid code used to mark a ligand residue."));
                 settings.add(new Setting("plcc_I_lig_min_atoms", 'I', "1", "The minimum number of atoms a ligand needs to consist of to count as an SSE."));
                 settings.add(new Setting("plcc_I_lig_max_atoms", 'I', "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited."));
-            
+                break;
+                
             case "Secondary Structure Element (SSE)":
                 settings.add(new Setting("plcc_S_ligSSECode", 'S', "L", "The SSE code used to mark an SSE of type ligand."));
                 settings.add(new Setting("plcc_S_rnaSseCode", 'S', "R", "The SSE code used to mark an SSE of type RNA"));
@@ -168,7 +172,8 @@ public class Section {
                 settings.add(new Setting("plcc_B_merge_helices", 'B', "true", "whether to merge different helix types if they are adjacent in the primary structure."));
                 settings.add(new Setting("plcc_I_merge_helices_max_dist", 'I', "false", "The maximal distance in amino acids of the primary sequence where helices are merged when 'plcc_B_merge_helices' is true. "
                         + "The (default) value 0 means only directly adjacent SSEs are merged."));
-             
+                break;
+                
             case "SSE orientation":
                 settings.add(new Setting("plcc_B_spatrel_use_dd", 'B', "false", "Whether to use double difference mode for computation of orientation of SSEs. False invokes vector-mode instead."));
                 settings.add(new Setting("plcc_I_spatrel_vector_num_res_centroids", 'I', "4", "Vector mode: How many residues to use for centroid computation of start and end point of vector for SSE."));
@@ -182,7 +187,8 @@ public class Section {
                 settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_he", 'I', "6", "Double difference mode: Same as above, but for H/E or E/H interactions."));
                 settings.add(new Setting("plcc_I_spatrel_dd_largest_antip_def", 'I', "-7", "Double difference mode: Same as above, this is the default for other interactions (e.g., coil/helix)."));
                 settings.add(new Setting("plcc_I_spatrel_dd_smallest_parallel_def", 'I', "7", "Double difference mode: Same as above, this is the default for other interactions."));
-            
+                break;
+                
             case "Contact definition":
                 settings.add(new Setting("plcc_I_aa_atom_radius", 'I', "20", "The atom radius of protein atoms in 10th part Angstroem (setting 20 here means 2 A)"));
                 settings.add(new Setting("plcc_I_rna_atom_radius", 'I', "20", "The atom radius of RNA atoms in 10th part Angstroem (setting 20 here means 2 A)"));
@@ -190,6 +196,7 @@ public class Section {
                 settings.add(new Setting("plcc_I_max_contacts_per_type", 'I', "1", "The maximum number of contacts of a certain type that is counted for a residue pair. Set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). "
                         + "The PTGL uses a setting of 1 (so if a pair has 3 B/B contacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)"));
                 settings.add(new Setting("plcc_B_forceBackboneContacts", 'B', "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone."));
+                break;
                 
             case "AAG":
                 settings.add(new Setting("plcc_I_aag_min_residue_seq_distance_for_contact", 'I', "0", "If set to a value greater than zero, only contacts from residues more than or exactly this value apart in the sequence can have a contact."
@@ -198,6 +205,7 @@ public class Section {
                         + "Can be used to force network of short-range contacts, ignoring long-range connections. Also ignores all contacts to residues from other chains."));
                 settings.add(new Setting("plcc_B_AAgraph_allchainscombined", 'B', "false", "Whether to compute and output combined amino acid graphs (one for all chains) as well."));
                 settings.add(new Setting("plcc_B_AAgraph_perchain", 'B', "false", "Whether to compute and output amino acid graphs per chain as well."));
+                break;
                 
             case "Database (DB) connection":
                 settings.add(new Setting("plcc_B_useDB", 'B', "false", "Whether to write any data to the PostgreSQL database."));
@@ -207,6 +215,7 @@ public class Section {
                 settings.add(new Setting("plcc_S_db_username", 'S', "vplg", "DB username"));
                 settings.add(new Setting("plcc_S_db_password", 'S', "", "DB password (empty if local is TRUST for this user)"));
                 settings.add(new Setting("plcc_B_db_use_autocommit", 'B', "false", "Whether the DB connection gets set to autocommit when created."));
+                break;
                 
             case "DB settings":
                 settings.add(new Setting("plcc_S_graph_image_base_path", 'S', "/srv/www/htdocs/vplgweb/data/", "[DEPRECATED] The base path for graph visualizations for the database. The relative path to the path given here is used to locate the graph image on disk."));
@@ -221,6 +230,7 @@ public class Section {
                         + "They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm."));
                 settings.add(new Setting("plcc_B_report_db_proteins", 'B', "false", "Write a list of PDB IDs which are currently in the database to the file 'db_content_proteins.txt', then exit."));
                 settings.add(new Setting("plcc_B_uglySQLhacks", 'B', "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB."));
+                break;
                 
             case "DB structure search":
                 settings.add(new Setting("plcc_B_matrix_structure_search", 'B', "vplg", "Search a linear notation (input) in a proteinstructure (input)"));
@@ -228,7 +238,8 @@ public class Section {
                 settings.add(new Setting("plcc_S_linear_notation", 'S', "", "The linear notation of a PG for the matrix structure comparison."));
                 settings.add(new Setting("plcc_S_linear_notation_type", 'S', "", "The type of linear notation (adj or red) for matrix structure comparison."));
                 settings.add(new Setting("plcc_S_linear_notation_graph_type", 'S', "", "alpha, beta or albe = The graph type of the PG graph of the linear notation."));
-            
+                break;
+                
             case "FG":
                 settings.add(new Setting("plcc_I_min_fgraph_size_draw", 'I', "3", "The minimum size of a Folding Graph to be drawn. Setting this to 1 or 0 draws all of them, including isolated vertices."));
                 settings.add(new Setting("plcc_I_min_fgraph_size_write_to_db", 'I', "1", "The minimum size of a Folding Graph to be written to the database. Setting this to 1 or 0 saves all of them, including isolated vertices."));
@@ -237,6 +248,7 @@ public class Section {
                 settings.add(new Setting("plcc_B_print_notations_on_fg_images", 'B', "false", "Whether to add the notation string to the FG images."));
                 settings.add(new Setting("plcc_B_output_fg_linear_notations_to_file", 'B', "true", "Whether to save linear notations of Folding Graphs to a text file."));
                 settings.add(new Setting("plcc_B_special_linnot_rules_for_bifurcated_adj_and_red", 'B', "true", "Whether special rules should be used for computing the ADJ and RED notations of FGs. These special rules were not used in the latest PTGL version by PM, but it seems in older versions."));
+                break;
                 
             case "PG":
                 settings.add(new Setting("plcc_B_output_GML", 'B', "true", "Whether to save Protein Graphs to text files in Graph Modelling Language (GML) format."));
@@ -257,6 +269,7 @@ public class Section {
                 settings.add(new Setting("plcc_B_add_metadata_comments_GML", 'B', "false", "Whether to add meta data to exported GML format graphs in comments. Note: Not all programs parse comments correctly."));
                 settings.add(new Setting("plcc_B_add_metadata_comments_DOT", 'B', "false", "Whether to add meta data to exported DOT format graphs in comments. Note: Not all programs parse comments correctly."));
                 settings.add(new Setting("plcc_B_compute_graph_metrics", 'B', "false", "Whether to compute graph metrics such as cluster coefficient for PGs. Slower!"));
+                break;
                 
             case "CG":
                 settings.add(new Setting("plcc_B_draw_ligandcomplexgraphs", 'B', "false", "[EXPERIMENTAL] Whether to draw ligand-centered Complex Graphs. This means one graph for each ligand in a PDB file, each showing all SSEs (regardless of chain) the ligand is in contact with."));
@@ -269,10 +282,12 @@ public class Section {
                 settings.add(new Setting("plcc_B_output_compgraph_JSON", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in JSON format."));
                 settings.add(new Setting("plcc_B_output_compgraph_XML", 'B', "false", "Whether to save Complex Graphs (including SSE info) to a text file in XGMML format."));
                 settings.add(new Setting("plcc_B_writeComplexContactCSV", 'B', "false", "Whether to write a CSV file containing all contacts used for Complex Graph computation."));
+                break;
                 
             case "Motifs":
                 settings.add(new Setting("plcc_B_compute_motifs", 'B', "true", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB)."));
                 settings.add(new Setting("plcc_B_compute_tim", 'B', "false", "Whether to search for tim barrel motif in FGs if plcc_B_compute_motifs is true."));
+                break;
                 
             case "Cluster mode":
                 settings.add(new Setting("plcc_B_clustermode", 'B', "false", "Whether to write extra output files used only in cluster mode, like GML albe graph file list."));
@@ -286,7 +301,8 @@ public class Section {
                 settings.add(new Setting("plcc_B_output_textfiles_dir_tree_core_html", 'B', "false", "Whether to write the core VPLGweb HTML files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well. "
                         + "These are the main page, search form and other stuff which is only needed once for the whole website."));
                 settings.add(new Setting("plcc_B_html_add_complex_graph_data", 'B', "true", "Whether to write data on the complex graph to the protein result HTML webpage (if available)."));
-
+                break;
+                
             case "DB: representative chains":
                 settings.add(new Setting("plcc_B_set_pdb_representative_chains_pre", 'B', "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file. "
                         + "Should be run BEFORE filling on a therefore empty database."));
@@ -295,11 +311,13 @@ public class Section {
                         + "Should be run AFTER filling on a therefore non-empty database."));
                 settings.add(new Setting("plcc_B_set_pdb_representative_chains_remove_old_labels_post", 'B', "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set."));
                 settings.add(new Setting("plcc_S_representative_chains_xml_file", 'S', "representatives.xml", "The path to the XML file containing the representative PDB chains from the PDB. You can get the file from the RCSB PDB REST web service."));
+                break;
                 
             case "Output settings":
                 settings.add(new Setting("plcc_B_ptgl_text_output", 'B', "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated."));
                 settings.add(new Setting("plcc_B_ptgl_geodat_output", 'B', "false", "Whether the PTGL text files geo.dat for SSE level contacts are written to a text file."));
                 settings.add(new Setting("plcc_B_ramachandran_plot", 'B', "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower)."));
+                break;
                 
             case "Image settings":
                 settings.add(new Setting("plcc_B_graphimg_header", 'B', "true", "Whether the graph images are created with header line with info on the graph type, PDB and chain ID."));
@@ -324,6 +342,7 @@ public class Section {
                 settings.add(new Setting("plcc_I_img_minPageWidth", 'I', "800", "The minimum image width in pixels, used in output images."));
                 settings.add(new Setting("plcc_I_img_minPageHeight", 'I', "600", "The minimum image height in pixels, used in output images."));
                 settings.add(new Setting("plcc_S_img_output_fileext", 'S', ".png", "[DEPRECATED] File extension of images. Not used for graph images anymore; applies to Ramaplot etc only."));
+                break;
                 
             case "DB: similarity search":
                 settings.add(new Setting("plcc_B_search_similar", 'B', "false", "[EXPERIMENTAL] Whether to search for the most similar protein."));
@@ -342,6 +361,7 @@ public class Section {
                 settings.add(new Setting("plcc_I_compute_all_graphlet_similarities_end_graphlet_index", 'I', "29", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the last (end) graphlet used. Do not forget to also set the start index properly. This is inclusive."));
                 settings.add(new Setting("plcc_I_number_of_graphlets", 'I', "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity."));
                 settings.add(new Setting("plcc_B_write_chains_file", 'B', "false", "Whether to write a chains file containing all chain names of the currently handled PDB file. Can be used by GraphletAnalyzer later to construct graph file names for all chains."));
+                break;
                 
             case "Debug":
                 settings.add(new Setting("plcc_I_debug_level", 'I', "0", "Debug level. Higher value means more output."));
@@ -350,6 +370,7 @@ public class Section {
                 settings.add(new Setting("plcc_B_contact_debug_dysfunct", 'B', "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!"));
                 settings.add(new Setting("plcc_B_debug_only_parse", 'B', "false", "Exit after parsing. WARNING: When this is true, plcc will abort after parsing and not produce results!"));
                 settings.add(new Setting("plcc_B_debug_only_contact_comp", 'B', "false", "Exit after contact computation. WARNING: When this is true, plcc will abort after contact computation and not produce results!"));
+                break;
                 
             case "Disabled":
                 settings.add(new Setting("plcc_B_parse_binding_sites", 'B', "false", "[DISABLED] Whether to parse binding site data from the REMARK 800 and SITE lines of legacy PDB file."));
@@ -358,11 +379,13 @@ public class Section {
                 settings.add(new Setting("plcc_B_complex_graph_same", 'B', "0", "[DISABLED] Determines whether the complex graph is drawn with all nodes of the same type."));
                 settings.add(new Setting("plcc_B_complex_graph_mere", 'B', "0", "[DISABLED] Determines whether the complex graph is drawn with nodes of different type for each mere."));
                 settings.add(new Setting("plcc_I_ligSAS", 'I', "20", "[DISABLED] The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)"));
+                break;
                 
             case "Alternate AAG":
                 settings.add(new Setting("plcc_B_handle_hydrogen_atoms_from_reduce", 'B', "false", "[EXPERIMENTAL] Whether to parse hydrogen atoms added to PDB files by the external Reduce software."));
                 settings.add(new Setting("plcc_B_alternate_aminoacid_contact_model", 'B', "false", "[EXPERIMENTAL] Whether to use alternate residue contact model by A. Scheck. Skips all computations except AA graphs."));
                 settings.add(new Setting("plcc_B_alternate_aminoacid_contact_model_with_ligands", 'B', "false", "[EXPERIMENTAL] Whether to use alternate residue contact model including ligands by A. Scheck. Skips all computations except AA graphs."));
+                break;
                 
             default:
                 DP.getInstance().e(Settings.PACKAGE_TAG, "Settings section with name '" + name + "' not implemented. Please contact a developer.");

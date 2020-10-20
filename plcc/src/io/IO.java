@@ -49,6 +49,8 @@ import tools.DP;
  * @author ts
  */
 public class IO {
+    
+    public static final String CLASS_TAG = "IO";
    
     public static Integer[] mapStringIntegerToArraySortedByMapKeys(Map<String, Integer> maxDiams) {
         List<String> sortedKeys = new ArrayList<>(maxDiams.keySet());
@@ -940,5 +942,51 @@ public class IO {
         return sb.toString();
     }
 
+    /**
+     * Writes a string to a file.
+     * @param content of the file
+     * @param path of the file
+     * @param overwrite whether to overwrite if file already exists
+     * @return 
+     */
+    public static Boolean writeStringToFile(String content, String path, Boolean overwrite) {
+        
+        // TODELETE
+        System.out.println(path);
+        
+        // check if file exists and we should not overwrite
+        File tmpFile = new File(path);
+        if (tmpFile.isFile() && !overwrite) {
+            DP.getInstance().w(CLASS_TAG, "Tried creating file '" + path + "', but file already existed and "
+                    + "overwrite flag was set to false. Returning failure and going on.");
+            return false;
+        }
+        
+        // try to write file
+        try {
+            FileWriter tmpWriter = new FileWriter(path);
+            tmpWriter.write(content);
+        } catch (IOException e) {
+            DP.getInstance().e(CLASS_TAG, "Could not create file '" + path + "'. Error: " + e.toString() + ". "
+                    + "Returning failure and going on.");
+            return false;
+        }
+        
+        return true;  // if code reaches here, it worked
+    }
     
+    
+    public static Properties readPropertiesFromFile(String path) {
+        Properties tempProperties = new Properties();
+        try {
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(path));
+            tempProperties.load(stream);
+            stream.close();
+            return tempProperties;
+        } catch (IOException e) {
+            DP.getInstance().w(CLASS_TAG, "Could not read properties from file '" + path + "'. Error: " + e.toString() + ". " +
+                    "Returning null and going on." );
+            return null;
+        }
+    }
 }

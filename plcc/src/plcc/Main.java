@@ -195,6 +195,9 @@ public class Main {
         outputToBePrintedUnlessSilent.append("Init... (Version ").append(version).append(")\n");
         
         // *************************************************** load default settings from config file *************************************
+        
+        // TODELETE
+        plccSettings.Settings.init();
 
         // The settings are defined in the Settings class. They are loaded from the config file below and can then be overwritten
         //  by command line arguments.
