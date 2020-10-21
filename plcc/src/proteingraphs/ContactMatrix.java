@@ -22,9 +22,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import plcc.Settings;
+import plcc.SettingsOld;
 //import org.jgrapht.graph.*;
-
 /**
  * Represents an SSE level contact matrix for a protein chain. Includes information on all SSE types, i.e., it is not
  * specific for a certain graph type.
@@ -140,7 +139,7 @@ public class ContactMatrix {
                     
                     // This information is kept in the chain-specific geo.dat file of bet_neo in the PTGL.
                     
-                    Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");//;   
+                    Integer mpt = SettingsOld.getInteger("plcc_I_max_contacts_per_type");//;   
                                        // See comment above, the maximum number of contacts of a certain type that
                                        // is counted for a residue pair. 
                                        // The PTGL uses a setting of 1.
@@ -599,7 +598,7 @@ public class ContactMatrix {
                 }
                 else {
                     // debug output
-                    if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+                    if (SettingsOld.getInteger("plcc_I_debug_level") >= 3) {
                         System.out.println("   [DEBUG LV 3] " + a.toString());
                         System.out.println("   [DEBUG LV 3] " + b.toString());
                         System.out.println("    [DEBUG LV 3] #BB: " + contBB[i][j] + " #BC: " + 
@@ -730,21 +729,21 @@ public class ContactMatrix {
         sumMax = difMax = tmp = Integer.MIN_VALUE;               // something small...
         sumMin = difMin = Integer.MAX_VALUE;               // & something laaarge :)
         Integer doubleDifference = null;
-        Integer eeLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_ee");
-        Integer eeSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_ee");
-        Integer hhLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_hh");
-        Integer hhSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_hh");
-        Integer heLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_he");
-        Integer heSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_he");
-        Integer defLargestAntip = Settings.getInteger("plcc_I_spatrel_dd_largest_antip_def");
-        Integer defSmallestParallel = Settings.getInteger("plcc_I_spatrel_dd_smallest_parallel_def");
+        Integer eeLargestAntip = SettingsOld.getInteger("plcc_I_spatrel_dd_largest_antip_ee");
+        Integer eeSmallestParallel = SettingsOld.getInteger("plcc_I_spatrel_dd_smallest_parallel_ee");
+        Integer hhLargestAntip = SettingsOld.getInteger("plcc_I_spatrel_dd_largest_antip_hh");
+        Integer hhSmallestParallel = SettingsOld.getInteger("plcc_I_spatrel_dd_smallest_parallel_hh");
+        Integer heLargestAntip = SettingsOld.getInteger("plcc_I_spatrel_dd_largest_antip_he");
+        Integer heSmallestParallel = SettingsOld.getInteger("plcc_I_spatrel_dd_smallest_parallel_he");
+        Integer defLargestAntip = SettingsOld.getInteger("plcc_I_spatrel_dd_largest_antip_def");
+        Integer defSmallestParallel = SettingsOld.getInteger("plcc_I_spatrel_dd_smallest_parallel_def");
         Integer largestAntip;       // used in loop below, gets assigned one of the values above
         Integer smallestParallel;
         Map<Integer, List<MolContactInfo>> rcMap = new HashMap<>();
         Integer resASSEPos, resBSSEPos;
         
         // pre-processing only for double difference required
-        if (Settings.getBoolean("plcc_B_spatrel_use_dd")) {
+        if (SettingsOld.getBoolean("plcc_B_spatrel_use_dd")) {
             // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string 
             //   (jnw_2019: more like the number of the SSE it is part of), and as value a list of all contacts 
             //   of that residue. This is done only once, and saves us from sequentially iterating through the 
@@ -784,7 +783,7 @@ public class ContactMatrix {
             
             for(Integer j = (i + 1); j < this.size; j++) {
                               
-                if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                if (SettingsOld.getInteger("plcc_I_debug_level") >= 4) {
                         System.out.println("[DEBUG LV 4] Vertices >>" + i + "<< and >>" + j + "<<");
                     }
 
@@ -808,7 +807,7 @@ public class ContactMatrix {
                         spatRelCode = SpatRel.LIGAND;
                         //System.out.println("    SSEs " + i + " and " + j + " are ligands, skipping DD calculation.");
                     } else {
-                        if (Settings.getBoolean("plcc_B_spatrel_use_dd")) {
+                        if (SettingsOld.getBoolean("plcc_B_spatrel_use_dd")) {
                             // use double difference mode
 
                             sumMax = difMax = Integer.MIN_VALUE;
@@ -850,7 +849,7 @@ public class ContactMatrix {
                                         sumMin = tmp;
                                     }
 
-                                    if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                                    if (SettingsOld.getInteger("plcc_I_debug_level") >= 4) {
                                         System.out.println("[DEBUG LV 4] Res " + resA.getDsspNum() + " + " + resB.getDsspNum());
                                         System.out.println("  Sum: " + tmp);
                                     }
@@ -858,7 +857,7 @@ public class ContactMatrix {
                                     // check for new difMax
                                     tmp = Math.abs(usedContList.get(k).getDsspNumA() - usedContList.get(k).getDsspNumB());
 
-                                    if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                                    if (SettingsOld.getInteger("plcc_I_debug_level") >= 4) {
                                         System.out.println("  Diff: " + tmp);
                                     }
 
@@ -879,7 +878,7 @@ public class ContactMatrix {
                             //doubleDifference = (sumMax - sumMin) - (difMax - difMin);
                             doubleDifference = sumMax - sumMin - difMax + difMin;
 
-                            if (Settings.getInteger("plcc_I_debug_level") >= 4) {
+                            if (SettingsOld.getInteger("plcc_I_debug_level") >= 4) {
                                 System.out.println("[DEBUG LV 4] Final values:");
                                 System.out.println("  sumMax: " + sumMax);
                                 System.out.println("  sumMin: " + sumMin);
@@ -922,20 +921,20 @@ public class ContactMatrix {
                             
                             if(doubleDifference <= largestAntip) {
                                 spatRelCode = SpatRel.ANTIPARALLEL;
-                                //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                                //if(SettingsOld.getInteger("plcc_I_debug_level") > 0) {
                                 //    System.out.println("    SSEs " + i + " and " + j + " are antiparallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
                                 //}
                             }
                             else if(doubleDifference >= smallestParallel) {
                                 spatRelCode = SpatRel.PARALLEL;
-                                //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                                //if(SettingsOld.getInteger("plcc_I_debug_level") > 0) {
                                 //    System.out.println("    SSEs " + i + " and " + j + " are parallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
                                 //}
                             }
                             else {
                                 // DD = 0
                                 spatRelCode = SpatRel.MIXED;
-                                //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                                //if(SettingsOld.getInteger("plcc_I_debug_level") > 0) {
                                 //    System.out.println("    SSEs " + i + " and " + j + " are mixed (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
                                 //}
                             }

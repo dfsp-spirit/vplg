@@ -950,10 +950,7 @@ public class IO {
      * @return 
      */
     public static Boolean writeStringToFile(String content, String path, Boolean overwrite) {
-        
-        // TODELETE
-        System.out.println(path);
-        
+
         // check if file exists and we should not overwrite
         File tmpFile = new File(path);
         if (tmpFile.isFile() && !overwrite) {

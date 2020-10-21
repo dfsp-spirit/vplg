@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import plcc.Settings;
+import plcc.SettingsOld;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
 import proteinstructure.Chain;
@@ -643,7 +643,7 @@ class CifParser {
                 atomRecordName = lineData[colHeaderPosMap.get("group_PDB")];
             }
         } else {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+            if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("FP_CIF", "Seems like _atom_site.group_PDB is missing. Trying to ignore it.");  
                 colHeaderPosMap.put("group_PDB", -1);  // save that warning has been printed
             } 
@@ -688,7 +688,7 @@ class CifParser {
 
         // coordX
         // for information on difference between ptgl and plcc style look in old parser
-        if (Settings.getBoolean("plcc_B_round_coordinates")) {
+        if (SettingsOld.getBoolean("plcc_B_round_coordinates")) {
             oCoordXf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10;
             coordX = Math.round(oCoordXf);
         } else {
@@ -698,7 +698,7 @@ class CifParser {
 
 
         // coordY
-        if (Settings.getBoolean("plcc_B_round_coordinates")) {
+        if (SettingsOld.getBoolean("plcc_B_round_coordinates")) {
             oCoordYf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_y")]) * 10;
             coordY = Math.round(oCoordYf);
         } else {
@@ -707,7 +707,7 @@ class CifParser {
         }
 
         // coordZ
-        if (Settings.getBoolean("plcc_B_round_coordinates")) {
+        if (SettingsOld.getBoolean("plcc_B_round_coordinates")) {
             oCoordZf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_z")]) * 10;
             coordZ = Math.round(oCoordZf);
         } else {
@@ -724,15 +724,15 @@ class CifParser {
         // TODO: possible to ignore alt loc atoms right now?
 
         if(FileParser.isDNAresidueName(FileParser.leftInsertSpaces(molNamePDB, 3))) {
-            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+            if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
             }
             return;  // atom is not used
         }
 
-        if( ! Settings.getBoolean("plcc_B_include_rna")) {
+        if( ! SettingsOld.getBoolean("plcc_B_include_rna")) {
             if(checkType(Molecule.RESIDUE_TYPE_RNA)) {
-                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to RNA residue (residue 3-letter code is '" + molNamePDB + "'), skipping.");
                 }
                 return;  // atom is not used
@@ -752,7 +752,7 @@ class CifParser {
                 if (! silent) {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
-                        if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                        if(SettingsOld.getInteger("plcc_I_debug_level") >= 1) {
                             System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand or RNA.");
                         }
                 }
@@ -771,8 +771,8 @@ class CifParser {
         Atom a = new Atom();
 
         if (FileParser.isIgnoredAtom(chemSym)) {
-            if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
-                if (Settings.getInteger("plcc_I_debug_level") > 0) {
+            if( ! (SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                if (SettingsOld.getInteger("plcc_I_debug_level") > 0) {
                     System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
                             " as it is either in ignored list or handle_hydrogens turned off.");
                 }
@@ -781,7 +781,7 @@ class CifParser {
         }
 
         // only ATOMs, not HETATMs, have a DSSP entry
-        if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+        if((SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
             a.setDsspResNum(null);
         }
         else {
@@ -816,7 +816,7 @@ class CifParser {
                     a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);
                     FileParser.ignoredLigands += 1;
                     
-                    if(Settings.getInteger("plcc_I_debug_level") > 0){
+                    if(SettingsOld.getInteger("plcc_I_debug_level") > 0){
                         DP.getInstance().w("Ignored RNA-Ligand found at PDB line " + molNumPDB + ". Name: " + molNamePDB);
                     }
                     return;
@@ -830,7 +830,7 @@ class CifParser {
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
-                    if(Settings.getInteger("plcc_I_debug_level") > 2){
+                    if(SettingsOld.getInteger("plcc_I_debug_level") > 2){
                         DP.getInstance().d("New RNA molecule added in PDB line " + molNumPDB);
                     }
                 }
@@ -863,7 +863,7 @@ class CifParser {
                 lig.setChain(FileParser.getChainByPdbChainID(chainID));
                 // still just assigning default model 1
                 lig.setModelID(m.getModelID());
-                lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
+                lig.setSSEString(SettingsOld.get("plcc_S_ligSSECode"));
                 
                 
                 // add ligand to list of residues if it not on the ignore list
@@ -871,7 +871,7 @@ class CifParser {
                     ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but this ligand won't be stored so decrement to previous value.
                     FileParser.ignoredLigands += 1;
 
-                    if(Settings.getInteger("plcc_I_debug_level") > 0){
+                    if(SettingsOld.getInteger("plcc_I_debug_level") > 0){
                         System.out.println("    PDB: Ignored ligand '" + molNamePDB + "-" + molNumPDB + "' at PDB line " + molNumPDB + ".");
                     }
                 } else {
@@ -952,7 +952,7 @@ class CifParser {
                     DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
                 } else {
-                    if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+                    if(SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
                         lastMol.addHydrogenAtom(a);
                     }
                     else {
@@ -1206,7 +1206,7 @@ class CifParser {
                     "label_asym_id", "Cartn_x", "Cartn_y", "Cartn_z"};
                 break;
             default:
-                if (! Settings.getBoolean("plcc_B_no_warn")) {
+                if (! SettingsOld.getBoolean("plcc_B_no_warn")) {
                     DP.getInstance().w("FP_CIF", "Tried to check table of category " + categoryName +
                             " for presence of important columns, but function is not defined for that " +
                             "category. Ignoring the check and moving on.");

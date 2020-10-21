@@ -93,16 +93,18 @@ class Setting {
     
     
     /**
-     * 
+     * Sets the overwritten value after a type check.
      * @param value
      * @return 
      */
-    void setOverwrittenValue(String value) {
+    Boolean setOverwrittenValue(String value) {
         if (checkDataType(value)) {
             this.overwrittenValue = value;
+            return true;
         } else {
             DP.getInstance().w(Settings.PACKAGE_TAG, "Could not overwrite setting '" + name + "', because value '" + value + "' is of wrong format. "
                     + "Required for this setting: " + getDataTypeString());
+            return false;
         }
     }
     

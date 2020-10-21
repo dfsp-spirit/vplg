@@ -40,7 +40,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import proteingraphs.FoldingGraph;
 import proteingraphs.Position2D;
-import plcc.Settings;
+import plcc.SettingsOld;
 import tools.DP;
 
 /**
@@ -110,7 +110,7 @@ public class DrawTools {
     }
     
     public static void main(String [] args) {
-        Settings.init();
+        SettingsOld.init();
         System.out.println("Testing drawing functions...");
         DrawTools.drawTest("test");
         System.out.println("Done.");
@@ -341,7 +341,7 @@ public class DrawTools {
      */
     public static ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwardsInCaseOfSimpleArc, int pixelsToShiftCentralLineOnYAxis) {
                 
-        Boolean useAlternate = Settings.getBoolean("plcc_B_key_use_alternate_arcs");
+        Boolean useAlternate = SettingsOld.getBoolean("plcc_B_key_use_alternate_arcs");
         if(useAlternate) {
             return getArcConnectorAlternative(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);
         }

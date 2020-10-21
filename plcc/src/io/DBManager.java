@@ -28,7 +28,7 @@ import plcc.Main;
 import motifs.MotifSearchTools;
 import motifs.Motifs;
 import resultcontainers.PTGLNotationFoldResult;
-import plcc.Settings;
+import plcc.SettingsOld;
 import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;
@@ -387,7 +387,7 @@ public class DBManager {
      * @return whether the connection succeeded
      */
     public static Boolean initUsingDefaults() {
-        return init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), false);
+        return init(SettingsOld.get("plcc_S_db_name"), SettingsOld.get("plcc_S_db_host"), SettingsOld.getInteger("plcc_I_db_port"), SettingsOld.get("plcc_S_db_username"), SettingsOld.get("plcc_S_db_password"), false);
     }
 
     /**
@@ -425,7 +425,7 @@ public class DBManager {
         
         if(conOK) {
             try {                
-                if(! Settings.getBoolean("plcc_B_silent")) {
+                if(! SettingsOld.getBoolean("plcc_B_silent")) {
                     System.out.println("Connection to " + dbProductName + " " + dbProductVersion + " successful. Autocommit is " + (dbc.getAutoCommit() ? "on" : "off") + ".");                    
                 }
             } catch(Exception e) {
@@ -481,7 +481,7 @@ public class DBManager {
             DP.getInstance().w("DBManager", "computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(): Graphlets for your chose graph type '" + graphType + "' may not be in the database. By default, we compute \"albe\" graphlets only.");
         }
         
-        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        String graphletSimMethod = SettingsOld.get("plcc_S_search_similar_graphlet_scoretype");
         
         
         Long numScoresComputed = 0L;
@@ -642,7 +642,7 @@ public class DBManager {
      */
     public static Long[] computeGraphletSimilarityScoresForCGsWholeDatabaseAndStoreBest(Integer numberOfTopScoresToSavePerPair) {
                 
-        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        String graphletSimMethod = SettingsOld.get("plcc_S_search_similar_graphlet_scoretype");
         Long numScoresComputed = 0L;
         Long numScoresSaved = 0L;
         List<String> allPDBs = DBManager.getAllPDBIDsInTheDB(); // more than 100k chains with full PDB in database
@@ -775,7 +775,7 @@ public class DBManager {
         
         Long numPDBsFound = ((Integer)allPDBs.size()).longValue();
         Long numGraphletsFound = 0L;
-        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        String graphletSimMethod = SettingsOld.get("plcc_S_search_similar_graphlet_scoretype");
         Double[] src_graphlets, cmp_graphlets;
         
         String src_pdb_id, cmp_pdb_id;
@@ -913,7 +913,7 @@ public class DBManager {
      */
     boolean supportsTransactions() throws SQLException {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
 
         return (dbc.getMetaData().supportsTransactions());
     }
@@ -926,7 +926,7 @@ public class DBManager {
      */
     public static int doInsertQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -956,7 +956,7 @@ public class DBManager {
      */
     public static int doUpdateQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -986,7 +986,7 @@ public class DBManager {
      */
     public static int doDeleteQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -1039,7 +1039,7 @@ public class DBManager {
      */
     public static ArrayList<ArrayList<String>> doSelectQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
 
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -1156,7 +1156,7 @@ public class DBManager {
      * @return whether it worked out
      */
     public static Boolean dropTables() {
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -1246,7 +1246,7 @@ public class DBManager {
     public static Boolean createTables(Boolean fillTypetables) {
 
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(SettingsOld.getBoolean("plcc_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -2173,7 +2173,7 @@ connection.close();
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
-        if (Settings.getBoolean("plcc_B_compute_tim")) {
+        if (SettingsOld.getBoolean("plcc_B_compute_tim")) {
             if(DBManager.chainContainsMotif_TIMBarrel(chain_db_id)) {
                 motif_db_id = Motifs.MOTIFCODE__TIM_BARREL.longValue();
                 rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
@@ -2215,7 +2215,7 @@ connection.close();
                                         
         
         // OK -- all motifs tested
-        if(! Settings.getBoolean("plcc_B_silent")) {
+        if(! SettingsOld.getBoolean("plcc_B_silent")) {
             if(foundMotifsForChain.size() > 0) {
                 System.out.println("      Found " + foundMotifsForChain.size() + " motives in all folding graph linear notations of " + pdbid + " chain " + chain + ": " + IO.stringListToString(foundMotifsForChain));
             } else {
@@ -2748,8 +2748,8 @@ connection.close();
     */
     public static void main(String[] argv) {
         Boolean silent = false;
-        Settings.init();
-        int numSettingsLoaded = Settings.load("");
+        SettingsOld.init();
+        int numSettingsLoaded = SettingsOld.load("");
         if(DBManager.initUsingDefaults()) {
                 if(! silent) {
                     System.out.println("  -> Database connection OK.");
@@ -2767,7 +2767,7 @@ connection.close();
             else {
                 System.out.println("  -> Database connection FAILED.");
                 DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
-                Settings.set("plcc_B_useDB", "false");
+                SettingsOld.set("plcc_B_useDB", "false");
             }
        
     }
@@ -3485,7 +3485,7 @@ connection.close();
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
-        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+        if( ! SettingsOld.getBoolean("plcc_B_no_not_impl_warn")) {
             DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         }
         
@@ -4525,7 +4525,7 @@ connection.close();
             all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
         }
         
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+        if(SettingsOld.getInteger("plcc_I_debug_level") > 0) {
             DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: START. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
         }
             
@@ -7625,7 +7625,7 @@ connection.close();
             }
         }
         
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+        if(SettingsOld.getInteger("plcc_I_debug_level") > 0) {
             DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: END. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
         }
         
@@ -8830,7 +8830,7 @@ connection.close();
             }
         }
         
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+        if(SettingsOld.getInteger("plcc_I_debug_level") > 0) {
             DP.getInstance().d("DBManager", "chainContainsMotif_UbiquitinRoll: list of PDB ids: " + IO.stringListToString(all_pdb_ids));
         }
         
@@ -12527,7 +12527,7 @@ connection.close();
      */
     public static Boolean writeNormalizedGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Double[] graphlet_counts) throws SQLException {
 
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_number_of_graphlets");
+        int numReqGraphletTypes = SettingsOld.getInteger("plcc_I_number_of_graphlets");
         if(graphlet_counts.length != numReqGraphletTypes) {
             System.err.println("ERROR: writeNormalizedGraphletsToDB: Invalid number of graphlet types specified (got " + graphlet_counts.length + ", required " + numReqGraphletTypes + "). Skipping graphlets.");
             return false;
@@ -15076,7 +15076,7 @@ connection.close();
      */
     public static Integer[] getGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
         
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_number_of_graphlets");
+        int numReqGraphletTypes = SettingsOld.getInteger("plcc_I_number_of_graphlets");
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
@@ -15188,8 +15188,8 @@ connection.close();
      */
     public static Double[] getNormalizedProteinGraphGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
                 
-        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
-        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int graphletStartIndex = SettingsOld.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = SettingsOld.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
         int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
@@ -15302,8 +15302,8 @@ connection.close();
      */
     public static Double[] getNormalizedComplexgraphGraphletCounts(String pdb_id) throws SQLException {
                 
-        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
-        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int graphletStartIndex = SettingsOld.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = SettingsOld.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
         int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         ResultSetMetaData md;
@@ -15433,8 +15433,8 @@ connection.close();
     public static Double[] getNormalizedAminoacidgraphGraphletCounts(String pdb_id) throws SQLException {
         
         
-        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
-        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int graphletStartIndex = SettingsOld.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = SettingsOld.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
         int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         ResultSetMetaData md;
@@ -15843,7 +15843,7 @@ connection.close();
      * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
-     * @return the relative path to the graph image in SVG format, or null if no such graph image exists (path relative to the base directory, see Settings class).
+     * @return the relative path to the graph image in SVG format, or null if no such graph image exists (path relative to the base directory, see SettingsOld class).
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
     public static String getGraphImagePathSVG(String pdb_id, String chain_name, String graph_type) throws SQLException {

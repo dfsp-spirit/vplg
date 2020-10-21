@@ -16,7 +16,7 @@ import java.util.Collections;
 import io.DBManager;
 import proteingraphs.ProtGraph;
 import proteingraphs.ProtGraphs;
-import plcc.Settings;
+import plcc.SettingsOld;
 
 /**
  * This class implements methods that compare an element against the whole database.
@@ -108,7 +108,7 @@ public class CompareOneToDB {
      * @param patternSSEString 
      */
     public static void performSSEStringComparison(String patternSSEString) {
-        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarToSSEString(patternSSEString, Settings.getInteger("plcc_I_search_similar_num_results"), Settings.get("plcc_S_search_similar_graphtype"), true);
+        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarToSSEString(patternSSEString, SettingsOld.getInteger("plcc_I_search_similar_num_results"), SettingsOld.get("plcc_S_search_similar_graphtype"), true);
                 
         if(res.size() > 0) {
 
@@ -119,7 +119,7 @@ public class CompareOneToDB {
         } else {
             DP.getInstance().w("Received no similarity results -- is the database empty?");  
         }
-        System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
+        System.out.println("Similarity search for PDB ID '" + SettingsOld.get("plcc_B_search_similar_PDBID") + "' chain '" + SettingsOld.get("plcc_B_search_similar_chainID") + "' graph type '" + SettingsOld.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
     
     
@@ -128,7 +128,7 @@ public class CompareOneToDB {
      * Performs the comparison and prints results to STDOUT.
      */
     public static void performGraphSetComparison() {
-        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarByGraphSetBased(Settings.get("plcc_S_search_similar_PDBID"), Settings.get("plcc_S_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"), Settings.getInteger("plcc_I_search_similar_num_results"));
+        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarByGraphSetBased(SettingsOld.get("plcc_S_search_similar_PDBID"), SettingsOld.get("plcc_S_search_similar_chainID"), SettingsOld.get("plcc_S_search_similar_graphtype"), SettingsOld.getInteger("plcc_I_search_similar_num_results"));
                 
         if(res.size() > 0) {
 
@@ -140,7 +140,7 @@ public class CompareOneToDB {
         } else {
             DP.getInstance().w("Received no similarity results -- is the database empty?");  
         }
-        System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
+        System.out.println("Similarity search for PDB ID '" + SettingsOld.get("plcc_B_search_similar_PDBID") + "' chain '" + SettingsOld.get("plcc_B_search_similar_chainID") + "' graph type '" + SettingsOld.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
     
     
@@ -148,7 +148,7 @@ public class CompareOneToDB {
      * Performs the comparison and prints results to STDOUT.
      */
     public static void performGraphCompatGraphComparison() {
-        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarByCompatibilityGraph(Settings.get("plcc_S_search_similar_PDBID"), Settings.get("plcc_S_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"), Settings.getInteger("plcc_I_search_similar_num_results"));
+        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarByCompatibilityGraph(SettingsOld.get("plcc_S_search_similar_PDBID"), SettingsOld.get("plcc_S_search_similar_chainID"), SettingsOld.get("plcc_S_search_similar_graphtype"), SettingsOld.getInteger("plcc_I_search_similar_num_results"));
                 
         System.out.println("Comparison done, checking results.");
         
@@ -162,7 +162,7 @@ public class CompareOneToDB {
         } else {
             DP.getInstance().w("Received no similarity results -- is the database empty?");  
         }
-        System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
+        System.out.println("Similarity search for PDB ID '" + SettingsOld.get("plcc_B_search_similar_PDBID") + "' chain '" + SettingsOld.get("plcc_B_search_similar_chainID") + "' graph type '" + SettingsOld.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
     
 

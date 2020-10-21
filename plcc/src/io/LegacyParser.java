@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import plcc.Settings;
+import plcc.SettingsOld;
 import proteingraphs.MolContactInfo;
 import proteingraphs.ProtGraph;
 import proteinstructure.AminoAcid;
@@ -128,7 +128,7 @@ class LegacyParser {
         }
         createAllChainsFromPdbData();   // fills s_chains
         
-        if(Settings.getBoolean("plcc_B_parse_binding_sites")) {
+        if(SettingsOld.getBoolean("plcc_B_parse_binding_sites")) {
             if(! silent) {
                 System.out.println("  Creating binding sites...");
             }
@@ -243,7 +243,7 @@ class LegacyParser {
         }
         
         // assign residues to binding sites
-        if(Settings.getBoolean("plcc_B_parse_binding_sites")) {
+        if(SettingsOld.getBoolean("plcc_B_parse_binding_sites")) {
             Integer siteResPdbResNum; String siteResChainID; String siteResName;
             int numResAssigned = 0;
             int numWaterResIgnored = 0;
@@ -354,7 +354,7 @@ class LegacyParser {
             
             
   
-            if(Settings.getBoolean("plcc_B_round_coordinates")) {
+            if(SettingsOld.getBoolean("plcc_B_round_coordinates")) {
             // PLCC style: round the coordinates
                 oCoordXf = Float.valueOf((curLinePDB.substring(30, 38)).trim()) * 10;
                 oCoordYf = Float.valueOf((curLinePDB.substring(38, 46)).trim()) * 10;
@@ -414,7 +414,7 @@ class LegacyParser {
             if(FileParser.isIgnoredAtom(chemSym)) {
                 //a.setAtomtype(3);
                 
-                if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                if( ! (SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                     return(false);
                 } 
             }
@@ -430,7 +430,7 @@ class LegacyParser {
 
             // only ATOMs, not HETATMs, have a DSSP entry
             //a.setDsspResNum(getDsspResNumForPdbResNum(resNumPDB));
-            if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+            if((SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                 a.setDsspResNum(null);
             }
             else {
@@ -482,7 +482,7 @@ class LegacyParser {
             return(false);
         } else {            
             
-            if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+            if(SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
                 tmpRes.addHydrogenAtom(a);
             }
             else {
@@ -652,7 +652,7 @@ class LegacyParser {
                 System.out.println("    PDB: Multiple models found, all but the default model will be ignored.");
             }
 
-            if(Settings.getBoolean("plcc_B_split_dsspfile_warning")) {
+            if(SettingsOld.getBoolean("plcc_B_split_dsspfile_warning")) {
                 System.err.println("*************************************** WARNING ******************************************");
                 DP.getInstance().w("Multiple models detected in PDB file. I'm fine with that but unless you did split");
                 DP.getInstance().w(" the PDB file into separate models for DSSP, the current DSSP file is broken.");
@@ -1050,7 +1050,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     lig.setAAName1(AminoAcid.getLigandName1());
                     lig.setChain(FileParser.getChainByPdbChainID(chainID));
                     lig.setModelID(modelID);
-                    lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
+                    lig.setSSEString(SettingsOld.get("plcc_S_ligSSECode"));
                                       
 
                     // add ligand to list of residues if it not on the ignore list
@@ -1062,7 +1062,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     else {
                         // add info from PDB HET fields (HET, HETNAM, HETSYN, FORMUL)
                         // Note: we now use prepared statements so any strange chars do no longer lead to irritations or security trouble
-                        Boolean removeStuff = Settings.getBoolean("plcc_B_uglySQLhacks");
+                        Boolean removeStuff = SettingsOld.getBoolean("plcc_B_uglySQLhacks");
                         lf = getLigFormula(resNamePDB);
                         if(removeStuff) {
                             lf = lf.replaceAll("\\s", "");               // remove all whitespace

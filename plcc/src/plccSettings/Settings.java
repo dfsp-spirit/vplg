@@ -26,6 +26,9 @@ public class Settings {
     static HashMap<String, String> mapSettingNameToSectionName;  // Maps settings names (=keys) to the section names they are in
     static HashMap<String, Integer> mapSectionNameToSectionIndex;  // Maps the section names (=key) to their index in the ArrayList
     
+    static Boolean createdDefaultFile = false;
+    static int numLoadedSettings = 0;
+    
     static final String PACKAGE_TAG = "SETTINGS";
     static final String FS = System.getProperty("file.separator");
     static private final File DEFAULT_FILE = new File(System.getProperty("user.home") + FS  + "plcc_settings.txt");
@@ -119,14 +122,18 @@ public class Settings {
             @SuppressWarnings("unchecked")  // skip warning associated to next line, according to https://www.boraji.com/how-to-iterate-properites-in-java
             Enumeration<String> enumer = (Enumeration<String>) readProperties.propertyNames();  // seems we have to create it outside the loop head
             while (enumer.hasMoreElements()) {
-                // TODO set values
-                break;
+                String key = enumer.nextElement();
+                String value = readProperties.getProperty(key);
+                if (setOverwrittenValue(key, value)) { numLoadedSettings++; } 
             }
         } else {
             // create default settings file
-            if (io.IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), false) != true) {
+            DP.getInstance().w(PACKAGE_TAG, "Could not load settings from properties file, trying to create it.");
+            if (io.IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), false)) {
+                createdDefaultFile = true;
+            } else {
                 DP.getInstance().w(PACKAGE_TAG, "Did not found default file and could not create it at '" + DEFAULT_FILE.getAbsolutePath() + "'. " +
-                        "Trying to go on.");
+                        "Trying to go on and using default values.");
             }
         }
     }
@@ -176,12 +183,17 @@ public class Settings {
     }
     
     
-    static public void setOverwrittenValue(String key, String value) {
+    static public Boolean setOverwrittenValue(String key, String value) {
         Setting targetSetting = getSettingByName(key);
         if (targetSetting != null) {
-            getSettingByName(key).setOverwrittenValue(value);
+            return getSettingByName(key).setOverwrittenValue(value);
         } else {
             DP.getInstance().w(PACKAGE_TAG, "Could not find setting '" + key + "' to overwrite its value. Going on without changes to the settings.");
+            return false;
         }
     }
+    
+    // ### simple getter and setter
+    public static int getNumLoadedSettings() { return numLoadedSettings; }
+    public static Boolean getCreatedDefaultFile() { return createdDefaultFile; }
 }

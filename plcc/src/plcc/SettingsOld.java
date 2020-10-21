@@ -21,7 +21,7 @@ import tools.DP;
  * saving them to a text file in 'key = value' format.
  *
  */
-public class Settings {
+public class SettingsOld {
     
     /** The settings which are currently in use. */
     static private Properties cfg;
@@ -75,14 +75,14 @@ public class Settings {
     public static IMAGEFORMAT[] getProteinGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
         
-        if(Settings.getBoolean("plcc_B_img_output_format_PNG")) {
+        if(SettingsOld.getBoolean("plcc_B_img_output_format_PNG")) {
             formats.add(IMAGEFORMAT.PNG);
         }
-        if(Settings.getBoolean("plcc_B_img_output_format_PDF")) {
+        if(SettingsOld.getBoolean("plcc_B_img_output_format_PDF")) {
             formats.add(IMAGEFORMAT.PDF);
         }
         // --- ignore SVG because it is always produced ---
-        //if(Settings.getBoolean("plcc_B_img_output_format_SVG")) {
+        //if(SettingsOld.getBoolean("plcc_B_img_output_format_SVG")) {
         //    formats.add(IMAGEFORMAT.SVG);
         //}
         
@@ -96,10 +96,10 @@ public class Settings {
     public static IMAGEFORMAT[] getAminoAcidGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
         
-        if(Settings.getBoolean("plcc_B_img_AAG_output_format_PNG")) {
+        if(SettingsOld.getBoolean("plcc_B_img_AAG_output_format_PNG")) {
             formats.add(IMAGEFORMAT.PNG);
         }
-        if(Settings.getBoolean("plcc_B_img_AAG_output_format_PDF")) {
+        if(SettingsOld.getBoolean("plcc_B_img_AAG_output_format_PDF")) {
             formats.add(IMAGEFORMAT.PDF);
         }
        
@@ -114,14 +114,14 @@ public class Settings {
     public static IMAGEFORMAT[] getFoldingGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
         
-        if(Settings.getBoolean("plcc_B_img_FG_output_format_PNG")) {
+        if(SettingsOld.getBoolean("plcc_B_img_FG_output_format_PNG")) {
             formats.add(IMAGEFORMAT.PNG);
         }
-        if(Settings.getBoolean("plcc_B_img_FG_output_format_PDF")) {
+        if(SettingsOld.getBoolean("plcc_B_img_FG_output_format_PDF")) {
             formats.add(IMAGEFORMAT.PDF);
         }
         // --- ignore SVG because it is always produced ---
-        //if(Settings.getBoolean("plcc_B_img_FG_output_format_SVG")) {
+        //if(SettingsOld.getBoolean("plcc_B_img_FG_output_format_SVG")) {
         //    formats.add(IMAGEFORMAT.SVG);
         //}
         
@@ -135,14 +135,14 @@ public class Settings {
     public static IMAGEFORMAT[] getComplexGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
         
-        if(Settings.getBoolean("plcc_B_img_CG_output_format_PNG")) {
+        if(SettingsOld.getBoolean("plcc_B_img_CG_output_format_PNG")) {
             formats.add(IMAGEFORMAT.PNG);
         }
-        if(Settings.getBoolean("plcc_B_img_CG_output_format_PDF")) {
+        if(SettingsOld.getBoolean("plcc_B_img_CG_output_format_PDF")) {
             formats.add(IMAGEFORMAT.PDF);
         }
         // --- ignore SVG because it is always produced ---
-        //if(Settings.getBoolean("plcc_B_img_CG_output_format_SVG")) {
+        //if(SettingsOld.getBoolean("plcc_B_img_CG_output_format_SVG")) {
         //    formats.add(IMAGEFORMAT.SVG);
         //}
         
@@ -692,7 +692,7 @@ public class Settings {
             }           
             
             //if(warnUnset) {
-                //System.out.println("INFO: Settings: Setting '" + key + "' not defined in config file. Trying internal default.");
+                //System.out.println("INFO: SettingsOld: Setting '" + key + "' not defined in config file. Trying internal default.");
             //}
             
             

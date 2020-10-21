@@ -44,7 +44,7 @@ import resultcontainers.PTGLNotationFoldResult;
 import proteingraphs.Position2D;
 import proteingraphs.ProtGraph;
 import proteingraphs.SSEGraph;
-import plcc.Settings;
+import plcc.SettingsOld;
 import proteingraphs.SpatRel;
 import proteinstructure.AminoAcid;
 import proteinstructure.Chain;
@@ -67,7 +67,7 @@ public class ProteinGraphDrawer {
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
     public static Integer drawLegendSEQ(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
-        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        Boolean drawAll = SettingsOld.getBoolean("plcc_B_graphimg_legend_always_all");
         ig2.setFont(pl.getLegendFont());
         FontMetrics fontMetrics = ig2.getFontMetrics();
         ig2.setStroke(new BasicStroke(2));
@@ -172,9 +172,9 @@ public class ProteinGraphDrawer {
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-            if (Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+            if (SettingsOld.getBoolean("plcc_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
         }
@@ -286,7 +286,7 @@ public class ProteinGraphDrawer {
                 ig2.setFont(font);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (fg.getSize() > 99) {
                 printNth = 2;
@@ -317,7 +317,7 @@ public class ProteinGraphDrawer {
                     ig2.setPaint(Color.BLACK);
                 }
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegendDEFADJ(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg, false);
             }
         }
@@ -351,7 +351,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write protein graph file : '" + ex.getMessage() + "'.");
         }
-        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+        if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("      Output protein graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -381,7 +381,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write drawable graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (!SettingsOld.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
             sb.append("      Output drawable graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -411,7 +411,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write SEQ folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+        if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output SEQ folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -441,7 +441,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write RED folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+        if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output RED folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -460,7 +460,7 @@ public class ProteinGraphDrawer {
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
     public static Integer drawLegendKEY(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
-        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        Boolean drawAll = SettingsOld.getBoolean("plcc_B_graphimg_legend_always_all");
         ig2.setFont(pl.getLegendFont());
         FontMetrics fontMetrics = ig2.getFontMetrics();
         ig2.setStroke(new BasicStroke(2));
@@ -614,7 +614,7 @@ public class ProteinGraphDrawer {
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
             ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
         }
@@ -802,13 +802,13 @@ public class ProteinGraphDrawer {
                     }
                 }
                 if (edgeIsBackwards && edgeIsCrossOver) {
-                    if (Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                    if (SettingsOld.getBoolean("plcc_B_key_use_alternate_arcs")) {
                         connShapes = DrawTools.getArcConnectorAlternative(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), !startUpwards, pixelsToShiftOnYAxis);
                     } else {
                         connShapes = DrawTools.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), !startUpwards, pixelsToShiftOnYAxis);
                     }
                 } else {
-                    if (Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                    if (SettingsOld.getBoolean("plcc_B_key_use_alternate_arcs")) {
                         connShapes = DrawTools.getArcConnectorAlternative(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, pixelsToShiftOnYAxis);
                     } else {
                         connShapes = DrawTools.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, pixelsToShiftOnYAxis);
@@ -876,7 +876,7 @@ public class ProteinGraphDrawer {
                 ig2.drawString("C", currentVertX, currentVertY + 20);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (fg.getSize() > 0) {
                 ig2.setPaint(Color.BLACK);
@@ -908,7 +908,7 @@ public class ProteinGraphDrawer {
                     ig2.setPaint(Color.BLACK);
                 }
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegendKEY(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
             }
         }
@@ -964,9 +964,9 @@ public class ProteinGraphDrawer {
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-            if (Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+            if (SettingsOld.getBoolean("plcc_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
         }
@@ -1078,7 +1078,7 @@ public class ProteinGraphDrawer {
                 ig2.setFont(font);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (fg.getSize() > 99) {
                 printNth = 2;
@@ -1113,7 +1113,7 @@ public class ProteinGraphDrawer {
                     ig2.setPaint(Color.BLACK);
                 }
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
             }
         }
@@ -1165,7 +1165,7 @@ public class ProteinGraphDrawer {
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Integer k;
@@ -1303,7 +1303,7 @@ public class ProteinGraphDrawer {
                 ig2.setFont(font);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (fg.getSize() > 99) {
                 printNth = 2;
@@ -1334,7 +1334,7 @@ public class ProteinGraphDrawer {
                     ig2.setPaint(Color.BLACK);
                 }
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegendDEFADJ(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg, true);
             }
         }
@@ -1355,7 +1355,7 @@ public class ProteinGraphDrawer {
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
     public static Integer drawLegendDEFADJ(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g, Boolean includeParentEdge) {
-        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        Boolean drawAll = SettingsOld.getBoolean("plcc_B_graphimg_legend_always_all");
         ig2.setFont(pl.getLegendFont());
         FontMetrics fontMetrics = ig2.getFontMetrics();
         ig2.setStroke(new BasicStroke(2));
@@ -1517,7 +1517,7 @@ public class ProteinGraphDrawer {
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Shape shape;
@@ -1783,7 +1783,7 @@ public class ProteinGraphDrawer {
                 ig2.drawString("C", vertStart.x + numDrawnVertices * pl.vertDist, vertStart.y + 20);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (pg.getSize() > 9) {
                 printNth = 1;
@@ -1837,7 +1837,7 @@ public class ProteinGraphDrawer {
                 ig2.drawString("ML", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4));
             }
             
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 if (iChainID != -1) {
                     ProteinGraphDrawer.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 4 + (stringHeight / 4)), pl, pg);                    
                 } else {
@@ -1926,7 +1926,7 @@ public class ProteinGraphDrawer {
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Shape shape, markShape;
@@ -2094,7 +2094,7 @@ public class ProteinGraphDrawer {
                 ig2.drawString("C", vertStart.x + pg.getDrawableVertices().size() * pl.vertDist, vertStart.y + 20);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (pg.getDrawableVertices().size() > 9) {
                 printNth = 1;
@@ -2123,7 +2123,7 @@ public class ProteinGraphDrawer {
                     
                 }
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl); 
             }
         }
@@ -2177,7 +2177,7 @@ public class ProteinGraphDrawer {
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
     public static Integer drawLegend(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
-        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        Boolean drawAll = SettingsOld.getBoolean("plcc_B_graphimg_legend_always_all");
         ig2.setFont(pl.getLegendFont());
         FontMetrics fontMetrics = ig2.getFontMetrics();
         ig2.setStroke(new BasicStroke(2));
@@ -2280,7 +2280,7 @@ public class ProteinGraphDrawer {
      * @return the x pixel position after drawing (with in pixels)
      */
     public static Integer drawLegend(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
-        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        Boolean drawAll = SettingsOld.getBoolean("plcc_B_graphimg_legend_always_all");
         ig2.setFont(pl.getLegendFont());
         FontMetrics fontMetrics = ig2.getFontMetrics();
         ig2.setStroke(new BasicStroke(2));
@@ -2385,7 +2385,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write ADJ folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+        if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output ADJ folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -2436,9 +2436,9 @@ public class ProteinGraphDrawer {
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-            if (Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+            if (SettingsOld.getBoolean("plcc_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
         }
@@ -2530,7 +2530,7 @@ public class ProteinGraphDrawer {
                 ig2.setFont(font);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
             if (fg.getSize() > 99) {
                 printNth = 2;
@@ -2561,7 +2561,7 @@ public class ProteinGraphDrawer {
                     ig2.setPaint(Color.BLACK);
                 }
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegendSEQ(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
             }
         }
@@ -2584,7 +2584,7 @@ public class ProteinGraphDrawer {
             if (pnfr.keyNotation != null || pnfr.keyStartFG >= 0) {
                 DP.getInstance().e("SSEGraph", "drawFoldingGraphKEY: FG reported to NOT support KEY notation, but a KEY notation string is set: '" + pnfr.keyNotation + "', start index is parent is " + pnfr.keyStartFG + ".");
             }
-            if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+            if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("          Output KEY folding graph files: none, FG does not support KEY notation.");
             }
             return resultFilesByFormat;
@@ -2601,7 +2601,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write KEY folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+        if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output KEY folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -2720,7 +2720,7 @@ public class ProteinGraphDrawer {
         String sseNumberSeqInChain;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Integer[] shiftBack = new Integer[pg.getSize()];
@@ -2894,7 +2894,7 @@ public class ProteinGraphDrawer {
                         if (debug) {
                             ig2.setColor(Color.RED);
                         }
-                        if (Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                        if (SettingsOld.getBoolean("plcc_B_key_use_alternate_arcs")) {
                             shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y - vertHeight, p.x, p.y, ig2.getStroke(), true, 0);
                         } else {
                             shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y - vertHeight, p.x, p.y, ig2.getStroke(), true, 0);
@@ -2903,7 +2903,7 @@ public class ProteinGraphDrawer {
                         if (debug) {
                             ig2.setColor(Color.ORANGE);
                         }
-                        if (Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                        if (SettingsOld.getBoolean("plcc_B_key_use_alternate_arcs")) {
                             shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y, p.x, p.y - vertHeight, ig2.getStroke(), false, 0);
                         } else {
                             shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y, p.x, p.y - vertHeight, ig2.getStroke(), false, 0);
@@ -2959,12 +2959,12 @@ public class ProteinGraphDrawer {
         if (debug) {
             System.out.println("newKEY = " + testKEY.toString());
         }
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
-            if (Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_header")) {
+            if (SettingsOld.getBoolean("plcc_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
         }
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (SettingsOld.getBoolean("plcc_B_graphimg_footer")) {
             if (fg.getSize() > 0) {
                 ig2.setPaint(Color.BLACK);
                 ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
@@ -2975,7 +2975,7 @@ public class ProteinGraphDrawer {
             } else {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }
-            if (Settings.getBoolean("plcc_B_graphimg_legend")) {
+            if (SettingsOld.getBoolean("plcc_B_graphimg_legend")) {
                 ProteinGraphDrawer.drawLegendKEY(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
             }
         }
@@ -3006,7 +3006,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write DEF folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
+        if (! (SettingsOld.getBoolean("plcc_B_silent") || SettingsOld.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output DEF folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
