@@ -47,19 +47,63 @@ class Setting {
         if (ALLOWED_DATA_TYPES.contains(dataType)) {
             this.dataType = dataType;
         } else {
-            DP.getInstance().e(Settings.PACKAGE_TAG, "Creating the setting '" + name + " failed, because the data type is not allowed or correctly formatted. "
+            DP.getInstance().e(Settings.PACKAGE_TAG, "Creating the setting '" + name + "' failed, because the data type is not allowed or correctly formatted. "
                     + "This is an error in the code, please inform the developer of this software. Exiting now.");
             this.dataType = 'S';  // for the IDE
             System.exit(1);
         }
         
-        this.defaultValue = defaultValue;
+        // if developer do no mistakes, this check is unneccessary - that is why we do the check
+        if (checkDataType(defaultValue)) { 
+            this.defaultValue = defaultValue;
+        } else {
+            DP.getInstance().e(Settings.PACKAGE_TAG, "Creating the setting '" + name + "' failed, because the default value '" + defaultValue + "' "
+                    + "seems not to be of the required data type '" + getDataTypeString() + "'. "
+                    + "This is an error in the code, please inform the developer of this software. Exiting now.");
+            System.exit(1);
+            this.defaultValue = "";  // for the IDE
+        }
+        
         this.documentation = documentation;
     }
     
     
+    private Boolean checkDataType(String value) {
+        switch (dataType) {
+            case 'S':
+                return true;  // String is always String
+            case 'I':
+                if (tools.TextTools.isInteger(value)) {
+                    return true;
+                }
+                break;
+            case 'F':
+                if (tools.TextTools.isFloat(value)) {
+                    return true;
+                }
+                break;
+            case 'B':
+                if (tools.TextTools.isTrueOrFalse(value)) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+    
+    
+    /**
+     * 
+     * @param value
+     * @return 
+     */
     void setOverwrittenValue(String value) {
-        this.overwrittenValue = value;
+        if (checkDataType(value)) {
+            this.overwrittenValue = value;
+        } else {
+            DP.getInstance().w(Settings.PACKAGE_TAG, "Could not overwrite setting '" + name + "', because value '" + value + "' is of wrong format. "
+                    + "Required for this setting: " + getDataTypeString());
+        }
     }
     
     
@@ -74,4 +118,14 @@ class Setting {
     }
     
     String getDefaultValue() { return defaultValue; }
+    
+    private String getDataTypeString() {
+        switch (dataType) {
+            case 'S': { return "String"; }
+            case 'I': { return "Integer"; }
+            case 'F': { return "Float"; }
+            case 'B': { return "Boolean"; }
+            default: { return "UNSPECIFIED DATATYPE"; }
+        }
+    }
 }

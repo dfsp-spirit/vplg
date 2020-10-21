@@ -9,6 +9,7 @@
 package plccSettings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import tools.DP;
 
 /**
@@ -20,6 +21,8 @@ class Section {
     String name;  // name of the section
     String type;  // either user, advanced or developer
     ArrayList<Setting> settings;  // the settings that are part of this section
+    // WARNING: Following data structure MUST be filled after settings have been filled
+    HashMap<String, Integer> mapSettingNameToSettingIndex;  // Maps the setting names (=key) to their index in the ArrayList
     
     static final ArrayList<String> ALLOWED_TYPES = new ArrayList<String>() {
         {
@@ -49,7 +52,8 @@ class Section {
         
         this.type = type;
         
-        init();
+        initSettings();
+        initIndexMap();
     }
     
     
@@ -57,7 +61,7 @@ class Section {
      * Initializes a settings section, i.e., creates the corresponding settings.
      * Should only be called when the name of the section is set.
      */
-    private void init() {
+    private void initSettings() {
         settings = new ArrayList<>();
         switch(name) {
             case "General settings":
@@ -170,7 +174,7 @@ class Section {
                 settings.add(new Setting("plcc_B_include_coils", 'B', "false", "Whether coils (DSSP SSE type ' ') should be considered as own vertices."));
                 settings.add(new Setting("plcc_S_coilSSECode", 'S', "C", "The amino acid code used to mark a coiled region residue."));
                 settings.add(new Setting("plcc_B_merge_helices", 'B', "true", "whether to merge different helix types if they are adjacent in the primary structure."));
-                settings.add(new Setting("plcc_I_merge_helices_max_dist", 'I', "false", "The maximal distance in amino acids of the primary sequence where helices are merged when 'plcc_B_merge_helices' is true. "
+                settings.add(new Setting("plcc_I_merge_helices_max_dist", 'I', "0", "The maximal distance in amino acids of the primary sequence where helices are merged when 'plcc_B_merge_helices' is true. "
                         + "The (default) value 0 means only directly adjacent SSEs are merged."));
                 break;
                 
@@ -233,8 +237,8 @@ class Section {
                 break;
                 
             case "DB structure search":
-                settings.add(new Setting("plcc_B_matrix_structure_search", 'B', "vplg", "Search a linear notation (input) in a proteinstructure (input)"));
-                settings.add(new Setting("plcc_B_matrix_structure_search_db", 'B', "vplg", "Search a linear notation (input) in the database, ignores any given proteinstructure as input"));
+                settings.add(new Setting("plcc_B_matrix_structure_search", 'B', "false", "Search a linear notation (input) in a proteinstructure (input)"));
+                settings.add(new Setting("plcc_B_matrix_structure_search_db", 'B', "false", "Search a linear notation (input) in the database, ignores any given proteinstructure as input"));
                 settings.add(new Setting("plcc_S_linear_notation", 'S', "", "The linear notation of a PG for the matrix structure comparison."));
                 settings.add(new Setting("plcc_S_linear_notation_type", 'S', "", "The type of linear notation (adj or red) for matrix structure comparison."));
                 settings.add(new Setting("plcc_S_linear_notation_graph_type", 'S', "", "alpha, beta or albe = The graph type of the PG graph of the linear notation."));
@@ -376,8 +380,8 @@ class Section {
                 settings.add(new Setting("plcc_B_parse_binding_sites", 'B', "false", "[DISABLED] Whether to parse binding site data from the REMARK 800 and SITE lines of legacy PDB file."));
                 settings.add(new Setting("plcc_B_write_lig_geolig", 'B', "false", "[DISABLED] Determines whether ligand contacts are included in the <pdbid>.geolig file."));
                 settings.add(new Setting("plcc_B_consider_all_ligands_for_each_chain", 'B', "false", "[DISABLED] Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with. WARNING: This setting is ignored and off atm."));
-                settings.add(new Setting("plcc_B_complex_graph_same", 'B', "0", "[DISABLED] Determines whether the complex graph is drawn with all nodes of the same type."));
-                settings.add(new Setting("plcc_B_complex_graph_mere", 'B', "0", "[DISABLED] Determines whether the complex graph is drawn with nodes of different type for each mere."));
+                settings.add(new Setting("plcc_B_complex_graph_same", 'B', "false", "[DISABLED] Determines whether the complex graph is drawn with all nodes of the same type."));
+                settings.add(new Setting("plcc_B_complex_graph_mere", 'B', "false", "[DISABLED] Determines whether the complex graph is drawn with nodes of different type for each mere."));
                 settings.add(new Setting("plcc_I_ligSAS", 'I', "20", "[DISABLED] The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)"));
                 break;
                 
@@ -390,5 +394,21 @@ class Section {
             default:
                 DP.getInstance().e(Settings.PACKAGE_TAG, "Settings section with name '" + name + "' not implemented. Please contact a developer.");
         }
+    }
+    
+    
+    /**
+     * Creates a map for setting names to their index. Always call after settings are created!
+     */
+    private void initIndexMap() {
+        mapSettingNameToSettingIndex = new HashMap<>();
+        for (int i = 0; i < settings.size(); i++) {
+            mapSettingNameToSettingIndex.put(settings.get(i).name, i);
+        }
+    }
+
+    
+    Setting getSetting(String name) {
+        return settings.get(mapSettingNameToSettingIndex.get(name));
     }
 }

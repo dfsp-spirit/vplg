@@ -20,8 +20,11 @@ import tools.DP;
  * @author jnw
  */
 public class Settings {
+    
     static ArrayList<Section> sections;  // holds the setting sections in their correct order
-    static HashMap<String, String> mapSettingsSection;  // WARNING: MUST be filled after sections. Maps the settings names (=keys) to the section they are in
+    // WARNING: Following data structures MUST be filled after sections have been filled
+    static HashMap<String, String> mapSettingNameToSectionName;  // Maps settings names (=keys) to the section names they are in
+    static HashMap<String, Integer> mapSectionNameToSectionIndex;  // Maps the section names (=key) to their index in the ArrayList
     
     static final String PACKAGE_TAG = "SETTINGS";
     static final String FS = System.getProperty("file.separator");
@@ -32,8 +35,12 @@ public class Settings {
         // first, init sections
         initSections();
         
-        // second, init map
-        initMap();
+        // WARNING: Following functions filling the data structures MUST be called after creation of sections
+        // second, init names map
+        initNamesMap();
+        
+        // third, init index map
+        initIndexMap();
     }
 
     /**
@@ -82,14 +89,25 @@ public class Settings {
     
     
     /**
-     * Creates a map settings names to section names. Always call after sections are created!
+     * Creates a map for settings names to section names. Always call after sections are created!
      */
-    static private void initMap() {
-        mapSettingsSection = new HashMap<>();
+    static private void initNamesMap() {
+        mapSettingNameToSectionName = new HashMap<>();
         for (Section tmpSection : sections) {
             for (Setting tmpSetting : tmpSection.settings) {
-                mapSettingsSection.put(tmpSetting.name, tmpSection.name);
+                mapSettingNameToSectionName.put(tmpSetting.name, tmpSection.name);
             }
+        }
+    }
+    
+    
+    /**
+     * Creates a map for section names to their index. Always call after sections are created!
+     */
+    static private void initIndexMap() {
+        mapSectionNameToSectionIndex = new HashMap<>();
+        for (int i = 0; i < sections.size(); i++) {
+            mapSectionNameToSectionIndex.put(sections.get(i).name, i);
         }
     }
     
@@ -149,7 +167,21 @@ public class Settings {
     }
     
     
+    static private Setting getSettingByName(String name) {
+        if (mapSettingNameToSectionName.containsKey(name)) {
+            return sections.get(mapSectionNameToSectionIndex.get(mapSettingNameToSectionName.get(name))).getSetting(name);
+        } else {
+            return null;
+        }
+    }
+    
+    
     static public void setOverwrittenValue(String key, String value) {
-        
+        Setting targetSetting = getSettingByName(key);
+        if (targetSetting != null) {
+            getSettingByName(key).setOverwrittenValue(value);
+        } else {
+            DP.getInstance().w(PACKAGE_TAG, "Could not find setting '" + key + "' to overwrite its value. Going on without changes to the settings.");
+        }
     }
 }

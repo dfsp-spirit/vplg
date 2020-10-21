@@ -134,6 +134,41 @@ public class TextTools {
         }
         return sb.toString();
     }
+    
+    
+    public static Boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        }
+        catch( NumberFormatException e ) {
+            return false;
+        }
+    }
+    
+    public static Boolean isFloat(String s) {
+        try {
+            Float.parseFloat(s);
+            return true;
+        }
+        catch( NumberFormatException e ) {
+            return false;
+        }
+    }
+    
+    public static Boolean isBoolean(String s) {
+        try {
+            Boolean.parseBoolean(s);
+            return true;
+        }
+        catch( NumberFormatException e ) {
+            return false;
+        }
+    }
+    
+    public static Boolean isTrueOrFalse(String s) {
+        return s.toLowerCase().equals("true") || s.toLowerCase().equals("false");
+    }
         
     
 }
