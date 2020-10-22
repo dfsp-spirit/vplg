@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -987,5 +989,32 @@ public class IO {
                     "Returning null and going on." );
             return null;
         }
+    }
+    
+    
+    public static String readFileToString(String path) {
+        try {
+            return Files.readString(Path.of(path));
+        } catch (IOException e) {
+            DP.getInstance().w(CLASS_TAG, "Could not read file '" + path + "' to String. Error: " + e.toString() + ". "
+                    + "Returning empty string and going on.");
+        }
+        return "";
+    }
+    
+    
+    /**
+     * Expects a path with filename and extends the name if already existing.
+     * @param absPath
+     * @return 
+     */
+    public static String getUniqueFilename(String absPath) {
+        File uniqueFile = new File(absPath);
+        Integer extension = 0;  // count which is applied to file name to create an unique one
+        while (uniqueFile.exists()) {
+            extension ++;
+            uniqueFile = new File(uniqueFile.getAbsoluteFile() + "_" + extension.toString());
+        }
+        return uniqueFile.getAbsolutePath();
     }
 }

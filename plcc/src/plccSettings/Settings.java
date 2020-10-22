@@ -10,6 +10,7 @@ package plccSettings;
 
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -27,8 +28,10 @@ public class Settings {
     static HashMap<String, String> mapSettingNameToSectionName;  // Maps settings names (=keys) to the section names they are in
     static HashMap<String, Integer> mapSectionNameToSectionIndex;  // Maps the section names (=key) to their index in the ArrayList
     
+    static int numTotalSettings;  // number of all existing settings
+    
     static Boolean createdDefaultFile = false;
-    static int numLoadedSettings = 0;
+    static int numLoadedSettings = 0;  // number of settings loaded from the default file
     
     static final String PACKAGE_TAG = "SETTINGS";
     static final String FS = System.getProperty("file.separator");
@@ -45,6 +48,8 @@ public class Settings {
         
         // third, init index map
         initIndexMap();
+        
+        numTotalSettings = mapSettingNameToSectionName.size();
     }
 
     /**
@@ -127,9 +132,37 @@ public class Settings {
                 String value = readProperties.getProperty(key);
                 if (set(key, value)) { numLoadedSettings++; } 
             }
+            
+            // check whether default file is correctly formatted and contains all existing settings
+            String readFile = io.IO.readFileToString(DEFAULT_FILE.getAbsolutePath());
+            if (! readFile.equals(asFormattedString())) {
+                // file differs from how it should look: provide some info, copy old one and write new one
+                // info
+                ArrayList<String> unoverwrittenSettings = getUnoverwrittenSettings();
+                if (unoverwrittenSettings.size() > 0) {
+                    DP.getInstance().w(PACKAGE_TAG, "Settings file is missing following settings: " + unoverwrittenSettings.toString());
+                    for (String tmpSettingName : unoverwrittenSettings) {
+                        DP.getInstance().w(tmpSettingName, 2);
+                    }
+                } else {
+                    DP.getInstance().w(PACKAGE_TAG, "Settings file contains all settings, but is not formatted properly");
+                }
+                
+                // copy old file
+                String copiedFilepath = io.IO.getUniqueFilename(DEFAULT_FILE.getAbsolutePath() + "_copied");
+                DP.getInstance().w("Copying old settings file to '" + copiedFilepath + "' and writing correctly formatted settings file "
+                        + "with all settings and your previous values to '" + DEFAULT_FILE.getAbsolutePath() + "'. Nothing to thank ;-)", 2);
+                io.IO.writeStringToFile(readFile, copiedFilepath, false);
+                
+                // rewrite
+                io.IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), true);
+            }
         } else {
             // create default settings file
             DP.getInstance().w(PACKAGE_TAG, "Could not load settings from properties file, trying to create it.");
+            DP.getInstance().i(PACKAGE_TAG, "If you have used PLCC previously and just upgraded to a new version, you might want to use your "
+                    + "previous settings file. It should be located at your home directory and be named '.plcc_settings'. Simply rename it to "
+                    + "'plcc_settings.txt' and rerun PLCC once. It creates the newly formatted settings file for you with your previous settings.");
             if (io.IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), false)) {
                 createdDefaultFile = true;
             } else {
@@ -141,14 +174,14 @@ public class Settings {
     
     
     static public String asFormattedString() {
-        String settingsStr = "";
+        String formattedString = "";
         String lastSectionType = "";  // used to track in which type of section we are: User, Advanced, Developer
 
         // header
-        settingsStr += "##### PLCC SETTINGS #####\n\n";
-        settingsStr += "# This file contains the settings for VPLG's PLCC as key-value pairs per line. The character atfer 'plcc' indicates which data type is expected: "
+        formattedString += "##### PLCC SETTINGS #####\n\n";
+        formattedString += "# This file contains the settings for VPLG's PLCC as key-value pairs per line. The character atfer 'plcc' indicates which data type is expected: "
                 + "B(oolean), S(tring), I(nteger) or F(loat)\n";
-        settingsStr += "# The file is structured in sections which either belong to user, advanced or developer settings.\n\n";
+        formattedString += "# The file is structured in sections which either belong to user, advanced or developer settings.\n\n";
         
         // sections
         for (int i = 0; i < sections.size(); i++) {
@@ -156,22 +189,14 @@ public class Settings {
             
             // print type if encountering new one
             if (! lastSectionType.equals(tmpSection.type)) {
-                settingsStr += "\n### " + tmpSection.type + " settings ###\n";
+                formattedString += "### " + tmpSection.type + " settings ###\n\n";
                 lastSectionType = tmpSection.type;
             }
             
-            settingsStr += "\n## " + tmpSection.name + " ##\n\n";
-            
-            // settings
-            for (int j = 0; j < tmpSection.settings.size(); j++) {
-                Setting tmpSetting = tmpSection.settings.get(j);
-                settingsStr += "# " + tmpSetting.getDocumentation() + "\n";  // documentation
-                settingsStr += "# Default: '" + tmpSetting.getDefaultValue() + "'\n";  // default value
-                settingsStr += tmpSetting.getName() + "=" + tmpSetting.getValue() + "\n\n";  // key-value pair
-            }
+            formattedString += tmpSection.asFormattedString() + "\n";
         }
         
-        return settingsStr;
+        return formattedString;
     }
     
     
@@ -274,7 +299,7 @@ public class Settings {
         if (targetSetting != null) {
             return getSettingByName(key).setOverwrittenValue(value);
         } else {
-            DP.getInstance().w(PACKAGE_TAG, "Could not find setting '" + key + "' to overwrite its value. Going on without changes to the settings.");
+            DP.getInstance().w(PACKAGE_TAG, "Could not find setting '" + key + "' to overwrite its value. Going on without changes to the setting.");
             return false;
         }
     }
@@ -305,6 +330,19 @@ public class Settings {
      */
     public static String getDefaultConfigFilePath() {
         return(DEFAULT_FILE.getAbsolutePath());
+    }
+    
+    
+    public static ArrayList<String> getUnoverwrittenSettings() {
+        ArrayList<String> unoverwrittenSettings = new ArrayList<>();
+        for (Section tmpSection : sections) {
+            for (Setting tmpSetting : tmpSection.settings) {
+                if (! tmpSetting.isOverwritten()) {
+                    unoverwrittenSettings.add(tmpSetting.getName());
+                }
+            }
+        }
+        return unoverwrittenSettings;
     }
     
     

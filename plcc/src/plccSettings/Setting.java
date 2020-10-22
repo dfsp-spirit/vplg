@@ -20,7 +20,7 @@ class Setting {
     final private char dataType;  // values can only be saved as string, so we need to know, which data type they should have, capital letter
     final private String defaultValue;  // hard coded default value
     final private String documentation;  // documentation string
-    private String overwrittenValue = "";  // the value of the setting that can be changed by the user via a settings file or command line options
+    private String overwrittenValue = UNOVERWRITTEN_PLACEHOLDER;  // the value of the setting that can be changed by the user via a settings file or command line options
     
     // contains the allowed data types for the check in the constructor as capital letters
     static final ArrayList<Character> ALLOWED_DATA_TYPES = new ArrayList<Character>() {
@@ -31,6 +31,8 @@ class Setting {
             add('S');
         }
     };
+    
+    static final String UNOVERWRITTEN_PLACEHOLDER = "$UNSET$";
 
     
     /**
@@ -99,13 +101,18 @@ class Setting {
      */
     Boolean setOverwrittenValue(String value) {
         if (checkDataType(value)) {
-            this.overwrittenValue = value;
-            return true;
+            if (! value.equals(UNOVERWRITTEN_PLACEHOLDER)) {
+                this.overwrittenValue = value;
+                return true;
+            } else {
+                DP.getInstance().w(Settings.PACKAGE_TAG, "Could not overwrite setting '" + name + "', because value '" + value + "' is used as internal "
+                        + " placeholder for unset values. Please use something else. ");
+            }
         } else {
             DP.getInstance().w(Settings.PACKAGE_TAG, "Could not overwrite setting '" + name + "', because value '" + value + "' is of wrong format. "
                     + "Required for this setting: " + getDataTypeString());
-            return false;
         }
+        return false;
     }
     
     
@@ -114,13 +121,13 @@ class Setting {
      * @return value as String
      */
     String getValue() {
-        if (overwrittenValue.equals("")) {
+        if (isOverwritten()) {
+            return overwrittenValue;
+        } else {
             // default value not overwritten
             // TODO if plcc_B_warn_cfg_fallback_to_default warn
             // System.out.println("INFO: Settings: Using internal default value '" + s + "' for setting '" + key + "'. Edit config file to override.");
             return defaultValue;
-        } else {
-            return overwrittenValue;
         }
     }
     
@@ -132,6 +139,22 @@ class Setting {
             case 'B': { return "Boolean"; }
             default: { return "UNSPECIFIED DATATYPE"; }
         }
+    }
+    
+    Boolean isOverwritten() { 
+        return ! overwrittenValue.equals(UNOVERWRITTEN_PLACEHOLDER); }
+    
+    @Override
+    public String toString() {
+        return "[SETTING] " + name + " | default: '" + defaultValue + "' | overwritten: '" + overwrittenValue + "'";
+    }
+    
+    String asFormattedString() {
+        String formattedString = "";
+        formattedString += "# " + documentation + "\n";  // documentation
+        formattedString += "# Default: '" + defaultValue + "'\n";  // default value
+        formattedString += name + "=" + getValue() + "\n";  // key-value pair
+        return formattedString;
     }
     
     // ### simple getter / setter ###

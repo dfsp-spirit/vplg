@@ -53,7 +53,7 @@ public class DP {
             // the settings have not been inited yet, so assume that we should warn
             //System.err.println("WARNING: No settings yet.");
         }
-        
+              
         // if optionalNumberLeadingSpaces is given, take first number for number of spaces. Zero spaces otherwise
         String leadingSpaces = new String(new char[optionalNumberLeadingSpaces.length > 0? optionalNumberLeadingSpaces[0] : 0]).replace("\0", " ");
         
@@ -75,8 +75,12 @@ public class DP {
             // the settings have not been inited yet, so assume that we should warn
             //System.err.println("WARNING: No settings yet.");
         }
+        
+        // if optionalNumberLeadingSpaces is given, take first number for number of spaces. Zero spaces otherwise
+        String leadingSpaces = new String(new char[optionalNumberLeadingSpaces.length > 0? optionalNumberLeadingSpaces[0] : 0]).replace("\0", " ");
+        
         if(doWarn) {
-            System.err.println(DP.appTag + DP.warningTag + "[" + srcTag + "] " + msg);
+            System.err.println(leadingSpaces + DP.appTag + DP.warningTag + "[" + srcTag + "] " + msg);
         }
     }
     
