@@ -963,6 +963,8 @@ public class IO {
         try {
             FileWriter tmpWriter = new FileWriter(path);
             tmpWriter.write(content);
+            tmpWriter.flush();
+            tmpWriter.close();
         } catch (IOException e) {
             DP.getInstance().e(CLASS_TAG, "Could not create file '" + path + "'. Error: " + e.toString() + ". "
                     + "Returning failure and going on.");
