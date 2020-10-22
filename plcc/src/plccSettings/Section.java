@@ -403,7 +403,7 @@ class Section {
     private void initIndexMap() {
         mapSettingNameToSettingIndex = new HashMap<>();
         for (int i = 0; i < settings.size(); i++) {
-            mapSettingNameToSettingIndex.put(settings.get(i).name, i);
+            mapSettingNameToSettingIndex.put(settings.get(i).getName(), i);
         }
     }
 

@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import plcc.SettingsOld;
 import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
 import proteinstructure.Molecule;
 import tools.DP;
+import plccSettings.Settings;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -226,8 +226,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     }
     
     private Boolean contactSatisfiesRules(MolContactInfo c) {
-        Integer minSeqDist = SettingsOld.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
-        Integer maxSeqDist = SettingsOld.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
+        Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
+        Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
         Boolean minSeqDistanceCheckPassed = checkMinSeqDistance(minSeqDist, c);
         Boolean maxSeqDistanceCheckPassed = checkMaxSeqDistance(maxSeqDist, c);
         

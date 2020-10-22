@@ -19,7 +19,7 @@ import proteingraphs.CompatGraph;
 import io.DBManager;
 import proteingraphs.ProtGraph;
 import proteingraphs.SSEGraph;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 import static similarity.SimilarityByGraphlets.getRandIntegerArray;
 
 /**
@@ -235,7 +235,7 @@ public class GraphSimilarity {
         
         
         System.out.println("Comparing by relative graphlet frequency distance -- 7timA and 8icdA:");
-        SettingsOld.init();
+        Settings.init();
         DBManager.initUsingDefaults();
         
         // insert fake values into DB

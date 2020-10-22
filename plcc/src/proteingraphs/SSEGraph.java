@@ -84,7 +84,7 @@ import graphformats.IGEXFFormat;
 import graphformats.IManualSVGFormat;
 import graphformats.ISimpleProteinGraphFormat;
 import io.IO;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 import static proteingraphs.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 
@@ -2854,7 +2854,7 @@ E	3	3	3
     public String getOneLineMetadataString() {
         String sep = "";
         try {
-            sep = SettingsOld.get("plcc_S_graph_metadata_splitstring");
+            sep = Settings.get("plcc_S_graph_metadata_splitstring");
         } catch(java.lang.NullPointerException e) {
             // no settings object yet
             return "";
@@ -2883,7 +2883,7 @@ E	3	3	3
         
         // we put meta data in comments for GML language graphs
         try {
-            if(SettingsOld.getBoolean("plcc_B_add_metadata_comments_GML")) {
+            if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
                 for(String key : this.metadata.keySet()) {
                     gmlf.append("//[VPLG_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
                 }
@@ -2906,7 +2906,7 @@ E	3	3	3
         gmlf.append("  directed 0\n");
         gmlf.append("  isplanar 0\n");
         try {
-            gmlf.append("  creator \"PLCC version ").append(SettingsOld.getVersion()).append("\"\n");
+            gmlf.append("  creator \"PLCC version ").append(Settings.getVersion()).append("\"\n");
         }catch(java.lang.NullPointerException e) {
             // no settings object yet, assume not to write stuff
         }
@@ -3019,12 +3019,12 @@ E	3	3	3
         StringBuilder dlf = new StringBuilder();
         
         // put meta data in comments for DOT language graphs
-        if(SettingsOld.getBoolean("plcc_B_add_metadata_comments_GML")) {
+        if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
             for(String key : this.metadata.keySet()) {
                 dlf.append("#[VPLG_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
             }
 
-            dlf.append("#[VPLG_METADATA] creator=PLCC version ").append(SettingsOld.getVersion()).append("\n");
+            dlf.append("#[VPLG_METADATA] creator=PLCC version ").append(Settings.getVersion()).append("\n");
         }
         
         String graphLabel = "ProteinGraph";
@@ -3149,7 +3149,7 @@ E	3	3	3
     public String toKavoshFormat() {
         StringBuilder kf = new StringBuilder();
         
-        if(SettingsOld.getBoolean("plcc_B_kavosh_format_directed")) {
+        if(Settings.getBoolean("plcc_B_kavosh_format_directed")) {
             kf.append(this.numVertices()).append("\n");
 
             for(Integer i = 0; i < this.getSize(); i++) {
@@ -3319,7 +3319,7 @@ E	3	3	3
     
     @Override
     public String toGEXFFormat() {
-        String version = SettingsOld.get("plcc_S_gexf_format_version");
+        String version = Settings.get("plcc_S_gexf_format_version");
         if(version.equals("1.2")) {
             return this.toGEXFFormatDraft12();
         }

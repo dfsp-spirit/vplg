@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import plcc.Main;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 
 
 /**
@@ -81,7 +81,7 @@ public class Residue extends Molecule implements java.io.Serializable {
         
         int numAtomsBefore = this.atoms.size();
         if(numAtomsBefore < 1) {
-            if(! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Molecule " + this.getFancyName() + " of chain " + this.getChainID() + " has NO atoms at all *before* choosing alternative location PDB field and deleting others.");
             }
             return new ArrayList<Atom>();
@@ -93,7 +93,7 @@ public class Residue extends Molecule implements java.io.Serializable {
         int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
     
         if((numAtomsWithChosenAltLoc < 1 || numAtomsWithChosenAltLoc > Main.MAX_ATOMS_PER_AA) && this.isAA()) {
-            if( ! SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
+            if( ! Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
                 DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA molecule " + this.getFancyName() + ".");
             }
         }
@@ -309,10 +309,10 @@ public class Residue extends Molecule implements java.io.Serializable {
     	Atom a, b, center;
         a = b = center = null;
         Integer maxDistForAtom, dist = 0;      // just assign a small start value
-//      //Integer atomRadius = SettingsOld.getInteger("plcc_I_aa_atom_radius");
+//      //Integer atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
 
         if(atoms.size() < 1) {
-            if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("getCenterAtom(): PDB molecule  " + this.pdbNum + " chain " + this.getChainID() + " of type " + getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
             }
             return(null);

@@ -19,8 +19,9 @@ import tools.DP;
 /**
  * This class implements a static class that manages program settings. It supports loading them from and
  * saving them to a text file in 'key = value' format.
- *
+ * @deprecated use {@link #plccSettings.Settings} instead
  */
+@Deprecated
 public class SettingsOld {
     
     /** The settings which are currently in use. */
@@ -46,116 +47,7 @@ public class SettingsOld {
         
         setDefaults();
     }
-    
-    
-   
-    
-    /**
-     * Returns the default config file location. Note that this may or may not be in use atm. Use getConfigFile() instead if you
-     * need the file that is currently in use.
-     * @return the path as a String
-     */
-    public static String getDefaultConfigFilePath() {
-        return(defaultFile);
-    }
-    
-    
-    /**
-     * Returns the application tag that is printed as a prefix for all output lines.
-     * @return the apptag
-     */
-    public static String getApptag() {
-        return("[PLCC] ");
-    }
-    
-    /**
-     * Creates an array of the output image formats for protein graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
-     */
-    public static IMAGEFORMAT[] getProteinGraphOutputImageFormats() {
-        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
-        
-        if(SettingsOld.getBoolean("plcc_B_img_output_format_PNG")) {
-            formats.add(IMAGEFORMAT.PNG);
-        }
-        if(SettingsOld.getBoolean("plcc_B_img_output_format_PDF")) {
-            formats.add(IMAGEFORMAT.PDF);
-        }
-        // --- ignore SVG because it is always produced ---
-        //if(SettingsOld.getBoolean("plcc_B_img_output_format_SVG")) {
-        //    formats.add(IMAGEFORMAT.SVG);
-        //}
-        
-        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
-    }
-    
-    /**
-     * Creates an array of the output image formats for aa graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_AAG_output_format_PNG'
-     */
-    public static IMAGEFORMAT[] getAminoAcidGraphOutputImageFormats() {
-        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
-        
-        if(SettingsOld.getBoolean("plcc_B_img_AAG_output_format_PNG")) {
-            formats.add(IMAGEFORMAT.PNG);
-        }
-        if(SettingsOld.getBoolean("plcc_B_img_AAG_output_format_PDF")) {
-            formats.add(IMAGEFORMAT.PDF);
-        }
-       
-        
-        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
-    }
-    
-    /**
-     * Creates an array of the output image formats for folding graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_FG_output_format_PNG'
-     */
-    public static IMAGEFORMAT[] getFoldingGraphOutputImageFormats() {
-        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
-        
-        if(SettingsOld.getBoolean("plcc_B_img_FG_output_format_PNG")) {
-            formats.add(IMAGEFORMAT.PNG);
-        }
-        if(SettingsOld.getBoolean("plcc_B_img_FG_output_format_PDF")) {
-            formats.add(IMAGEFORMAT.PDF);
-        }
-        // --- ignore SVG because it is always produced ---
-        //if(SettingsOld.getBoolean("plcc_B_img_FG_output_format_SVG")) {
-        //    formats.add(IMAGEFORMAT.SVG);
-        //}
-        
-        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
-    }
-    
-    /**
-     * Creates an array of the output image formats for complex graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_CG_output_format_PNG'
-     */
-    public static IMAGEFORMAT[] getComplexGraphOutputImageFormats() {
-        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
-        
-        if(SettingsOld.getBoolean("plcc_B_img_CG_output_format_PNG")) {
-            formats.add(IMAGEFORMAT.PNG);
-        }
-        if(SettingsOld.getBoolean("plcc_B_img_CG_output_format_PDF")) {
-            formats.add(IMAGEFORMAT.PDF);
-        }
-        // --- ignore SVG because it is always produced ---
-        //if(SettingsOld.getBoolean("plcc_B_img_CG_output_format_SVG")) {
-        //    formats.add(IMAGEFORMAT.SVG);
-        //}
-        
-        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
-    }
-    
-    /**
-     * Returns the version string. This is NOT guaranteed to be a number.
-     * @return the PLCC version
-     */
-    public static String getVersion() {
-        return("0.98.3");
-    }
+
 
     /**
      * Loads the properties from the file 'file'. Should be called at the start of main to init the settings. These default
@@ -554,85 +446,18 @@ public class SettingsOld {
         return(false);
     }
 
-
-    /**
-     * Tries to cast the value of the property key 'key' to Integer and return it. If this fails it is considered a fatal error.
-     * @param key the key of the properties hashmap
-     * @return the value of the key as an Integer
-     */
-    public static Integer getInteger(String key) {
-        Integer i = null;
-        String s = get(key);
-
-        try {
-            i = Integer.valueOf(s);
-        }
-        catch (Exception e) {
-            System.err.println("ERROR: Settings: Could not load setting '" + key + "' from settings as an Integer, invalid format.");
-            System.exit(1);
-        }
-        return(i);
-    }
-    
     
     
     /**
      * Determines whether the key 'key' in the currently used settings is at the default setting.
      * @return true if it is in default setting, false if this setting has been changed by the user (via command line or config file)
      */
-    public static Boolean isAtDefaultSetting(String key) {
-        if(get(key).equals(defGet(key))) {
-            return(true);
-        }
-        return(false);        
-    }
-
-    
-    /**
-     * Tries to cast the value of the property key 'key' to Float and return it. If this fails it is considered a fatal error.
-     * @param key the key of the properties hashmap
-     * @return the value of the key as a Float
-     */
-    public static Float getFloat(String key) {
-        Float f = null;
-        String s = get(key);
-
-        try {
-            f = Float.valueOf(s);
-        }
-        catch (Exception e) {
-            System.err.println("ERROR: Settings: Could not load setting '" + key + "' from settings as a Float, invalid format.");
-            System.exit(1);
-        }
-        return(f);
-    }
-
-
-    /**
-     * Tries to extract the value of the property key 'key' as a Boolean and return it. If this fails it is considered a fatal error.
-     * The only accepted string representations of Booleans are "true" and "false".
-     * @param key the key of the properties hashmap
-     * @return the value of the key as a Boolean
-     */
-    public static Boolean getBoolean(String key) {
-        Boolean b = null;
-        String s = null;
-
-        s = get(key);
-
-        if(s.toLowerCase().equals("true")) {
-            return(true);
-        }
-        else if(s.toLowerCase().equals("false")) {
-            return(false);
-        }
-        else {
-            System.err.println("ERROR: Settings: Could not load setting '" + key + "' from settings as Boolean, invalid format.");
-            System.exit(1);
-            return(false);      // never reached
-        }
-    }
-
+//    public static Boolean isAtDefaultSetting(String key) {
+//        if(get(key).equals(defGet(key))) {
+//            return(true);
+//        }
+//        return(false);        
+//    }
 
     /**
      * Returns the path to the currently used config file as a String.
@@ -671,47 +496,6 @@ public class SettingsOld {
         System.out.println("Printing of all " + def.size() + " default settings done.");
     }
 
-    
-    
-    /**
-     * Retrieves the setting with key 'key' from the settings and returns it as a String. Note that it is considered a fatal error if no such key exists. Ask first using 'contains()' if you're not sure. :)
-     * @param key the key to get
-     * @return the value of the specified key
-     */
-    public static String get(String key) {
-        
-        if(cfg.containsKey(key)) {
-            return((String)cfg.getProperty(key));
-        }
-        else {
-            boolean warnUnset = true;
-            if(cfg.getProperty("plcc_B_warn_cfg_fallback_to_default") != null) {
-                if((cfg.getProperty("plcc_B_warn_cfg_fallback_to_default")).toLowerCase().equals("false")) {                
-                    warnUnset = false;
-                }   
-            }           
-            
-            //if(warnUnset) {
-                //System.out.println("INFO: SettingsOld: Setting '" + key + "' not defined in config file. Trying internal default.");
-            //}
-            
-            
-            if(initSingleSettingFromDefault(key)) {
-                String s = defGet(key);
-                
-                if(warnUnset) {
-                    System.out.println("INFO: Settings: Using internal default value '" + s + "' for setting '" + key + "'. Edit config file to override.");
-                }
-                
-                return(s);                
-            } else {
-                System.err.println("ERROR: Settings: No config file or default value for setting '" + key + "' exists, setting invalid.");
-                System.exit(1);                
-                return("ERROR");    // for the IDE
-            }                        
-        }
-        
-    }
     
     /**
      * Retrieves the setting with key 'key' from the default settings and returns it as a String. Note that it is considered a fatal error if no such key exists. Ask first using 'contains()' if you're not sure. :)

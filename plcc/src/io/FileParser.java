@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 import proteingraphs.MolContactInfo;
 import proteingraphs.ProtGraph;
 import proteinstructure.BindingSite;
@@ -100,7 +100,7 @@ public class FileParser {
      * @param pf PDB file path
      */
     protected static void initVariables(String pf) {
-        silent = SettingsOld.getBoolean("plcc_B_silent");
+        silent = Settings.getBoolean("plcc_B_silent");
         
         pdbFile = pf;
         
@@ -649,17 +649,17 @@ public class FileParser {
 
     // setting methods
     private static boolean settingCif() {
-        return SettingsOld.getBoolean("plcc_B_use_mmCIF_parser");
+        return Settings.getBoolean("plcc_B_use_mmCIF_parser");
     }
     
     // protected so that other parsers can use
     protected static boolean settingSilent() {
-        return SettingsOld.getBoolean("plcc_B_silent");
+        return Settings.getBoolean("plcc_B_silent");
     }
     
     // protected so that other parsers can use
     protected static boolean settingEssentialOutput() {
-        return SettingsOld.getBoolean("plcc_B_only_essential_output");
+        return Settings.getBoolean("plcc_B_only_essential_output");
     }
 
 

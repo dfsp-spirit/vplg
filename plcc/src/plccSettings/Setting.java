@@ -16,10 +16,10 @@ import tools.DP;
  * @author jnw
  */
 class Setting {
-    final String name;  // name of the setting, should have format: plcc_D_NAME, where D is the data type
-    final char dataType;  // values can only be saved as string, so we need to know, which data type they should have, capital letter
+    final private String name;  // name of the setting, should have format: plcc_D_NAME, where D is the data type
+    final private char dataType;  // values can only be saved as string, so we need to know, which data type they should have, capital letter
     final private String defaultValue;  // hard coded default value
-    final String documentation;  // documentation string
+    final private String documentation;  // documentation string
     private String overwrittenValue = "";  // the value of the setting that can be changed by the user via a settings file or command line options
     
     // contains the allowed data types for the check in the constructor as capital letters
@@ -114,12 +114,15 @@ class Setting {
      * @return value as String
      */
     String getValue() {
-        return (overwrittenValue.equals("") ? defaultValue : overwrittenValue);
-        
-        // TODO warn fallback to default
+        if (overwrittenValue.equals("")) {
+            // default value not overwritten
+            // TODO if plcc_B_warn_cfg_fallback_to_default warn
+            // System.out.println("INFO: Settings: Using internal default value '" + s + "' for setting '" + key + "'. Edit config file to override.");
+            return defaultValue;
+        } else {
+            return overwrittenValue;
+        }
     }
-    
-    String getDefaultValue() { return defaultValue; }
     
     private String getDataTypeString() {
         switch (dataType) {
@@ -130,4 +133,9 @@ class Setting {
             default: { return "UNSPECIFIED DATATYPE"; }
         }
     }
+    
+    // ### simple getter / setter ###
+    String getDefaultValue() { return defaultValue; }
+    String getDocumentation() { return documentation; }
+    String getName() { return name; }
 }

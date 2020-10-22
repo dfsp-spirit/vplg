@@ -8,6 +8,7 @@
 
 package plccSettings;
 
+import graphdrawing.DrawTools.IMAGEFORMAT;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -98,7 +99,7 @@ public class Settings {
         mapSettingNameToSectionName = new HashMap<>();
         for (Section tmpSection : sections) {
             for (Setting tmpSetting : tmpSection.settings) {
-                mapSettingNameToSectionName.put(tmpSetting.name, tmpSection.name);
+                mapSettingNameToSectionName.put(tmpSetting.getName(), tmpSection.name);
             }
         }
     }
@@ -124,7 +125,7 @@ public class Settings {
             while (enumer.hasMoreElements()) {
                 String key = enumer.nextElement();
                 String value = readProperties.getProperty(key);
-                if (setOverwrittenValue(key, value)) { numLoadedSettings++; } 
+                if (set(key, value)) { numLoadedSettings++; } 
             }
         } else {
             // create default settings file
@@ -164,9 +165,9 @@ public class Settings {
             // settings
             for (int j = 0; j < tmpSection.settings.size(); j++) {
                 Setting tmpSetting = tmpSection.settings.get(j);
-                settingsStr += "# " + tmpSetting.documentation + "\n";  // documentation
+                settingsStr += "# " + tmpSetting.getDocumentation() + "\n";  // documentation
                 settingsStr += "# Default: '" + tmpSetting.getDefaultValue() + "'\n";  // default value
-                settingsStr += tmpSetting.name + "=" + tmpSetting.getValue() + "\n\n";  // key-value pair
+                settingsStr += tmpSetting.getName() + "=" + tmpSetting.getValue() + "\n\n";  // key-value pair
             }
         }
         
@@ -183,7 +184,92 @@ public class Settings {
     }
     
     
-    static public Boolean setOverwrittenValue(String key, String value) {
+    /**
+     * Retrieves the setting with key 'key' from the settings and returns it as a String. Note that it is considered a fatal error if no such key exists. Ask first using 'contains()' if you're not sure. :)
+     * @param key the key to get
+     * @return the value of the specified key
+     */
+    public static String get(String key) {
+        if(mapSettingNameToSectionName.containsKey(key)) {
+            return(getSettingByName(key).getValue());
+        }
+        else {
+            DP.getInstance().e(PACKAGE_TAG, "No config file or default value for setting '" + key + "' exists, setting invalid. "
+                    + "Please inform a developer.  Exiting now.");
+            System.exit(1);                
+            return("ERROR");    // for the IDE                    
+        }
+        
+    }
+    
+    
+    /**
+     * Tries to cast the value of the property key 'key' to Integer and return it. If this fails it is considered a fatal error.
+     * @param key the key of the properties hashmap
+     * @return the value of the key as an Integer
+     */
+    public static Integer getInteger(String key) {
+        Integer i = null;
+        String s = get(key);
+
+        try {
+            i = Integer.valueOf(s);
+        }
+        catch (NumberFormatException e) {
+            DP.getInstance().e(PACKAGE_TAG, "Could not load setting '" + key + "' from settings as an Integer, invalid format. Exiting now.");
+            System.exit(1);
+        }
+        return(i);
+    }
+    
+    
+    /**
+     * Tries to cast the value of the property key 'key' to Float and return it. If this fails it is considered a fatal error.
+     * @param key the key of the properties hashmap
+     * @return the value of the key as a Float
+     */
+    public static Float getFloat(String key) {
+        Float f = null;
+        String s = get(key);
+
+        try {
+            f = Float.valueOf(s);
+        }
+        catch (NumberFormatException e) {
+            DP.getInstance().e(PACKAGE_TAG, "Could not load setting '" + key + "' from settings as an Float, invalid format. Exiting now.");
+            System.exit(1);
+        }
+        return(f);
+    }
+    
+    
+    /**
+     * Tries to extract the value of the property key 'key' as a Boolean and return it. If this fails it is considered a fatal error.
+     * The only accepted string representations of Booleans are "true" and "false".
+     * @param key the key of the properties hashmap
+     * @return the value of the key as a Boolean
+     */
+    public static Boolean getBoolean(String key) {
+        Boolean b = null;
+        String s = null;
+
+        s = get(key);
+
+        if(s.toLowerCase().equals("true")) {
+            return(true);
+        }
+        else if(s.toLowerCase().equals("false")) {
+            return(false);
+        }
+        else {
+            DP.getInstance().e(PACKAGE_TAG, "Could not load setting '" + key + "' from settings as an Boolean, invalid format. Exiting now.");
+            System.exit(1);
+            return(false);      // never reached
+        }
+    }
+    
+    
+    static public Boolean set(String key, String value) {
         Setting targetSetting = getSettingByName(key);
         if (targetSetting != null) {
             return getSettingByName(key).setOverwrittenValue(value);
@@ -192,6 +278,118 @@ public class Settings {
             return false;
         }
     }
+    
+    
+    /**
+     * Returns the version string. This is NOT guaranteed to be a number.
+     * @return the PLCC version
+     */
+    public static String getVersion() {
+        return("0.98.3");
+    }
+    
+    
+    /**
+     * Returns the application tag that is printed as a prefix for all output lines.
+     * @return the apptag
+     */
+    public static String getApptag() {
+        return("[PLCC] ");
+    }
+    
+    
+    /**
+     * Returns the default config file location. Note that this may or may not be in use atm. Use getConfigFile() instead if you
+     * need the file that is currently in use.
+     * @return the path as a String
+     */
+    public static String getDefaultConfigFilePath() {
+        return(DEFAULT_FILE.getAbsolutePath());
+    }
+    
+    
+    /**
+     * Creates an array of the output image formats for protein graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getProteinGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<>();
+        
+        if(getBoolean("plcc_B_img_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(getBoolean("plcc_B_img_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+        // --- ignore SVG because it is always produced ---
+        //if(Settings.getBoolean("plcc_B_img_output_format_SVG")) {
+        //    formats.add(IMAGEFORMAT.SVG);
+        //}
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    /**
+     * Creates an array of the output image formats for aa graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_AAG_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getAminoAcidGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<>();
+        
+        if(getBoolean("plcc_B_img_AAG_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(getBoolean("plcc_B_img_AAG_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+       
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    /**
+     * Creates an array of the output image formats for folding graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_FG_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getFoldingGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<>();
+        
+        if(getBoolean("plcc_B_img_FG_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(getBoolean("plcc_B_img_FG_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+        // --- ignore SVG because it is always produced ---
+        //if(Settings.getBoolean("plcc_B_img_FG_output_format_SVG")) {
+        //    formats.add(IMAGEFORMAT.SVG);
+        //}
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    /**
+     * Creates an array of the output image formats for complex graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_CG_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getComplexGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
+        
+        if(getBoolean("plcc_B_img_CG_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(getBoolean("plcc_B_img_CG_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+        // --- ignore SVG because it is always produced ---
+        //if(Settings.getBoolean("plcc_B_img_CG_output_format_SVG")) {
+        //    formats.add(IMAGEFORMAT.SVG);
+        //}
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    
     
     // ### simple getter and setter
     public static int getNumLoadedSettings() { return numLoadedSettings; }

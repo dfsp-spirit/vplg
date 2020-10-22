@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import proteingraphs.Position3D;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 
 
 /**
@@ -83,7 +83,7 @@ public class Atom implements java.io.Serializable {
         Integer di;
         di = distToPoint(a.getCoordX(), a.getCoordY(), a.getCoordZ());
         
-        if(SettingsOld.getBoolean("plcc_B_contact_debug_dysfunct")) {
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             if(this.isCalphaAtom() && a.isCalphaAtom()) {
                 System.out.println("Distance between C-alpha atoms " + this.pdbAtomNumber + " of " + this.getPdbResNum() + " and " + a.pdbAtomNumber + " of " + a.getPdbResNum() + " is " + di + " (-- before sqrt -> due to change of function not given).");
                 System.out.println(this.getCoordString() + "/" + a.getCoordString());
@@ -134,7 +134,7 @@ public class Atom implements java.io.Serializable {
         distDouble = Math.sqrt(dd);
         distInt = Integer.valueOf((int)Math.round(distDouble));
         
-        if(SettingsOld.getBoolean("plcc_B_contact_debug_dysfunct")) {
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             if(this.isCalphaAtom() && a.isCalphaAtom()) {
                 System.out.println("Distance between C-alpha atoms " + this.pdbAtomNumber + " of " + this.getPdbResNum() + " and " + a.pdbAtomNumber + " of " + a.getPdbResNum() + " is " + distInt + " (" + dd + " before sqrt, " + distDouble + " as Double).");
             }            
@@ -166,8 +166,8 @@ public class Atom implements java.io.Serializable {
         Integer atomRadiusThis;
         Integer atomRadiusOther;
         
-        Integer radProt = SettingsOld.getInteger("plcc_I_aa_atom_radius");
-        Integer radLig = SettingsOld.getInteger("plcc_I_lig_atom_radius");
+        Integer radProt = Settings.getInteger("plcc_I_aa_atom_radius");
+        Integer radLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
         if(this.isLigandAtom()) {
             atomRadiusThis = radLig;
@@ -192,7 +192,7 @@ public class Atom implements java.io.Serializable {
         //    System.exit(1);
         //}
         
-        if (SettingsOld.getInteger("plcc_I_debug_level") >= 2) {
+        if (Settings.getInteger("plcc_I_debug_level") >= 2) {
             if (dist < maxDist) {
                 System.out.println("   [DEBUG LV 2] Atom " + this.getPdbAtomNum() + " " +
                     this.getCoordString() + " and atom " + 
@@ -330,7 +330,7 @@ public class Atom implements java.io.Serializable {
         Double atomRadiusThis;
         Double atomRadiusOther;
         
-        //Double radLig = SettingsOld.getInteger("plcc_I_lig_atom_radius").doubleValue();
+        //Double radLig = Settings.getInteger("plcc_I_lig_atom_radius").doubleValue();
 
         if(this.isLigandAtom()) {
             atomRadiusThis = vdwRadii.get(this.chemSym.replaceAll("\\s+",""));

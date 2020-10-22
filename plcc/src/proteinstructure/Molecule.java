@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import plcc.Main;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 import tools.DP;
 
 /**
@@ -164,7 +164,7 @@ abstract public class Molecule {
         
         int numAtomsBefore = this.atoms.size();
         if(numAtomsBefore < 1) {
-            if(! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Molecule " + this.getFancyName() + " of chain " + this.getChainID() + " has NO atoms at all *before* choosing alternative location PDB field and deleting others.");
             }
             return new ArrayList<Atom>();
@@ -175,7 +175,7 @@ abstract public class Molecule {
         int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
     
         if((numAtomsWithChosenAltLoc < 1 || numAtomsWithChosenAltLoc > Main.MAX_ATOMS_PER_AA) && this.isAA()) {
-            if( ! SettingsOld.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
+            if( ! Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
                 DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA molecule " + this.getFancyName() + ".");
             }
         }
@@ -202,7 +202,7 @@ abstract public class Molecule {
         Integer totalMinMaxDist = MAXDIST;
         
         if(atoms.size() < 1) {
-            if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("getCenterAtom(): PDB molecule  " + this.pdbNum + " chain " + this.getChainID() + " of type " + getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
             }
             return(null);
@@ -260,7 +260,7 @@ abstract public class Molecule {
         if(this.centerSphereRadius == null) {
             
             Integer rad = 50;      // 5 A
-            if(! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Could not determine center sphere radius of PDB molecule " + this.getPdbNum() + ", may have no atoms. Using guessed value " + rad + ".");
             }
             this.centerSphereRadius = rad;
@@ -317,7 +317,7 @@ abstract public class Molecule {
      * @return sphere radius as 10th of Angström
      */
     public Integer getSphereRadius() {
-        return (SettingsOld.getBoolean("plcc_B_centroid_method")) ? getCentroidSphereRadius() : getCenterSphereRadius();
+        return (Settings.getBoolean("plcc_B_centroid_method")) ? getCentroidSphereRadius() : getCenterSphereRadius();
     }
     
     
@@ -531,7 +531,7 @@ abstract public class Molecule {
         
         this.backboneCentroidCoords = backboneCentroid;
         
-        if (SettingsOld.getInteger("plcc_I_debug_level") >= 3) {
+        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
             System.out.println("[DEBUG LV 3] " + this.toString());
             System.out.println("    [DEBUG LV 3] centroid: " + Arrays.toString(this.centroidCoords));
             System.out.println("    [DEBUG LV 3] backbone centroid: " + Arrays.toString(this.backboneCentroidCoords));
@@ -575,7 +575,7 @@ abstract public class Molecule {
         Atom b = m.getCenterAtom();
 
         if(a == null || b == null) {
-            if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbNum + " and " + m.getPdbNum() + " lacking center atoms, assuming 100.");
             }
             return(100);      
@@ -613,7 +613,7 @@ abstract public class Molecule {
      * @return molecule-molecule distance
      */
     public Integer distTo(Molecule m) {
-        return (SettingsOld.getBoolean("plcc_B_centroid_method") ? this.centroidDistTo(m) : this.centerDistTo(m));
+        return (Settings.getBoolean("plcc_B_centroid_method") ? this.centroidDistTo(m) : this.centerDistTo(m));
     }
     
     public Boolean isLigand() { return(this.type.equals(Residue.RESIDUE_TYPE_LIGAND)); }
@@ -631,19 +631,19 @@ abstract public class Molecule {
         
         switch(type) {
             case 0:
-                atomRadius = SettingsOld.getInteger("plcc_I_aa_atom_radius");
+                atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
                 break;
             case 1:
-                atomRadius = SettingsOld.getInteger("plcc_I_lig_atom_radius");     // no value for "Other" so far --> Default is AA
+                atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");     // no value for "Other" so far --> Default is AA
                 break;
             case 2:
-                atomRadius = SettingsOld.getInteger("plcc_I_aa_atom_radius");
+                atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
                 break;
             case 3:
-                atomRadius = SettingsOld.getInteger("plcc_I_rna_atom_radius");
+                atomRadius = Settings.getInteger("plcc_I_rna_atom_radius");
                 break;
             default:
-                atomRadius = SettingsOld.getInteger("plcc_I_aa_atom_radius");
+                atomRadius = Settings.getInteger("plcc_I_aa_atom_radius");
                 DP.getInstance().w("No Radius for this Molecule. Trying to move on with default value.");
                 break;
         }
@@ -663,7 +663,7 @@ abstract public class Molecule {
             dist = this.getCenterAtom().distToAtom(r.getCenterAtom());      // dist: actual distance between the two molecules
         }
         catch(Exception e) {
-            if( ! SettingsOld.getBoolean("plcc_B_no_parse_warn")) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                 DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
             }
             return(false);

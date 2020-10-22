@@ -13,7 +13,7 @@ import proteinstructure.SSE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import io.IO;
-import plcc.SettingsOld;
+import plccSettings.Settings;
 import tools.DP;
 import plcc.Main;
 
@@ -293,7 +293,7 @@ public class Chain implements java.io.Serializable {
             chainCentroid[1] = (int) (Math.round((double) tmpCenter[1] / tmpAtomNumber));
             chainCentroid[2] = (int) (Math.round((double) tmpCenter[2] / tmpAtomNumber));
 
-            if (SettingsOld.getInteger("plcc_I_debug_level") > 0) {
+            if (Settings.getInteger("plcc_I_debug_level") > 0) {
                 System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCentroid));
             }
 
@@ -310,7 +310,7 @@ public class Chain implements java.io.Serializable {
                 }
             }
 
-            if (SettingsOld.getInteger("plcc_I_debug_level") > 0) {
+            if (Settings.getInteger("plcc_I_debug_level") > 0) {
                 System.out.println("[DEBUG] Radius of chain " + pdbChainID + " is " + String.valueOf(tmpBiggestDist));
             }
 
@@ -345,7 +345,7 @@ public class Chain implements java.io.Serializable {
         dist = (int)Math.round(Math.sqrt(tmpSum));
         
         // presume there are ligands in the chain
-        Integer atomRadius = SettingsOld.getInteger("plcc_I_lig_atom_radius");
+        Integer atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
         
         Integer justToBeSure = 4;   // account for small errors due to rounding
         Integer summedSpheres = this.getRadiusFromCentroid() + c.getRadiusFromCentroid() + (atomRadius * 2) + justToBeSure;
@@ -353,7 +353,7 @@ public class Chain implements java.io.Serializable {
         //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
         //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
 
-        if (SettingsOld.getInteger("plcc_I_debug_level") > 0) {
+        if (Settings.getInteger("plcc_I_debug_level") > 0) {
             System.out.println("[DEBUG][CHAIN] Chain " + this.pdbChainID + " and " + c.pdbChainID);
             System.out.println(" ... mid points: " + this.chainCentroid[0] + "|" + this.chainCentroid[1] + "|" + this.chainCentroid[2]);
             System.out.println(" ... mid points: " + c.chainCentroid[0] + "|" + c.chainCentroid[1] + "|" + c.chainCentroid[2]);
