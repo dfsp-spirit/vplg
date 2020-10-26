@@ -880,7 +880,6 @@ public class Main {
                             syntaxError();
                         }
                         else {
-                            outputDir = args[i+1];
                             Settings.set("plcc_S_output_dir", outputDir);
                             argsUsed[i] = true;
                             argsUsed[i+1] = true;
@@ -1574,6 +1573,8 @@ public class Main {
             }
         }
         
+        outputDir = Settings.get("plcc_S_output_dir");
+        
         if(Settings.getBoolean("plcc_B_clustermode")) {
             if(! silent) {
                 System.out.println("Cluster mode active.");
@@ -1596,14 +1597,7 @@ public class Main {
             DP.getInstance().w("Using vector mode instead of double distance for SSE orientation, but plcc_I_spatrel_vector_num_res_centroids cannot be negative."
                     + " Setting it to 1 and proceeding.");
         }
-        
-        // This check is rather useless and it will break PDB files that were split into multiple files (one for each
-        //  model) and renames, e.g. "2kos_1.pdb" for model 1 of protein 2kos. It is therefore disabaled atm.
-        if(pdbid.length() != 4) {
-            if(! silent) {
-                //System.out.println("WARNING: The PDB identifier '" + pdbid + "' should be 4 characters long (but is " + pdbid.length() + ").");            
-            }
-        }
+
 
         // ****************************************************    test for required files    **********************************************************
 
