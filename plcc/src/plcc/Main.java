@@ -1514,6 +1514,7 @@ public class Main {
                         if (args.length <= i + 1) {
                             syntaxError();
                         }
+                        
                         int numSettingsLoaded = Settings.loadFromFile(args[i + 1], false);
                         if (numSettingsLoaded > 0) {
                             outputToBePrintedUnlessSilent.append("  Loaded ").append(numSettingsLoaded).append(" settings as requested by command line argument from properties file ").append(args[i + 1]).append(".\n");
@@ -1521,6 +1522,15 @@ public class Main {
                             outputToBePrintedUnlessSilent.append("  Could not load any settings from properties file ").append(args[i + 1]).append(". Does the file exist and contain PLCC settings?\n");
                         }
                         argsUsed[i] = argsUsed[i+1] = true;
+                    }
+                    
+                    if (s.equals("--set")) {
+                        if (args.length <= i + 2) {
+                            syntaxError();
+                        }
+                        
+                        Settings.set(args[i + 1], args[i + 2]);
+                        argsUsed[i] = argsUsed[i + 1] = argsUsed[i + 2] = true;
                     }
                     
                     
@@ -11204,6 +11214,7 @@ public class Main {
         System.out.println("   --matrix-structure-search <nt> <ln> <gt>: search a structure <ln> in linear notation in a Proteingraph; <nt> = type of linnot; <gt> = graphtype of linnot");
         System.out.println("   --matrix-structure-search-db <nt> <ln> <gt>: search a structure <ln> in linear notation in the whole database; <nt> = type of linnot; <gt> = graphtype of linnot");
         System.out.println("   --settingsfile <f>      : load settings from file <f>.");
+        System.out.println("   --set <k> <v>           : set setting <k> to value <v>.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
