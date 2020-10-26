@@ -1009,38 +1009,6 @@ public class Main {
                     }
                     
                     
-                    
-                    if(s.equals("-m") || s.equals("--image-format")) {
-                        if(args.length <= i+1 ) {
-                            syntaxError();
-                        }
-                        else {
-                            String format = args[i+1].toUpperCase();
-                            
-                            argsUsed[i] = true;
-                            argsUsed[i+1] = true;
-                            
-                            if((format.equals("PNG"))) {
-                                Settings.set("plcc_S_img_output_format", "PNG");
-                                Settings.set("plcc_S_img_output_fileext", ".png");
-                            }
-                            else if((format.equals("JPG"))) {
-                                Settings.set("plcc_S_img_output_format", "JPG");
-                                Settings.set("plcc_S_img_output_fileext", ".jpg");
-                            }
-                            else if((format.equals("TIF"))) {
-                                Settings.set("plcc_S_img_output_format", "TIF");
-                                Settings.set("plcc_S_img_output_fileext", ".tif");
-                            }
-                            else {
-                                System.err.println("ERROR: Requested image output format '" + format + "' invalid. Use 'PNG' or 'SVG' for bitmap or vector output.");
-                                checkArgsUsage(args, argsUsed);
-                                syntaxError();
-                            }                            
-                        }
-                    }
-                    
-                    
                     if(s.equals("--contact-level-debugging")) {                                                                        
                         Settings.set("plcc_B_contact_debug_dysfunct", "true");
                         argsUsed[i] = true;
@@ -1537,20 +1505,21 @@ public class Main {
                     }
                     
                     if (s.equals("--settingsfile")) {
-                        // as this may overwrite command line arguments, this should always preceed command lines
+                        // as this may overwrite command line arguments, this should always preceed other command lines
+                        // NOTE: if this settings contains only a sub set of settings then only these are overwritten
                         if (i > 1) {
-                            DP.getInstance().w("Command line argument '--settingsfile' should always be first argument, as it may overwrite settings "
-                                    + "from previous command line options.", 2);
+                            DP.getInstance().w("Command line argument '--settingsfile' overwrites settings with settings from file. "
+                                    + "It may overwrite previous command line options if not used as first command line option.", 2);
                         }
                         
                         if (args.length <= i + 1) {
                             syntaxError();
                         }
-                        int numSettingsLoaded = SettingsOld.load(args[i + 1]);
+                        int numSettingsLoaded = Settings.loadFromFile(args[i + 1], false);
                         if (numSettingsLoaded > 0) {
                             outputToBePrintedUnlessSilent.append("  Loaded ").append(numSettingsLoaded).append(" settings as requested by command line argument from properties file ").append(args[i + 1]).append(".\n");
-                            // TODO update command line option to work with new Settings
-                            outputToBePrintedUnlessSilent.append("  [WARNING] This command line options is for this commit DEPRECATED and does not work!");
+                        } else {
+                            outputToBePrintedUnlessSilent.append("  Could not load any settings from properties file ").append(args[i + 1]).append(". Does the file exist and contain PLCC settings?\n");
                         }
                         argsUsed[i] = argsUsed[i+1] = true;
                     }
@@ -1654,13 +1623,6 @@ public class Main {
                     System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
                 }
             }
-        }
-        
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
-            SettingsOld.writeDocumentedDefaultFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".plcc_example_settings");
-            // TODO update to new Settings class
-            System.out.println("[WARNING] Writing of documented example settings file because of debug level > 0 deprecated for this commit.");
-        
         }
         
         
@@ -11210,7 +11172,6 @@ public class Main {
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
         System.out.println("-L | --lig-filter <i> <a>  : only consider ligands which have at least <i> and at most <a> atoms. A setting of zero means no limit.");                
-        System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");
         System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-N | --no-warn             : do not print any warnings (intended for cluster use to reduce job output in logs).");

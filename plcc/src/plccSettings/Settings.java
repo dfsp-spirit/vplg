@@ -16,6 +16,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 import tools.DP;
+import io.IO;
 
 /**
  *
@@ -121,20 +122,28 @@ public class Settings {
     }
     
     
-    public static void init() {
-        // read settings in if existing and create otherwise
-        if (io.IO.fileExistsIsFileAndCanRead(DEFAULT_FILE)) {
-            Properties readProperties = io.IO.readPropertiesFromFile(DEFAULT_FILE.getAbsolutePath());
-            @SuppressWarnings("unchecked")  // skip warning associated to next line, according to https://www.boraji.com/how-to-iterate-properites-in-java
-            Enumeration<String> enumer = (Enumeration<String>) readProperties.propertyNames();  // seems we have to create it outside the loop head
-            while (enumer.hasMoreElements()) {
-                String key = enumer.nextElement();
-                String value = readProperties.getProperty(key);
-                if (set(key, value)) { numLoadedSettings++; } 
-            }
-            
+    /**
+     * Reads the settings from a file to set overwritten settings.
+     * @param filepath use default file path if empty
+     * @param rewrite whether file should be rewritten if not conform with file format
+     * @return number of settings loaded
+     */
+    public static int loadFromFile(String filepath, Boolean rewrite) {
+        filepath = (filepath.equals("") ? DEFAULT_FILE.getAbsolutePath() : filepath);  // use default filepath if not specified
+        int numLoaded = 0;
+        
+        Properties readProperties = IO.readPropertiesFromFile(filepath);
+        @SuppressWarnings("unchecked")  // skip warning associated to next line, according to https://www.boraji.com/how-to-iterate-properites-in-java
+        Enumeration<String> enumer = (Enumeration<String>) readProperties.propertyNames();  // seems we have to create it outside the loop head
+        while (enumer.hasMoreElements()) {
+            String key = enumer.nextElement();
+            String value = readProperties.getProperty(key);
+            if (set(key, value)) { numLoaded++; } 
+        }
+        
+        if (rewrite) {
             // check whether default file is correctly formatted and contains all existing settings
-            String readFile = io.IO.readFileToString(DEFAULT_FILE.getAbsolutePath());
+            String readFile = IO.readFileToString(filepath);
             if (! readFile.equals(asFormattedString())) {
                 // file differs from how it should look: provide some info, copy old one and write new one
                 // info
@@ -147,23 +156,33 @@ public class Settings {
                 } else {
                     DP.getInstance().w(PACKAGE_TAG, "Settings file contains all settings, but is not formatted properly");
                 }
-                
+
                 // copy old file
-                String copiedFilepath = io.IO.getUniqueFilename(DEFAULT_FILE.getAbsolutePath() + "_copied");
+                String copiedFilepath = IO.getUniqueFilename(filepath + "_copied");
                 DP.getInstance().w("Copying old settings file to '" + copiedFilepath + "' and writing correctly formatted settings file "
-                        + "with all settings and your previous values to '" + DEFAULT_FILE.getAbsolutePath() + "'. Nothing to thank ;-)", 2);
-                io.IO.writeStringToFile(readFile, copiedFilepath, false);
-                
+                        + "with all settings and your previous values to '" + filepath + "'. Nothing to thank ;-)", 2);
+                IO.writeStringToFile(readFile, copiedFilepath, false);
+
                 // rewrite
-                io.IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), true);
+                IO.writeStringToFile(asFormattedString(), filepath, true);
             }
+        }
+        
+        return numLoaded;
+    }
+    
+    
+    public static void init() {
+        // read settings in if existing and create otherwise
+        if (IO.fileExistsIsFileAndCanRead(DEFAULT_FILE)) {
+            numLoadedSettings = loadFromFile("", true);
         } else {
             // create default settings file
             DP.getInstance().w(PACKAGE_TAG, "Could not load settings from properties file, trying to create it.");
             DP.getInstance().i(PACKAGE_TAG, "If you have used PLCC previously and just upgraded to a new version, you might want to use your "
                     + "previous settings file. It should be located at your home directory and be named '.plcc_settings'. Simply rename it to "
                     + "'plcc_settings.txt' and rerun PLCC once. It creates the newly formatted settings file for you with your previous settings.");
-            if (io.IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), false)) {
+            if (IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), false)) {
                 createdDefaultFile = true;
             } else {
                 DP.getInstance().w(PACKAGE_TAG, "Did not found default file and could not create it at '" + DEFAULT_FILE.getAbsolutePath() + "'. " +
