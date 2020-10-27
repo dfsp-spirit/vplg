@@ -5549,13 +5549,14 @@ public class Main {
 
             a = mols.get(i);
             numResToSkip = 0L;
-
             
             
+           
             for(int j = i + 1; j < rs; j++) {
 
                 b = mols.get(j);
                 
+              
                 // DEBUG
                 if(Settings.getInteger("plcc_I_debug_level") >= 1) {
                     if(! silent) {
@@ -5575,7 +5576,7 @@ public class Main {
                 // We only need to check on atom level if the center spheres overlap
                 if(a.contactPossibleWithMolecule(b)) {                                        
                     numResContactsPossible++;
-
+                    
                     //System.out.println("    DSSP mols# " + a.getDsspNum() + "/" + b.getDsspNum() + ": Collision spheres overlap, checking on atom level.");
 
                     rci = calculateAtomContactsBetweenResidues(a, b);
@@ -5819,11 +5820,11 @@ public class Main {
      * @return A MolContactInfo object with information on the atom contacts between 'a' and 'b'.
      */
     public static MolContactInfo calculateAtomContactsBetweenResidues(Molecule a, Molecule b) {
-
+        
         
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
-
+        
         Atom x, y;
         Integer dist = null;
         Integer CAdist = a.distTo(b);
@@ -5892,7 +5893,7 @@ public class Main {
         Integer aIntID = a.getInternalAAID();     // Internal AA ID (ALA=1, ARG=2, ...)
         Integer bIntID = b.getInternalAAID();
         Integer statAtomIDi, statAtomIDj;
-
+        
 
 
         // Iterate through all atoms of the two residues and check contacts for all pairs
@@ -5906,7 +5907,7 @@ public class Main {
             }
             
             x = atoms_a.get(i);
-
+            
             innerloop:
             for(Integer j = 0; j < atoms_b.size(); j++) {
                                 
@@ -5917,7 +5918,7 @@ public class Main {
                 }
                 
                 y = atoms_b.get(j);
-                                
+                                              
 
                 // Check whether a contact exist. If so, classify it. Note that the code of geom_neo works based on the
                 //  position of an atom in the atom list of its residue (e.g., it assumes that the 2nd atom of an AA is
@@ -5929,10 +5930,10 @@ public class Main {
                 //System.out.println("        " + y);
 
                 dist = x.distToAtom(y);
-
+                
                 if(x.atomContactTo(y)) {             // If a contact is detected, Atom.atomContactTo() returns true
+                   
                     
-
                     // The van der Waals radii spheres overlap, contact found.
                     numPairContacts[MolContactInfo.TT]++;   // update total number of contacts for this residue pair
                     

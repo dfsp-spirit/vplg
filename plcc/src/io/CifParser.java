@@ -1042,7 +1042,7 @@ class CifParser {
         }
         */
         
-            if (checkType(Molecule.RESIDUE_TYPE_RNA) || checkType(Molecule.RESIDUE_TYPE_AA)){
+            if (lastMol.getType() == Molecule.RESIDUE_TYPE_AA || lastMol.getType() == Molecule.RESIDUE_TYPE_RNA){
                 if (lastMol == null) {
                     DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
@@ -1518,6 +1518,7 @@ class CifParser {
     /**
      * Returns whether the molecule type matches the requested one.
      * Checks whether the the molecule type in the chemical components map corresponds to the requested one.
+     * Careful with this function! There are amino acid ligands that are not always reliably categorized as ligands but instead as amino acids.
      * @param requestedType integer of the type one is looking for (0 for AA, 1 for ligand, 3 for RNA)
      */
     protected static Boolean checkType(Integer requestedType){

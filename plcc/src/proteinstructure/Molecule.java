@@ -620,7 +620,7 @@ abstract public class Molecule {
 
         Integer justToBeSure = 4;   // Setting this to 0 shouldn't change the number of contacts found (but all harm it could do is to increase the runtime a tiny bit). Verified: has no influence. Should be removed in future release.
         Integer maxDistForContact = this.getCenterSphereRadius() + r.getCenterSphereRadius() +  this.getAtomRadius() + r.getAtomRadius() + justToBeSure;        //maxDistForContact: area in which overlapping is possible
-
+        
         if(dist > (maxDistForContact)) {
             return(false);
         }
