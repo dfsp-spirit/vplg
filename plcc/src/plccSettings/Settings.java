@@ -149,7 +149,7 @@ public class Settings {
                 // info
                 ArrayList<String> unoverwrittenSettings = getUnoverwrittenSettings();
                 if (unoverwrittenSettings.size() > 0) {
-                    DP.getInstance().w(PACKAGE_TAG, "Settings file is missing following settings: " + unoverwrittenSettings.toString());
+                    DP.getInstance().w(PACKAGE_TAG, "Settings file is missing following settings:");
                     for (String tmpSettingName : unoverwrittenSettings) {
                         DP.getInstance().w(tmpSettingName, 2);
                     }

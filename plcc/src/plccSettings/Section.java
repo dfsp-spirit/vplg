@@ -117,6 +117,9 @@ class Section {
             case "Complex Graph (CG)":
                 settings.add(new Setting("plcc_B_complex_graphs", 'B', "false", "Whether Complex Graphs are computed and drawn."));
                 settings.add(new Setting("plcc_I_cg_contact_threshold", 'I', "1", "The lowest number of interchain residue contacts where an edge in Complex Graphs is drawn."));
+                settings.add(new Setting("plcc_B_CG_ignore_ligands", 'B', "true", "Whether ligands should be ignored. If not, they may be part of the chain they are "
+                        + "added to by the authors of the PDB file. This influences the (number of) contacts. May be superseded in the future by placing ligands in "
+                        + "own chain."));
                 settings.add(new Setting("plcc_B_img_CG_output_format_PNG", 'B', "true", "Whether to write Complex Graph visualizations in PNG format."));
                 settings.add(new Setting("plcc_B_img_CG_output_format_PDF", 'B', "false", "Whether to write Complex Graph visualizations in PDF format."));
                 // Removed: Currently not used as SVG is base for conversion to other file formats and therefore always created.

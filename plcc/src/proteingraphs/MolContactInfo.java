@@ -188,6 +188,15 @@ public class MolContactInfo {
     @Override public String toString() {
         return("[MCI] TypeA " + getResTypeStringA() + ", TypeB " + getResTypeStringB() + ", DsspNumA "+ getDsspNumA() + ", DsspNumB " + getDsspNumB());
     }
+    
+    
+    /**
+     * Whether one or both molecules are ligands.
+     * @return 
+     */
+    public Boolean isLigandContact() {
+        return molA.isLigand() || molB.isLigand();
+    }
 
 
     /** Returns a string indicating whether residue A is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").

@@ -48,6 +48,7 @@ import java.util.Objects;
 import java.util.Set;
 import plccSettings.Settings;
 import proteinstructure.Chain;
+import proteinstructure.Molecule;
 import proteinstructure.Residue;
 import proteinstructure.SSE;
 import tools.DP;
@@ -137,10 +138,40 @@ public class ComplexGraph extends UAdjListGraph {
         
         chainResAASeq = new String[numberChains];
         
-        createVertices(chains);
-        createHomologueChainsMatrix(chains);
-        calculateNumChainInteractions(resContacts);
-        createEdges(resContacts);
+        // preprocess chains if required
+        List<Chain> preprocessedChains;
+        if (Settings.getBoolean("plcc_B_CG_ignore_ligands")) {
+            preprocessedChains = new ArrayList<>();
+            for (Chain tmpChain : chains) {
+                Chain newChain = new Chain(tmpChain.getPdbChainID());
+                // only get AAResidues
+                for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
+                    newChain.addMolecule(tmpMol);
+                }
+                preprocessedChains.add(newChain);
+            }
+        } else {
+            preprocessedChains = chains;
+        }
+        
+        createVertices(preprocessedChains);
+        createHomologueChainsMatrix(preprocessedChains);
+        
+        // preprocess res contacts if required
+        List<MolContactInfo> preprocessedResContacts;
+        if (Settings.getBoolean("plcc_B_CG_ignore_ligands")) {
+            preprocessedResContacts = new ArrayList<>();
+            for (MolContactInfo tmpMci : resContacts) {
+                if (! tmpMci.isLigandContact()) {
+                    preprocessedResContacts.add(tmpMci);
+                }
+            }
+        } else {
+            preprocessedResContacts = resContacts;
+        }
+        
+        calculateNumChainInteractions(preprocessedResContacts);
+        createEdges(preprocessedResContacts);
     }
     
     
@@ -215,13 +246,13 @@ public class ComplexGraph extends UAdjListGraph {
      */
     private void calculateNumChainInteractions(List<MolContactInfo> resContacts) {
         numChainInteractions = new Integer[numberChains][numberChains];
-        for(Integer i = 0; i < resContacts.size(); i++){
+        for(Integer i = 0; i < resContacts.size(); i++){             
             ComplexGraph.Vertex chainA = getVertexFromChain(resContacts.get(i).getMolA().getChainID());
             ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
                       
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
-            
+                       
             // We only want interchain contacts
             if (!chainA.equals(chainB)){
                 if(numChainInteractions[chainAint][chainBint] == null){
@@ -1327,13 +1358,16 @@ public class ComplexGraph extends UAdjListGraph {
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("normalized_weight", normalizedEdgeWeigth));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixcoil_contacts", numHelixCoilInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandstrand_contacts", numStrandStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandcoil_contacts", numStrandCoilInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandligand_contacts", numStrandLigandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilcoil_contacts", numCoilCoilInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilligand_contacts", numCoilLigandInteractionsMap));
+        if (! Settings.getBoolean("plcc_B_CG_ignore_ligands")) { 
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandligand_contacts", numStrandLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilligand_contacts", numCoilLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_ligandligand_contacts", numLigandLigandInteractionsMap));
+        }
 
         FileOutputStream fop = null;
         boolean allOK = true;
