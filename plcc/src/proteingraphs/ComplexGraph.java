@@ -38,6 +38,9 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import io.DBManager;
 import io.FileParser;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -67,10 +70,12 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numCoilCoilInteractionsMap;
     public Map<Edge, Integer> numCoilLigandInteractionsMap;
     public Map<Edge, Integer> numLigandLigandInteractionsMap;
-    public Map<Edge, Integer> numAllInteractionsMap;
+    public Map<Edge, Integer> numAllInteractionsMap;  // number of residue-residue contacts
+    public Map<Edge, BigDecimal> normalizedEdgeWeigth;  // normalized by chain length: num res contact / #res1 * #res2. Using BigDecimal for precision.
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
     public Map<Vertex, String> molMap;  // contains for each vertex (= protein chain) the corresponding molecule name
+    public Map<Vertex, Integer> chainLengthMap;  // used for the GML file output
     public Map<List<Integer>, Integer> numSSEContacts;
     public Map<List<Integer>, List<String>> numSSEContactChainNames;
     
@@ -78,6 +83,7 @@ public class ComplexGraph extends UAdjListGraph {
     private ArrayList<String> contactInfo;
 
     private Integer[][] numChainInteractions;
+    private HashMap<String, Integer> mapChainIdToLength;  // used for the normalized edge weights
     private Integer[][] homologueChains;
     private final Set<String> molIDs;  // Contains the mol IDs for all chains. Used to get number of mol IDs (= size)
     private final String[] chainResAASeq;
@@ -87,6 +93,8 @@ public class ComplexGraph extends UAdjListGraph {
      * The RCSB PDB id this graph is based on.
      */
     private final String pdbid;
+    
+    private final static int PRECISION = 35;  // used as precision for the BigDecimal normalized edge weight, i.e., number of digits left and right of decimal point
 
     /**
      * Constructor.
@@ -111,13 +119,19 @@ public class ComplexGraph extends UAdjListGraph {
         numCoilLigandInteractionsMap = createEdgeMap();
         numLigandLigandInteractionsMap = createEdgeMap();
         numAllInteractionsMap = createEdgeMap();
+        normalizedEdgeWeigth = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
+        chainNamesInEdge = createEdgeMap();
+        
         proteinNodeMap = createVertexMap();
         molMap = createVertexMap();
+        chainLengthMap = createVertexMap();
+        
         molIDs = new HashSet<>();
-        chainNamesInEdge = createEdgeMap();
         numSSEContacts = new HashMap<>();
         numSSEContactChainNames = new HashMap<>();
+        mapChainIdToLength = new HashMap<>();
+        
 
         neglectedEdges = 0;
         
@@ -136,13 +150,18 @@ public class ComplexGraph extends UAdjListGraph {
      */
     private void createVertices(List<Chain> chains) {
         for(Integer i = 0; i < chains.size(); i++) {
+            Chain tmpChain = chains.get(i);
             Vertex v = createVertex();
-            proteinNodeMap.put(v, chains.get(i).getPdbChainID());
-            molMap.put(v, FileParser.getMetaInfo(pdbid, chains.get(i).getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
-            molIDs.add(FileParser.getMetaInfo(pdbid, chains.get(i).getPdbChainID()).getMolName());
+            
+            proteinNodeMap.put(v, tmpChain.getPdbChainID());
+            molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
+            chainLengthMap.put(v, tmpChain.getResidues().size());
+            
+            molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
+            mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getResidues().size());
 
             // get AA sequence string for each chainName
-            for(Residue resi : chains.get(i).getResidues()) {
+            for(Residue resi : tmpChain.getResidues()) {
                 
                 if ( ! Settings.get("plcc_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
                     if (chainResAASeq[i] != null) {
@@ -634,6 +653,25 @@ public class ComplexGraph extends UAdjListGraph {
             } else {
                 neglectedEdges++; // TODO: so wrong...
             }
+        } // end of loop over all res contacts
+        computeNormalizedEdgeWeights();  // do this here instead of in loop, so we need to compute it only once
+    }
+    
+    
+    private void computeNormalizedEdgeWeights() {
+        for (Edge e : numAllInteractionsMap.keySet()) {
+            
+            // use String constructor for BigDecimal to achieve precision 
+            //  (see https://www.simplexacode.ch/en/blog/2018/07/using-bigdecimal-as-an-accurate-replacement-for-floating-point-numbers/)
+            BigDecimal tmpContacts = new BigDecimal(numAllInteractionsMap.get(e).toString());
+            BigDecimal tmpNumRes1 = new BigDecimal(mapChainIdToLength.get(chainNamesInEdge.get(e)[0]));  // number of residues from one chain
+            BigDecimal tmpNumRes2 = new BigDecimal(mapChainIdToLength.get(chainNamesInEdge.get(e)[1]));  // number of residues from other chain
+            
+            // divide can produce infinite digits after comma:
+            //   allow precision, i.e. significant digits left and right, of 25
+            BigDecimal tmpNormalizedWeight = tmpContacts.divide(tmpNumRes1.multiply(tmpNumRes2), PRECISION, RoundingMode.HALF_UP);
+            
+            normalizedEdgeWeigth.put(e, tmpNormalizedWeight);
         }
     }
     
@@ -656,11 +694,7 @@ public class ComplexGraph extends UAdjListGraph {
 
     public Boolean chainsHaveEnoughContacts(Integer A, Integer B) {
         if (this.numChainInteractions[A][B] != null) {
-            if (this.numChainInteractions[A][B] >= Settings.getInteger("plcc_I_cg_contact_threshold")) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.numChainInteractions[A][B] >= Settings.getInteger("plcc_I_cg_contact_threshold");
         } else {
             return false;
         }
@@ -1246,6 +1280,24 @@ public class ComplexGraph extends UAdjListGraph {
                 return '"' + molMap.get(o) + '"';
             }
         });
+        
+        // add a new line per node holding the chain's length
+        gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
+            @Override
+            public String getAttribute() {
+                return "chain_length";
+            }
+
+            @Override
+            public boolean hasValue(Vertex o) {
+                return chainLengthMap.containsKey(o);
+            }
+
+            @Override
+            public String write(Vertex o) {
+                return chainLengthMap.get(o).toString();
+            }
+        });
 
         //gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>());
         /**
@@ -1272,6 +1324,7 @@ public class ComplexGraph extends UAdjListGraph {
         });
        
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_all_res_res_contacts", numAllInteractionsMap));  // same as label but as int = without '"' // only underscore allowed (by Cytoscape)
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("normalized_weight", normalizedEdgeWeigth));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));
