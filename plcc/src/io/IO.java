@@ -1005,7 +1005,7 @@ public class IO {
     
     /**
      * Expects a path with filename and extends the name if already existing.
-     * @param absPath
+     * @param absPath absolute filepath
      * @return 
      */
     public static String getUniqueFilename(String absPath) {
@@ -1013,7 +1013,7 @@ public class IO {
         Integer extension = 0;  // count which is applied to file name to create an unique one
         while (uniqueFile.exists()) {
             extension ++;
-            uniqueFile = new File(uniqueFile.getAbsoluteFile() + "_" + extension.toString());
+            uniqueFile = new File(absPath + "_" + extension.toString());
         }
         return uniqueFile.getAbsolutePath();
     }
