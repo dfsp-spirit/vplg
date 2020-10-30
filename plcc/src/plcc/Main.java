@@ -13158,11 +13158,12 @@ public class Main {
                 return;
         }
         
+        //TODELETE
         // print warning here so that it only appears once (not once per chain)
-        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
-            DP.getInstance().w("CIF setting enabled: Parsing of protein meta info not fully " + 
-                        "implemented yet.");
-        }
+//        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+//            DP.getInstance().w("CIF setting enabled: Parsing of protein meta info not fully " + 
+//                        "implemented yet.");
+//        }
 
         // Get SSEs for all chains
         for(Integer i = 0; i < allChains.size(); i++) {

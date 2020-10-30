@@ -70,6 +70,7 @@ class CifParser {
     // - - atom_site - -
     private static int ligandsTreatedNum = 0;
     private static int RnaTreatedNum = 0;
+    private static int freeResTreatedNum = 0;
     private static int numberAtoms = 0;
     
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
@@ -81,7 +82,7 @@ class CifParser {
     private static RNA rna = null;
 
     // - variables per (atom) line -
-    private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
+    private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB, entityID;
     private static String atomRecordName, atomName, chainID, altChainID, chemSym, altLoc, iCode, molNamePDB;
     private static Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
     private static Float oCoordXf, oCoordYf, oCoordZf;
@@ -721,7 +722,7 @@ class CifParser {
 
         // - - atom - -
         // reset variables
-        atomSerialNumber = molNumPDB = coordX =  coordY = coordZ = null;
+        atomSerialNumber = molNumPDB = coordX =  coordY = coordZ = entityID = null;
         atomRecordName = atomName = molNamePDB = chainID = chemSym = altLoc = null;
         iCode = " "; // if column does not exist or ? || . is assigned use 1 blank (compare old parser)
         oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
@@ -770,7 +771,9 @@ class CifParser {
         // use auth_seq_id > label_seq_id (hope DSSP does so too)
         // resNumPDB = Integer.valueOf(lineData[colHeaderPosMap.get("auth_seq_id")]);
         molNumPDB = Integer.valueOf(lineData[colHeaderPosMap.get("auth_seq_id")]);
-
+        
+        // entity ID for classification of ligands
+        entityID = Integer.valueOf(lineData[colHeaderPosMap.get("label_entity_id")]);
 
         // insertion code
         // only update if column and value exist, otherwise stick to blank ""
@@ -841,7 +844,7 @@ class CifParser {
         if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
             tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);  // null if not in DSSP data -> ligand/free AA
             // check that a peptide residue could be found                   
-            if (tmpMol == null || checkType(tmpMol.RESIDUE_TYPE_LIGAND)) {
+            if (checkType(tmpMol.RESIDUE_TYPE_LIGAND) || (tmpMol == null && entityID != lastMol.getEntityID() )) {
                 // residue is not in DSSP file -> must be free (modified) amino acid, ligand or RNA
                 if (! silent) {
                     // print note only once
@@ -852,13 +855,40 @@ class CifParser {
                 }
 
             } else {
-                lastMol = tmpMol;
+                
+                if (tmpMol == null) {
+                    Residue res = new Residue();
+                    
+                    res.setPdbNum(molNumPDB);
+                    res.setType(Molecule.RESIDUE_TYPE_AA);
+                    
+                    freeResTreatedNum++;
+                    int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
+                    res.setDsspNum(resNumDSSP);
+
+                    res.setChainID(chainID);
+                    res.setiCode(iCode);
+                    res.setName3(molNamePDB);
+                    res.setAAName1(molNamePDB);  //TOASK TODELETE umschreiben
+                    res.setChain(FileParser.getChainByPdbChainID(chainID));
+                    res.setModelID(m.getModelID());
+                    res.setSSEString("plcc_S_rnaSseCode"); //TOASK TODELETE was nimmt man für aas?
+                    
+                    lastChainID = chainID;
+                    FileParser.s_molecules.add(res);
+                    FileParser.getChainByPdbChainID(chainID).addMolecule(res);
+                    lastMol = res;
+                } else {
+                    lastMol = tmpMol;
+                }
+
                 lastMol.setModelID(m.getModelID());
                 lastMol.setChain(tmpChain);
                 tmpChain.addMolecule(lastMol);
 
                 // assign PDB res name (which differs in case of modifed residues)
                 lastMol.setName3(molNamePDB);
+                lastMol.setEntityID(entityID);
             }
         }
 
@@ -892,7 +922,7 @@ class CifParser {
                 rna.setType(Molecule.RESIDUE_TYPE_RNA);                
                 
                 RnaTreatedNum++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum;
+                int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
                 rna.setDsspNum(resNumDSSP);
                 
                 rna.setChainID(chainID);
@@ -931,9 +961,10 @@ class CifParser {
             }       
         }
         
-        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) || tmpMol == null){  // If a molecule is not parsed at this point, it has to be a ligand
+        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) || (tmpMol == null && entityID != lastMol.getEntityID())) {  // If a molecule is not parsed at this point, it has to be a ligand
+//        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) || (tmpMol == null && lastMol.getType() != Molecule.RESIDUE_TYPE_AA)){  
             // >> LIG <<
-            
+                     
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
             // check if we have created ligand residue for s_residue
@@ -947,7 +978,7 @@ class CifParser {
 
                 // assign fake DSSP Num increasing with each seen ligand
                 ligandsTreatedNum ++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum + RnaTreatedNum; // assign an unused fake DSSP residue number
+                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum + RnaTreatedNum + freeResTreatedNum; // assign an unused fake DSSP residue number
 
                 lig.setDsspNum(resNumDSSP);
                 lig.setChainID(chainID);

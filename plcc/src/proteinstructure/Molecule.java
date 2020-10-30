@@ -46,7 +46,8 @@ abstract public class Molecule {
     public Boolean isPartOfDsspSse = false;                // whether this molecule is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* molecules)
     protected Integer centerSphereRadius = null;
     private Integer[] centroidCoords = null;                // x,y,z coordinates of residue centroid
-    private Integer centroidSphereRadius = null; // distance from centroid to farthest atom (= radius of sphere around centroid encompassing all atoms)
+    private Integer centroidSphereRadius = null;        //  distance from centroid to farthest atom (= radius of sphere around centroid encompassing all atoms)
+    public Integer entityID = null;                     //  ID of chain/ligand
 
     
     //constructor
@@ -342,6 +343,7 @@ abstract public class Molecule {
     public String getAAName1() { return(AAName1); }
     public Integer getPdbNum() { return(pdbNum); }
     public Integer getDsspNum() { return(dsspNum); }
+    public Integer getEntityID() { return(entityID); }
     
     
     
@@ -423,17 +425,19 @@ abstract public class Molecule {
     public SSE getSSE() { return(sse); }
     public Boolean getDsspSseState() { return(isPartOfDsspSse); }
     
-    /**
-     * Return true, if this is type is a protein and false if this is a type of rna.
-     * @return boolean 
-     */
-    public boolean getMolType(Integer type){
-        if(type == 2){
-            return false;
-        }
-        
-        return true;
-    }
+    
+    //TODELETE
+//    /**
+//     * Return true, if this is type is a protein and false if this is a type of rna.
+//     * @return boolean 
+//     */
+//    public boolean getMolType(Integer type){
+//        if(type == 2){
+//            return false;
+//        }
+//        
+//        return true;
+//    }
     
     // setters
     public void addAtom(Atom a) { atoms.add(a); }
@@ -452,7 +456,8 @@ abstract public class Molecule {
     public void setPdbNum(Integer i) { pdbNum = i; }
     public void setDsspNum(Integer i) { dsspNum = i; }
     public void setiCode(String s) { iCode = s; }
-    public void setType(Integer i) { type = i;}
+    public void setType(Integer i) { type = i; }
+    public void setEntityID(Integer i) { entityID = i; }
     
     /**
      * Returns information on all atoms of this molecule (used for debugging only).
