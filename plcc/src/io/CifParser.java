@@ -827,10 +827,10 @@ class CifParser {
                     res.setChainID(chainID);
                     res.setiCode(iCode);
                     res.setName3(molNamePDB);
-                    res.setAAName1(molNamePDB);  //TOASK TODELETE umschreiben
+                    res.setAAName1(Residue.getAAName1fromAAName3(molNamePDB));
                     res.setChain(FileParser.getChainByPdbChainID(chainID));
                     res.setModelID(m.getModelID());
-                    res.setSSEString("UNDEF"); //TOASK TODELETE was nimmt man für aas?
+                    res.setSSEString("C");
                     
                     lastChainID = chainID;
                     FileParser.s_molecules.add(res);

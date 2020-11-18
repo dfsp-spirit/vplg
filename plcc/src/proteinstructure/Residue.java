@@ -34,7 +34,40 @@ public class Residue extends Molecule implements java.io.Serializable {
     
     /** The binding sites, if any, that this residue is part of (for protein residues which are part of the pocket, NOT for ligands which dock into a pocket).  */
     private List<BindingSite> partOfBindingSites;
+       
+    public static HashMap<String,String> AANames = new HashMap<String, String>(){{
+       put("ARG","R");
+       put("HIS","H");
+       put("LYS","K");
+       put("ASP","D");
+       put("GLU","E");
+       put("SER","S");
+       put("THR","T");
+       put("ASN","N");
+       put("GLN","Q");
+       put("CYS","C");
+       put("SEC","U");
+       put("GLY","G");
+       put("PRO","P");
+       put("ALA","A");
+       put("ILE","I");
+       put("LEU","L");
+       put("MET","M");
+       put("PHE","F");
+       put("TRP","W");
+       put("TYR","Y");
+       put("VAL","V");
+    }};
     
+    
+    /**
+     * Returns the one-letter code for amino acids from AAName Map.
+     * @param AAName3: Three letter code
+     * @return One letter code
+     */
+    public static String getAAName1fromAAName3(String AAName3) {
+        return AANames.getOrDefault(AAName3, "X");
+    }
     
     /**
      * Determines all AltLoc identifiers which have an alpha carbon atom assigned to them for this residue.
