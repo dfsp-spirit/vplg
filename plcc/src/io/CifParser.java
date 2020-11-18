@@ -801,7 +801,7 @@ class CifParser {
             tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);  // null if not in DSSP data -> rna/ligand/free AA
             // check that a peptide residue could be found                   
             if (checkType(tmpMol.RESIDUE_TYPE_LIGAND) || entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer")) {
-                // residue is not in DSSP file -> must be free (modified) amino acid, ligand or RNA
+                // residue is not in DSSP file and is not part of a chain -> must be free (modified) amino acid, ligand or RNA
                 if (! silent) {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
@@ -812,7 +812,7 @@ class CifParser {
 
             } else {
                 
-                // sometimes residues are missing from the dssp file if they are not incomplete (mostly at chain breaks)
+                // sometimes residues are missing from the dssp file if they are incomplete (mostly at chain breaks)
                 // in this case, they have to be parsed here
                 if (tmpMol == null) {
                     res = new Residue();
@@ -820,6 +820,7 @@ class CifParser {
                     res.setPdbNum(molNumPDB);
                     res.setType(Molecule.RESIDUE_TYPE_AA);
                     
+                    // assign fake dssp number taking into account other elements that have been given a dssp number
                     freeResTreatedNum++;
                     int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
                     res.setDsspNum(resNumDSSP);
