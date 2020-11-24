@@ -159,7 +159,7 @@ abstract public class Molecule {
      * atoms which have other AltLocs. For non-AAs, this function will always choose the AltLoc identifier which
      * maximizes the number of atoms in this molecule. The list of deleted atoms is returned so they can be deleted
      * from the global atom list.
-     * The function is overriden in the Residue class.
+     * The function is overwritten in the Residue class, but may be used if object is not an AA.
      * @return the list of the atoms that were deleted
      */
     public ArrayList<Atom> chooseYourAltLoc() {

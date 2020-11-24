@@ -26,6 +26,7 @@ import proteinstructure.Molecule;
 import proteinstructure.ProtMetaInfo;
 import proteinstructure.Residue;
 import proteinstructure.RNA; 
+import proteinstructure.Ligand;
 import tools.DP;
 
 
@@ -78,7 +79,7 @@ class CifParser {
     private static Molecule tmpMol = null;      // used to save lastMol if getResidue returns null
     private static Chain tmpChain = null;
     private static Residue res = null;
-    private static Residue lig = null;
+    private static Ligand lig = null;
     private static RNA rna = null;
 
     // - variables per (atom) line -
@@ -931,7 +932,7 @@ class CifParser {
             if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
 
                 // create new Residue from info, we'll have to see whether we really add it below though
-                lig = new Residue();
+                lig = new Ligand();
 
                 lig.setPdbNum(molNumPDB);
                 lig.setType(Molecule.RESIDUE_TYPE_LIGAND);
