@@ -822,8 +822,7 @@ class CifParser {
                     
                     // assign fake dssp number taking into account other elements that have been given a dssp number
                     freeResTreatedNum++;
-                    int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
-                    res.setDsspNum(resNumDSSP);
+                    res.setDsspNum(assignDsspNum());
 
                     res.setChainID(chainID);
                     res.setiCode(iCode);
@@ -881,8 +880,7 @@ class CifParser {
                 rna.setType(Molecule.RESIDUE_TYPE_RNA);                
                 
                 RnaTreatedNum++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
-                rna.setDsspNum(resNumDSSP);
+                rna.setDsspNum(assignDsspNum());
                 
                 rna.setChainID(chainID);
                 rna.setiCode(iCode);
@@ -941,9 +939,8 @@ class CifParser {
 
                 // assign fake DSSP Num increasing with each seen ligand
                 ligandsTreatedNum ++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum + RnaTreatedNum + freeResTreatedNum; // assign an unused fake DSSP residue number
-
-                lig.setDsspNum(resNumDSSP);
+                lig.setDsspNum(assignDsspNum());
+                
                 lig.setChainID(chainID);
                 lig.setiCode(iCode);
                 lig.setName3(molNamePDB);
@@ -984,7 +981,7 @@ class CifParser {
                     //resIndexDSSP[resNumDSSP] = resIndex;
                     //resIndexPDB[molNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                     if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                        System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + resNumDSSP + ").");
+                        System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspNum() + ").");
                         System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                     }
 
@@ -1539,6 +1536,15 @@ class CifParser {
             }
         }
         return (actualType == requestedType) ? true : false;
+    }
+    
+    
+    /**
+     * Assigns a fake DSSP-Number based on all objects that have received DSSP-Numbers.
+     * Only AAs in DSSP file get a real DSSP number, all other objects (RNA, ligands, free AAs) have to be assigned one.
+     */
+    protected static Integer assignDsspNum () {
+        return DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
     }
       
 }

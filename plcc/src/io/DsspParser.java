@@ -264,7 +264,7 @@ public class DsspParser {
                     if (dLine.length() >= 164){
                         dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
                     } else {
-                        dLine.substring(149, 153);  // PDBCHAIN column
+                        dsspChainID = dLine.substring(149, 153);  // PDBCHAIN column
                     }
                     
                     // 12 is ignored: blank

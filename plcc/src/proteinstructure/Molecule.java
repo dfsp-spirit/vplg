@@ -426,19 +426,6 @@ abstract public class Molecule {
     public Boolean getDsspSseState() { return(isPartOfDsspSse); }
     
     
-    //TODELETE
-//    /**
-//     * Return true, if this is type is a protein and false if this is a type of rna.
-//     * @return boolean 
-//     */
-//    public boolean getMolType(Integer type){
-//        if(type == 2){
-//            return false;
-//        }
-//        
-//        return true;
-//    }
-    
     // setters
     public void addAtom(Atom a) { atoms.add(a); }
     public void addHydrogenAtom(Atom a) { hydrogenatoms.add(a); }
