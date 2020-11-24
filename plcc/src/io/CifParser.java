@@ -64,10 +64,12 @@ class CifParser {
     //     therefore always use auth columns unless you explicitly want the PDB ones
     private static HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
     private static Boolean columnsChecked = false;
+    private static ArrayList<String> currentLineValues = new ArrayList<String>();    //stores values of non-loop-blocks so they can be parsed as "fake-loops"
     
     // - - atom_site - -
     private static int ligandsTreatedNum = 0;
     private static int RnaTreatedNum = 0;
+    private static int freeResTreatedNum = 0;
     private static int numberAtoms = 0;
     
     // - variables for successive matching atom -> residue/RNA : Molecule -> chain -
@@ -75,12 +77,13 @@ class CifParser {
     private static Molecule lastMol = null;    // starts as first residue and is always the actual one
     private static Molecule tmpMol = null;      // used to save lastMol if getResidue returns null
     private static Chain tmpChain = null;
+    private static Residue res = null;
     private static Residue lig = null;
     private static RNA rna = null;
 
     // - variables per (atom) line -
-    private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB;
-    private static String atomRecordName, atomName, chainID, chemSym, altLoc, iCode, molNamePDB;
+    private static Integer atomSerialNumber, coordX, coordY, coordZ, molNumPDB, entityID;
+    private static String atomRecordName, atomName, chainID, altChainID, chemSym, altLoc, iCode, molNamePDB;
     private static Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
     private static Float oCoordXf, oCoordYf, oCoordZf;
     private static int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
@@ -90,8 +93,10 @@ class CifParser {
     private static String tmpModelID;
     private static String chainNum = null;  // identifier of the current chain e.g. A
     private static String chainType = null; // type of the current chain e.g. RNA
-    private static String nameOrgCommon;
-    private static String nameOrgScientific;
+    private static String nameOrgCommon = "";
+    private static String nameOrgScientific = "";
+    private static String nameOrgCommonSource = "";  // line that an orgName comes from
+    private static String nameOrgScientificSource = "";  // line that an orgName comes from
 
     // - variables for already printed warnings -
     private static Boolean furtherModelWarningPrinted = false;
@@ -145,7 +150,7 @@ class CifParser {
     private static Boolean parseData() {
         
         createResidues();
-        lastMol = new Residue(); // create artificial molecule to fill so there is no NullPointerException, it will be overridden once atoms are parsed
+        lastMol = new Residue(); // create artificial molecule to fill so there is no NullPointerException, it will be overwritten once atoms are parsed
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(FileParser.pdbFile));
@@ -177,6 +182,7 @@ class CifParser {
                     currentCategory = null;
                     inString = false;
                     interruptedLine = "";
+                    currentLineValues.clear();
                     continue;  // nothing else to do / parse here
                 }
                 // from now on: line does not start with '#' (is no comment)
@@ -194,7 +200,7 @@ class CifParser {
                 
                 // check if line is part of a multi-line string
                 if (inString) {
-                    interruptedLine += line;  // keep the semicolon to hide special characters inside. reset is done after switch/case treating a (combined) line
+                        interruptedLine += line;  // keep the semicolon to hide special characters inside. reset is done after switch/case treating a (combined) line
                     continue;  // only parse combined line, nothing else to parse here
                 }
                 // from now on: cannot be inString and line should always hold all data items (not splitted), despite when new line and single quotation string
@@ -222,33 +228,55 @@ class CifParser {
                         addColumnHeaderToMap(line);
                         continue;  // nothing else to parse here
                     }
+                    else {
+                        String[] elementsSeperatedByDotAndTab = line.split("\\.| ");
+                        colHeaderPosMap.put(elementsSeperatedByDotAndTab[1].trim(), colHeaderPosMap.size());  // add header to colHeaderPosMap
+                        String value = (line.substring(line.indexOf(' ')+1)).trim();
+                        currentLineValues.add(value);  // save value in currentLineValues
+                    }
                 }
                 // from now on: not in loop column header definition
                 
                 // get the data items
                 if (! interruptedLine.equals("")) {
                     // we want to combine the line with previous line(s)
-                    line = interruptedLine + " " + line;
+                    if (inLoop){
+                        line = interruptedLine + " " + line;
+                    }
+                    else {
+                        // since a value is always added to currentLineValues (even if it is empty) when filling the colHeaderPosMap, 
+                        // the empty value has to be deleted to be replaced by the interruptedLine
+                        currentLineValues.remove(currentLineValues.size() -1);
+                        currentLineValues.add(interruptedLine);
+                    }
                     interruptedLine = "";
                 }
-                lineData = lineToArray(line);
                 
-                // check for minimum lenght of lineData (2 for non-loop and #header for loop) and merge with coming line if not
-                if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 2)) {
-                    interruptedLine += line;
-                    continue;
+                if (inLoop) {
+                    lineData = lineToArray(line);
+                } else {
+                    lineData = trimSpecialChars(currentLineValues);
                 }
-                if ((inLoop && lineData.length > colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length > 2)) {
+                
+                // check for minimum length of lineData (2 for non-loop and #header for loop) and merge with coming line if not
+                if ((inLoop && lineData.length < colHeaderPosMap.keySet().size()) || (!inLoop && lineData.length < 1)) {
+                        interruptedLine += line;
+                        continue;
+                }
+                
+                if (lineData.length > colHeaderPosMap.keySet().size()) {
                     DP.getInstance().w("FP_CIF", "Line " + numLine + " (together with previous if combined) seems to be too long. Trying to ignore it, but may miss data.");
                 }
                 // from now on: line contains expected lenght of data items
-                       
+
                 switch(currentCategory) {
                 case "_exptl":
                     // check for experimental method
                     handleExptlLine();
                     break;
                 case "_reflns":
+                    handleReflnsLine();
+                    break;
                 case "_refine":
                     // check for resolution (meta data)
                     // TODO: really the best attribute(s) to do this?
@@ -272,6 +300,12 @@ class CifParser {
                     break;
                 case "_entity_src_gen":
                     handleEntitySrcGen();
+                    break;
+                case "_entity_src_nat":
+                    handleEntitySrcNat();
+                    break;
+                case "_pdbx_entity_src_syn":
+                    handlePdbxEntitySrcSyn();
                     break;
                 case "_struct":
                     handleStructLine();
@@ -395,92 +429,131 @@ class CifParser {
     
     
     /**
-     * Handles a line starting with '_exptl.method' defining the experimental method.
-     * Saves the value in metaData.
+     * Handles a line starting with '_exptl.' defining the experimental method.
+     * Saves the experiment method in metaData.
      */
     private static void handleExptlLine() {
-        if (lineData[0].equals("_exptl.method")) {
-            if (valueIsAssigned(lineData[1])) {
-                metaData.put("experiment", lineData[1]);
+        if (colHeaderPosMap.get("method") != null ){
+            if (! lineData[colHeaderPosMap.get("method")].equals("?")){
+                metaData.put("experiment", lineData[colHeaderPosMap.get("method")]);
             }
+        }
+        else{
+            metaData.put("experiment", "");
         }
     }
     
     
     /**
-     * Handles lines starting with '_struct'.
-     * Saves the title of the PDB File.
+     * Handles lines starting with '_struct.'.
+     * Saves the title of the PDB File in metaData.
      */
     private static void handleStructLine(){
-        if (lineData[0].equals("title")){
-            metaData.put("title", lineData[1]);
+        if (colHeaderPosMap.get("title") != null ){
+            if (! lineData[colHeaderPosMap.get("title")].equals("?")){
+                metaData.put("title", lineData[colHeaderPosMap.get("title")]);
+            }
+        }
+        else{
+            metaData.put("title", "");
         }
     }
     
     
     /**
      * Handles lines starting with '_struct_keywords'.
+     * Saves possible keywords in metaData.
      */
     private static void handleStructKeywords(){
-        if (lineData[0].equals("_struct_keywords.text")){
-            metaData.put("keywords", lineData[1]);
+        if (colHeaderPosMap.get("text") != null ){
+            if (! lineData[colHeaderPosMap.get("text")].equals("?")){
+                metaData.put("keywords", lineData[colHeaderPosMap.get("text")]);
+            }
         }
-        if (lineData[0].equals("_struct_keywords.pdbx_keywords")){
-            metaData.put("header", lineData[1]);
+        else{
+            metaData.put("keywords", "");
+        }
+        if (colHeaderPosMap.get("pdbx_keywords") != null ){
+            if (! lineData[colHeaderPosMap.get("pdbx_keywords")].equals("?")){
+                metaData.put("header", lineData[colHeaderPosMap.get("pdbx_keywords")]);
+            }
+        }
+        else{
+            metaData.put("header", "");
         }
     }
     
     
     /**
      * Handles lines starting with '_pdbx_database_status'.
-     * 
+     * Saves the date in metaData.
      */
     private static void handlePdbxDatabaseStatus(){
-        if (lineData[0].equals("_pdbx_database_status.recvd_initial_deposition_date")){
-            metaData.put("date", lineData[1]);
+        if (colHeaderPosMap.get("recvd_initial_deposition_date") != null ){
+            if (! lineData[colHeaderPosMap.get("recvd_initial_deposition_date")].equals("?")){
+                metaData.put("date", lineData[colHeaderPosMap.get("recvd_initial_deposition_date")]);
+            }
+        }
+        else{
+            metaData.put("date", "");
+        }
+    }
+    
+    
+    /**
+     * Handles a line starting with '_refine.'.
+     * Defining the resolution. Saves the value in metaData. Is probably not the best way to extract the resolution.
+     * Resolution can be parsed different ways, this is the preferred one.
+     */
+    private static void handleResolutionLine() {
+        if (colHeaderPosMap.get("ls_d_res_high") != null ){
+            if (! lineData[colHeaderPosMap.get("ls_d_res_high")].equals("?")){
+                metaData.put("resolution", lineData[colHeaderPosMap.get("ls_d_res_high")]);
+            }
+        }
+        else{
+            if (! metaData.containsKey("resolution")) {
+                metaData.put("resolution", "");
+            }
         }
     }
     
     /**
-     * Handles a line starting with '_reflns.d_resolution_high', '_reflns.d_res_high' or '_refine.ls_d_res_high'
-     * defining the resolution. Saves the value in metaData. Is probably not the best way to extract the resolution.
+     * Handles a line starting with '_reflns.'.
+     * Alternative way to parse resolution.
      */
-    private static void handleResolutionLine() {
-        if (lineData[0].equals("_reflns.d_resolution_high") || lineData[0].equals("_reflns.d_res_high") || lineData[0].equals("_refine.ls_d_res_high")) {
-            if (valueIsAssigned(lineData[1])) {
-                metaData.put("resolution", lineData[1]);
+    private static void handleReflnsLine() {
+        if (! metaData.containsKey("resolution") && colHeaderPosMap.get("d_resolution_high") != null) {
+            if (! lineData[colHeaderPosMap.get("d_resolution_high")].equals("?")){
+                metaData.put("resolution", lineData[colHeaderPosMap.get("d_resolution_high")]);
+            }
+        }
+        else{
+            if (! metaData.containsKey("resolution")){
+                metaData.put("resolution", "");
             }
         }
     }
     
     
     /**
-     * 
+     * Handles a line starting with '_entity.'.
+     * Parses information on which entities (chains/ligands) exist in the molecule. Information is saved in entityInformation map.
      */
     private static void handleEntityLine() {
         String tmpValue;
-        
-        if (inLoop) {
-            String tmpEntityID = lineData[0];
-            entityInformation.put(tmpEntityID, new HashMap<String, String>());
-                        
-            // get all available information per entity, despite ID (saved as superior key)
-            for (String colHeader : colHeaderPosMap.keySet()) {
-                if (! colHeader.equals("id")) {
-                    tmpValue = (valueIsAssigned(lineData[colHeaderPosMap.get(colHeader)]) ? lineData[colHeaderPosMap.get(colHeader)] : null);  // assign value or null
-                    entityInformation.get(tmpEntityID).put(colHeader, (valueIsAssigned(tmpValue) ? tmpValue : ""));
-                }
+
+        String tmpEntityID = lineData[0];
+        entityInformation.put(tmpEntityID, new HashMap<String, String>());
+
+        // get all available information per entity, despite ID (saved as superior key)
+        for (String colHeader : colHeaderPosMap.keySet()) {
+            if (! colHeader.equals("id")) {
+                tmpValue = (valueIsAssigned(lineData[colHeaderPosMap.get(colHeader)]) ? lineData[colHeaderPosMap.get(colHeader)] : null);  // assign value or null
+                entityInformation.get(tmpEntityID).put(colHeader, (valueIsAssigned(tmpValue) ? tmpValue : ""));
             }
-        } else {
-            // no loop just category.item and data per line
-            if (lineData[0].equals("_entity.id")) {
-                entityInformation.put(lineData[1], new HashMap<String, String>());
-            } else {
-                // we only have one entity, so add the information to the only entity ID
-                tmpValue = (valueIsAssigned(lineData[1]) ? lineData[1] : null);  // assign value or null
-                entityInformation.get(entityInformation.keySet().iterator().next()).put(lineData[0].split("\\.")[1], tmpValue);
-            }
-        }
+
+        }            
     }
     
     
@@ -488,8 +561,7 @@ class CifParser {
      * Handle a line starting with '_entity_poly.' holding entity information of polymers.
      * Fills, for example, the homologuesMap and the chainIdentity Map which maps chain ID to its molecule type.
      */
-    private static void handleEntityPolyLine() {       
-        if (inLoop) {
+    private static void handleEntityPolyLine() {
             if (colHeaderPosMap.get("pdbx_strand_id") != null ) {
                 FileParser.fillHomologuesMapFromChainIdList(lineData[colHeaderPosMap.get("pdbx_strand_id")].split(","));
                 
@@ -499,35 +571,12 @@ class CifParser {
                     chainIdentity.put(s, lineData[colHeaderPosMap.get("type")]);
                 }
             }
-        } 
-        else {
-            if (lineData[0].equals("_entity_poly.type")) {
-                chainType = lineData[1];
-                if (chainType == null){
-                    DP.getInstance().w("No chain type found. Trying to continue with null.");
-                }
-            }
-            if (lineData[0].equals("_entity_poly.pdbx_strand_id")) {
-                FileParser.fillHomologuesMapFromChainIdList(lineData[1].split(","));
-                chainNum = lineData[1];
-                if (chainNum == null){
-                    DP.getInstance().w("No chain ID found. Trying to continue with null.");
-                }
-                
-                // Multiple chains can be listed under "pdx_strand_id". But since at this point we can be sure that they have the same type, 
-                // they have to be split and can then be added to chainIdentity with the type identified above.
-                String[] chainList = chainNum.split(",");
-                for (String s : chainList) {
-                    chainIdentity.put(s, chainType);
-                }
-            }
         }
-    }
     
     
     /**
      * Handle a line starting with '_atom_site.' holding atom coordinates. Creates the atoms, ligands, chains and models.
-     * Matches atoms <-> residues <-> chains <-> models.
+     * Matches atoms <-> residues/rna/ligands <-> chains <-> models.
      */
     private static void handleAtomSiteLine() {
         // atom coordinates should always be within a loop      
@@ -635,7 +684,8 @@ class CifParser {
         oCoordXf = oCoordYf = oCoordZf = null;
 
         // chain name
-        chainID = lineData[colHeaderPosMap.get("auth_asym_id")];
+        chainID = lineData[colHeaderPosMap.get("auth_asym_id")];      // chain ID as set by author --> preferably use this one for all kinds of tasks
+        altChainID = lineData[colHeaderPosMap.get("label_asym_id")];  // chain ID computed by the PDB
 
         // PDBx field alias atom record name
         if (colHeaderPosMap.get("group_PDB") != null) {
@@ -676,7 +726,9 @@ class CifParser {
         // use auth_seq_id > label_seq_id (hope DSSP does so too)
         // resNumPDB = Integer.valueOf(lineData[colHeaderPosMap.get("auth_seq_id")]);
         molNumPDB = Integer.valueOf(lineData[colHeaderPosMap.get("auth_seq_id")]);
-
+        
+        // entity ID (mostly used for classification of ligands)
+        entityID = Integer.valueOf(lineData[colHeaderPosMap.get("label_entity_id")]);
 
         // insertion code
         // only update if column and value exist, otherwise stick to blank ""
@@ -745,10 +797,10 @@ class CifParser {
         // match res <-> chain here
         // load new Residue into lastMol if we approached next Residue, otherwise only add new atom
         if (! (Objects.equals(molNumPDB, lastMol.getPdbNum()) && chainID.equals(lastMol.getChainID()) && iCode.equals(lastMol.getiCode()))) {
-            tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);
-            // check that a peptid residue could be found                   
-            if (tmpMol == null || tmpMol.isLigand()) {
-                // residue is not in DSSP file -> must be free (modified) amino acid, ligand of RNA
+            tmpMol = FileParser.getResidueFromList(molNumPDB, chainID, iCode);  // null if not in DSSP data -> rna/ligand/free AA
+            // check that a peptide residue could be found                   
+            if (checkType(tmpMol.RESIDUE_TYPE_LIGAND) || entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer")) {
+                // residue is not in DSSP file and is not part of a chain -> must be free (modified) amino acid, ligand or RNA
                 if (! silent) {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
@@ -758,13 +810,42 @@ class CifParser {
                 }
 
             } else {
-                lastMol = tmpMol;
+                
+                // sometimes residues are missing from the dssp file if they are incomplete (mostly at chain breaks)
+                // in this case, they have to be parsed here
+                if (tmpMol == null) {
+                    res = new Residue();
+                                        
+                    res.setPdbNum(molNumPDB);
+                    res.setType(Molecule.RESIDUE_TYPE_AA);
+                    
+                    // assign fake dssp number taking into account other elements that have been given a dssp number
+                    freeResTreatedNum++;
+                    res.setDsspNum(assignDsspNum());
+
+                    res.setChainID(chainID);
+                    res.setiCode(iCode);
+                    res.setName3(molNamePDB);
+                    res.setAAName1(Residue.getAAName1fromAAName3(molNamePDB));
+                    res.setChain(FileParser.getChainByPdbChainID(chainID));
+                    res.setModelID(m.getModelID());
+                    res.setSSEString("C");
+                    
+                    lastChainID = chainID;
+                    FileParser.s_molecules.add(res);
+                    FileParser.getChainByPdbChainID(chainID).addMolecule(res);
+                    lastMol = res;
+                } else {
+                    lastMol = tmpMol;
+                }
+
                 lastMol.setModelID(m.getModelID());
                 lastMol.setChain(tmpChain);
                 tmpChain.addMolecule(lastMol);
 
                 // assign PDB res name (which differs in case of modifed residues)
                 lastMol.setName3(molNamePDB);
+                lastMol.setEntityID(entityID);
             }
         }
 
@@ -798,8 +879,7 @@ class CifParser {
                 rna.setType(Molecule.RESIDUE_TYPE_RNA);                
                 
                 RnaTreatedNum++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum;
-                rna.setDsspNum(resNumDSSP);
+                rna.setDsspNum(assignDsspNum());
                 
                 rna.setChainID(chainID);
                 rna.setiCode(iCode);
@@ -808,6 +888,9 @@ class CifParser {
                 rna.setChain(FileParser.getChainByPdbChainID(chainID));
                 rna.setModelID(m.getModelID());
                 rna.setSSEString("plcc_S_rnaSseCode");
+                rna.setEntityID(entityID);
+                
+                lastMol = rna;
                                 
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
                     // RNA chains can contain ligands that should be ignored such as water
@@ -820,6 +903,7 @@ class CifParser {
                         DP.getInstance().w("Ignored RNA-Ligand found at PDB line " + molNumPDB + ". Name: " + molNamePDB);
                     }
                     return;
+                    
                 } else {                    
                     lastRnaNumPDB = molNumPDB;
                     lastChainID = chainID;
@@ -830,16 +914,17 @@ class CifParser {
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
-                    if(Settings.getInteger("plcc_I_debug_level") > 2){
-                        DP.getInstance().d("New RNA molecule added in PDB line " + molNumPDB);
-                    }
+                    DP.getInstance().d("New RNA molecule named " + molNamePDB + " added in PDB line " + molNumPDB + " to chain " + chainID + ".");
                 }
             }       
         }
         
-        if (checkType(Molecule.RESIDUE_TYPE_LIGAND)){
+        // If a molecule is not parsed at this point, it has to be a ligand
+        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) ||                                                                                       // if the molecule is categorized as a ligand through chem_comp map
+                (entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer") && ! checkType(Molecule.RESIDUE_TYPE_RNA)) )   // if entity is defined as 'non-polymer' while not being RNA
+        {
             // >> LIG <<
-
+                     
             // idea: add always residue (for consistency) but atom only if it is not an ignored ligand
 
             // check if we have created ligand residue for s_residue
@@ -853,9 +938,8 @@ class CifParser {
 
                 // assign fake DSSP Num increasing with each seen ligand
                 ligandsTreatedNum ++;
-                int resNumDSSP = DsspParser.lastUsedDsspNum + ligandsTreatedNum + RnaTreatedNum; // assign an unused fake DSSP residue number
-
-                lig.setDsspNum(resNumDSSP);
+                lig.setDsspNum(assignDsspNum());
+                
                 lig.setChainID(chainID);
                 lig.setiCode(iCode);
                 lig.setName3(molNamePDB);
@@ -864,7 +948,9 @@ class CifParser {
                 // still just assigning default model 1
                 lig.setModelID(m.getModelID());
                 lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
+                lig.setEntityID(entityID);
                 
+                lastMol = lig;
                 
                 // add ligand to list of residues if it not on the ignore list
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
@@ -894,7 +980,7 @@ class CifParser {
                     //resIndexDSSP[resNumDSSP] = resIndex;
                     //resIndexPDB[molNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                     if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                        System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + resNumDSSP + ").");
+                        System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspNum() + ").");
                         System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                     }
 
@@ -947,7 +1033,7 @@ class CifParser {
         }
         */
         
-            if (checkType(Molecule.RESIDUE_TYPE_RNA) || checkType(Molecule.RESIDUE_TYPE_AA)){
+            if (lastMol.getType() == Molecule.RESIDUE_TYPE_AA || lastMol.getType() == Molecule.RESIDUE_TYPE_RNA){
                 if (lastMol == null) {
                     DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
@@ -987,7 +1073,7 @@ class CifParser {
      */
     private static void handleChemComp(){
         String category = null;              // categories such as type, name
-        String value = null;              // values such as peptide, Methionine 
+        String value = null;              // values such as peptide, Methionine
         HashMap<String, String> tmpComponent = new HashMap<>();     // stores categories and values for current component
         for (String cat : colHeaderPosMap.keySet()){
             category = cat;
@@ -999,18 +1085,64 @@ class CifParser {
     
     
     /**
-     * Handles lines starting with _entity_src_gen.
+     * Handles lines starting with '_entity_src_gen'.
      * Assigns the common and the scientific name of the molecule to variables that are later transferred to ProtMetaInfo.
      */
     private static void handleEntitySrcGen(){
-        if (lineData[0].equals("_entity_src_gen.gene_src_common_name")){
-            nameOrgCommon = lineData[1];
+        if (colHeaderPosMap.get("gene_src_common_name") != null ){
+            if (! lineData[colHeaderPosMap.get("gene_src_common_name")].equals("?")){
+                nameOrgCommon = lineData[colHeaderPosMap.get("gene_src_common_name")];
+                nameOrgCommonSource = "_entity_src_gen";
+            }
         }
-        if (lineData[0].equals("_entity_src_gen.pdbx_gene_src_scientific_name")){
-            nameOrgScientific = lineData[1];
+        if (colHeaderPosMap.get("pdbx_gene_src_scientific_name") != null ){
+            if (! lineData[colHeaderPosMap.get("pdbx_gene_src_scientific_name")].equals("?")){
+                nameOrgScientific = lineData[colHeaderPosMap.get("pdbx_gene_src_scientific_name")];
+                nameOrgScientificSource = "_entity_src_gen";
+            }
         }
     }
     
+    
+    /**
+     * Handles Lines starting with '_entity_src_nat.'.
+     * Alternative way to parse organism name.
+     */
+    private static void handleEntitySrcNat(){
+        if (colHeaderPosMap.get("common_name") != null && ! nameOrgCommonSource.equals("_entity_src_gen")){
+            if (! lineData[colHeaderPosMap.get("common_name")].equals("?")){
+                nameOrgCommon = lineData[colHeaderPosMap.get("common_name")];
+                nameOrgCommonSource = "_entity_src_nat";
+            }
+        }
+        if (colHeaderPosMap.get("pdbx_organism_scientific") != null && ! nameOrgScientificSource.equals("_entity_src_gen")){
+            if (! lineData[colHeaderPosMap.get("pdbx_organism_scientific")].equals("?")){
+                nameOrgScientific = lineData[colHeaderPosMap.get("pdbx_organism_scientific")];
+                nameOrgScientificSource = "_entity_src_nat";
+            }
+        }
+    }
+    
+    
+    /**
+     * Handles lines starting with '_pdbx_entity_src_syn'.
+     * Alternative way to parse organism name.
+     */
+    private static void handlePdbxEntitySrcSyn(){
+        if (colHeaderPosMap.get("organism_common_name") != null && ! nameOrgCommon.equals("")){
+            if (! lineData[colHeaderPosMap.get("organism_common_name")].equals("?")){
+                nameOrgCommon = lineData[colHeaderPosMap.get("organism_common_name")];
+                nameOrgCommonSource = "_pdbx_entity_src_syn";
+            }
+        }
+        if (colHeaderPosMap.get("organism_scientific") != null && ! nameOrgScientific.equals("")){
+            if (! lineData[colHeaderPosMap.get("organism_scientific")].equals("?")){
+                nameOrgScientific = lineData[colHeaderPosMap.get("organism_scientific")];
+                nameOrgScientificSource = "_pdbx_entity_src_syn";
+            }
+        }
+    }
+
     
     /**
      * Checks the string value for being not null, empty or an mmCIF placeholder.
@@ -1032,6 +1164,35 @@ class CifParser {
             }
         }
         return true;
+    }
+    
+    
+    /**
+     * Trims ' or ; when they exist as first an last char, then removes \n.
+     * 
+     */
+    private static String[] trimSpecialChars(ArrayList<String> stringList) {
+        ArrayList<String> charsToDelete = new ArrayList<>(Arrays.asList((";"), ("\'")));
+        String[] returnList = new String[stringList.size()];
+        String element;
+        for (int i = 0; i < stringList.size(); i++) {
+            element = stringList.get(i);  // start with respective element
+            if (stringList.get(i).length() > 0) {
+                // First check if there are special chars around the line
+                if (charsToDelete.contains(String.valueOf(stringList.get(i).charAt(0))) && charsToDelete.contains(String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)))){
+                    element = stringList.get(i).substring(1, stringList.get(i).length() - 1);
+                    if (element.endsWith("\n")){
+                        // Secondly, check if there is still a newline char at the end of the line
+                        element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
+                    }
+                }
+                if (String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)).equals("\n")){ // could probably be removed
+                    element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
+                }
+            }
+            returnList[i] = element;
+        }
+        return returnList;
     }
     
     
@@ -1103,7 +1264,9 @@ class CifParser {
                                 inLineQuote = true;
                                 break;
                             case ';':
-                                inMultiString = true;
+                                if (prev_char == ' ' || next_char == ' '){  // in case a ';' is embedded in between two characters it is assumed it is part of a string
+                                    inMultiString = true;
+                                }
                                 break;
                             case '\'':
                                 if (prev_char == ' ') {
@@ -1238,16 +1401,18 @@ class CifParser {
      * @param line 
      */
     private static void addColumnHeaderToMap(String line) {
-        String[] elementsSeperatedByDot = line.split("\\.");
-        
-        if (elementsSeperatedByDot.length < 2) {
-            DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
-                numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
-            return;
+        if (inLoop){
+            String[] elementsSeperatedByDot = line.split("\\.");
+
+            if (elementsSeperatedByDot.length < 2) {
+                DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
+                    numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
+                return;
+            }
+            // from now on elementsSeperatedByDot has at least two elements
+
+            colHeaderPosMap.put(elementsSeperatedByDot[1].trim(), colHeaderPosMap.size());
         }
-        // from now on elementsSeperatedByDot has at least two elements
-        
-        colHeaderPosMap.put(elementsSeperatedByDot[1].trim(), colHeaderPosMap.size());
     }
 
     
@@ -1299,7 +1464,8 @@ class CifParser {
         c.setModelID(m.getModelID());
         m.addChain(c);
         c.setMoleculeType(chainIdentity.get(cID));
-        
+        c.setAltChainID(altChainID);
+                
         c.setHomologues(FileParser.homologuesMap.get(cID));
         //c.setMacromolID(entityID);
         pmi.setMacromolID(entityID);
@@ -1347,6 +1513,7 @@ class CifParser {
     /**
      * Returns whether the molecule type matches the requested one.
      * Checks whether the the molecule type in the chemical components map corresponds to the requested one.
+     * Careful with this function! There are amino acid ligands that are not always reliably categorized as ligands but instead as amino acids.
      * @param requestedType integer of the type one is looking for (0 for AA, 1 for ligand, 3 for RNA)
      */
     protected static Boolean checkType(Integer requestedType){
@@ -1362,12 +1529,21 @@ class CifParser {
             actualType = 3;
         }
         else{
-            intIndex = chemTypeLowerCase.indexOf("peptide");
+            intIndex = chemTypeLowerCase.indexOf("peptide linking");  // if it says "peptide" only, it might be a ligand and not linking
             if (intIndex != -1){
                 actualType = 0;
             }
         }
         return (actualType == requestedType) ? true : false;
+    }
+    
+    
+    /**
+     * Assigns a fake DSSP-Number based on all objects that have received DSSP-Numbers.
+     * Only AAs in DSSP file get a real DSSP number, all other objects (RNA, ligands, free AAs) have to be assigned one.
+     */
+    protected static Integer assignDsspNum () {
+        return DsspParser.lastUsedDsspNum + RnaTreatedNum + ligandsTreatedNum + freeResTreatedNum;
     }
       
 }

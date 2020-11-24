@@ -24,8 +24,8 @@ import plcc.Main;
 public class Chain implements java.io.Serializable {
 
     // declare class vars
-    private String pdbChainID = null;                // chain ID from PDB file
-    private String dsspChainID = null;               // chain ID from DSSP file
+    private String pdbChainID = null;                // author chain ID from PDB file
+    private String altChainID = null;               // alternative chain ID from DSSP file
     private ArrayList<Molecule> molecules = null;      // a list of all Molecules of the Chain
     private String macromolID = null;                // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
     private String macromolName = null;              // the macromol name from the PDB file
@@ -44,7 +44,7 @@ public class Chain implements java.io.Serializable {
     // getters
     /** Returns the chain ID (chain name) from PDB file. Something like "A". */
     public String getPdbChainID() { return(pdbChainID); }
-    public String getDsspChainID() { return(dsspChainID); }
+    public String getAltChainID() { return(altChainID); }
     public String getModelID() { return(modelID); }
     public String getMacromolID() { return(macromolID); }
     public String getMacromolName() { return(macromolName); }
@@ -142,7 +142,7 @@ public class Chain implements java.io.Serializable {
     // setters
     public void addMolecule(Molecule mol){molecules.add(mol);}
     public void setPdbChainID(String s) { pdbChainID = s; }
-    public void setDsspChainID(String s) { dsspChainID = s; }
+    public void setAltChainID(String s) { altChainID = s; }
     public void setMacromolID(String s) { macromolID = s; }
     public void setMacromolName(String s) { macromolName = s; }
     public void setModelID(String s) { modelID = s; }
