@@ -5121,7 +5121,7 @@ public class Main {
             
             int chainANumberResidues = chainA.getResidues().size();
             ArrayList<Residue> AAResiduesA = new ArrayList<>();
-            ArrayList<Residue> ligResiduesA = new ArrayList<>();
+            ArrayList<Ligand> ligResiduesA = new ArrayList<>();
             AAResiduesA.addAll(chainA.getAllAAResidues());
             ligResiduesA.addAll(chainA.getAllLigandResidues());
             
