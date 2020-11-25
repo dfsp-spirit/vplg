@@ -35,6 +35,7 @@ import graphdrawing.DrawTools;
 import graphformats.GraphFormats;
 import proteinstructure.Model;
 import proteinstructure.Residue;
+import proteinstructure.Ligand;
 import proteinstructure.Chain;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
@@ -173,6 +174,7 @@ public class Main {
     //   resFromMolecules or rnaFromMolecules is called
     static ArrayList<Residue> residues = null;
     static ArrayList<RNA> rnas = null;
+    static ArrayList<Ligand> ligands = null;
     
 
     public static void checkArgsUsage(String[] args, Boolean[] argsUsed) {

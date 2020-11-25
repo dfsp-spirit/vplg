@@ -923,6 +923,7 @@ class CifParser {
         // If a molecule is not parsed at this point, it has to be a ligand
         else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) ||                                                                                       // if the molecule is categorized as a ligand through chem_comp map
                 (entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer") && ! checkType(Molecule.RESIDUE_TYPE_RNA)) )   // if entity is defined as 'non-polymer' while not being RNA (e.g. free AA)
+            
         {
             // >> LIG <<
                      
