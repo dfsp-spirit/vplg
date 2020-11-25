@@ -95,12 +95,11 @@ public class Chain implements java.io.Serializable {
      */
     
     
-    public ArrayList<Residue> getAllLigandResidues() {
-        ArrayList<Residue> ligands = new ArrayList<>();     
-        Residue r;
+    public ArrayList<Ligand> getAllLigandResidues() {
+        ArrayList<Ligand> ligands = new ArrayList<>();     
+        Ligand r = new Ligand();
         for(Molecule m : this.molecules) 
-            if(m.isLigand() && m instanceof Residue) {
-                r = (Residue) m;    // Ligand has to stay an instance of Residue for handling in Main
+            if(m.isLigand()) {
                 ligands.add(r);
             }
         return ligands;
@@ -162,7 +161,7 @@ public class Chain implements java.io.Serializable {
     public String getChainChemProps5StringAllResidues() {
         StringBuilder sb = new StringBuilder();   
         if (this.molecules.size() > 0) {
-            if ((this.molecules.get(0)) instanceof RNA) {
+            if ((this.molecules.get(0)) instanceof RNA || this.molecules.get(0) instanceof Ligand) {
                 return null;
             }
         }
@@ -181,7 +180,7 @@ public class Chain implements java.io.Serializable {
     public String getChainChemProps3StringAllResidues() {
         StringBuilder sb = new StringBuilder();  
         if (this.molecules.size() > 0) {
-            if ((this.molecules.get(0)) instanceof RNA) {
+            if ((this.molecules.get(0)) instanceof RNA || this.molecules.get(0) instanceof Ligand) {
                 return null;
             }
         }
@@ -267,6 +266,8 @@ public class Chain implements java.io.Serializable {
         //System.out.println("Added " + numSeps + " separators.");
         return new String[] { sbChemProp.toString(), sbSSE.toString() };
     }
+    
+    
     /**
      * Computes the geometrical center of all atoms and the largest distance from center to an atom (=radius).
      */
