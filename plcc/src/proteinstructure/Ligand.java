@@ -13,7 +13,8 @@ import plcc.Main;
 import plccSettings.Settings;
 
 /**
- *
+ * This class was created for Ligands, extending class Molecule.
+ * Previously, ligands were instances of class Residue, therefore there might still be some function where the two are handled as one.
  * @author mariella
  */
 public class Ligand extends Molecule implements java.io.Serializable {
