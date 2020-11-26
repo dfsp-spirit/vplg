@@ -12,6 +12,14 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import java.util.ArrayList;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 import proteingraphs.Position2D;
 import plccSettings.Settings;
 
@@ -30,6 +38,7 @@ public class PageLayout {
     public Position2D headerStart;
     public Integer headerHeight;
     public Integer footerHeight;
+    public Integer footerWidth;
     public Position2D imgStart;
     
     public Integer marginLeft;
@@ -56,7 +65,18 @@ public class PageLayout {
      * @param numVerts the number of vertices in the graph, this is required to determine the width and height of the image area and thus the entire image.
      */
     public PageLayout(Integer numVerts) {
-        
+        init(numVerts);
+    }
+    
+    public PageLayout(Integer numVerts, ArrayList<String> vertLabels) {
+        init(numVerts);
+        ArrayList<Integer> x_y_values = getFooterOutline(vertLabels);
+        this.footerHeight = x_y_values.get(1);
+        this.footerWidth = x_y_values.get(0);
+        // TODO preprocessing 
+    }
+    
+    private void init(Integer numVerts) {
         this.numVerts = numVerts;
         this.minImgHeight = Settings.getInteger("plcc_I_img_min_img_height");
         
@@ -68,6 +88,7 @@ public class PageLayout {
         this.headerStart = new Position2D(marginLeft,  marginTop);        
         this.headerHeight = Settings.getInteger("plcc_I_img_header_height");
         this.footerHeight = Settings.getInteger("plcc_I_img_footer_height");
+        this.footerWidth = 0;
         
         this.textLineHeight = Settings.getInteger("plcc_I_img_text_line_height");
         
@@ -80,10 +101,7 @@ public class PageLayout {
         this.vertDist = Settings.getInteger("plcc_I_img_vert_dist");
         this.vertRadius = Settings.getInteger("plcc_I_img_vert_radius");
         this.isForKEY = false;
-        
-        
     }
-    
     
     public Integer getVertDiameter() {
         return vertRadius * 2;
@@ -134,7 +152,7 @@ public class PageLayout {
     }
     
     public Integer getFooterWidth() {
-        return(getImageAreaWidth());
+        return Math.max(this.footerHeight, getImageAreaWidth());
     }
     
     /**
@@ -172,7 +190,7 @@ public class PageLayout {
      * @return the width in pixels
      */
     public Integer getPageWidth() {
-        Integer w = marginLeft + this.getImageAreaWidth() + marginRight;
+        Integer w = Math.max( (marginLeft + this.getImageAreaWidth() + marginRight), this.footerWidth);
         return(w < minPageWidth ? minPageWidth : w);
     }
     
@@ -300,6 +318,47 @@ public class PageLayout {
         
         // vertical line for right margin
         g2d.drawLine((getPageWidth() - marginRight), getPageStart().y, (getPageWidth() - marginRight), (getPageStart().y + getPageHeight()));
+    }
+    
+    
+     /**
+     * Calculates the Width and Height of the Footer Area considering the Molecule Names.
+     */
+    public ArrayList getFooterOutline(ArrayList<String> vertLabels){
+        ArrayList<Integer> x_y_values = new ArrayList<Integer>();
+        x_y_values.add(0);
+        x_y_values.add(0);
+
+        
+        SVGGraphics2D graphic;
+        DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+        // Create an instance of org.w3c.dom.Document.
+        String svgNS = "http://www.w3.org/2000/svg";
+        Document document = domImpl.createDocument(svgNS, "svg", null);
+        // Create an instance of the SVG Generator.
+        graphic = new SVGGraphics2D(document);
+                
+        Integer stringHeight = graphic.getFontMetrics().getAscent();
+        Integer start_y = getFooterStart().y + (textLineHeight * 3) + (stringHeight / 4);
+        System.out.println(start_y);
+        
+        for(Integer i = 0; i < vertLabels.size(); i++){
+            Integer start_x = getFooterStart().x + (i * vertDist) + vertRadius / 2;
+            Integer radius = graphic.getFontMetrics().stringWidth(vertLabels.get(i));
+            Integer new_x = (int) (start_x + radius * cos(0.785d));
+            Integer new_y = (int) (start_y + radius * sin(0.785d));
+            
+            if(x_y_values.get(0) < new_x){
+                x_y_values.set(0,new_x);
+            }
+            if(x_y_values.get(1) < new_y){
+                x_y_values.set(1,new_y);
+            }
+        }
+        x_y_values.set(0,(x_y_values.get(0) - getFooterStart().x));
+        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()))); //getFooterStart().y is 40 Pixel bigger than the actual height
+
+        return x_y_values;
     }
     
 }

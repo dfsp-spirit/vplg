@@ -883,10 +883,12 @@ public class ComplexGraph extends UAdjListGraph {
         Integer numVerts = cg.getVertices().size();
 
         Boolean bw = nonProteinGraph;
+        
+        ArrayList<String> molNames = new ArrayList<String>(cg.molMap.values());
 
     // All these values are in pixels
         // page setup
-        PageLayout pl = new PageLayout(numVerts);
+        PageLayout pl = new PageLayout(numVerts, molNames);
         Position2D vertStart = pl.getVertStart();
 
     // ------------------------- Prepare stuff -------------------------
@@ -957,7 +959,10 @@ public class ComplexGraph extends UAdjListGraph {
 
                 // determine edge type and the resulting color
                     //edgeType = cg.getContactType(i, j);
-                    ig2.setPaint(Color.GRAY);
+                    
+                    ig2.setPaint(new Color(0.5f, 0.5f, 0.5f, 0.3f)); //sets Color to Gray and Transparency
+                    
+                    
                     if (bw) {
                         ig2.setPaint(Color.LIGHT_GRAY);
                     }      // for non-protein graphs
@@ -998,11 +1003,13 @@ public class ComplexGraph extends UAdjListGraph {
 
                     spacerX = pl.vertRadius;
                     spacerY = 0;
-
+                    
+                    
                     // draw it                                                
                     arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
                     shape = ig2.getStroke().createStrokedShape(arc);
                     ig2.fill(shape);
+                    ig2.setPaint(Color.GRAY);
 
                 }
             }
@@ -1112,7 +1119,8 @@ public class ComplexGraph extends UAdjListGraph {
             ig2.fill(rot_45deg.createTransformedShape(rect));
 
         }
-
+        
+        
         // Draw the markers for the N-terminus and C-terminus if there are any vertices in this graph            
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.BLACK);
@@ -1148,15 +1156,18 @@ public class ComplexGraph extends UAdjListGraph {
                 ig2.drawString("C#", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
                 ig2.drawString("CN", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                 ig2.drawString("ML", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));
+                ig2.drawString("MN", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
             } else {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }
             iChainID = -1;
             String[] vertexNameAssignment = cg.proteinNodeMap.toString().replace("{", "").replace("}", "").replace(" ", "").split(",");  // produces array of "x=a" where x is number of vertex and a chain name
             
-            
-            
-            for (Integer i = 0; i < cg.getVertices().size(); i++) {                
+            Iterator<Vertex> vertIter2 = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for getUniqueHue
+            Vertex curVert2;
+            List<String> homologues = new ArrayList<String>();  //the list is used to check for previous appearances of homologues when drawing the names
+            for (Integer i = 0; i < cg.getVertices().size(); i++) {
+                curVert2 = vertIter2.next();
                 // Draw each label until 999 and from then on only even ones
                 if (i >= 999) {
                     if (i % 2 == 0) {
@@ -1175,19 +1186,44 @@ public class ComplexGraph extends UAdjListGraph {
                 } else {
                     chainId = edgesString.substring(foundIndex + 3, foundIndex + 4);
                 }
-                chainName = "" + chainId;
+                chainName = "" + chainId; Vertex curVert2;
                 */
 
                 chainName = vertexNameAssignment[i].split("=")[1];
+                
 
                 //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                 stringHeight = fontMetrics.getAscent();
+                
+                String mol_name = cg.molMap.get(curVert2);
+                AffineTransform rotate_MN = new AffineTransform();
+                rotate_MN.rotate(Math.toRadians(45),0,0); // rotation around center of vertex
+                Font rotatedFont = font.deriveFont(rotate_MN);
+                
+               
+                //Font font = new Font(null, Font.PLAIN, 10);
+                
 
                 ig2.drawString(chainNumber, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
                 ig2.drawString(chainName, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 1) + (stringHeight / 4));
                 ig2.drawString(molInfoForChains.get(chainName), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
-
-                // determine chain of SSEs
+                
+                //Molecule names are only drawn at the homologues first appearance
+                if(homologues.contains(molInfoForChains.get(chainName))){
+                    ig2.drawString("<", pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
+                }
+                else{
+                    ig2.setFont(rotatedFont);
+                     //TODELETE:
+                    Integer pixel = ig2.getFontMetrics().stringWidth(mol_name);
+                    System.out.print("mol_name: ");
+                    System.out.println(pixel);
+                    
+                    ig2.drawString(mol_name, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
+                    homologues.add(molInfoForChains.get(chainName));
+                    ig2.setFont(font);
+                }
+// determine chain of SSEs
                 /*for(Integer x = 0; x < cg.getVertices().size(); x++){
                  if(i < cg.chainEnd.get(x)) {iChainID = x; break;}
                  }
