@@ -960,7 +960,7 @@ public class ComplexGraph extends UAdjListGraph {
                 // determine edge type and the resulting color
                     //edgeType = cg.getContactType(i, j);
                     
-                    ig2.setPaint(new Color(0.5f, 0.5f, 0.5f, 0.3f)); //sets Color to Gray and Transparency
+                    ig2.setPaint(new Color(0.3f, 0.3f, 0.3f, 0.3f)); //sets Color to Gray and Transparency
                     
                     
                     if (bw) {
@@ -1165,7 +1165,8 @@ public class ComplexGraph extends UAdjListGraph {
             
             Iterator<Vertex> vertIter2 = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for getUniqueHue
             Vertex curVert2;
-            List<String> homologues = new ArrayList<String>();  //the list is used to check for previous appearances of homologues when drawing the names
+            Map<String, String> homologues = new HashMap<>(); //the list is used to check for previous appearances of homologues when drawing the names
+
             for (Integer i = 0; i < cg.getVertices().size(); i++) {
                 curVert2 = vertIter2.next();
                 // Draw each label until 999 and from then on only even ones
@@ -1209,20 +1210,19 @@ public class ComplexGraph extends UAdjListGraph {
                 ig2.drawString(molInfoForChains.get(chainName), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
                 
                 //Molecule names are only drawn at the homologues first appearance
-                if(homologues.contains(molInfoForChains.get(chainName))){
-                    ig2.drawString("<", pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
-                }
-                else{
-                    ig2.setFont(rotatedFont);
-                     //TODELETE:
-                    Integer pixel = ig2.getFontMetrics().stringWidth(mol_name);
-                    System.out.print("mol_name: ");
-                    System.out.println(pixel);
+                /*if(homologues.containsKey(molInfoForChains.get(chainName))){
+                    //ig2.drawString("<"+(homologues.get(molInfoForChains.get(chainName))), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
                     
-                    ig2.drawString(mol_name, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
-                    homologues.add(molInfoForChains.get(chainName));
-                    ig2.setFont(font);
+                    //TODELETE:
+                    ig2.drawString("<ABCD", pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
                 }
+                else{*/
+                    ig2.setFont(rotatedFont);
+                                        
+                    ig2.drawString(mol_name, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
+                    //homologues.put(molInfoForChains.get(chainName), chainName);
+                    ig2.setFont(font);
+                //}
 // determine chain of SSEs
                 /*for(Integer x = 0; x < cg.getVertices().size(); x++){
                  if(i < cg.chainEnd.get(x)) {iChainID = x; break;}
@@ -1230,7 +1230,14 @@ public class ComplexGraph extends UAdjListGraph {
                  */
                 //if(iChainID != -1) {ig2.drawString(cg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
             }
-
+            
+            final Rectangle2D legend = ig2.getFontMetrics().getStringBounds("'<X': see chain X for molecule name", ig2);
+            ig2.drawString("'<X' : see chain X for molecule name", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) legend.getHeight());
+            int border = 10;
+            //ig2.draw(legend);
+            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) legend.getWidth() + 2 * border, (int) legend.getHeight() + 2 * border);
+            
+            
             /*
              if(Settings.getBoolean("plcc_B_graphimg_legend")) {
              if(iChainID != -1){

@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import java.util.ArrayList;
@@ -344,9 +345,12 @@ public class PageLayout {
         
         for(Integer i = 0; i < vertLabels.size(); i++){
             Integer start_x = getFooterStart().x + (i * vertDist) + vertRadius / 2;
-            Integer radius = graphic.getFontMetrics().stringWidth(vertLabels.get(i));
-            Integer new_x = (int) (start_x + radius * cos(0.785d));
-            Integer new_y = (int) (start_y + radius * sin(0.785d));
+            final Rectangle2D string_measures= graphic.getFontMetrics().getStringBounds(vertLabels.get(i), graphic);
+            //Integer radius = graphic.getFontMetrics().stringWidth(vertLabels.get(i));
+            //Integer new_x = (int) (start_x + radius * cos(0.785d));
+            //Integer new_y = (int) (start_y + radius * sin(0.785d));
+            Integer new_x = (int)(start_x + string_measures.getWidth() * cos(0.785d));
+            Integer new_y = (int)(start_y + string_measures.getWidth() * sin(0.785d));
             
             if(x_y_values.get(0) < new_x){
                 x_y_values.set(0,new_x);
@@ -356,8 +360,10 @@ public class PageLayout {
             }
         }
         x_y_values.set(0,(x_y_values.get(0) - getFooterStart().x));
-        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()))); //getFooterStart().y is 40 Pixel bigger than the actual height
-
+        //getFooterStart().y is 40 Pixel bigger than the actual height
+        // +50 for legend box size and 10px space
+        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()) + 50)); 
+        
         return x_y_values;
     }
     
