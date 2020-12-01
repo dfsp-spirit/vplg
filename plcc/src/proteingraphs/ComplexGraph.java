@@ -1198,7 +1198,7 @@ public class ComplexGraph extends UAdjListGraph {
                 
                 String mol_name = cg.molMap.get(curVert2);
                 AffineTransform rotate_MN = new AffineTransform();
-                rotate_MN.rotate(Math.toRadians(45),0,0); // rotation around center of vertex
+                rotate_MN.rotate(0.785d,0,0); // rotation around center of vertex
                 Font rotatedFont = font.deriveFont(rotate_MN);
                 
                
@@ -1231,12 +1231,15 @@ public class ComplexGraph extends UAdjListGraph {
                 //if(iChainID != -1) {ig2.drawString(cg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
             }
             
-            final Rectangle2D legend = ig2.getFontMetrics().getStringBounds("'<X': see chain X for molecule name", ig2);
-            ig2.drawString("'<X' : see chain X for molecule name", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) legend.getHeight());
-            int border = 10;
-            //ig2.draw(legend);
-            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) legend.getWidth() + 2 * border, (int) legend.getHeight() + 2 * border);
+            /*
+            //key for the footer
             
+            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("'<X': see chain X for molecule name", ig2);
+            ig2.drawString("'<X' : see chain X for molecule name", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
+            int border = 10;
+            //ig2.draw(key);
+            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) key.getWidth() + 2 * border, (int) key.getHeight() + 2 * border);
+            */
             
             /*
              if(Settings.getBoolean("plcc_B_graphimg_legend")) {

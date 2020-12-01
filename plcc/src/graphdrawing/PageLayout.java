@@ -153,7 +153,7 @@ public class PageLayout {
     }
     
     public Integer getFooterWidth() {
-        return Math.max(this.footerHeight, getImageAreaWidth());
+        return Math.max(this.footerWidth, getImageAreaWidth());
     }
     
     /**
@@ -191,7 +191,7 @@ public class PageLayout {
      * @return the width in pixels
      */
     public Integer getPageWidth() {
-        Integer w = Math.max( (marginLeft + this.getImageAreaWidth() + marginRight), this.footerWidth);
+        Integer w = Math.max( (marginLeft + this.getImageAreaWidth() + marginRight), (marginLeft + footerWidth + marginRight));
         return(w < minPageWidth ? minPageWidth : w);
     }
     
@@ -341,16 +341,19 @@ public class PageLayout {
                 
         Integer stringHeight = graphic.getFontMetrics().getAscent();
         Integer start_y = getFooterStart().y + (textLineHeight * 3) + (stringHeight / 4);
-        System.out.println(start_y);
+        
+        AffineTransform rotate_MN = new AffineTransform();
+        rotate_MN.rotate(0.785d,0,0); // rotation around center of vertex
+        Font rotatedFont = getStandardFont().deriveFont(rotate_MN);
+        graphic.setFont(rotatedFont);
         
         for(Integer i = 0; i < vertLabels.size(); i++){
             Integer start_x = getFooterStart().x + (i * vertDist) + vertRadius / 2;
             final Rectangle2D string_measures= graphic.getFontMetrics().getStringBounds(vertLabels.get(i), graphic);
             //Integer radius = graphic.getFontMetrics().stringWidth(vertLabels.get(i));
-            //Integer new_x = (int) (start_x + radius * cos(0.785d));
-            //Integer new_y = (int) (start_y + radius * sin(0.785d));
-            Integer new_x = (int)(start_x + string_measures.getWidth() * cos(0.785d));
-            Integer new_y = (int)(start_y + string_measures.getWidth() * sin(0.785d));
+            
+            Integer new_x = (int)(start_x + string_measures.getBounds().width * cos(0.785d));
+            Integer new_y = (int)(start_y + string_measures.getBounds().width * sin(0.785d));
             
             if(x_y_values.get(0) < new_x){
                 x_y_values.set(0,new_x);
@@ -359,10 +362,10 @@ public class PageLayout {
                 x_y_values.set(1,new_y);
             }
         }
-        x_y_values.set(0,(x_y_values.get(0) - getFooterStart().x));
+        x_y_values.set(0,(x_y_values.get(0) - marginRight));
         //getFooterStart().y is 40 Pixel bigger than the actual height
         // +50 for legend box size and 10px space
-        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()) + 50)); 
+        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()) )); 
         
         return x_y_values;
     }
