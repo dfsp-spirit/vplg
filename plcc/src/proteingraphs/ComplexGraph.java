@@ -869,6 +869,27 @@ public class ComplexGraph extends UAdjListGraph {
         return 1f / molIDs.size() * (molID - 1);
     }
     
+    /**
+     * TODO 
+     */
+    public ArrayList<Float> getSaturationAndBrightness(Integer molID){
+        ArrayList<Float> satbright = new ArrayList<Float>();
+        if(molIDs.size() < 10){
+            satbright.add(1f);
+            satbright.add(1f);
+        }
+        else{
+            Integer x = (int) Math.ceil((molIDs.size() / 10) / 2);
+            
+            satbright.add(1f / x * (molID - 1));
+            
+            Integer y = (int) Math.floor((molIDs.size() / 10) / 2);
+            
+            satbright.add(1f / x * (molID - 1));
+        }
+        return satbright;
+    }
+    
 
     /**
      * Draws a complex graph
@@ -1096,19 +1117,40 @@ public class ComplexGraph extends UAdjListGraph {
             //   Important to note: the 'old' function is insensitive to the case of many nodes and few molIDs
             /*
             cg.molIDs.clear();
-            for (Integer m = 1; m <= 80; m++) {
+            for (Integer m = 1; m <= 200; m++) {
                 System.out.println("m: " + m);
-                cg.lastColorStep = 0;
+                //cg.lastColorStep = 0;
                 cg.molIDs.add(m.toString());
                 for (int n = 1; n <= m; n++) {
+                    s = 1.0f;
                     rect = new Rectangle2D.Double(0 + n * 10, 0 + m * 10, 10, 10);
-                    //ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), s, b));
-                    ig2.setPaint(Color.getHSBColor(cg.getUniqueColor(m), s, b));
+                    ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), s, b));
+                    //ig2.setPaint(Color.getHSBColor(cg.getUniqueColor(m), s, b));
                     ig2.fill(rect);
                 }
             }
             i = 1000;  // no edges and vertices
             */
+            cg.molIDs.clear();
+            ArrayList<Float> satbright = new ArrayList<Float>();
+            for (Integer m = 1; m <= 50; m++) {
+                System.out.println("m: " + m);
+                
+                cg.molIDs.add(m.toString());
+                for (int n = 1; n <= m; n++) {
+                    rect = new Rectangle2D.Double(0 + n * 10, 0 + m * 10, 10, 10);
+                    satbright = cg.getSaturationAndBrightness(n);
+                    
+                    //System.out.println("sat: "+ sat);
+                    //System.out.println("bright: " + bright);
+                    ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), satbright.get(0), satbright.get(1)));
+                    
+                    ig2.fill(rect);
+                                                           
+                }
+            }
+            i = 1000;  // no edges and vertices
+            
             
         // pick color depending on SSE type
 
@@ -1209,20 +1251,13 @@ public class ComplexGraph extends UAdjListGraph {
                 ig2.drawString(chainName, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 1) + (stringHeight / 4));
                 ig2.drawString(molInfoForChains.get(chainName), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
                 
-                //Molecule names are only drawn at the homologues first appearance
-                /*if(homologues.containsKey(molInfoForChains.get(chainName))){
-                    //ig2.drawString("<"+(homologues.get(molInfoForChains.get(chainName))), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
-                    
-                    //TODELETE:
-                    ig2.drawString("<ABCD", pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
-                }
-                else{*/
-                    ig2.setFont(rotatedFont);
-                                        
-                    ig2.drawString(mol_name, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
-                    //homologues.put(molInfoForChains.get(chainName), chainName);
-                    ig2.setFont(font);
-                //}
+               
+                ig2.setFont(rotatedFont);
+
+                ig2.drawString(mol_name, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
+                //homologues.put(molInfoForChains.get(chainName), chainName);
+                ig2.setFont(font);
+                
 // determine chain of SSEs
                 /*for(Integer x = 0; x < cg.getVertices().size(); x++){
                  if(i < cg.chainEnd.get(x)) {iChainID = x; break;}
