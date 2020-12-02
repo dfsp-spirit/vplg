@@ -874,18 +874,53 @@ public class ComplexGraph extends UAdjListGraph {
      */
     public ArrayList<Float> getSaturationAndBrightness(Integer molID){
         ArrayList<Float> satbright = new ArrayList<Float>();
-        if(molIDs.size() < 10){
+        if(molIDs.size() < 20){
             satbright.add(1f);
             satbright.add(1f);
         }
         else{
-            Integer x = (int) Math.ceil((molIDs.size() / 10) / 2);
+            Float sat;
+            Float bright;
+            Integer x = (int) Math.ceil((molIDs.size() / 10));
+            Integer y = molIDs.size()/(x+1);
+            //todelete
+            //System.out.println("x: " + x);
             
-            satbright.add(1f / x * (molID - 1));
+            if(molID%y == 0){
+                sat = 1f;
+                bright = 0.8f;
+            }
+            else{
+                
+                bright = (1f/(x+1) * ((molID-1)%(x+1)));
+                if(bright <= 0.3){
+                    bright = 0.3f;
+                }
+                if(bright >=0.7){
+                    bright = 0.7f;
+                }
+                
+                if(molIDs.size() > 50){
+                    sat = (1f/(x+1)*((molID-2) % (x+1)));
+                    if(sat <= 0.5){
+                        sat = 0.5f;
+                    }
+                }
+                else{
+                    sat = 1.0f;
+                }
+            }
+                
+        
             
-            Integer y = (int) Math.floor((molIDs.size() / 10) / 2);
+            //if(molID > 3 && (sat == 0f) && (bright == ))
             
-            satbright.add(1f / x * (molID - 1));
+            satbright.add(sat);
+            
+            //Integer y = (int) Math.floor((molIDs.size() / 10) / 2);
+            
+            
+            satbright.add(bright);
         }
         return satbright;
     }
@@ -956,7 +991,7 @@ public class ComplexGraph extends UAdjListGraph {
 
         if (Settings.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-            //i2.drawString(addInfo, pl.headerStart.x, pl.headerStart.y + pl.textLineHeight);
+            //i2.drawString(addInfo, pl.headerStart.x, pl.headerStart.y + pl.textLineHeight);((1f/x*(molID-2)) - (int)(1f/x*(molID-2)))
         }
 
     // ------------------------- Draw the graph -------------------------
@@ -1102,6 +1137,14 @@ public class ComplexGraph extends UAdjListGraph {
             float h = (float) 0.5;
             float s = (float) 1.0; // change this for saturation (higher = more saturated)
             float b = (float) 0.8; // change this for brightness (0.0 -> Dark/Black)
+            /*ArrayList<Float> satbright = new ArrayList<Float>();
+            satbright = cg.getSaturationAndBrightness(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert))));
+            
+            if (! bw) {
+                ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert)))), satbright.get(0), satbright.get(1)));
+            } else {
+                ig2.setPaint(Color.GRAY);
+            }*/
             
             if (! bw) {
                 ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert)))), s, b));
@@ -1115,7 +1158,7 @@ public class ComplexGraph extends UAdjListGraph {
             //   you can switch between 'old' getUniqueColor and 'new' getUniqueHue
             //   the result is saved as chain CG
             //   Important to note: the 'old' function is insensitive to the case of many nodes and few molIDs
-            /*
+            
             cg.molIDs.clear();
             for (Integer m = 1; m <= 200; m++) {
                 System.out.println("m: " + m);
@@ -1130,10 +1173,11 @@ public class ComplexGraph extends UAdjListGraph {
                 }
             }
             i = 1000;  // no edges and vertices
-            */
+            
+            /*
             cg.molIDs.clear();
             ArrayList<Float> satbright = new ArrayList<Float>();
-            for (Integer m = 1; m <= 50; m++) {
+            for (Integer m = 1; m <= 100; m++) {
                 System.out.println("m: " + m);
                 
                 cg.molIDs.add(m.toString());
@@ -1141,16 +1185,18 @@ public class ComplexGraph extends UAdjListGraph {
                     rect = new Rectangle2D.Double(0 + n * 10, 0 + m * 10, 10, 10);
                     satbright = cg.getSaturationAndBrightness(n);
                     
-                    //System.out.println("sat: "+ sat);
-                    //System.out.println("bright: " + bright);
-                    ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), satbright.get(0), satbright.get(1)));
+                    System.out.println("sat: "+ satbright.get(0));
+                    System.out.println("bright: " + satbright.get(1));
+                    float hue = cg.getUniqueHue(n);
+                    System.out.println("hue: " + hue);
+                    ig2.setPaint(Color.getHSBColor(hue, satbright.get(0), satbright.get(1)));
                     
                     ig2.fill(rect);
                                                            
                 }
             }
             i = 1000;  // no edges and vertices
-            
+            */
             
         // pick color depending on SSE type
 
