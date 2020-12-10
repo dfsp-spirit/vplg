@@ -1464,7 +1464,7 @@ public class Main {
                         else {
                             argsUsed[i] = true;
                             argsUsed[i+1] = true;
-                            Settings.set("plcc_I_cg_contact_threshold", args[i+1]);
+                            Settings.set("plcc_I_CG_contact_threshold", args[i+1]);
                         }
                     }
                     

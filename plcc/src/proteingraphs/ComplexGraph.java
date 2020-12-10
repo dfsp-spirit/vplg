@@ -38,12 +38,15 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import io.DBManager;
 import io.FileParser;
+import io.IO;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
 import plccSettings.Settings;
@@ -73,6 +76,8 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numLigandLigandInteractionsMap;
     public Map<Edge, Integer> numAllInteractionsMap;  // number of residue-residue contacts
     public Map<Edge, BigDecimal> normalizedEdgeWeigth;  // normalized by chain length: num res contact / #res1 * #res2. Using BigDecimal for precision.
+    private BigDecimal minimumNormalizedEdgeWeight;  // the smallest normalized edge weight: used for the lucid normalized edge weights
+    private Map<Edge, BigDecimal> lucidNormalizedEdgeWeight;  // norm. edge weight / smallest edge weight => factor of smallest norm. edge weight in [1;n]
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
     public Map<Vertex, String> molMap;  // contains for each vertex (= protein chain) the corresponding molecule name
@@ -96,7 +101,8 @@ public class ComplexGraph extends UAdjListGraph {
     private final String pdbid;
     
     private final static int PRECISION = 35;  // used as precision for the BigDecimal normalized edge weight, i.e., number of digits left and right of decimal point
-
+    private final static String CLASS_TAG = "CG";
+    
     /**
      * Constructor.
      * @param pdbid RSCB PDB ID
@@ -121,6 +127,7 @@ public class ComplexGraph extends UAdjListGraph {
         numLigandLigandInteractionsMap = createEdgeMap();
         numAllInteractionsMap = createEdgeMap();
         normalizedEdgeWeigth = createEdgeMap();
+        lucidNormalizedEdgeWeight = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
         chainNamesInEdge = createEdgeMap();
         
@@ -279,10 +286,10 @@ public class ComplexGraph extends UAdjListGraph {
         }
         
         // inform here if edge threshold is >1 (below it would result in multiple prints)
-        if (Settings.getInteger("plcc_I_cg_contact_threshold") > 1) {    
+        if (Settings.getInteger("plcc_I_CG_contact_threshold") > 1) {    
             if (! Settings.getBoolean("plcc_B_silent")) {
                 System.out.println("  Complex graph contact threshold for edges is set to "
-                        + Settings.getInteger("plcc_I_cg_contact_threshold").toString()
+                        + Settings.getInteger("plcc_I_CG_contact_threshold").toString()
                         + ". Resulting graphs may differ from default setting '1' where all "
                         + "edges are drawn.");
             }
@@ -690,6 +697,8 @@ public class ComplexGraph extends UAdjListGraph {
     
     
     private void computeNormalizedEdgeWeights() {
+        BigDecimal curMinimumNormEdgeWeight = BigDecimal.ONE;  // initialize as 1 = highest possible normalized edge weight
+        
         for (Edge e : numAllInteractionsMap.keySet()) {
             
             // use String constructor for BigDecimal to achieve precision 
@@ -702,7 +711,16 @@ public class ComplexGraph extends UAdjListGraph {
             //   allow precision, i.e. significant digits left and right, of 25
             BigDecimal tmpNormalizedWeight = tmpContacts.divide(tmpNumRes1.multiply(tmpNumRes2), PRECISION, RoundingMode.HALF_UP);
             
+            curMinimumNormEdgeWeight = curMinimumNormEdgeWeight.min(tmpNormalizedWeight);  // update min if necessary
+            
             normalizedEdgeWeigth.put(e, tmpNormalizedWeight);
+        }
+        
+        minimumNormalizedEdgeWeight = curMinimumNormEdgeWeight;
+        
+        // now that we have the minimum normalized edge weight we can compute the lucid normalized edge weights
+        for (Edge e : numAllInteractionsMap.keySet()) {
+            lucidNormalizedEdgeWeight.put(e, normalizedEdgeWeigth.get(e).divide(minimumNormalizedEdgeWeight, PRECISION, RoundingMode.HALF_UP));
         }
     }
     
@@ -725,7 +743,7 @@ public class ComplexGraph extends UAdjListGraph {
 
     public Boolean chainsHaveEnoughContacts(Integer A, Integer B) {
         if (this.numChainInteractions[A][B] != null) {
-            return this.numChainInteractions[A][B] >= Settings.getInteger("plcc_I_cg_contact_threshold");
+            return this.numChainInteractions[A][B] >= Settings.getInteger("plcc_I_CG_contact_threshold");
         } else {
             return false;
         }
@@ -925,7 +943,7 @@ public class ComplexGraph extends UAdjListGraph {
     // ------------------------- Draw header -------------------------
         // check width of header string
         String proteinHeader = "The chain complex graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges().size() + "].";
-        String addInfo = "(Interchain contact threshold is set to " + Settings.getInteger("plcc_I_cg_contact_threshold") + ". Neglected edges: " + cg.neglectedEdges + ")";
+        String addInfo = "(Interchain contact threshold is set to " + Settings.getInteger("plcc_I_CG_contact_threshold") + ". Neglected edges: " + cg.neglectedEdges + ")";
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
         String chainName;    // the SSE number in the primary structure, N to C terminus
@@ -941,19 +959,17 @@ public class ComplexGraph extends UAdjListGraph {
         java.awt.Shape shape;
         Arc2D.Double arc;
         ig2.setStroke(new BasicStroke(2));  // thin edges
-        Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY, iChainID, jChainID;
+        Integer leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
         Integer labelPosX, labelPosY;
 
-        String edges = cg.getEdges().toString();
+        String edges = cg.getEdges().toString();        
         for (Integer i = 0; i < cg.getVertices().size(); i++) {
             for (Integer j = i + 1; j < cg.getVertices().size(); j++) {
 
-                String tmp = "(" + i + ", " + j + ")";
+                String tmpEdgeString = "(" + i + ", " + j + ")";
 
                 // If there is a contact...
-                if (edges.indexOf(tmp) != -1) {
-
-                    Integer cInteractions = cg.numChainInteractions[i][j];
+                if (edges.contains(tmpEdgeString)) {
 
                 // determine edge type and the resulting color
                     //edgeType = cg.getContactType(i, j);
@@ -964,8 +980,6 @@ public class ComplexGraph extends UAdjListGraph {
 
                 // ----- complex graph specific stuff -----
                     // determine chain of SSEs
-                    iChainID = -1;
-                    jChainID = -1;
                     /*
                      for(Integer x = 0; x < cg.chainEnd.size(); x++){
                      if(i < cg.chainEnd.get(x)) {iChainID = x; break;}
@@ -1007,55 +1021,51 @@ public class ComplexGraph extends UAdjListGraph {
                 }
             }
         }
+        
+        for (Edge e : cg.getEdges()) {
 
-        // draw arc labels on top to prevent unreadability 
-        for (Integer i = 0; i < cg.getVertices().size(); i++) {
-            for (Integer j = i + 1; j < cg.getVertices().size(); j++) {
+            // recreate environment for loop over (i,j)
+            int i = Integer.parseInt(e.toString().split(",")[0].replace("(", "").strip());  // num of first chain
+            int j = Integer.parseInt(e.toString().split(",")[1].replace(")", "").strip());  // num of second chain
+            
+            if (i < j) {
+                leftVert = i;
+                rightVert = j;
+            } else {
+                leftVert = j;
+                rightVert = i;
+            }
 
-                String tmp = "(" + i + ", " + j + ")";
+            // TODO: is it clever to calculate everything again?
+            leftVertPosX = pl.getVertStart().x + (leftVert * pl.vertDist);
+            rightVertPosX = pl.getVertStart().x + (rightVert * pl.vertDist);
 
-                // If there is a contact...
-                if (edges.indexOf(tmp) != -1) {
-                    iChainID = -1;
-                    jChainID = -1;
-                    if (i < j) {
-                        leftVert = i;
-                        rightVert = j;
-                    } else {
-                        leftVert = j;
-                        rightVert = i;
-                    }
+            arcWidth = rightVertPosX - leftVertPosX;
+            arcHeight = arcWidth / 2;
 
-                    // TODO: is it clever to calculate everything again?
-                    leftVertPosX = pl.getVertStart().x + (leftVert * pl.vertDist);
-                    rightVertPosX = pl.getVertStart().x + (rightVert * pl.vertDist);
+            arcTopLeftX = leftVertPosX;
+            arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
 
-                    arcWidth = rightVertPosX - leftVertPosX;
-                    arcHeight = arcWidth / 2;
+            spacerX = pl.vertRadius;
+            spacerY = 0;
+            //calculate label positions
+            labelPosX = leftVertPosX + arcWidth / 2 + 2;
+            labelPosY = arcTopLeftY + spacerY - 5;
+            //draw labels on arcs
+            Font labelfont = new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size") - 5);
+            ig2.setFont(labelfont);
+            ig2.setPaint(Color.BLACK);
+            
+            String cInteractionsString;
+            // cInteractionsString = cg.lucidNormalizedEdgeWeight.get(e).setScale(0).toString();  // label as rounded factor
+            cInteractionsString = cg.numChainInteractions[i][j].toString();
 
-                    arcTopLeftX = leftVertPosX;
-                    arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
-
-                    spacerX = pl.vertRadius;
-                    spacerY = 0;
-                    //calculate label positions
-                    labelPosX = leftVertPosX + arcWidth / 2 + 2;
-                    labelPosY = arcTopLeftY + spacerY - 5;
-                    //draw labels on arcs
-                    Font labelfont = new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size") - 5);
-                    ig2.setFont(labelfont);
-                    ig2.setPaint(Color.BLACK);
-                    Integer cInteractions = cg.numChainInteractions[i][j];
-                    
-                    if(cInteractions != null) {
-                        ig2.drawString(cInteractions.toString(), labelPosX, labelPosY + (stringHeight / 4));
-                    } else {
-                        // This may happen if not the top-right part of the numChainInteractions is filled (due to some different ordering in the chains)
-                        DP.getInstance().w("ComplexGraph", "Tried to read out a null entry from numChainInteractions while writing the edge weights in the chain-level CG. "
-                                + "This is probably a programming error, so please inform the developers.");
-                    }
-
-                }
+            if(cInteractionsString != null) {
+                ig2.drawString(cInteractionsString, labelPosX, labelPosY + (stringHeight / 4));
+            } else {
+                // This may happen if not the top-right part of the numChainInteractions is filled (due to some different ordering in the chains)
+                DP.getInstance().w("ComplexGraph", "Tried to read out a null entry from numChainInteractions while writing the edge weights in the chain-level CG. "
+                        + "This is probably a programming error, so please inform the developers.");
             }
         }
 
@@ -1151,7 +1161,6 @@ public class ComplexGraph extends UAdjListGraph {
             } else {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }
-            iChainID = -1;
             String[] vertexNameAssignment = cg.proteinNodeMap.toString().replace("{", "").replace("}", "").replace(" ", "").split(",");  // produces array of "x=a" where x is number of vertex and a chain name
             
             
@@ -1266,6 +1275,8 @@ public class ComplexGraph extends UAdjListGraph {
      * @return true if the file was written, false otherwise
      */
     public boolean writeToFileGML(File file) {
+        
+        // - - - Checks - - -
 
         if (!file.exists()) {
             try {
@@ -1275,6 +1286,11 @@ public class ComplexGraph extends UAdjListGraph {
                 return false;
             }
         }
+        
+        
+        // - - - Create GML String with SPARGEL - - -
+        
+        // - - Vertex attributes - -
 
         GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge> gw = new GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge>(this);        
         gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
@@ -1329,6 +1345,9 @@ public class ComplexGraph extends UAdjListGraph {
                 return chainLengthMap.get(o).toString();
             }
         });
+        
+        
+        // - - Edge attributes - -
 
         //gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>());
         /**
@@ -1356,6 +1375,7 @@ public class ComplexGraph extends UAdjListGraph {
        
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_all_res_res_contacts", numAllInteractionsMap));  // same as label but as int = without '"' // only underscore allowed (by Cytoscape)
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("normalized_weight", normalizedEdgeWeigth));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("lucid_normalized_weight", lucidNormalizedEdgeWeight));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixcoil_contacts", numHelixCoilInteractionsMap));
@@ -1368,28 +1388,42 @@ public class ComplexGraph extends UAdjListGraph {
             gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilligand_contacts", numCoilLigandInteractionsMap));
             gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_ligandligand_contacts", numLigandLigandInteractionsMap));
         }
-
-        FileOutputStream fop = null;
-        boolean allOK = true;
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            fop = new FileOutputStream(file);
-            gw.write(fop);
-            fop.flush();
-            fop.close();
-        } catch (Exception e) {
-            System.err.println("ERROR: Could not write complex graph to file '" + file.getAbsolutePath() + "': " + e.getMessage() + ".");
-            allOK = false;
-        } finally {
-            if (fop != null) {
-                try {
-                    fop.close();
-                } catch (Exception e) {
-                    // nvm
-                }
-            }
-
+            gw.write(baos);
+        } catch (IOException ex) {
+            DP.getInstance().e(CLASS_TAG, "Writing the GML to a ByteArrayOutputStream failed. Please inform a developer. Trying to ignore it and going on.");
+            Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return allOK;
+        String GmlString = new String(baos.toByteArray());
+        
+        
+        // - - - Add graph meta data / graph attributes
+        
+        // SPARGEL's GMLWriter does not allow to add graph meta data / graph attributes, so we post process the string
+        
+        String[] GmlLines = GmlString.split("\n");
+        String postprocessedGmlString = "";
+        String lastLine = "";
+        
+        LinkedHashMap<String, String> graphAttributes = new LinkedHashMap<>();
+        graphAttributes.put("ignore_ligands", (Settings.getBoolean("plcc_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
+        graphAttributes.put("min_contacts_for_edge", Settings.getInteger("plcc_I_CG_contact_threshold").toString());  // contact threshold
+        graphAttributes.put("factor_lucid_normalized_weight", minimumNormalizedEdgeWeight.toString());  // factor to reconstruct normalized edge weight
+
+        for (String GmlLine : GmlLines) {
+            if (lastLine.equals("graph [")) {
+                postprocessedGmlString += IO.mapToKeyValueString(graphAttributes, "\t", " ");
+            }
+            postprocessedGmlString += GmlLine + "\n";
+            lastLine = GmlLine;
+        }
+        
+        
+        // - - - Write String to file - - -
+        
+        return IO.writeStringToFile(postprocessedGmlString, file.getAbsolutePath(), true);
     }
     
     
