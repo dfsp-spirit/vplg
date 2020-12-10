@@ -885,7 +885,7 @@ public class ComplexGraph extends UAdjListGraph {
             x = 10;
         }
         x = x-1;
-        Integer maxSat = 4;
+        Integer maxSat = 2;
         //colors.set(0, getUniqueHue(molID));
         //colors.set(1, 1f);
         //colors.set(2, 1f);
@@ -925,16 +925,37 @@ public class ComplexGraph extends UAdjListGraph {
                 //colors.set(0, getUniqueHue(molID));
                 Integer y = (int)Math.ceil(x/maxSat) +1;
                 System.out.println("y: " + y);
-
-                if((molID-1) % (x+1) == 1){
+                System.out.println("molID-1: " + (molID-1));
+                Integer counter = ((molID-1)%(x+1));
+                System.out.println("counter: " + counter);
+                
+                if((counter == 1)|| (counter % (maxSat+1)) == 1){
+                    System.out.println("inif");
+                    //colors.set(1, 1f);
+                    //colors.set(1, 0.6f + (0.4f / maxSat * ((counter-1) % (maxSat+1))));
+                    colors.set(2, 0.6f + (0.4f / y * (counter % y)));
+                }
+                //else{
+                    colors.set(1, 0.6f + (0.4f / maxSat * ((counter-1) % (maxSat+1))));
+                //}
+                
+                //colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
+                
+                /*if((molID-1) % (x+1) == 1){
+                    
                     colors.set(1, 1f);
+                    colors.set(2, 0.6f + ((0.4f / y) * (counter % y)));
                 }
                 else{
                     colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
                 }
+                if(counter % (maxSat+1) == 0){
+                    System.out.println("in if");
+                    colors.set(2, 0.6f + (0.4f / y * (counter % y)));
+                }
                 //colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
-              
-                colors.set(2, 0.6f + ((0.4f / y) * ((molID-1) % y)));
+                */
+                
                 /*else{
                     colors.set(1, 0.5f + (0.5f / x * ((molID-1) % x)));
                 }
