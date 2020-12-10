@@ -873,96 +873,66 @@ public class ComplexGraph extends UAdjListGraph {
     }
     
     /**
-     * TODO Hue might become larger than 1!!! Gotta fix that!!!
+     * Returns an ArrayList containing [hue,saturation,brightness] for the HSB-color-coding.
+     * Iterates over hue and adds iteration over saturation and brightness after a certain number of distinct vertices.
+     * @param molID, colors
+     * @return
      */
-    public ArrayList<Float> getcolorcode(Integer molID, ArrayList<Float> colors){
-        //ArrayList<Float> satbright = new ArrayList<Float>();
+    public ArrayList<Float> getColorCode(Integer molID, ArrayList<Float> colors){
         
-        Integer pieces = 10;
+        //Divides the vertices into groups of size x. x can't be larger than 10 because we prefer more groups to larger groups.
+        Integer pieces = 10; 
         Integer x = (int)(molIDs.size() / pieces);
         if(x > pieces){
             pieces = x;
             x = 10;
         }
         x = x-1;
-        Integer maxSat = 2;
-        //colors.set(0, getUniqueHue(molID));
-        //colors.set(1, 1f);
-        //colors.set(2, 1f);
-            
-        if(x <= 0){
+        
+        Integer maxSat = 2; //Maximum of different saturation values.
+        
+        
+        if(x <= 0){ //For graphs with up to 19 vertices only the hue is iterated.
             colors.set(0, getUniqueHue(molID));
             colors.set(1, 1f);
             colors.set(2, 0.8f);
             
         }
-        else if(x <= 2){
-            if((molID-1) % (x+1) == 0){
-                colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
-                //colors.set(0, getUniqueHue(molID));
+        else if(x <= 2){ // For graphs with up to 39 vertices hue and brightness are iterated.
+            if((molID-1) % (x+1) == 0){ //the hue with default saturation and brightness is used first.
+                
+                colors.set(0, getUniqueHue(molID));
                 colors.set(1, 1f);
                 colors.set(2, 0.8f); 
             }
-            else{
-                colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
-                //colors.set(0, getUniqueHue(molID));
-                colors.set(1, 1f);
+            else{ //The brightness is iterated.
                 
-                colors.set(2, 0.6f + (0.4f / x * ((molID-1) % x)));
+                colors.set(0, getUniqueHue(molID));
+                colors.set(1, 1f);
+                colors.set(2, 0.6f + (0.4f / x * ((molID-1) % x))); //All values under 0.6 produce dark colors that are harder to distinguish
             }
         }
-        else{
+        else{ // Brightness and saturation are iterated
             if((molID-1) % (x+1) == 0){
-               colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
-               //colors.set(0, getUniqueHue(molID));
+               
+               colors.set(0, getUniqueHue(molID));
                colors.set(1, 1f);
                colors.set(2, 0.8f);
                
             }
             else{
-                System.out.println("x: " + x);
-                colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
-                //colors.set(0, getUniqueHue(molID));
-                Integer y = (int)Math.ceil(x/maxSat) +1;
-                System.out.println("y: " + y);
-                System.out.println("molID-1: " + (molID-1));
-                Integer counter = ((molID-1)%(x+1));
-                System.out.println("counter: " + counter);
                 
+                colors.set(0, getUniqueHue(molID));
+                Integer y = (int)Math.ceil(x/maxSat) +1; // number of changes the brightness has for one group of x
+                Integer counter = ((molID-1)%(x+1)); // calculates the current position of molID in its group of x vertices
+                
+                //the brightness and saturation are calculated according to the counter
                 if((counter == 1)|| (counter % (maxSat+1)) == 1){
-                    System.out.println("inif");
-                    //colors.set(1, 1f);
-                    //colors.set(1, 0.6f + (0.4f / maxSat * ((counter-1) % (maxSat+1))));
                     colors.set(2, 0.6f + (0.4f / y * (counter % y)));
                 }
-                //else{
-                    colors.set(1, 0.6f + (0.4f / maxSat * ((counter-1) % (maxSat+1))));
-                //}
                 
-                //colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
+                colors.set(1, 0.6f + (0.4f / maxSat * ((counter-1) % (maxSat+1))));
                 
-                /*if((molID-1) % (x+1) == 1){
-                    
-                    colors.set(1, 1f);
-                    colors.set(2, 0.6f + ((0.4f / y) * (counter % y)));
-                }
-                else{
-                    colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
-                }
-                if(counter % (maxSat+1) == 0){
-                    System.out.println("in if");
-                    colors.set(2, 0.6f + (0.4f / y * (counter % y)));
-                }
-                //colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
-                */
-                
-                /*else{
-                    colors.set(1, 0.5f + (0.5f / x * ((molID-1) % x)));
-                }
-                //colors.set(1, 0.6f + (0.4f / x * ((molID-1) % x)));
-              
-                colors.set(2, 0.6f + (0.4f / x * ((molID-1) % x)));
-                */
             }
         }       
         return colors;
@@ -1173,11 +1143,10 @@ public class ComplexGraph extends UAdjListGraph {
         Iterator<Vertex> vertIter = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for getUniqueHue
         Vertex curVert;
         
-        ArrayList<Float> colorcode = new ArrayList<Float>();
-        colorcode.add(0.5f);
-        colorcode.add(1f);
-        colorcode.add(0.8f);
-        System.out.println("colorcode "+colorcode);
+        ArrayList<Float> colorCode = new ArrayList<Float>(); //ArrayList that contains the color codings for HSB-Colors
+        colorCode.add(0.5f);
+        colorCode.add(1f);
+        colorCode.add(0.8f);
         
         for (Integer i = 0; i < cg.getVertices().size(); i++) {
             curVert = vertIter.next();
@@ -1187,31 +1156,24 @@ public class ComplexGraph extends UAdjListGraph {
             float h = (float) 0.5;
             float s = (float) 1.0; // change this for saturation (higher = more saturated)
             float b = (float) 0.8; // change this for brightness (0.0 -> Dark/Black)
-            //ArrayList<Float> satbright = new ArrayList<Float>();
-            //satbright = cg.getSaturationAndBrightness(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert))));
-            /*cg.getcolorcode(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert))));
+            
+            colorCode = cg.getColorCode(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert))), colorCode);
             
             if (! bw) {
-                ig2.setPaint(Color.getHSBColor(cg.colorcode.get(0), cg.colorcode.get(1), cg.colorcode.get(2)));
+                ig2.setPaint(Color.getHSBColor(colorCode.get(0), colorCode.get(1), colorCode.get(2)));
             } else {
                 ig2.setPaint(Color.GRAY);
             }
-            */
-            /*
-            if (! bw) {
-                ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert)))), s, b));
-            } else {
-                ig2.setPaint(Color.GRAY);
-            }
-            */
+            
+            
             // following code produces a color palette for m graphs containing n = 1..m vertices
             //   it is best to set min_width and min_height to 1200 and 900
             //   and turn header and footer off
-            //   you can switch between 'old' getUniqueColor and 'new' getUniqueHue
+            //   you can switch between 'super old' getUniqueColor and 'old' getUniqueHue and 'new' getColorCode
             //   the result is saved as chain CG
             //   Important to note: the 'old' function is insensitive to the case of many nodes and few molIDs
-            /*
-            cg.molIDs.clear();
+            
+            /*cg.molIDs.clear();
             for (Integer m = 1; m <= 200; m++) {
                 System.out.println("m: " + m);
                 //cg.lastColorStep = 0;
@@ -1219,36 +1181,20 @@ public class ComplexGraph extends UAdjListGraph {
                 for (int n = 1; n <= m; n++) {
                     s = 1.0f;
                     rect = new Rectangle2D.Double(0 + n * 10, 0 + m * 10, 10, 10);
-                    ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), s, b));
+                    
+                    //ig2.setPaint(Color.getHSBColor(cg.getUniqueHue(n), s, b));
+                    
                     //ig2.setPaint(Color.getHSBColor(cg.getUniqueColor(m), s, b));
+            
+                    //new coding:
+                    colorCode = cg.getColorCode(n, colorCode);
+                    ig2.setPaint(Color.getHSBColor(colorCode.get(0), colorCode.get(1), colorCode.get(2)));
+            
                     ig2.fill(rect);
                 }
             }
             i = 1000;  // no edges and vertices
             */
-            
-            cg.molIDs.clear();
-            //ArrayList<Float> satbright = new ArrayList<Float>();
-            for (Integer m = 1; m <= 100; m++) {
-                System.out.println("m: " + m);
-                
-                cg.molIDs.add(m.toString());
-                for (int n = 1; n <= m; n++) {
-                    rect = new Rectangle2D.Double(0 + n * 10, 0 + m * 10, 10, 10);
-                    colorcode = cg.getcolorcode(n, colorcode);
-                    
-                    //System.out.println("sat: "+ colorcode.get(1));
-                    //System.out.println("bright: " + colorcode.get(2));
-                    //float hue = cg.getUniqueHue(n);
-                    //System.out.println("hue: " + colorcode.get(0));
-                    System.out.println("array: " + colorcode);
-                    ig2.setPaint(Color.getHSBColor(colorcode.get(0), colorcode.get(1), colorcode.get(2)));
-                    
-                    ig2.fill(rect);
-                                                           
-                }
-            }
-            i = 1000;  // no edges and vertices
             
             
         // pick color depending on SSE type
