@@ -873,7 +873,7 @@ public class ComplexGraph extends UAdjListGraph {
     }
     
     /**
-     * TODO 
+     * TODO Hue might become larger than 1!!! Gotta fix that!!!
      */
     public ArrayList<Float> getcolorcode(Integer molID, ArrayList<Float> colors){
         //ArrayList<Float> satbright = new ArrayList<Float>();
@@ -885,7 +885,7 @@ public class ComplexGraph extends UAdjListGraph {
             x = 10;
         }
         x = x-1;
-        Integer maxSat = 3;
+        Integer maxSat = 4;
         //colors.set(0, getUniqueHue(molID));
         //colors.set(1, 1f);
         //colors.set(2, 1f);
@@ -898,13 +898,13 @@ public class ComplexGraph extends UAdjListGraph {
         }
         else if(x <= 2){
             if((molID-1) % (x+1) == 0){
-                colors.set(0, (1f/(pieces) * (int)((molID-1)/(x+1))));
+                colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
                 //colors.set(0, getUniqueHue(molID));
                 colors.set(1, 1f);
                 colors.set(2, 0.8f); 
             }
             else{
-                colors.set(0, (1f/(pieces) * (int)((molID-1)/(x+1))));
+                colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
                 //colors.set(0, getUniqueHue(molID));
                 colors.set(1, 1f);
                 
@@ -913,7 +913,7 @@ public class ComplexGraph extends UAdjListGraph {
         }
         else{
             if((molID-1) % (x+1) == 0){
-               colors.set(0, (1f/(pieces) * (int)((molID-1)/(x+1))));
+               colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
                //colors.set(0, getUniqueHue(molID));
                colors.set(1, 1f);
                colors.set(2, 0.8f);
@@ -921,19 +921,20 @@ public class ComplexGraph extends UAdjListGraph {
             }
             else{
                 System.out.println("x: " + x);
-                colors.set(0, (1f/(pieces) * (int)((molID-1)/(x+1))));
+                colors.set(0, (1f/(pieces) * ((int)((molID-1)/(x+1)))));
                 //colors.set(0, getUniqueHue(molID));
-                Integer y = x/maxSat;
+                Integer y = (int)Math.ceil(x/maxSat) +1;
+                System.out.println("y: " + y);
 
                 if((molID-1) % (x+1) == 1){
                     colors.set(1, 1f);
                 }
                 else{
-                    colors.set(1, 0.5f + (0.5f / maxSat * ((molID-1) % maxSat)));
+                    colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
                 }
                 //colors.set(1, 0.6f + (0.4f / maxSat * ((molID-1) % maxSat)));
               
-                colors.set(2, 0.6f + (0.4f / y * ((molID-1) % y)));
+                colors.set(2, 0.6f + ((0.4f / y) * ((molID-1) % y)));
                 /*else{
                     colors.set(1, 0.5f + (0.5f / x * ((molID-1) % x)));
                 }
