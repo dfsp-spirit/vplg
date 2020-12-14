@@ -43,6 +43,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+//import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -867,22 +869,29 @@ public class ComplexGraph extends UAdjListGraph {
      * @param molID
      * @return 
      */
-    public float getUniqueHue(Integer molID) {
+    public float getUniqueHue(Integer molID, Integer numberHomologues) {
         //return (360f / (molIDs.size()) * molID) / 360f;
-        return 1f / molIDs.size() * (molID - 1);
+        //return 1f / molIDs.size() * (molID - 1);
+        return 1f / numberHomologues * (molID - 1);
     }
     
     /**
      * Returns an ArrayList containing [hue,saturation,brightness] for the HSB-color-coding.
      * Iterates over hue and adds iteration over saturation and brightness after a certain number of distinct vertices.
-     * @param molID, colors
+     * since only homologue chains are colored the number ob colores is equal to the number of homologue chains
+     * @param molID
+     * @param Homologues
+     * @param molIdName
      * @return
      */
-    public ArrayList<Float> getColorCode(Integer molID, ArrayList<Float> colors){
+    public ArrayList<Float> getColorCode(String molIdName, ArrayList<Float> colors, ArrayList<String> Homologues){
+        
+        Integer molID = Homologues.indexOf(molIdName) + 1; //since only homologue chains are colored the molID needs to be set according to the number of homologues
+        Integer numberHomologues = Homologues.size();
         
         //Divides the vertices into groups of size x. x can't be larger than 10 because we prefer more groups to larger groups.
         Integer pieces = 10; 
-        Integer x = (int)(molIDs.size() / pieces);
+        Integer x = (int)(numberHomologues / pieces);
         if(x > pieces){
             pieces = x;
             x = 10;
@@ -893,7 +902,7 @@ public class ComplexGraph extends UAdjListGraph {
         
         
         if(x <= 0){ //For graphs with up to 19 vertices only the hue is iterated.
-            colors.set(0, getUniqueHue(molID));
+            colors.set(0, getUniqueHue(molID, numberHomologues));
             colors.set(1, 1f);
             colors.set(2, 0.8f);
             
@@ -901,13 +910,13 @@ public class ComplexGraph extends UAdjListGraph {
         else if(x <= 2){ // For graphs with up to 39 vertices hue and brightness are iterated.
             if((molID-1) % (x+1) == 0){ //the hue with default saturation and brightness is used first.
                 
-                colors.set(0, getUniqueHue(molID));
+                colors.set(0, getUniqueHue(molID, numberHomologues));
                 colors.set(1, 1f);
                 colors.set(2, 0.8f); 
             }
             else{ //The brightness is iterated.
                 
-                colors.set(0, getUniqueHue(molID));
+                colors.set(0, getUniqueHue(molID, numberHomologues));
                 colors.set(1, 1f);
                 colors.set(2, 0.6f + (0.4f / x * ((molID-1) % x))); //All values under 0.6 produce dark colors that are harder to distinguish
             }
@@ -915,14 +924,14 @@ public class ComplexGraph extends UAdjListGraph {
         else{ // Brightness and saturation are iterated
             if((molID-1) % (x+1) == 0){
                
-               colors.set(0, getUniqueHue(molID));
+               colors.set(0, getUniqueHue(molID, numberHomologues));
                colors.set(1, 1f);
                colors.set(2, 0.8f);
                
             }
             else{
                 
-                colors.set(0, getUniqueHue(molID));
+                colors.set(0, getUniqueHue(molID, numberHomologues));
                 Integer y = (int)Math.ceil(x/maxSat) +1; // number of changes the brightness has for one group of x
                 Integer counter = ((molID-1)%(x+1)); // calculates the current position of molID in its group of x vertices
                 
@@ -1140,14 +1149,32 @@ public class ComplexGraph extends UAdjListGraph {
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
         
-        Iterator<Vertex> vertIter = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for getUniqueHue
-        Vertex curVert;
+        Iterator<Vertex> vertIterator = cg.getVertices().iterator();  // this and next line used to iterate vertices to get the number of Homologues
+        Vertex curVertice;
         
         ArrayList<Float> colorCode = new ArrayList<Float>(); //ArrayList that contains the color codings for HSB-Colors
         colorCode.add(0.5f);
         colorCode.add(1f);
         colorCode.add(0.8f);
         
+        ArrayList<String> Homologues = new ArrayList<String>(); //contains molIDs of homologue vertices
+        Integer homologues;
+        
+        //Array Homologues is filled with homologue molIDs
+        for(Integer i = 0; i < cg.getVertices().size(); i++){
+            curVertice = vertIterator.next();
+            String molID = molInfoForChains.get(cg.proteinNodeMap.get(curVertice));
+            if(!Homologues.contains(molID)){
+                homologues = Collections.frequency((molInfoForChains.values()), molID);
+                if(homologues > 1){
+                    Homologues.add(molID);
+                }
+            }
+        }
+        
+        
+        Iterator<Vertex> vertIter = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for colorCode
+        Vertex curVert;    
         for (Integer i = 0; i < cg.getVertices().size(); i++) {
             curVert = vertIter.next();
 
@@ -1157,10 +1184,19 @@ public class ComplexGraph extends UAdjListGraph {
             float s = (float) 1.0; // change this for saturation (higher = more saturated)
             float b = (float) 0.8; // change this for brightness (0.0 -> Dark/Black)
             
-            colorCode = cg.getColorCode(Integer.parseInt(molInfoForChains.get(cg.proteinNodeMap.get(curVert))), colorCode);
             
+            String molID = molInfoForChains.get(cg.proteinNodeMap.get(curVert));
+                        
             if (! bw) {
-                ig2.setPaint(Color.getHSBColor(colorCode.get(0), colorCode.get(1), colorCode.get(2)));
+                //check if molID has homologues
+                //only chains with homologues are colored
+                if(Homologues.contains(molID)){
+                    colorCode = cg.getColorCode(molID, colorCode, Homologues);
+                    ig2.setPaint(Color.getHSBColor(colorCode.get(0), colorCode.get(1), colorCode.get(2)));
+                }
+                else{
+                    ig2.setPaint(Color.GRAY);
+                }
             } else {
                 ig2.setPaint(Color.GRAY);
             }
@@ -1250,10 +1286,9 @@ public class ComplexGraph extends UAdjListGraph {
             iChainID = -1;
             String[] vertexNameAssignment = cg.proteinNodeMap.toString().replace("{", "").replace("}", "").replace(" ", "").split(",");  // produces array of "x=a" where x is number of vertex and a chain name
             
-            Iterator<Vertex> vertIter2 = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for getUniqueHue
+            Iterator<Vertex> vertIter2 = cg.getVertices().iterator();  // this and next line used to iterate vertices to get current vertex number for MolNames
             Vertex curVert2;
-            Map<String, String> homologues = new HashMap<>(); //the list is used to check for previous appearances of homologues when drawing the names
-
+            
             for (Integer i = 0; i < cg.getVertices().size(); i++) {
                 curVert2 = vertIter2.next();
                 // Draw each label until 999 and from then on only even ones
@@ -1283,10 +1318,10 @@ public class ComplexGraph extends UAdjListGraph {
                 //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                 stringHeight = fontMetrics.getAscent();
                 
-                String mol_name = cg.molMap.get(curVert2);
-                AffineTransform rotate_MN = new AffineTransform();
-                rotate_MN.rotate(0.785d,0,0); // rotation around center of vertex
-                Font rotatedFont = font.deriveFont(rotate_MN);
+                String molName = cg.molMap.get(curVert2);
+                AffineTransform rotateMN = new AffineTransform();
+                rotateMN.rotate(0.785d,0,0); // rotation around center of vertex
+                Font rotatedFont = font.deriveFont(rotateMN);
                 
                
                 //Font font = new Font(null, Font.PLAIN, 10);
@@ -1299,8 +1334,8 @@ public class ComplexGraph extends UAdjListGraph {
                
                 ig2.setFont(rotatedFont);
 
-                ig2.drawString(mol_name, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
-                //homologues.put(molInfoForChains.get(chainName), chainName);
+                ig2.drawString(molName, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));    
+                
                 ig2.setFont(font);
                 
 // determine chain of SSEs
