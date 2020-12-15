@@ -365,7 +365,7 @@ public class PageLayout {
         x_y_values.set(0,(x_y_values.get(0) - marginRight));
         //getFooterStart().y is 40 Pixel bigger than the actual height
         // +50 for legend box size and 10px space
-        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()) )); 
+        x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()) + 50 )); 
         
         return x_y_values;
     }

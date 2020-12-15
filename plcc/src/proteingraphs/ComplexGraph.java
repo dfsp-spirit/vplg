@@ -1038,7 +1038,7 @@ public class ComplexGraph extends UAdjListGraph {
                 // determine edge type and the resulting color
                     //edgeType = cg.getContactType(i, j);
                     
-                    ig2.setPaint(new Color(0.3f, 0.3f, 0.3f, 0.3f)); //sets Color to Gray and Transparency
+                    ig2.setPaint(new Color(0.3f, 0.3f, 0.3f, 0.3f)); //sets Color to Gray and Transparency. 0.0f = fully transparent, 1.0f = not transparent
                     
                     
                     if (bw) {
@@ -1346,15 +1346,15 @@ public class ComplexGraph extends UAdjListGraph {
                 //if(iChainID != -1) {ig2.drawString(cg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
             }
             
-            /*
+            
             //key for the footer
             
-            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("'<X': see chain X for molecule name", ig2);
-            ig2.drawString("'<X' : see chain X for molecule name", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
+            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologue chains have the same color. Non-homologue chains are gray.", ig2);
+            ig2.drawString("Homologue chains have the same color. Non-homologue chains are gray.", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
             int border = 10;
             //ig2.draw(key);
             ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) key.getWidth() + 2 * border, (int) key.getHeight() + 2 * border);
-            */
+            
             
             /*
              if(Settings.getBoolean("plcc_B_graphimg_legend")) {
