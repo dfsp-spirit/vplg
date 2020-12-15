@@ -14,16 +14,16 @@
 //---- Database settings ----//
 $DB_HOST		= '127.0.0.1';
 $DB_USER		= 'vplg';
-$DB_PASSWORD		= 'vplg';
-$DB_NAME		= 'vplg';
+$DB_PASSWORD		= '';
+$DB_NAME		= 'vplg_recent';
 $DB_PORT		= '5432';
 //---- End of database settings ----//
 
 //---- Site settings ----//
 $SITE_TITLE = "PTGL";
 $TITLE_SPACER = " -- ";
-//$SITE_BASE_URL="http://ptgl.uni-frankfurt.de";
-$SITE_BASE_URL="http://127.0.0.1/~ts/PTGL3";
+$SITE_BASE_URL="http://ptgl.uni-frankfurt.de";
+//$SITE_BASE_URL="http://127.0.0.1/~ts/PTGL3";
 //---- End of site settings ----//	
 
 //---- Search Settings ----//
@@ -37,6 +37,9 @@ $ENABLE_RANDOM_SEARCH = TRUE;
 
 $USE_LOGIC_OPERATORS	= FALSE;
 $USE_PRECOMPUTED_GRAPHLET_SIMILARITY_DATA_FROM_DB = TRUE;
+
+$LOWERCASE_PDB_IDS		= TRUE;  // transfers input PDB IDs to lowercase in search
+
 //---- End of search settings ----//
 
 $USE_DENORMALIZED_DB_FIELDS = TRUE;
@@ -54,8 +57,8 @@ $TMP_DOWNLOAD_DIR	= './temp_downloads/';
 //---- End of file settings ----//
 
 // Maintenance.php users
-$MAINTENANCE_USERS = array("ts", "nodi");
-$MAINTENANCE_TOKENS_MD5 = array("c8bd0177e53c5d2fec5d7e8cba43c505", "9d07535b8ff70398d39c78c9d19e257e");
+$MAINTENANCE_USERS = array("interim", "ts", "nodi");
+$MAINTENANCE_TOKENS_MD5 = array("e05a1d7c4d61053abc84c110c0f72f8b", "c8bd0177e53c5d2fec5d7e8cba43c505", "9d07535b8ff70398d39c78c9d19e257e");
 
 
 //---- Debug settings ----//

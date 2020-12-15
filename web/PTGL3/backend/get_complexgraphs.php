@@ -132,6 +132,9 @@ if(isset($_GET['pdb'])){
         $pageload_was_search = TRUE;
 	$valid_values = FALSE;
 	$pdb_id = $_GET["pdb"];
+
+	$pdb_id = $LOWERCASE_PDB_IDS ? strtolower($pdb_id) : $pdb_id;
+	
 	if(($graphtype_int === "1" || $graphtype_int === "2" || $graphtype_int === "3" || 
 	    $graphtype_int === "4" || $graphtype_int === "5" || $graphtype_int === "6") ) { 
 
