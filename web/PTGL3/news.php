@@ -51,6 +51,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<p>Here we list important information on PTGL updates, planned maintenance times, and more.</p>
 		<br /><br/>
 
+		<h4>DEC 15, 2020: New PTGL paper published</h4>
+		<p>We have published a paper describing Complex Graphs in <i>Oxford Bioinformatics</i>. Read it via <a href="https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaa706/5891172?guestAccessKey=c5d067b4-1e81-4893-81a4-55076e9c0e17" target="_blank">DOI 10.1093/bta706 at Oxford University Press</a>.</p>
+		<br /><br/>
+
 		<h4>MAR 02, 2020: Updating server to latest PDB release</h4>
 		<p>We are currently rolling out an Update to the PTGL server. Until finished, the server may be unavailable. This update will also fix some issues with large structures' CGs.</p>
 		<br /><br/>

@@ -1,4 +1,6 @@
 <ul id="publicationsList">
+			<li>Wolf JN, Keßler M, Ackermann J, Koch I (2020). PTGL: extension to graph-based topologies of cryo-EM data for large protein structures. <i>Bioinformatics</i>. (<a href="https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaa706/5891172?guestAccessKey=c5d067b4-1e81-4893-81a4-55076e9c0e17" target="_blank">DOI 10.1093/bta706 at Oxford University Press</a>).</li>
+
 			<li>Koch I and Schäfer T (2018). Protein super-secondary structure and quaternary structure topology: theoretical description and application. <i>Current opinions in structural biology</i>, 50, 134-143</li>
 
 			<li>Schäfer T, Scheck A, Bruneß D, May P, Koch I (2015). The new protein topology graph library web server. <i>Bioinformatics</i>. (<a href="http://bioinformatics.oxfordjournals.org/content/early/2015/10/27/bioinformatics.btv574" target="_blank">btv574 at oxfordjournals.org</a>).</li>

@@ -77,7 +77,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<p>
 		For citation of the PTGL or its underlying software, VPLG, please use:<br>
 		<br>
-		Koch I and Schäfer T (2018). Protein super-secondary structure and quaternary structure topology: theoretical description and application. <i>Current opinions in structural biology</i>, 50, 134-143 (<a href="https://www.sciencedirect.com/science/article/abs/pii/S0959440X1730115X" target="_blank">article at sciencedirect</a>).
+		Wolf JN, Keßler M, Ackermann J, Koch I (2020). PTGL: extension to graph-based topologies of cryo-EM data for large protein structures. <i>Bioinformatics</i>. (<a href="https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaa706/5891172?guestAccessKey=c5d067b4-1e81-4893-81a4-55076e9c0e17" target="_blank">DOI 10.1093/bta706 at Oxford University Press</a>).
 		<br>
 		<br>
 			
@@ -85,6 +85,19 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	</p>
 
 	<div id="bibtex">
+		@article{wolf2020ptgl,<br>
+		  title={{PTGL: extension to graph-based topologies of cryo-EM data for large protein structures}},<br>
+		  author={{Wolf, Jan Niclas and Ke{\ss}ler, Marcus and Ackermann, J{\"o}rg and Koch, Ina}},<br>
+		  journal={Bioinformatics},<br>
+		  year={2020}<br>
+		}
+	</div>
+
+  <br>
+  
+  <p>BibTex entries for older publications:</p>
+
+  <div id="bibtex">
 		@article{koch2018protein,<br>
 		  title={Protein super-secondary structure and quaternary structure topology: theoretical description and application},<br>
 		  author={Koch, Ina and Sch{\"a}fer, Tim},<br>
@@ -96,9 +109,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		}
 	</div>
 
-  <br>
-  
-  <p>BibTex entries for older publications:</p>
+	<br>
 
     <div id="bibtex">
 	  @article{schafer2015new,<br>
@@ -133,22 +144,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	annote =    {Keywords: protein structure, graph theory, ligand, secondary structure, protein ligang graph}<br>
 	}<br>
   </div>
-  <br>
-  
-  <div id="bibtex">
-        @article{May01012010,<br>
-        author = {May, Patrick and Kreuchwig, Annika and Steinke, Thomas and Koch, Ina}, <br>
-        title = {PTGL: a database for secondary structure-based protein topologies},<br>
-        volume = {38}, <br>
-        number = {suppl 1}, <br>
-        pages = {D326-D330}, <br>
-        year = {2010}, <br>
-        doi = {10.1093/nar/gkp980}, <br>
-        URL = {http://nar.oxfordjournals.org/content/38/suppl_1/D326.abstract}, <br>
-        eprint = {http://nar.oxfordjournals.org/content/38/suppl_1/D326.full.pdf+html}, <br>
-        journal = {Nucleic Acids Research} <br>
-        }<br>
-  </div>
+
   <br>
 
 		
