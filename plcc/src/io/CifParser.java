@@ -256,6 +256,7 @@ class CifParser {
                     lineData = lineToArray(line);
                 } else {
                     lineData = trimSpecialChars(currentLineValues);
+                    //System.out.println(currentLineValues); //TODELETE
                 }
                 
                 // check for minimum length of lineData (2 for non-loop and #header for loop) and merge with coming line if not
@@ -1183,11 +1184,8 @@ class CifParser {
                     element = stringList.get(i).substring(1, stringList.get(i).length() - 1);
                     if (element.endsWith("\n")){
                         // Secondly, check if there is still a newline char at the end of the line
-                        element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
+                        element = String.valueOf(element.replaceAll("\n", ""));
                     }
-                }
-                if (String.valueOf(stringList.get(i).charAt((stringList.get(i).length()) - 1)).equals("\n")){ // could probably be removed
-                    element = String.valueOf(stringList.get(i)).replaceAll("\n", "");
                 }
             }
             returnList[i] = element;
