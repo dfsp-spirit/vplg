@@ -74,7 +74,6 @@ public class PageLayout {
         ArrayList<Integer> x_y_values = getFooterOutline(vertLabels);
         this.footerHeight = x_y_values.get(1);
         this.footerWidth = x_y_values.get(0);
-        // TODO preprocessing 
     }
     
     private void init(Integer numVerts) {
@@ -324,6 +323,7 @@ public class PageLayout {
     
      /**
      * Calculates the Width and Height of the Footer Area considering the Molecule Names.
+     * @param vertLabels Molecule Names for all vertices
      */
     public ArrayList getFooterOutline(ArrayList<String> vertLabels){
         ArrayList<Integer> x_y_values = new ArrayList<Integer>();

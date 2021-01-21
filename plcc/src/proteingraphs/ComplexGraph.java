@@ -43,7 +43,6 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -92,8 +91,6 @@ public class ComplexGraph extends UAdjListGraph {
     private final String[] chainResAASeq;
     public Integer neglectedEdges;
     
-    //Todelete
-    //private ArrayList<Float> colorcode;
 
     /**
      * The RCSB PDB id this graph is based on.
@@ -865,8 +862,9 @@ public class ComplexGraph extends UAdjListGraph {
     
     /**
      * Returns a hue based on the molID in relation to the total number of molIDs. Requires molIDs to be filled.
-     * All homologous chains get the same color and the colors of all Homologues are distinct with equal distance to each other. 
+     * All homologous chains get the same color and the colors of all homologues are distinct with equal distance to each other. 
      * @param molID
+     * @param numberHomologues total number of colors needed
      * @return 
      */
     public float getUniqueHue(Integer molID, Integer numberHomologues) {
@@ -878,10 +876,10 @@ public class ComplexGraph extends UAdjListGraph {
     /**
      * Returns an ArrayList containing [hue,saturation,brightness] for the HSB-color-coding.
      * Iterates over hue and adds iteration over saturation and brightness after a certain number of distinct vertices.
-     * since only homologue chains are colored the number ob colores is equal to the number of homologue chains
-     * @param molID
-     * @param Homologues
-     * @param molIdName
+     * since only homologous chains are colored the number of colors is equal to the number of homologous chains
+     * @param molIdName molID of the current vertex
+     * @param colors contains current HSB-color-coding
+     * @param Homologues contains only molIDs that have homologous chains
      * @return
      */
     public ArrayList<Float> getColorCode(String molIdName, ArrayList<Float> colors, ArrayList<String> Homologues){
