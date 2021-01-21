@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -369,6 +370,25 @@ public class IO {
         }
         return sb.toString();
     }
+    
+    
+    /**
+     * Creates a string of a map with one key-value pair per line.
+     * @param <K> datatype of the keys
+     * @param <V> datatype of the values
+     * @param map LinkedHashMap so that the order is remained
+     * @param prefix added before each key-value pair, e.g., "\t"
+     * @param connector added between key and value, e.g. " " or "="
+     * @return 
+     */
+    public static <K, V> String mapToKeyValueString(LinkedHashMap<K,V> map, String prefix, String connector) {
+        String keyValueString = "";
+        for (K key : map.keySet()) {
+            keyValueString += prefix + key.toString() + connector + map.get(key) + "\n";
+        }
+        return keyValueString;
+    }
+    
     
     /**
      * Debug function to get a string representation of a Set.

@@ -198,7 +198,7 @@ public class Settings {
 
         // header
         formattedString += "##### PLCC SETTINGS #####\n\n";
-        formattedString += "# This file contains the settings for VPLG's PLCC as key-value pairs per line. The character atfer 'plcc' indicates which data type is expected: "
+        formattedString += "# This file contains the settings for VPLG's PLCC as key-value pairs per line. The character after 'plcc' indicates which data type is expected: "
                 + "B(oolean), S(tring), I(nteger) or F(loat)\n";
         formattedString += "# The file is structured in sections which either belong to user, advanced or developer settings.\n\n";
         

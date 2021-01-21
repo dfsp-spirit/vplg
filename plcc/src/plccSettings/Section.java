@@ -116,7 +116,7 @@ class Section {
                 
             case "Complex Graph (CG)":
                 settings.add(new Setting("plcc_B_complex_graphs", 'B', "false", "Whether Complex Graphs are computed and drawn."));
-                settings.add(new Setting("plcc_I_cg_contact_threshold", 'I', "1", "The lowest number of interchain residue contacts where an edge in Complex Graphs is drawn."));
+                settings.add(new Setting("plcc_I_CG_contact_threshold", 'I', "1", "The lowest number of interchain residue contacts where an edge in Complex Graphs is drawn."));
                 settings.add(new Setting("plcc_B_CG_ignore_ligands", 'B', "true", "Whether ligands should be ignored. If not, they may be part of the chain they are "
                         + "added to by the authors of the PDB file. This influences the (number of) contacts. May be superseded in the future by placing ligands in "
                         + "own chain."));
