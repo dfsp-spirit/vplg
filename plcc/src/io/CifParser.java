@@ -870,7 +870,7 @@ class CifParser {
             a.setDsspResNum(lastMol.getDsspNum());
         }
         
-        if (checkType(Molecule.RESIDUE_TYPE_RNA)){
+        if ((checkType(Molecule.RESIDUE_TYPE_RNA) && entityInformation.get(String.valueOf(entityID)).get("type").equals("polymer"))) {  // Nucleotides are only parsed as RNA if they are polymers, not if they act as single ligands.
             // >> RNA <<
             // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
             // otherwise, a new RNA molecule is created
@@ -921,8 +921,8 @@ class CifParser {
         }
         
         // If a molecule is not parsed at this point, it has to be a ligand
-        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) ||                                                                                       // if the molecule is categorized as a ligand through chem_comp map
-                (entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer") && ! checkType(Molecule.RESIDUE_TYPE_RNA)) )   // if entity is defined as 'non-polymer' while not being RNA (e.g. free AA)
+        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) ||                                          // if the molecule is categorized as a ligand through chem_comp map
+                (entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer"))) // if entity is defined as 'non-polymer' (e.g. free AA/RNA)
             
         {
             // >> LIG <<

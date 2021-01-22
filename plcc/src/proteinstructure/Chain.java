@@ -77,6 +77,7 @@ public class Chain implements java.io.Serializable {
         return(radiusFromCentroid);
     }
     
+
     public ArrayList<Residue> getResidues() {
         ArrayList<Residue> thisResidues = new ArrayList<>();
         for (Molecule m : this.molecules) {
@@ -97,10 +98,10 @@ public class Chain implements java.io.Serializable {
     
     public ArrayList<Ligand> getAllLigandResidues() {
         ArrayList<Ligand> ligands = new ArrayList<>();     
-        Ligand r = new Ligand();
+        Ligand l = new Ligand();
         for(Molecule m : this.molecules) 
             if(m.isLigand()) {
-                ligands.add(r);
+                ligands.add(l);
             }
         return ligands;
     }
@@ -121,6 +122,21 @@ public class Chain implements java.io.Serializable {
             }
         }
         return AAResidues;
+    }
+    
+    
+    /**
+     * Returns a list of all RNA residues in this chain.
+     * 
+     */
+    public ArrayList<RNA> getAllRnaResidues() {
+        ArrayList<RNA> allRna = new ArrayList<>();     
+        RNA r = new RNA();
+        for(Molecule m : this.molecules) 
+            if(m.isRNA()) {
+                allRna.add(r);
+            }
+        return allRna;
     }
     
     

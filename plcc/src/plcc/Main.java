@@ -2505,7 +2505,7 @@ public class Main {
             if(! silent) {
                 System.out.println("Writing ligand file for residues...");
             }
-            writeLigands(ligandsFile, pdbid, resFromMolecules(molecules));
+            writeLigands(ligandsFile, pdbid, ligandsFromMolecules(molecules));
             
             // write residue mapping files
             if(! silent) {
@@ -3593,7 +3593,7 @@ public class Main {
                         Long chainDbId = DBManager.getDBChainID(pdbid, chain);
                         
                         if(chainDbId >= 1) {
-                            for(Residue ligand : c.getAllLigandResidues()) {
+                            for(Ligand ligand : c.getAllLigandResidues()) {
                                 ligName3Trimmed = ligand.getTrimmedName3();
                                 
                                 // TODO: these 3 lines are not thread-safe, running several plcc instances in parallel may lead to race conditions
@@ -5033,7 +5033,7 @@ public class Main {
     }
     
     
-    private static long calculateSkipNeighborNum(Residue res1, Residue res2, int maxSequenceNeighborDist, int currentSeqPos, int SeqLength) {
+    private static long calculateSkipNeighborNum(Molecule mol1, Molecule mol2, int maxSequenceNeighborDist, int currentSeqPos, int SeqLength) {
         // jnw_2019: following taken from old contact computation and adopted such that maxSeqNeighDist without ligands and within each chain
         //   See there for comments how sequence neigbhor skip works in general (removed here for brevity)
         
@@ -5042,10 +5042,10 @@ public class Main {
             int combinedAtomRadius = 0;
             long spaceBetweenResidues, numResToSkip;
 
-            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
-            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
+            combinedAtomRadius += (mol1.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius"); //TODO: RNA ergänzen?
+            combinedAtomRadius += (mol2.isLigand()) ? Settings.getInteger("plcc_I_lig_atom_radius") : Settings.getInteger("plcc_I_aa_atom_radius");
 
-            spaceBetweenResidues = res1.distTo(res2) - (combinedAtomRadius + res1.getSphereRadius() + res2.getSphereRadius() + justToBeSure);
+            spaceBetweenResidues = mol1.distTo(mol2) - (combinedAtomRadius + mol1.getSphereRadius() + mol2.getSphereRadius() + justToBeSure);
 
             //DEBUG
             /*
@@ -5061,7 +5061,7 @@ public class Main {
                 numResToSkip = spaceBetweenResidues / maxSequenceNeighborDist;
 
                 if(Settings.getInteger("plcc_I_debug_level") >= 2) {
-                    System.out.println("  [DEBUG LV 2] Residue skipping kicked in for DSSP res " + res1.getDsspNum() + ", skipped " + numResToSkip + " residues after " + res2.getDsspNum() + " in distance " + res1.distTo(res2));
+                    System.out.println("  [DEBUG LV 2] Residue skipping kicked in for DSSP res " + mol1.getDsspNum() + ", skipped " + numResToSkip + " residues after " + mol2.getDsspNum() + " in distance " + mol1.distTo(mol2));
                 }
 
                 // preserve correct statistics if skip
@@ -5096,7 +5096,8 @@ public class Main {
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<>();
         Residue res1, res2;
-        //Molecule mol1, mol2;
+        Ligand lig1, lig2;
+        Molecule mol1, mol2;
 
         // variables for statistics
         long numResContactsChecked, numResContactsPossible, numResContactsImpossible, chainSkippedRes, seqNeighSkippedResIntraChain, seqNeighSkippedResInterChain;
@@ -5119,10 +5120,11 @@ public class Main {
                 continue;
             }
             
-            int chainANumberResidues = chainA.getResidues().size();
-            ArrayList<Residue> AAResiduesA = new ArrayList<>();
+            int chainANumberResidues = chainA.getMolecules().size();
+            ArrayList<Molecule> AAResiduesA = new ArrayList<>(); // list for residues and polymeric RNA     TODO: change name
             ArrayList<Ligand> ligResiduesA = new ArrayList<>();
             AAResiduesA.addAll(chainA.getAllAAResidues());
+            AAResiduesA.addAll(chainA.getAllRnaResidues());
             ligResiduesA.addAll(chainA.getAllLigandResidues());
             
             numberResTotal += chainANumberResidues;
@@ -5132,32 +5134,32 @@ public class Main {
             // - - - contacts within chains (incl sequence neighbor skip)  - - -
             //
             // multiple loops: 
-            // 1) res1 = AA
-            //   1.1) res2 = AA -> seq neigh skip
+            // 1) res1 = AA/RNA
+            //   1.1) res2 = AA/RNA -> seq neigh skip
             //   HINT: 1.2) res2 = lig NOT needed (same as Lig-AA, but no skip possible)
-            // 2) res1 = lig
-            //   2.1) res2 = AA -> seq neigh skip
+            // 2) res1 = lig (or single nucleotide RNA which is handled as ligand)
+            //   2.1) res2 = AA/RNA -> seq neigh skip
             //   2.2) res2 = lig -> no skip possible b/c we do not calculate MaxSeqNeighborDist for ligands
             
             // 1)
             for (int i = 0; i < AAResiduesA.size(); i++) {
-                res1 = AAResiduesA.get(i);
+                mol1 = AAResiduesA.get(i);
                 
                 // 1.1)
                 for (int j = i + 1; j < AAResiduesA.size(); j++) {
-                    res2 = AAResiduesA.get(j);
+                    mol2 = AAResiduesA.get(j);
 
                     if(Settings.getInteger("plcc_I_debug_level") >= 1) {
-                        System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 1.1) " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                        System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 1.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                     }
                     
                     numResContactsChecked++;
 
                     // We only need to check on atom level if the center spheres overlap
-                    if (res1.contactPossibleWithMolecule(res2)) {                                        
+                    if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                         numResContactsPossible++;
 
-                        rci = calculateAtomContactsBetweenResidues(res1, res2);
+                        rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                         if( rci != null) {
                             // There were atoms contacts!
                             // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5166,7 +5168,7 @@ public class Main {
                     }
                     else {
                         numResContactsImpossible++;
-                        numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
+                        numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                         j += numResToSkip;
                         seqNeighSkippedResIntraChain += numResToSkip;
                     }
@@ -5177,25 +5179,25 @@ public class Main {
             // can be skipped if plcc_B_write_lig_geolig = false
             if (Settings.getBoolean("plcc_B_write_lig_geolig")) {
                 for (int i = 0; i < ligResiduesA.size(); i++) {
-                    res1 = ligResiduesA.get(i);
+                    mol1 = ligResiduesA.get(i);
                                        
                     // 2.1)
                     // here we have to start at j = 0 b/c it is another list!
                     for (int j = 0; j < AAResiduesA.size(); j++) {
 
-                        res2 = AAResiduesA.get(j);
+                        mol2 = AAResiduesA.get(j);
 
                         if (Settings.getInteger("plcc_I_debug_level") >= 1) {
-                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 2.1) " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 2.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
                         numResContactsChecked++;
 
                         // We only need to check on atom level if the center spheres overlap
-                        if (res1.contactPossibleWithMolecule(res2)) {                                        
+                        if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                             numResContactsPossible++;
 
-                            rci = calculateAtomContactsBetweenResidues(res1, res2);
+                            rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                             if( rci != null) {
                                 // There were atoms contacts!
                                 contactInfo.add(rci);
@@ -5203,7 +5205,7 @@ public class Main {
                         }
                         else {
                             numResContactsImpossible++;
-                            numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
+                            numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                             j += numResToSkip;
                             seqNeighSkippedResIntraChain += numResToSkip;
                         }
@@ -5212,19 +5214,19 @@ public class Main {
                     // 2.2)
                     for(int j = i + 1; j < ligResiduesA.size(); j++) {
 
-                        res2 = ligResiduesA.get(j);
+                        mol2 = ligResiduesA.get(j);
 
                         if(Settings.getInteger("plcc_I_debug_level") >= 1) {
-                            System.out.println("  [DEBUG LV 1] Checking DSSP (loop 2.2) pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                            System.out.println("  [DEBUG LV 1] Checking DSSP (loop 2.2) pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
                         numResContactsChecked++;
 
                         // We only need to check on atom level if the center spheres overlap
-                        if(res1.contactPossibleWithMolecule(res2)) {                                        
+                        if(mol1.contactPossibleWithMolecule(mol1)) {                                        
                             numResContactsPossible++;
 
-                            rci = calculateAtomContactsBetweenResidues(res1, res2);
+                            rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                             if( rci != null) {
                                 // There were atoms contacts!
                                 contactInfo.add(rci);
@@ -5266,15 +5268,15 @@ public class Main {
                 }
                 
                 // vars for possible swapping of inner and outer loop to maximize skips -> only for loop 1.1) b/c we have no maxSeqNeighborDist for ligands!
-                ArrayList<Residue> innerLoopChainAAs = new ArrayList<>();
-                ArrayList<Residue> outerLoopChainAAs = new ArrayList<>();
+                ArrayList<Molecule> innerLoopChainAAs = new ArrayList<>();
+                ArrayList<Molecule> outerLoopChainAAs = new ArrayList<>();
                 int innerChainMaxSeqNeighborAADist;
                 innerChainMaxSeqNeighborAADist = 0;  // value needs to be initialized for Netbeans, just take something small
 
                 // check chain overlap
                 if (chainA.contactPossibleWithChain(chainB)) {
                     ArrayList<Residue> AAResiduesB = new ArrayList<>();
-                    ArrayList<Residue> ligResiduesB = new ArrayList<>();
+                    ArrayList<Ligand> ligResiduesB = new ArrayList<>();
                     AAResiduesB.addAll(chainB.getAllAAResidues());
                     ligResiduesB.addAll(chainB.getAllLigandResidues());
 
@@ -5294,26 +5296,26 @@ public class Main {
                     // 1)
                     for (int i = 0; i < outerLoopChainAAs.size(); i++) {
 
-                        res1 = outerLoopChainAAs.get(i);
+                        mol1 = outerLoopChainAAs.get(i);
                         
                         // 1.1)
                         // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                         for (int j = 0; j < innerLoopChainAAs.size(); j++) {
-                            res2 = innerLoopChainAAs.get(j);
+                            mol2 = innerLoopChainAAs.get(j);
 
                             if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                 if(! silent) {
-                                    System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                    System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                 }
                             }                
 
                             numResContactsChecked++;
 
                             // We only need to check on atom level if the center spheres overlap
-                            if (res1.contactPossibleWithMolecule(res2)) {                                        
+                            if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                 numResContactsPossible++;
 
-                                rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                 if( rci != null) {
                                     // There were atoms contacts!
                                     // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5322,7 +5324,7 @@ public class Main {
                             }
                             else {
                                 numResContactsImpossible++;
-                                numResToSkip = calculateSkipNeighborNum(res1, res2, innerChainMaxSeqNeighborAADist, j, innerLoopChainAAs.size());
+                                numResToSkip = calculateSkipNeighborNum(mol1, mol2, innerChainMaxSeqNeighborAADist, j, innerLoopChainAAs.size());
                                 j += numResToSkip;
                                 seqNeighSkippedResInterChain += numResToSkip;                            
                             }
@@ -5335,27 +5337,27 @@ public class Main {
                         // 2)
                         for (int i = 0; i < ligResiduesA.size(); i++) {
 
-                            res1 = ligResiduesA.get(i);
+                            mol1 = ligResiduesA.get(i);
                             
                             // 2.1)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                             for (int j = 0; j < AAResiduesB.size(); j++) {
 
-                                res2 = AAResiduesB.get(j);
+                                mol2 = AAResiduesB.get(j);
 
                                 if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithMolecule(res2)) {                                        
+                                if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                     numResContactsPossible++;
 
-                                    rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                    rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                     if( rci != null) {
                                         // There were atoms contacts!
                                         // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5364,7 +5366,7 @@ public class Main {
                                 }
                                 else {
                                     numResContactsImpossible++;
-                                    numResToSkip = calculateSkipNeighborNum(res1, res2, chainBMaxSeqNeighborAADist, j, AAResiduesB.size());
+                                    numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainBMaxSeqNeighborAADist, j, AAResiduesB.size());
                                     j += numResToSkip;
                                     seqNeighSkippedResInterChain += numResToSkip;                            
                                 }
@@ -5374,21 +5376,21 @@ public class Main {
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                             for (int j = 0; j < ligResiduesB.size(); j++) {
 
-                                res2 = ligResiduesB.get(j);
+                                mol2 = ligResiduesB.get(j);
 
                                 if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithMolecule(res2)) {                                        
+                                if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                     numResContactsPossible++;
 
-                                    rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                    rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                     if( rci != null) {
                                         // There were atoms contacts!
                                         // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5407,27 +5409,27 @@ public class Main {
                         // HINT: for this nested loop outer and inner are swapped: this way we can profit from the lig-AA skipping
                         for (int i = 0; i < ligResiduesB.size(); i++) {
 
-                            res1 = ligResiduesB.get(i);
+                            mol1 = ligResiduesB.get(i);
 
                             // 3.1)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                             for (int j = 0; j < AAResiduesA.size(); j++) {
 
-                                res2 = AAResiduesA.get(j);
+                                mol2 = AAResiduesA.get(j);
 
                                 if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithMolecule(res2)) {                                        
+                                if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                     numResContactsPossible++;
 
-                                    rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                    rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                     if( rci != null) {
                                         // There were atoms contacts!
                                         // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5436,7 +5438,7 @@ public class Main {
                                 }
                                 else {
                                     numResContactsImpossible++;
-                                    numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
+                                    numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                                     j += numResToSkip;
                                     seqNeighSkippedResInterChain += numResToSkip;                            
                                 }
@@ -10763,11 +10765,11 @@ public class Main {
      * @param pdbid the PDB ID of the current protein
      * @param ligands a list of residues which are expected to be ligands
      */
-    public static void writeLigands(String ligFile, String pdbid, List<Residue> ligands) {
+    public static void writeLigands(String ligFile, String pdbid, List<Ligand> ligands) {
 
         FileWriter ligFW = null;
         PrintWriter ligFH = null;
-        Residue r = null;
+        Ligand r = null;
 
         // open files
         try {
@@ -13697,6 +13699,28 @@ public class Main {
             }
         }
         return residues;
+    }
+    
+    
+        /**
+     * Retrieves a list of all ligands from a list of molecules.
+     * @param molecules ArrayList of Molecule
+     * @return ArrayList of Ligands
+     */
+    private static ArrayList<Ligand> ligandsFromMolecules(ArrayList<Molecule> molecules) {
+        if (ligands == null) {
+            ligands = new ArrayList<>();
+            for (Molecule m : molecules) {
+                if (m instanceof Ligand) {
+                    ligands.add((Ligand) m);
+                }
+            }
+            // check if empty
+            if (ligands.isEmpty()) {
+                System.out.println("Detected no ligands within molecules when first called resFromMolecules. Program will rely on that from now on.");
+            }
+        }
+        return ligands;
     }
     
     
