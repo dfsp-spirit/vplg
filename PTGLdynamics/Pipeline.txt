@@ -1,0 +1,40 @@
+1.) Pre-processing of file in PDB file format
+The python script pdbHandler.py converts files in legacy PDB file format.
+To add a COMPND part as header
+	-uncomment row ...
+	-add 'COMPND.txt' with respective COMPND part
+
+PTGL can identify molecule names due to the COMND part of the protein.
+Node in GML of CG file generated with COMPND.txt as input  
+	node [
+		id 0
+		label "1"
+		mol_name "NADH-QUINONE OXIDOREDUCTASE SUBUNIT 1"
+	]
+
+and without COMPND part
+
+	node [
+		id 0
+		label "A"
+		mol_name ""
+	]
+Files in PDB file format(, COMPND.txt) and pdbHandler.py have to be in the ame directory. 
+pdbHandler.py changes all files with the ending .pdb in the same directory.
+
+
+2.) Generate DSSP file with DSSP program:
+Only executable on Linux environment !
+command:
+./dsspcmbi pdbfilename.pdb > pdbfilename.dssp
+
+
+3.) Analysis of Complex graphs (CGs)
+GML expects two CGs as input and generates a CSV file with the differences of the edge weights. 
+Then, the edges that are either present in the first graph but not in the second graph and vice versa 
+are listed. If both graphs have identical edges, they have the same connectivity and show no structural 
+change.
+command:
+python GML_compare_edge_weights_and_subsets.py path_to_CG1 path_to_CG2
+
+optional [4.) Analysis of Protein graphs (PGs)]
