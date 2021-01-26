@@ -2299,11 +2299,11 @@ public class Main {
             if (! Settings.getBoolean("plcc_B_include_rna")) {
                 // RNA off
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
-                        " Residues, " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountLig + " Ligand Atoms)).");
+                        " Molecules (" + resFromMolecules(molecules).size() + " Residues, " + ligandsFromMolecules(molecules).size() + " Ligands, " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountLig + " Ligand Atoms)).");
             } else {
                 // RNA on
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
-                        " Molecules (" + resFromMolecules(molecules).size() + " Residues and " + rnaFromMolecules(molecules).size() +
+                        " Molecules (" + resFromMolecules(molecules).size() + " Residues, " + ligandsFromMolecules(molecules).size() + " Ligands and " + rnaFromMolecules(molecules).size() +
                         " RNAs), " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountRna + " RNA Atoms, " + atomCountLig + " Ligand Atoms)).");
             }
         }
@@ -5217,6 +5217,7 @@ public class Main {
                         mol2 = ligResiduesA.get(j);
 
                         if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                            
                             System.out.println("  [DEBUG LV 1] Checking DSSP (loop 2.2) pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
@@ -5260,7 +5261,7 @@ public class Main {
             for (int l = k + 1; l < chainCount; l++) {
                 
                 chainB = chains.get(l);
-                int chainBNumberResidues = chainB.getResidues().size();
+                int chainBNumberResidues = chainB.getMolecules().size();
                 
                 // skip chain if no (protein) atoms in it
                 if (chainB.getRadiusFromCentroid() == -1) {
@@ -5275,9 +5276,10 @@ public class Main {
 
                 // check chain overlap
                 if (chainA.contactPossibleWithChain(chainB)) {
-                    ArrayList<Residue> AAResiduesB = new ArrayList<>();
+                    ArrayList<Molecule> AAResiduesB = new ArrayList<>();
                     ArrayList<Ligand> ligResiduesB = new ArrayList<>();
                     AAResiduesB.addAll(chainB.getAllAAResidues());
+                    AAResiduesB.addAll(chainB.getAllRnaResidues());
                     ligResiduesB.addAll(chainB.getAllLigandResidues());
 
                     Integer chainBMaxSeqNeighborAADist = chainB.getMaxSeqNeighborAADist();
@@ -5305,6 +5307,7 @@ public class Main {
 
                             if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                 if(! silent) {
+                                    System.out.println("efg mol1 " + mol1.toString()); //TODELETE
                                     System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                 }
                             }                

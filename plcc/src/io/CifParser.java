@@ -892,6 +892,7 @@ class CifParser {
                 rna.setEntityID(entityID);
                 
                 lastMol = rna;
+                //tmpChain.addMolecule(lastMol);
                                 
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
                     // RNA chains can contain ligands that should be ignored such as water
@@ -915,7 +916,7 @@ class CifParser {
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
-                    DP.getInstance().d("New RNA molecule named " + molNamePDB + " added in PDB line " + molNumPDB + " to chain " + chainID + ".");
+                    DP.getInstance().d("New RNA molecule named " + molNamePDB + ", DSSPNumber " + rna.getDsspNum() + ", added in PDB line " + molNumPDB + " to chain " + chainID + ".");
                 }
             }       
         }
@@ -1037,7 +1038,7 @@ class CifParser {
         
             if (lastMol.getType() == Molecule.RESIDUE_TYPE_AA || lastMol.getType() == Molecule.RESIDUE_TYPE_RNA){
                 if (lastMol == null) {
-                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                    DP.getInstance().w("Molecule with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
                 } else {
                     if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {

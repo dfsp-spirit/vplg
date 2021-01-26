@@ -26,7 +26,7 @@ public class Chain implements java.io.Serializable {
     // declare class vars
     private String pdbChainID = null;                // author chain ID from PDB file
     private String altChainID = null;               // alternative chain ID from DSSP file
-    private ArrayList<Molecule> molecules = null;      // a list of all Molecules of the Chain
+    private ArrayList<Molecule> molecules = new ArrayList<>();      // a list of all Molecules of the Chain
     private String macromolID = null;                // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
     private String macromolName = null;              // the macromol name from the PDB file
     private String modelID = null;
@@ -112,6 +112,7 @@ public class Chain implements java.io.Serializable {
         Ligand l = new Ligand();
         for(Molecule m : this.molecules) 
             if(m.isLigand()) {
+                l = (Ligand) m;
                 ligands.add(l);
             }
         return ligands;
@@ -145,6 +146,7 @@ public class Chain implements java.io.Serializable {
         RNA r = new RNA();
         for(Molecule m : this.molecules) 
             if(m.isRNA()) {
+                r = (RNA) m;
                 allRna.add(r);
             }
         return allRna;
