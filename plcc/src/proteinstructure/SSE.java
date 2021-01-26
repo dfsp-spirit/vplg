@@ -81,6 +81,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     private Integer sseSeqChainNum = null;         // 
     private String sseType = null;
     private ArrayList<Residue> residues = null;
+    private ArrayList<Molecule> molecules = null;
     private Chain chain = null;
     private Integer seqSseNumDssp = null;
     private String betaSheetLabel = null;
@@ -125,6 +126,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     private void initDatastructures() {
         residues = new ArrayList<>();
+        molecules = new ArrayList<>();
     }
     
     
@@ -133,7 +135,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         Integer[] startPoint = {0,0,0};
         Integer[] endPoint = {0,0,0};
         
-        if (residues.isEmpty()) {
+        if (molecules.isEmpty()) {
             DP.getInstance().w("Tried to compute vector for orientation of an SSE without residue: " + this.toString() + ". "
                     + "Returning zero vector and trying to proceed.");
             orientationVector[0] = orientationVector[1] = orientationVector[2] = 0;
@@ -146,8 +148,8 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         // compute start and end point with respect to the number of residues contributing to each
         // 1) sum up values
         for (int i = 0; i < numResForCentroid; i++) {            
-            startPoint = tools.MathTools.elementWiseSum(startPoint, this.getResidues().get(0 + i).getBackboneCentroidCoords());
-            endPoint = tools.MathTools.elementWiseSum(endPoint, this.getResidues().get(this.getResidues().size() - 1 - i).getBackboneCentroidCoords());
+            startPoint = tools.MathTools.elementWiseSum(startPoint, this.getMolecules().get(0 + i).getBackboneCentroidCoords());
+            endPoint = tools.MathTools.elementWiseSum(endPoint, this.getMolecules().get(this.getMolecules().size() - 1 - i).getBackboneCentroidCoords());
         }
         
         // 2) divide values by number of residues and round
@@ -365,13 +367,14 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     /** Returns the DSSP SSEType string of this SSE. This is a single character, e.g., "T" for turn, "H" for an alpha helix. */
     public String getSseType() { return(sseType); }
     public ArrayList<Residue> getResidues() { return(residues); }
+    public ArrayList<Molecule> getMolecules() { return(molecules);}
     public Chain getChain() { return(chain); }
     
     /**
      * Returns the length of this SSE in residues.
      * @return The number of residues this SSE consists of
      */
-    public Integer getLength() { return(residues.size()); }
+    public Integer getLength() { return(molecules.size()); }
     
     public Integer getSeqSseNumDssp() { return(seqSseNumDssp); }
 
@@ -383,9 +386,14 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         StringBuilder seq = new StringBuilder();
 
         Residue r;
-        for(Integer i = 0; i < this.residues.size(); i++) {
-            r = this.residues.get(i);
-            seq.append(r.getAAName1());
+        for(Integer i = 0; i < this.molecules.size(); i++) {
+            if (this.molecules.get(i).isAA()){
+                r = (Residue) this.molecules.get(i);
+                seq.append(r.getAAName1());
+            }
+            else {
+                System.out.println("    [WARNING] Requested AA-Sequence of non-AA Molecule. Trying to continue.");
+            }
         }
 
         return(seq.toString());
@@ -399,9 +407,14 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         StringBuilder chemProps = new StringBuilder();
 
         Residue r;
-        for(Integer i = 0; i < this.residues.size(); i++) {
-            r = this.residues.get(i);
-            chemProps.append(r.getChemicalProperty5OneLetterString());
+        for(Integer i = 0; i < this.molecules.size(); i++) {
+            if (this.molecules.get(i).isAA()){
+                r = (Residue) this.molecules.get(i);
+                chemProps.append(r.getChemicalProperty5OneLetterString());
+            }
+            else {
+                System.out.println("    [WARNING] Requested AA-properties of non-AA Molecule. Trying to continue.");
+            }
         }
 
         return(chemProps.toString());
@@ -415,9 +428,14 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         StringBuilder chemProps = new StringBuilder();
 
         Residue r;
-        for(Integer i = 0; i < this.residues.size(); i++) {
-            r = this.residues.get(i);
-            chemProps.append(r.getChemicalProperty3OneLetterString());
+        for(Integer i = 0; i < this.molecules.size(); i++) {
+            if (this.molecules.get(i).isAA()){
+                r = (Residue) this.molecules.get(i);
+                chemProps.append(r.getChemicalProperty3OneLetterString());
+            }
+            else {
+                System.out.println("    [WARNING] Requested AA-properties of non-AA Molecule. Trying to continue.");
+            }
         }
 
         return(chemProps.toString());
@@ -431,8 +449,8 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public Position3D getCentralAtomPosition() {
         if(this.isLigandSSE()) {
             // this is a ligand
-            if(this.residues.size() > 0) {
-                return this.residues.get(0).getCenterAtom().getPosition3D();
+            if(this.molecules.size() > 0) {
+                return this.molecules.get(0).getCenterAtom().getPosition3D();
             }
             else {
                 return null;
@@ -443,8 +461,8 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             // First get all CA atoms.
             ArrayList<Atom> alphaCarbons = new ArrayList<Atom>();
             Atom ca;
-            for(Residue r : this.residues) {
-                ca = r.getAlphaCarbonAtom();
+            for(Molecule m : this.molecules) {
+                ca = m.getAlphaCarbonAtom();
                 if(ca != null) { 
                     alphaCarbons.add(ca);
                 }
@@ -453,9 +471,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             // now determine the central one
             if(alphaCarbons.isEmpty()) {
                 // no alpha carbons -- just return some Atom if there are any
-                if(this.residues.size() > 0) {
-                    if(this.residues.get(0).getAtoms().size() > 0) {
-                        return this.residues.get(0).getAtoms().get(0).getPosition3D();
+                if(this.molecules.size() > 0) {
+                    if(this.molecules.get(0).getAtoms().size() > 0) {
+                        return this.molecules.get(0).getAtoms().get(0).getPosition3D();
                     }
                 }
             } else {
@@ -474,9 +492,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * @return whether this SSE currently has at least one residue with at least one atom
      */
     public boolean hasResidueWithAtoms() {
-        if(this.residues.size() > 0) {
-            for(Residue r : this.residues) {
-                if(r.hasAtoms()) {
+        if(this.molecules.size() > 0) {
+            for(Molecule m : this.molecules) {
+                if(m.hasAtoms()) {
                     return true;
                 }
             }
@@ -486,7 +504,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
 
     @Override public String toString() {
-        return("[" + sseType + ":DSSP:" + this.getStartResidue().getDsspNum() + "-" + this.getEndResidue().getDsspNum() + ",PDB:" + this.getStartResidue().getUniquePDBName() + "-" + this.getEndResidue().getUniquePDBName() +"]");
+        return("[" + sseType + ":DSSP:" + this.getStartMolecule().getDsspNum() + "-" + this.getEndMolecule().getDsspNum() + ",PDB:" + this.getStartMolecule().getUniquePDBName() + "-" + this.getEndMolecule().getUniquePDBName() +"]");
     }
     
     /**
@@ -502,7 +520,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * @return a string representation of this SSE object.
      */
     public String longStringRep() {
-        return("[SSE] # " + seqSseNumDssp + ", type " + sseType + ", DSSP residues " + this.getStartResidue().getDsspNum() + ".." + this.getEndResidue().getDsspNum() + " (length " + this.getLength() + "), sequence='" + this.getAASequence() + "'");
+        return("[SSE] # " + seqSseNumDssp + ", type " + sseType + ", DSSP residues " + this.getStartMolecule().getDsspNum() + ".." + this.getEndMolecule().getDsspNum() + " (length " + this.getLength() + "), sequence='" + this.getAASequence() + "'");
     }
 
     /**
@@ -547,6 +565,37 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
         return(startRes);
     }
+    
+    
+        public Molecule getStartMolecule() {
+
+        if(molecules.size() < 1) {
+            System.err.println("ERROR: Empty SSE '" + sseIDPtgl + "' has no start. Check size before asking.");
+            return null;
+        }
+
+        Integer minResNumDssp = MAX_RES;
+        Molecule startMol = null;
+
+        Molecule m;
+        for(Integer i = 0; i < molecules.size(); i++) {
+
+            m = molecules.get(i);
+
+            if(m.getDsspNum() < minResNumDssp) {
+
+                minResNumDssp = m.getDsspNum();
+                startMol = m;
+            }
+        }
+
+        if(startMol == null || minResNumDssp == MAX_RES) {
+            System.err.println("ERROR: Could not determine start residue of non-empty SSE '" + sseIDPtgl + "' with length " + this.molecules.size() + ".");
+            return null;
+        }
+
+        return(startMol);
+    }
 
     /**
      * Determines the DSSP residue number of the first residue in this SSE. You have to make sure
@@ -555,19 +604,19 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * @return The DSSP residue number of the first residue of this SSE.
      */
     public Integer getStartDsspNum() {
-        Residue r = this.getStartResidue();
-        if(r == null) {
-            DP.getInstance().w("SSE", "getStartDsspNum(): This SSE has no residues.");
+        Molecule m = this.getStartMolecule();
+        if(m == null) {
+            DP.getInstance().w("SSE", "getStartDsspNum(): This SSE has no molecules.");
             return 0;
         }
-        return(r.getDsspNum());
+        return(m.getDsspNum());
     }
 
     /**
      * Returns a unique String identifying the first residue of this SSE in the PDB file.
      */
     public String getStartPdbResID() {
-        return(this.getStartResidue().getUniquePDBName());
+        return(this.getStartMolecule().getUniquePDBName());
     }
 
     /**
@@ -576,10 +625,10 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      */
     public String getAllPdbResiduesString(String separator) {
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < this.residues.size(); i++) {
-            Residue r = this.residues.get(i);
-            sb.append(r.getUniquePDBName());
-            if(i < this.residues.size() - 1) {
+        for(int i = 0; i < this.molecules.size(); i++) {
+            Molecule m = this.molecules.get(i);
+            sb.append(m.getUniquePDBName());
+            if(i < this.molecules.size() - 1) {
                 sb.append(separator);
             }
         }
@@ -590,7 +639,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * Returns a unique String identifying the last residue of this SSE in the PDB file.
      */
     public String getEndPdbResID() {
-        return(this.getEndResidue().getUniquePDBName());
+        return(this.getEndMolecule().getUniquePDBName());
     }
 
     /**
@@ -600,12 +649,12 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * @return The DSSP residue number of the last residue of this SSE.
      */
     public Integer getEndDsspNum() {
-        Residue r = this.getEndResidue();
-        if(r == null) {
+        Molecule m = this.getEndMolecule();
+        if(m == null) {
             DP.getInstance().w("SSE", "getEndDsspNum(): This SSE has no residues.");
             return 0;
         }
-        return(r.getDsspNum());
+        return(m.getDsspNum());
     }
     
     /**
@@ -619,8 +668,8 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             return("");
         }
         
-        if(this.residues.size() > 0) {
-            return(this.residues.get(0).getName3());
+        if(this.molecules.size() > 0) {
+            return(this.molecules.get(0).getName3());
         }
         else {
             return("");
@@ -638,8 +687,8 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
             return("");
         }
         
-        if(this.residues.size() > 0) {
-            return(this.residues.get(0).getTrimmedName3());
+        if(this.molecules.size() > 0) {
+            return(this.molecules.get(0).getTrimmedName3());
         }
         else {
             return("");
@@ -679,6 +728,37 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
         return(endRes);
     }
+    
+    
+    public Molecule getEndMolecule() {
+
+        if(molecules.size() < 1) {
+            System.err.println("ERROR: Empty SSE '" + sseIDPtgl + "' has no end residue. Check size before asking.");
+            System.exit(-1);
+        }
+
+        Integer maxResNumDssp = -1;
+        Molecule endMol = null;
+
+        Molecule m;
+        for(Integer i = 0; i < molecules.size(); i++) {
+
+            m = molecules.get(i);
+
+            if(m.getDsspNum() > maxResNumDssp) {
+
+                maxResNumDssp = m.getDsspNum();
+                endMol = m;
+            }
+        }
+
+        if(endMol == null || maxResNumDssp == -1) {
+            System.err.println("ERROR: Could not determine end residue of non-empty SSE '" + sseIDPtgl + "' with length " + this.molecules.size() + ".");
+            System.exit(1);
+        }
+
+        return(endMol);
+    }
 
     // setters
     public void setSseIDPtgl(String sID) { this.sseIDPtgl = sID; }
@@ -701,6 +781,14 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         r.setSSETypePlcc(this.getPLCCSSELabel());
     }
     
+    public void addMolecule(Molecule m) { 
+        if(m == null) {
+            throw new IllegalArgumentException("Molecule must not be null.");
+        }
+        this.molecules.add(m); 
+        m.setSSETypePlcc(this.getPLCCSSELabel());
+    }
+    
     public void setChain(Chain c) { this.chain = c; }
     public void setSeqSseNumDssp(Integer s) { this.seqSseNumDssp = s; }
     
@@ -709,9 +797,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      */
     public void setSeqSseChainNum(Integer s) { this.sseSeqChainNum = s; }
 
-    public void addResiduesAtStart(ArrayList<Residue> rl) {
+    public void addResiduesAtStart(ArrayList<Molecule> rl) {
         
-        ArrayList<Residue> rearrangedResidues = new ArrayList<>();
+        ArrayList<Molecule> rearrangedResidues = new ArrayList<>();
   
         // new first residues
         for (Integer i = 0; i < rl.size(); i++) {
@@ -719,11 +807,11 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         }
         
         // old residues
-        for (int i = 0; i < residues.size(); i++) {
-            rearrangedResidues.add(residues.get(i));
+        for (int i = 0; i < molecules.size(); i++) {
+            rearrangedResidues.add(molecules.get(i));
         }
         
-        residues = rearrangedResidues;
+        molecules = rearrangedResidues;
     }
     
     

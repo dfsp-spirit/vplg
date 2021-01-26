@@ -3647,7 +3647,7 @@ public class Main {
                 printSSEList(chainPtglSSEs, "PTGL");
             }
             
-            chainLigSSEs = createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
+            chainLigSSEs = createAllLigandSSEsFromResidueList(c.getLigands(), chainDsspSSEs);
             allChainSSEs = mergeSSEs(chainPtglSSEs, chainLigSSEs);
             if(! silent) {
                 System.out.println("    Added " + chainLigSSEs.size() + " ligand SSEs to the SSE list, now at " + allChainSSEs.size() + " SSEs.");
@@ -12368,7 +12368,7 @@ public class Main {
                     //System.out.println("      Created new SSE.");
 
                     // set SSE properties
-                    curSSE.addResidue(curResidue);
+                    curSSE.addMolecule(curResidue);
                     curSSE.setSeqSseNumDssp(dsspSSElist.size() + 1);
                     curSSE.setSseType(curResidue.getSSEString());
 
@@ -12402,7 +12402,7 @@ public class Main {
                     // This is a valid SSE according to DSSP
                     curResidue.setSSE(curSSE);
                     curResidue.setDsspSseState(true);
-                    curSSE.addResidue(curResidue);
+                    curSSE.addMolecule(curResidue);
                     //System.out.println("      Residue " + curResidue.getFancyName() + " added to an existing SSE.");
                 }
                 else {
@@ -12451,10 +12451,10 @@ public class Main {
      * @param dsspSSElist the list of all SSEs according to DSSP definition
      * @return a list of all ligand SSEs that are created from the ligand residues in the residue list.
      */
-    private static List<SSE> createAllLigandSSEsFromResidueList(List<Residue> resList, List<SSE> dsspSSElist) {
+    private static List<SSE> createAllLigandSSEsFromResidueList(List<Ligand> resList, List<SSE> dsspSSElist) {
         
         List<SSE> ligSSElist = new ArrayList<SSE>();
-        Residue r;
+        Ligand r;
         SSE s;
         Integer ligSSECount = 1;
         
@@ -12500,7 +12500,7 @@ public class Main {
                 s = new SSE(SSE.SSECLASS_STRING_LIGAND);
 
                 // set SSE properties
-                s.addResidue(r);
+                s.addMolecule(r);
                 s.setSeqSseNumDssp(dsspSSElist.size() + ligSSECount);
                 s.setSseType(SSE.SSECLASS_STRING_LIGAND);
                 s.setChain(r.getChain());
@@ -12610,7 +12610,7 @@ public class Main {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
                                 //curSSE.addResidues(nextSSE.getResidues());
-                                nextSSE.addResiduesAtStart(curSSE.getResidues());
+                                nextSSE.addResiduesAtStart(curSSE.getMolecules());
                                 currentSSEmergedIntoNext = true;
                                 //i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
                             }                                                                                    
@@ -12691,8 +12691,8 @@ public class Main {
                     }
                     
                     //add residues
-                    newSSE.addResiduesAtStart(curSSE.getResidues());
-                    newSSE.addResiduesAtStart(nextSSE.getResidues());
+                    newSSE.addResiduesAtStart(curSSE.getMolecules());
+                    newSSE.addResiduesAtStart(nextSSE.getMolecules());
                     
                     //set new sequential number of the SSE
                     newSSE.setSeqSseNumDssp(newList.size() + 1);
@@ -13154,7 +13154,7 @@ public class Main {
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
             
-            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
+            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getLigands(), chainDsspSSEs);
             oneChainSSEs = mergeSSEs(oneChainSSEs, chainLigSSEs);
 
             /*

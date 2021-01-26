@@ -88,6 +88,17 @@ public class Chain implements java.io.Serializable {
         return thisResidues;
     }
     
+    
+    public ArrayList<Ligand> getLigands() {
+        ArrayList<Ligand> thisLigands = new ArrayList<>();
+        for (Molecule m : this.molecules) {
+            if (m instanceof Ligand) {
+                thisLigands.add((Ligand) m);
+            }
+        }
+        return thisLigands;
+    }
+    
     /**
      * Returns a list of all ligand residues in this chain.
      * @return a list of all ligand residues in this chain

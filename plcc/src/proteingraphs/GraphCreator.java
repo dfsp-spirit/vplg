@@ -263,7 +263,7 @@ public class GraphCreator {
             r.setAAName1("A");
             r.setChainID("A");
             r.setiCode("");
-            sse.addResidue(r);
+            sse.addMolecule(r);
             if(vClass.equals(SSE.SSECLASS_LIGAND)) {
                 r.setName3("LIG");
             }

@@ -321,8 +321,8 @@ public class ContactMatrix {
     public Integer getSSEPosOfDsspResidue(Integer dsspResNum) {
         Integer pos = -1;
 
-        for(Integer i = 0; i < this.sseList.size(); i++) {            
-            if( (this.sseList.get(i).getStartResidue().getDsspNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspNum() >= dsspResNum)  ) {
+        for(Integer i = 0; i < this.sseList.size(); i++) { 
+            if( (this.sseList.get(i).getStartMolecule().getDsspNum() <= dsspResNum) && (this.sseList.get(i).getEndMolecule().getDsspNum() >= dsspResNum)  ) {
                 //System.out.println("   +DSSP Residue " + dsspResNum + " is part of SSE #" + i + ": " + this.sseList.get(i).shortStringRep() + ".");
                 return(i);
                 }            

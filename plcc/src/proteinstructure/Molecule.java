@@ -672,5 +672,21 @@ abstract public class Molecule {
             return(true);
         }
     }
+    
+    
+        /**
+     * Returns the C alpha atoms of this residue or null if it has none.
+     * @return the alpha carbon or null 
+     */
+    public Atom getAlphaCarbonAtom() {
+        if(this.isAA()) {
+            for(Atom a : this.atoms) {
+                if(a.isCalphaAtom()) {
+                    return a;
+                }
+            }
+        }
+        return null;
+    }
    
 }

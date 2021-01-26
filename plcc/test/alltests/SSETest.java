@@ -61,7 +61,7 @@ public class SSETest extends TestCase {
 
         try {
             // This call should throw an exception
-            sse_helix.addResidue(null);
+            sse_helix.addMolecule(null);
 
             fail("Did not throw exception when passing NULL residue.");
         }
