@@ -385,15 +385,15 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public String getAASequence() {
         StringBuilder seq = new StringBuilder();
 
-        Residue r;
+        Molecule m;
         for(Integer i = 0; i < this.molecules.size(); i++) {
-            if (this.molecules.get(i).isAA()){
-                r = (Residue) this.molecules.get(i);
-                seq.append(r.getAAName1());
-            }
-            else {
-                System.out.println("    [WARNING] Requested AA-Sequence of non-AA Molecule. Trying to continue.");
-            }
+//            if (this.molecules.get(i).isAA()){
+                m = this.molecules.get(i);
+                seq.append(m.getAAName1());
+//            }
+//            else {
+//                System.out.println("    [WARNING] Requested AA-Sequence of non-AA Molecule. Trying to continue.");
+//            }
         }
 
         return(seq.toString());
