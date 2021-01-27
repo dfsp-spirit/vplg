@@ -5307,7 +5307,6 @@ public class Main {
 
                             if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                 if(! silent) {
-                                    System.out.println("efg mol1 " + mol1.toString()); //TODELETE
                                     System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                 }
                             }                

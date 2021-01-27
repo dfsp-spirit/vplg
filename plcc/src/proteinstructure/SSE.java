@@ -380,20 +380,15 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
     /**
      * Returns the amino acid sequence of this SSE, determined from the 1-letter-code names of its residues.
-     * @return the amino acid sequence of this SSE
+     * @return the amino acid sequence of this SSE including code for ligands
      */
     public String getAASequence() {
         StringBuilder seq = new StringBuilder();
 
         Molecule m;
         for(Integer i = 0; i < this.molecules.size(); i++) {
-//            if (this.molecules.get(i).isAA()){
                 m = this.molecules.get(i);
                 seq.append(m.getAAName1());
-//            }
-//            else {
-//                System.out.println("    [WARNING] Requested AA-Sequence of non-AA Molecule. Trying to continue.");
-//            }
         }
 
         return(seq.toString());
@@ -408,13 +403,13 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
         Residue r;
         for(Integer i = 0; i < this.molecules.size(); i++) {
-            if (this.molecules.get(i).isAA()){
+//            if (this.molecules.get(i).isAA()){
                 r = (Residue) this.molecules.get(i);
                 chemProps.append(r.getChemicalProperty5OneLetterString());
-            }
-            else {
-                System.out.println("    [WARNING] Requested AA-properties of non-AA Molecule. Trying to continue.");
-            }
+//            }
+//            else {
+//                System.out.println("    [WARNING] Requested AA-properties of non-AA Molecule. Trying to continue.");
+//            }
         }
 
         return(chemProps.toString());
@@ -429,13 +424,13 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
         Residue r;
         for(Integer i = 0; i < this.molecules.size(); i++) {
-            if (this.molecules.get(i).isAA()){
+//            if (this.molecules.get(i).isAA()){
                 r = (Residue) this.molecules.get(i);
                 chemProps.append(r.getChemicalProperty3OneLetterString());
-            }
-            else {
-                System.out.println("    [WARNING] Requested AA-properties of non-AA Molecule. Trying to continue.");
-            }
+//            }
+//            else {
+//                System.out.println("    [WARNING] Requested AA-properties of non-AA Molecule. Trying to continue.");
+//            }
         }
 
         return(chemProps.toString());
