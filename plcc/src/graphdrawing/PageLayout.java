@@ -325,7 +325,7 @@ public class PageLayout {
      * Calculates the Width and Height of the Footer Area considering the Molecule Names.
      * @param vertLabels Molecule Names for all vertices
      */
-    public ArrayList getFooterOutline(ArrayList<String> vertLabels){
+    public ArrayList<Integer> getFooterOutline(ArrayList<String> vertLabels){
         ArrayList<Integer> x_y_values = new ArrayList<Integer>();
         x_y_values.add(0);
         x_y_values.add(0);
