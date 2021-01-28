@@ -626,7 +626,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     }
     
     /**
-     * Creates a simple text represenation of the graph used by the FANMOD software and also maps the indices from the standard AAGraph to this simple representation.
+     * Creates a simple text representation of the graph used by the FANMOD software and also maps the indices from the standard AAGraph to this simple representation.
      * The standard AAGraph format does not suit the required input format for the FANMOD software. (See: http://theinf1.informatik.uni-jena.de/~wernicke/motifs/fanmod-manual.pdf
      * for more details)
      * This will also return a string that maps the index a vertex has in the standard AAGraph format to the index the vertex now has in the simple representation.

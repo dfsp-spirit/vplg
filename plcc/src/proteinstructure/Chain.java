@@ -77,7 +77,10 @@ public class Chain implements java.io.Serializable {
         return(radiusFromCentroid);
     }
     
-
+    /**
+     * Returns all molecules of class Residue belonging to this chain.
+     * @return ArrayList of residues
+     */
     public ArrayList<Residue> getResidues() {
         ArrayList<Residue> thisResidues = new ArrayList<>();
         for (Molecule m : this.molecules) {
@@ -105,8 +108,6 @@ public class Chain implements java.io.Serializable {
      * First checks if this molecule is empty and if this molecule is an Instance of RNA 
      * For this method we need to convert the molecule object into a residue object 
      */
-    
-    
     public ArrayList<Ligand> getAllLigandResidues() {
         ArrayList<Ligand> ligands = new ArrayList<>();     
         Ligand l = new Ligand();
@@ -353,7 +354,7 @@ public class Chain implements java.io.Serializable {
     }
     
     /**
-     * This function determines whether we need to look at the residues to check for contacts betweens
+     * This function determines whether we need to look at the residues to check for contacts between
      * this chain and another one. If the center spheres don't overlap, there cannot exist any atom contacts.
      * @param c Chain: the other chain
      * @return Bool: if spheres overlap
