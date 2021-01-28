@@ -916,7 +916,11 @@ class CifParser {
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
-                    DP.getInstance().d("New RNA molecule named " + molNamePDB + ", DSSPNumber " + rna.getDsspNum() + ", added in PDB line " + molNumPDB + " to chain " + chainID + ".");
+                    if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                        if(! silent) {
+                            DP.getInstance().d("New RNA molecule named " + molNamePDB + ", DSSPNumber " + rna.getDsspNum() + ", added in PDB line " + molNumPDB + " to chain " + chainID + ".");
+                        }
+                    }
                 }
             }       
         }

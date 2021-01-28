@@ -69,7 +69,9 @@ public class Atom implements java.io.Serializable {
     public Boolean isLigandAtom() { return this.type == ATOMTYPE_LIGAND; }
     public Boolean isProteinAtom() { return this.type == ATOMTYPE_AA; }
     public Boolean isOtherAtom() { return this.type == ATOMTYPE_IGNORED_LIGAND; }
-    public Boolean isRNA() {return this.type == ATOMTYPE_RNA;}
+    public Boolean isRnaAtom() { return this.type == ATOMTYPE_RNA; }
+    
+    public Boolean isProteinOrRnaAtom() { return (this.type == ATOMTYPE_AA || this.type == ATOMTYPE_RNA); }
 
     
     
@@ -168,19 +170,26 @@ public class Atom implements java.io.Serializable {
         
         Integer radProt = Settings.getInteger("plcc_I_aa_atom_radius");
         Integer radLig = Settings.getInteger("plcc_I_lig_atom_radius");
+        Integer radRna = Settings.getInteger("plcc_I_rna_atom_radius");
 
-        if(this.isLigandAtom()) {
-            atomRadiusThis = radLig;
-        }
-        else {
+        if(this.isProteinAtom()) {
             atomRadiusThis = radProt;
         }
-        
-        if(a.isLigandAtom()) {
-            atomRadiusOther = radLig;
+        else if (this.isRnaAtom()) {
+            atomRadiusThis = radRna;
         }
         else {
+            atomRadiusThis = radLig;
+        }
+        
+        if(a.isProteinAtom()) {
             atomRadiusOther = radProt;
+        }
+        else if (a.isRnaAtom()) {
+            atomRadiusOther = radRna;
+        }
+        else {
+            atomRadiusOther = radLig;
         }
 
 

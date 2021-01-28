@@ -138,13 +138,13 @@ public class Main {
     
     /** The number of different contact types which are stored for a pair of residues. See calculateAtomContactsBetweenResidues() and
      the MolContactInfo class for details and usage. */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 12;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 15;
     
     /**
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the MolContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 41;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 44;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -2287,7 +2287,7 @@ public class Main {
             if (a.isProteinAtom()){
                 atomCountRes += 1;
             }
-            if (a.isRNA()){
+            if (a.isRnaAtom()){
                 atomCountRna += 1;
             }
             if (a.isLigandAtom()){
@@ -5824,6 +5824,7 @@ public class Main {
 
 
         Integer numTotalLigContactsPair = 0;
+        Integer numTotalRnaContactsPair = 0;
 
 
 
@@ -6090,8 +6091,50 @@ public class Main {
                             contactAtomNumInResidueA[MolContactInfo.LL] = i;
                             contactAtomNumInResidueB[MolContactInfo.LL] = j;
                         }
-                        
+                                              
 
+                    }
+                    else if((x.isRnaAtom() && y.isProteinAtom()) || (x.isRnaAtom() && y.isLigandAtom())) {
+                        // *************************** RNA - X contact *************************
+                        numTotalRnaContactsPair++;
+                        
+                        // this is an RNA - X contact (X can be protein or ligand)
+                        numPairContacts[MolContactInfo.RX]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[MolContactInfo.RX] < 0) || dist < minContactDistances[MolContactInfo.RX]) {
+                            minContactDistances[MolContactInfo.RX] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.RX] = i;
+                            contactAtomNumInResidueB[MolContactInfo.RX] = j;
+                        }
+                    }
+                    else if((x.isProteinAtom() && y.isRnaAtom()) || (x.isLigandAtom() && y.isRnaAtom())) {
+                        // *************************** X - RNA contact *************************
+                        numTotalRnaContactsPair++;
+                           
+                        // this is an X - RNA contact (X can be protein or ligand)
+                        numPairContacts[MolContactInfo.XR]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[MolContactInfo.XR] < 0) || dist < minContactDistances[MolContactInfo.XR]) {
+                            minContactDistances[MolContactInfo.XR] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.XR] = i;
+                            contactAtomNumInResidueB[MolContactInfo.XR] = j;
+                        }
+                    }
+                    else if(x.isRnaAtom() && y.isRnaAtom()) {
+                        // *************************** RNA - RNA contact *************************
+                        numTotalRnaContactsPair++;
+                           
+                        // this is an RNA - RNA contact
+                        numPairContacts[MolContactInfo.RR]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[MolContactInfo.RR] < 0) || dist < minContactDistances[MolContactInfo.RR]) {
+                            minContactDistances[MolContactInfo.RR] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.RR] = i;
+                            contactAtomNumInResidueB[MolContactInfo.RR] = j;
+                        }
                     }
                     else {
                         // *************************** unknown contact, wtf? *************************
@@ -6108,7 +6151,7 @@ public class Main {
 
         // Iteration through all atoms of the two residues is done
         if(numPairContacts[MolContactInfo.TT] > 0) {
-            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, numTotalRnaContactsPair);
         }
         else {
             result = null;
@@ -6117,7 +6160,8 @@ public class Main {
         return(result);         // This is null if no contact was detected
         
     }
- 
+    
+    
     /**
      * Checks if a pi effect between the given X-H and aromatic ring occurs.
      * @param x Atom which is has a H.
@@ -6435,6 +6479,7 @@ public class Main {
         
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
         Integer numTotalLigContactsPair = 0;
+        Integer numTotalRnaContactsPair = 0;
 
         Integer[] minContactDistances = new Integer[numPairContacts.length];
         // Holds the minimal distances of contacts of the appropriate type (see numPairContacts, index 0 is unused)
@@ -8452,7 +8497,7 @@ public class Main {
         
          // Iteration through all atoms of the two residues is done
         if(numPairContacts[MolContactInfo.TT] > 0) {
-            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, numTotalRnaContactsPair);
         }
         else {
             result = null;
@@ -8535,6 +8580,7 @@ public class Main {
 
         
         Integer numTotalLigContactsPair = 0;
+        Integer numTotalRnaContactsPair = 0;
 
 
 
@@ -9907,6 +9953,10 @@ public class Main {
                         // Nothing to do as we computing ligand contacts is disabled by the config.
                         // We still need to catch ligand molecules here, otherwise "detect" unknown contacts
                     }
+                    else if ((x.isRnaAtom() && y.isProteinAtom()) || (x.isProteinAtom() && y.isRnaAtom())) {
+                        numPairContacts[MolContactInfo.TT]++;
+                        numTotalRnaContactsPair++;
+                    }
                     else {
                         // *************************** unknown contact, wtf? *************************
                         // This branch should never be hit because atoms of type OTHER are ignored while creating the list of Atom objects
@@ -9992,7 +10042,7 @@ public class Main {
                                
         // Iteration through all atoms of the two residues is done
         if(numPairContacts[MolContactInfo.TT] > 0) {
-            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, atomAtomContactType, atomAtomContacts);
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, numTotalRnaContactsPair, atomAtomContactType, atomAtomContacts);
         }
         else {
             result = null;
