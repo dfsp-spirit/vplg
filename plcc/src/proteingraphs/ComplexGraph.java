@@ -1172,7 +1172,7 @@ public class ComplexGraph extends UAdjListGraph {
         for(Integer i = 0; i < cg.getVertices().size(); i++){
             curVertice = vertIterator.next();
             String molID = molInfoForChains.get(cg.proteinNodeMap.get(curVertice));
-            if(!Homologues.contains(molID)){
+            if(!Homologues.contains(molID) && molID != ""){
                 homologues = Collections.frequency((molInfoForChains.values()), molID);
                 if(homologues > 1){
                     Homologues.add(molID);

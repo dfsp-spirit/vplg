@@ -71,9 +71,11 @@ public class PageLayout {
     
     public PageLayout(Integer numVerts, ArrayList<String> vertLabels) {
         init(numVerts);
-        ArrayList<Integer> x_y_values = getFooterOutline(vertLabels);
-        this.footerHeight = x_y_values.get(1);
-        this.footerWidth = x_y_values.get(0);
+        if(vertLabels.size() > 0){
+            ArrayList<Integer> x_y_values = getFooterOutline(vertLabels);
+            this.footerHeight = x_y_values.get(1);
+            this.footerWidth = x_y_values.get(0);
+        }
     }
     
     private void init(Integer numVerts) {
@@ -348,24 +350,32 @@ public class PageLayout {
         graphic.setFont(rotatedFont);
         
         for(Integer i = 0; i < vertLabels.size(); i++){
-            Integer start_x = getFooterStart().x + (i * vertDist) + vertRadius / 2;
-            final Rectangle2D string_measures= graphic.getFontMetrics().getStringBounds(vertLabels.get(i), graphic);
-            //Integer radius = graphic.getFontMetrics().stringWidth(vertLabels.get(i));
             
-            Integer new_x = (int)(start_x + string_measures.getBounds().width * cos(0.785d));
-            Integer new_y = (int)(start_y + string_measures.getBounds().width * sin(0.785d));
+            //check if String is empty:
+            if(vertLabels.get(i) != ""){
+                Integer start_x = getFooterStart().x + (i * vertDist) + vertRadius / 2;
+                final Rectangle2D string_measures= graphic.getFontMetrics().getStringBounds(vertLabels.get(i), graphic);
+                //Integer radius = graphic.getFontMetrics().stringWidth(vertLabels.get(i));
+
+                Integer new_x = (int)(start_x + string_measures.getBounds().width * cos(0.785d));
+                Integer new_y = (int)(start_y + string_measures.getBounds().width * sin(0.785d));
+
+                if(x_y_values.get(0) < new_x){
+                    x_y_values.set(0,new_x);
+                }
+                if(x_y_values.get(1) < new_y){
+                    x_y_values.set(1,new_y);
+                }
+            }
             
-            if(x_y_values.get(0) < new_x){
-                x_y_values.set(0,new_x);
-            }
-            if(x_y_values.get(1) < new_y){
-                x_y_values.set(1,new_y);
-            }
         }
         x_y_values.set(0,(x_y_values.get(0) - marginRight));
         //getFooterStart().y is 40 Pixel bigger than the actual height
         // +50 for legend box size and 10px space
         x_y_values.set(1,(x_y_values.get(1) - (marginTop + headerHeight + this.getImageAreaHeight()) + 50 )); 
+        
+        x_y_values.set(0,Math.max(this.footerWidth, x_y_values.get(0)));
+        x_y_values.set(1,Math.max(this.footerHeight, x_y_values.get(1)));
         
         return x_y_values;
     }
