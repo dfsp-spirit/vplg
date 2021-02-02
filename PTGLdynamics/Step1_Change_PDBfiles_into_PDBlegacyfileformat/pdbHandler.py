@@ -6,9 +6,9 @@ import time
 _start_time = time.time()
 
 #reading COMPND.txt file which is the header of a  pdb file
-#f = open("COMPND.txt", "r")
-#header = f.read()
-#header = header+'\n'
+f = open("COMPND.txt", "r")
+header = f.read()
+header = header+'\n'
 
 #amino acids (residues)in column 18-20 
 aaCode = [ 'ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL']
@@ -27,6 +27,10 @@ for allfile in os.listdir('.'):
         addNo = 0
         for line in fileinput.input(allfile, inplace=True):
             #header
+            if cnt == 0:
+                line = line.replace(line, line+str(header))
+                sys.stdout.write(line)
+            
             if 'ATOM' == line[0:4]:
                 if line[75:76] != ' ':
                     chainID = line[75:76]
