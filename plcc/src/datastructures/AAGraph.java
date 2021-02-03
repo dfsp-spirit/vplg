@@ -395,22 +395,24 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         String startEdge = "  edge [";
         String endEdge   = "  ]";
         
+        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        
         gml.append("graph [\n");
         gml.append("  id ").append(1).append("\n");
         gml.append("  label \"" + "VPLG Amino acid contact stats matrix ").append(label_pdbid).append(label_chainid).append("\"\n");
         gml.append("  comment \"" + "VPLG Amino acid contact stats matrix  ").append(label_pdbid).append("\"\n");
         gml.append("  directed 0\n");
-        gml.append("  isplanar 0\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
         gml.append("  creator \"PLCC\"\n");
-        gml.append("  pdb_id \"").append(this.pdbid).append("\"\n");
-        gml.append("  chain_id \"").append(this.chainid).append("\"\n");
-        gml.append("  graph_type \"" + "aa_graph" + "\"\n");
-        gml.append("  is_protein_graph 1\n");
-        gml.append("  is_folding_graph 0\n");
-        gml.append("  is_SSE_graph 0\n");
-        gml.append("  is_AA_graph 1\n");
-        gml.append("  is_AA_type_contact_matrix 1\n");
-        gml.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "ID"), snakeCase)).append(" \"").append(this.pdbid).append("\"\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(this.chainid).append("\"\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("graph", "type"), snakeCase)).append(" \"" + "aa_graph" + "\"\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "Protein", "Graph"), snakeCase)).append(" 1\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "Folding", "Graph"), snakeCase)).append(" 0\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "SSE", "graph"), snakeCase)).append(" 0\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "AA", "graph"), snakeCase)).append(" 1\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "AA", "type", "contact", "matrix"), snakeCase)).append(" 1\n");
+        gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "all", "chains", "graph"), snakeCase)).append(" ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
         
         
         // print the 20 vertices -- one for each of the 20 amino acid types
