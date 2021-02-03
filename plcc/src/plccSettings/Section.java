@@ -323,6 +323,7 @@ class Section {
                 
             case "Output settings":
                 settings.add(new Setting("plcc_B_ptgl_text_output", 'B', "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated."));
+                settings.add(new Setting("plcc_B_gml_snake_case", 'B', "false", "Whether keys in all GML files should be written in snake case, i.e., with under scores instead of camel case. HINT: Originally, GML does not support snake case and so may some parsers for GML files."));
                 settings.add(new Setting("plcc_B_ptgl_geodat_output", 'B', "false", "Whether the PTGL text files geo.dat for SSE level contacts are written to a text file."));
                 settings.add(new Setting("plcc_B_ramachandran_plot", 'B', "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower)."));
                 break;
