@@ -7,6 +7,7 @@
  */
 package tools;
 
+import java.util.Collection;
 import java.util.Locale;
 
 /**
@@ -168,6 +169,38 @@ public class TextTools {
     
     public static Boolean isTrueOrFalse(String s) {
         return s.toLowerCase().equals("true") || s.toLowerCase().equals("false");
+    }
+    
+    /**
+     * Formats given subwords either in camel case or snake case. Presumes lower snake case
+     * @param subWords single words to make up the whole word
+     * @param snakeCase whether to use snake case, i.e, underscores
+     * @return compound and formatted word
+     */
+    public static String formatAsCaseStyle(Collection<String> subWords, Boolean snakeCase) {
+        String formattedWord = "";
+        for (String subWord : subWords) {
+            if (!snakeCase) {
+                // camel case
+                if (subWord.length() > 0) {
+                    if (formattedWord.length() == 0) {
+                        formattedWord += subWord.toLowerCase();
+                    } else {
+                        char[] subWordChars = subWord.toCharArray();
+                        for (int i = 0; i < subWordChars.length; i++) {
+                            char c = subWordChars[i];
+                            formattedWord += (i == 0 ? Character.toUpperCase(c) : Character.toLowerCase(c));
+                        }
+                    }
+                }
+            } else {
+                // snake case, i.e. underscores
+                if (subWord.length() > 0) {
+                    formattedWord += (formattedWord.length() == 0 ? subWord : "_" + subWord);
+                }
+            }
+        }
+        return formattedWord;
     }
         
     
