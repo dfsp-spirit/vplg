@@ -21,6 +21,7 @@ import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
 import proteinstructure.Molecule;
 import tools.DP;
+import tools.TextTools;
 import plccSettings.Settings;
 
 /**
@@ -553,8 +554,9 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     @Override
     public String toGraphModellingLanguageFormat() {
         
-        StringBuilder gmlf = new StringBuilder();
+        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
         
+        StringBuilder gmlf = new StringBuilder();        
         
         String label_pdbid = (this.pdbid == null ? "" : " PDB " + this.pdbid);
         String label_chainid = ((this.chainid == null ||  this.chainid.equals(AAGraph.CHAINID_ALL_CHAINS)) ? "" : " chain " + this.chainid);
@@ -570,17 +572,17 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         gmlf.append("  label \"" + "VPLG Protein Graph ").append(label_pdbid).append(label_chainid).append("\"\n");
         gmlf.append("  comment \"" + "VPLG Protein Graph ").append(label_pdbid).append("\"\n");
         gmlf.append("  directed 0\n");
-        gmlf.append("  isplanar 0\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
         gmlf.append("  creator \"PLCC\"\n");
-        gmlf.append("  pdb_id \"").append(this.pdbid).append("\"\n");
-        gmlf.append("  chain_id \"").append(this.chainid).append("\"\n");
-        gmlf.append("  graph_type \"" + "aa_graph" + "\"\n");
-        gmlf.append("  is_protein_graph 1\n");
-        gmlf.append("  is_folding_graph 0\n");
-        gmlf.append("  is_SSE_graph 0\n");
-        gmlf.append("  is_AA_graph 1\n");
-        gmlf.append("  is_AA_type_contact_matrix 0\n");
-        gmlf.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "ID"), snakeCase)).append(" \"").append(this.pdbid).append("\"\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(this.chainid).append("\"\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("graph", "type"), snakeCase)).append(" \"" + "aa_graph" + "\"\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "Protein", "Graph"),snakeCase)).append(" 1\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "Folding", "Graph"), snakeCase)).append(" 0\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "SSE", "graph"), snakeCase)).append(" 0\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "AA", "graph"), snakeCase)).append(" 1\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "AA", "type", "contact", "matrix"), snakeCase)).append(" 0\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "all", "chains", "graph"), snakeCase)).append(" ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
         
         // print all nodes
         Residue residue;
@@ -595,10 +597,10 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             if(molecule instanceof Residue){
                 residue = (Residue) molecule;
                 gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
-            gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
-            gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
-            gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
-            gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser            
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("chem", "prop5"), snakeCase)).append(" \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("chem", "prop3"), snakeCase)).append(" \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
+            gmlf.append("    SSE \"").append(residue.getNonEmptySSEString()).append("\"\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("SSE", "type"), snakeCase)).append(" \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser            
             
             }
             gmlf.append(endNode).append("\n");
