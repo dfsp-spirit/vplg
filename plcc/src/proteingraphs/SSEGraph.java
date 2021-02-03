@@ -87,6 +87,7 @@ import io.IO;
 import plccSettings.Settings;
 import static proteingraphs.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
+import tools.TextTools;
 
 
 /**
@@ -2879,6 +2880,8 @@ E	3	3	3
     @Override
     public String toGraphModellingLanguageFormat() {
         
+        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        
         StringBuilder gmlf = new StringBuilder();
         
         // we put meta data in comments for GML language graphs
@@ -2904,21 +2907,21 @@ E	3	3	3
         gmlf.append("  label \"" + "VPLG Protein Graph ").append(shortStr).append("\"\n");
         gmlf.append("  comment \"").append(this.getOneLineMetadataString()).append("\"\n");
         gmlf.append("  directed 0\n");
-        gmlf.append("  isplanar 0\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
         try {
             gmlf.append("  creator \"PLCC version ").append(Settings.getVersion()).append("\"\n");
         }catch(java.lang.NullPointerException e) {
             // no settings object yet, assume not to write stuff
         }
         
-        gmlf.append("  pdb_id \"").append(this.pdbid).append("\"\n");
-        gmlf.append("  chain_id \"").append(this.chainid).append("\"\n");
-        gmlf.append("  graph_type \"").append(this.graphType).append("\"\n");
-        gmlf.append("  is_protein_graph ").append(this.isProteinGraph ? "1" : "0").append("\n");
-        gmlf.append("  is_folding_graph ").append(this.isProteinGraph ? "0" : "1").append("\n");
-        gmlf.append("  is_SSE_graph 1\n");
-        gmlf.append("  is_AA_graph 0\n");
-        gmlf.append("  is_all_chains_graph ").append(this.isComplexGraph() ? "1" : "0").append("\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "ID"), snakeCase)).append(" \"").append(this.pdbid).append("\"\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(this.chainid).append("\"\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("graph", "type"), snakeCase)).append(" \"").append(this.graphType).append("\"\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "Protein", "Graph"), snakeCase)).append(" ").append(this.isProteinGraph ? "1" : "0").append("\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "Folding", "Graph"), snakeCase)).append(" ").append(this.isProteinGraph ? "0" : "1").append("\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "SSE", "graph"), snakeCase)).append(" 1\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "AA", "graph"), snakeCase)).append(" 0\n");
+        gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "all", "chains", "graph"), snakeCase)).append(" ").append(this.isComplexGraph() ? "1" : "0").append("\n");
         
         // print all nodes
         SSE vertex;
