@@ -167,7 +167,7 @@ public class MolContactInfo {
      * @param a the first Residue
      * @param b the second Residue
      */
-    public MolContactInfo(Residue a, Residue b) {
+    public MolContactInfo(Molecule a, Molecule b) {
         molA = a;
         molB = b;
         dist = a.distTo(b);  

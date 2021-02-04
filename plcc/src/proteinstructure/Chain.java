@@ -77,31 +77,7 @@ public class Chain implements java.io.Serializable {
         return(radiusFromCentroid);
     }
     
-    /**
-     * Returns all molecules of class Residue belonging to this chain.
-     * @return ArrayList of residues
-     */
-    public ArrayList<Residue> getResidues() {
-        ArrayList<Residue> thisResidues = new ArrayList<>();
-        for (Molecule m : this.molecules) {
-            if (m instanceof Residue) {
-                thisResidues.add((Residue) m);
-            }
-        }
-        return thisResidues;
-    }
-    
-    
-    public ArrayList<Ligand> getLigands() {
-        ArrayList<Ligand> thisLigands = new ArrayList<>();
-        for (Molecule m : this.molecules) {
-            if (m instanceof Ligand) {
-                thisLigands.add((Ligand) m);
-            }
-        }
-        return thisLigands;
-    }
-    
+        
     /**
      * Returns a list of all ligand residues in this chain.
      * @return a list of all ligand residues in this chain
@@ -119,24 +95,36 @@ public class Chain implements java.io.Serializable {
         return ligands;
     }
     
+    
     /**
-     * Returns a list of all amino acid residues in this chain.
-     * @return a list of all amino acid residues in this chain
+     * Returns all molecules of class Residue belonging to this chain.
+     * @return ArrayList of residues
      */
     public ArrayList<Residue> getAllAAResidues() {
-        ArrayList<Residue> AAResidues = new ArrayList<>();
-        Residue r;
-        for(Molecule m : this.molecules) {
+        ArrayList<Residue> thisResidues = new ArrayList<>();
+        for (Molecule m : this.molecules) {
             if (m instanceof Residue) {
-                r = (Residue) m;
-                if (r.isAA()) {
-                    AAResidues.add(r);
-                }
+                thisResidues.add((Residue) m);
             }
         }
-        return AAResidues;
+        return thisResidues;
     }
     
+    
+       /**
+     * Returns all molecules of class Residue belonging to this chain as output type Molecule.
+     * @return ArrayList of residues
+     */
+    public ArrayList<Molecule> getAllAAResiduesAsTypeMolecule() {
+        ArrayList<Molecule> thisResidues = new ArrayList<>();
+        for (Molecule m : this.molecules) {
+            if (m instanceof Residue) {
+                thisResidues.add(m);
+            }
+        }
+        return thisResidues;
+    }
+      
     
     /**
      * Returns a list of all RNA residues in this chain.

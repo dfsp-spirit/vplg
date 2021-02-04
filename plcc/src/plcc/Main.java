@@ -230,7 +230,7 @@ public class Main {
         ArrayList<Model> models = new ArrayList<Model>();
         ArrayList<Chain> chains = new ArrayList<Chain>();
         ArrayList<Molecule> molecules = new ArrayList<Molecule>();
-        ArrayList<Residue> residuesWithoutLigands;
+        ArrayList<Molecule> residuesWithoutLigands;
         HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
@@ -2606,7 +2606,7 @@ public class Main {
             for(Chain c : handleChains) {
                 plotPath = outputDir + fs + pdbid + "_" + c.getPdbChainID() + "_plot";
                 label = "Ramachandran plot of PDB entry " + pdbid + ", chain " + c.getPdbChainID() + "";
-                drawRamachandranPlot(plotPath, c.getResidues(), label);
+                drawRamachandranPlot(plotPath, c.getAllAAResidues(), label);
             }
         }
                         
@@ -2653,7 +2653,7 @@ public class Main {
                     if (Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
 
                         PPIGraph ppig;
-                        ppig = new PPIGraph(residues, cInfo);
+                        ppig = new PPIGraph(molecules, cInfo);
                         ppig.setPdbid(pdbid);
                         ppig.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                         // write the PPI graph to disc
@@ -2706,13 +2706,13 @@ public class Main {
                     
                     Boolean skipLigandsForAAGraphs = ( ! Settings.getBoolean("plcc_B_aminoacidgraphs_include_ligands"));
                     if(skipLigandsForAAGraphs) {
-                        for(Residue r : residues) {
-                            if(r.isAA()) { residuesWithoutLigands.add(r); }
+                        for(Molecule m : molecules) {
+                            if(m.isAA()) { residuesWithoutLigands.add(m); }
                         }
                         aag = new AAGraph(residuesWithoutLigands, cInfo);
                     }
                     else {
-                        aag = new AAGraph(residues, cInfo);
+                        aag = new AAGraph(molecules, cInfo);
                     }
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
@@ -2803,7 +2803,7 @@ public class Main {
                                         
                                         Set<Integer> s = aag.findResidues("A", 153, null);
                                         
-                                        List<Residue> l = aag.getResiduesFromSetByIndex(s);
+                                        List<Molecule> l = aag.getResiduesFromSetByIndex(s);
                                         System.out.println("Pymol select script for " + l.size() + " of the " + aag.getSize() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
                                     }
                                     
@@ -2921,11 +2921,12 @@ public class Main {
                     if(Settings.getBoolean("plcc_B_draw_aag")) {
                         Map<Integer, Color> cmap = new HashMap<>();
                         // fill color map
-                        Color c;
+                        Color c = null;
                         Boolean use3Colors = false;
                         for(int i = 0; i < aag.getNumVertices(); i++) {
-                            Residue r = aag.getVertex(i);
-                            if(r != null) {
+                            Molecule m = aag.getVertex(i);
+                            if(m != null && m.isAA()) {
+                                Residue r = (Residue) m;
                                 if(use3Colors) {
                                     c = ProteinGraphDrawer.getChemProp3Color(r.getChemicalProperty3OneLetterString());
                                 } else {
@@ -2941,9 +2942,9 @@ public class Main {
                         Map<Integer, String> lmap = new HashMap<>();
                         String l;
                         for(int i = 0; i < aag.getNumVertices(); i++) {
-                            Residue r = aag.getVertex(i);
-                            if(r != null) {
-                                l = r.getAAName1();
+                            Molecule m = aag.getVertex(i);
+                            if(m != null) {
+                                l = m.getAAName1();
                                 if(l != null) {
                                     lmap.put(i, l);
                                 }
@@ -3041,9 +3042,9 @@ public class Main {
                     
                     // compute chainName contacts
                     cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
-                    
+                                        
                     if(Settings.getBoolean("plcc_B_AAgraph_perchain")) {
-                        AAGraph aag = new AAGraph(c.getResidues(), cInfoThisChain);
+                        AAGraph aag = new AAGraph(c.getMolecules(), cInfoThisChain);
                         aag.setPdbid(pdbid);
                         aag.setChainid(c.getPdbChainID());
                         
@@ -3618,9 +3619,9 @@ public class Main {
 
             // determine SSEs for this chainName
             if(! silent) {
-                System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getResidues().size() + " residues.");
+                System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getAllAAResidues().size() + " residues.");
             }
-            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
+            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getAllAAResidues());
             
             if(chainDsspSSEs.isEmpty()) {
                 if(Settings.getBoolean("plcc_B_skip_empty_chains")) {
@@ -3647,7 +3648,7 @@ public class Main {
                 printSSEList(chainPtglSSEs, "PTGL");
             }
             
-            chainLigSSEs = createAllLigandSSEsFromResidueList(c.getLigands(), chainDsspSSEs);
+            chainLigSSEs = createAllLigandSSEsFromResidueList(c.getAllLigandResidues(), chainDsspSSEs);
             allChainSSEs = mergeSSEs(chainPtglSSEs, chainLigSSEs);
             if(! silent) {
                 System.out.println("    Added " + chainLigSSEs.size() + " ligand SSEs to the SSE list, now at " + allChainSSEs.size() + " SSEs.");
@@ -10753,7 +10754,7 @@ public class Main {
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
         String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
-        ArrayList<Residue> res = c.getResidues();
+        ArrayList<Residue> res = c.getAllAAResidues();
                 
         
         for (Residue r : res) {
@@ -10773,7 +10774,7 @@ public class Main {
 
         FileWriter mapFW = null;
         PrintWriter mapFH = null;
-        ArrayList<Residue> res = c.getResidues();
+        ArrayList<Residue> res = c.getAllAAResidues();
 
         // open files
         try {
@@ -11399,7 +11400,7 @@ public class Main {
      * @param protRes the protein residues
      * @return the script as a single string. note that the string may consist of multiple lines.
      */
-    public static String getPymolSelectionScriptForResidues(List<Residue> protRes) {
+    public static String getPymolSelectionScriptForResidues(List<Molecule> protRes) {
 
 
         StringBuilder scriptProt = new StringBuilder();
@@ -13202,11 +13203,11 @@ public class Main {
 
             // determine SSEs for this chainName
             //System.out.println("    Creating all SSEs for chainName '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
-            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
+            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getAllAAResidues());
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
             
-            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getLigands(), chainDsspSSEs);
+            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getAllLigandResidues(), chainDsspSSEs);
             oneChainSSEs = mergeSSEs(oneChainSSEs, chainLigSSEs);
 
             /*

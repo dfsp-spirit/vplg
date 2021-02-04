@@ -29,7 +29,7 @@ import plccSettings.Settings;
  * 
  * @author ts
  */
-public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
+public class AAGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraphModellingLanguageFormat {
     
     
     public static final String CHAINID_ALL_CHAINS = "ALL";
@@ -44,14 +44,39 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     
     /** Constructor
      * @param vertices the vertex list to use for the graph */
-    public AAGraph(ArrayList<Residue> vertices) {
+    public AAGraph(ArrayList<Molecule> vertices) {
         super(vertices);
         this.pdbid = "";
         this.chainid = "";
     }
     
+    /** Advanced Constructor, constructs the edges automatically from MolContactInfo list
+     * @param vertices the vertex list to use
+     * @param contacts the contacts, which are used to create the edges of the graph */
+    public AAGraph(List<Molecule> vertices, ArrayList<MolContactInfo> contacts) {
+        super(vertices);
+        for(int i = 0; i < contacts.size(); i++) {
+            if(contactSatisfiesRules(contacts.get(i))) {
+                this.addEdgeFromRCI(contacts.get(i));
+            }
+        }
+        this.pdbid = "";
+        this.chainid = "";
+    }
+    
+    /** Constructor
+     * @param vertices the vertex list to use
+     * @param pdbid the PDB ID of the protein chain represented by this graph (meta data)
+     * @param chainid the PDB chain name of the protein chain represented by this graph (meta data) 
+     */
+    public AAGraph(ArrayList<Molecule> vertices, String pdbid, String chainid) {
+        super(vertices);
+        this.setPdbid(pdbid);
+        this.setChainid(chainid);
+    }
+    
     /**
-     * Checks whether a residue contact satisifies the minimal sequential residue distance rule.
+     * Checks whether a residue contact satisfies the minimal sequential residue distance rule.
      * @param minSeqDist the minimal allowed seq dist
      * @param c the contact
      * @return whether the contact satisfies the minimal sequential residue distance rule
@@ -118,11 +143,11 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             maxDegs.put(AminoAcid.names1[i], 0);
         }
         
-        Residue r; String name1; Integer deg;
+        Molecule m; String name1; Integer deg;
         for(int i = 0; i < this.getNumVertices(); i++) {
-            r = this.getVertex(i);
-            if(r.isAA()) {
-                name1 = r.getAAName1();
+            m = this.getVertex(i);
+            if(m.isAA()) {
+                name1 = m.getAAName1();
                 deg = this.neighborsOf(i).size();
                 if(maxDegs.containsKey(name1)) {
                     if(maxDegs.get(name1) < deg) {
@@ -144,12 +169,12 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             maxDiameters.put(AminoAcid.names1[i], 0);
         }
         
-        Residue r; String name1; Integer diam;
+        Molecule m; String name1; Integer diam;
         for(int i = 0; i < this.getNumVertices(); i++) {
-            r = this.getVertex(i);
-            if(r.isAA()) {
-                name1 = r.getAAName1();
-                diam = r.getSphereRadius() * 2;
+            m = this.getVertex(i);
+            if(m.isAA()) {
+                name1 = m.getAAName1();
+                diam = m.getSphereRadius() * 2;
                 if(maxDiameters.containsKey(name1)) {
                     if(maxDiameters.get(name1) < diam) {
                         maxDiameters.put(name1, diam);
@@ -174,11 +199,11 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             numValues.put(AminoAcid.names1[i], 0);
         }
         
-        Residue r; String name1; Integer degree;
+        Molecule m; String name1; Integer degree;
         for(int i = 0; i < this.getNumVertices(); i++) {
-            r = this.getVertex(i);
-            if(r.isAA()) {
-                name1 = r.getAAName1();
+            m = this.getVertex(i);
+            if(m.isAA()) {
+                name1 = m.getAAName1();
                 degree = this.neighborsOf(i).size();
                 if(degreeSum.containsKey(name1)) {
                     degreeSum.put(name1, (degreeSum.get(name1) + degree));
@@ -207,12 +232,12 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             numValues.put(AminoAcid.names1[i], 0);
         }
         
-        Residue r; String name1; Integer diam;
+        Molecule m; String name1; Integer diam;
         for(int i = 0; i < this.getNumVertices(); i++) {
-            r = this.getVertex(i);
-            if(r.isAA()) {
-                name1 = r.getAAName1();
-                diam = r.getSphereRadius() * 2;
+            m = this.getVertex(i);
+            if(m.isAA()) {
+                name1 = m.getAAName1();
+                diam = m.getSphereRadius() * 2;
                 if(diameterSum.containsKey(name1)) {
                     diameterSum.put(name1, (diameterSum.get(name1) + diam));
                     numValues.put(name1, (numValues.get(name1) + 1));
@@ -235,32 +260,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         return allChecksPassed;
     }
-    
-    /** Advanced Constructor, constructs the edges automatically from MolContactInfo list
-     * @param vertices the vertex list to use
-     * @param contacts the contacts, which are used to create the edges of the graph */
-    public AAGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
-        super(vertices);
-        for(int i = 0; i < contacts.size(); i++) {
-            if(contactSatisfiesRules(contacts.get(i))) {
-                this.addEdgeFromRCI(contacts.get(i));
-            }
-        }
-        this.pdbid = "";
-        this.chainid = "";
-    }
-    
-    /** Constructor
-     * @param vertices the vertex list to use
-     * @param pdbid the PDB ID of the protein chain represented by this graph (meta data)
-     * @param chainid the PDB chain name of the protein chain represented by this graph (meta data) 
-     */
-    public AAGraph(ArrayList<Residue> vertices, String pdbid, String chainid) {
-        super(vertices);
-        this.setPdbid(pdbid);
-        this.setChainid(chainid);
-    }
-    
+        
     
     /**
      * Counts the number of amino acids of all types in the protein (how many ARG, how many PHE, ...).
@@ -275,8 +275,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         Arrays.fill(counts, 0);
         
         Integer residueTypeID;        
-        for(Residue r : this.vertices) {
-            residueTypeID = r.getInternalAAID();
+        for(Molecule m : this.vertices) {
+            residueTypeID = m.getInternalAAID();
             if(residueTypeID > 0 && residueTypeID < counts.length) {
                 counts[residueTypeID]++;
                 counts[0]++;    // total number of valid AAs
@@ -471,7 +471,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             
             if (!(molA instanceof Residue) || !(molB instanceof Residue)) {
                 // one is no Residue
-                DP.getInstance().w("AAGraph", "Atleast one of the molecules is an RNA and can not "
+                DP.getInstance().w("AAGraph", "Atleast one of the molecules is not a residue and can not "
                         + "be used for AAGraphs. Skipping that one (unwanted side effects?");
                 return false;
             } else {
@@ -535,8 +535,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     public Set<Integer> findResidues(String chain, Integer pdbresnum, String icode){
         Set<Integer> res = new HashSet<>();
         int resIndex = 0;
-        for(Residue r : this.vertices) {
-            if((chain == null || r.getChainID().equals(chain)) && (pdbresnum == null || r.getPdbNum().equals(pdbresnum)) && (icode == null || r.getiCode().equals(icode))) {
+        for(Molecule m : this.vertices) {
+            if((chain == null || m.getChainID().equals(chain)) && (pdbresnum == null || m.getPdbNum().equals(pdbresnum)) && (icode == null || m.getiCode().equals(icode))) {
                 res.add(resIndex);
                 resIndex++;
             }
@@ -635,7 +635,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     public ArrayList<String> toFanMod() {
         StringBuilder sbAag = new StringBuilder();
         StringBuilder sbIdx = new StringBuilder();
-        Residue residue;
+        Molecule mol;
         HashMap<Integer, Integer> indexTable = new HashMap<Integer, Integer>();
         
         // Header for index file
@@ -665,15 +665,15 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         for(int i = 0; i < sortedList.size(); i++) {
             indexTable.put(sortedList.get(i), i);
             
-            residue = this.vertices.get(sortedList.get(i));
+            mol = this.vertices.get(sortedList.get(i));
             
             sbIdx.append(i);
             sbIdx.append(",");
             sbIdx.append(sortedList.get(i));
             sbIdx.append(",");
-            sbIdx.append(residue.getPdbNum());
+            sbIdx.append(mol.getPdbNum());
             sbIdx.append(",");
-            sbIdx.append(residue.getName3());
+            sbIdx.append(mol.getName3());
             sbIdx.append(System.lineSeparator());
         }
        
@@ -736,8 +736,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         this.chainid = chainid;
     }
     
-    public List<Residue> getResiduesFromSetByIndex(Set<Integer> vertIndices) {
-        List<Residue> l = new ArrayList<>();
+    public List<Molecule> getResiduesFromSetByIndex(Set<Integer> vertIndices) {
+        List<Molecule> l = new ArrayList<>();
         for(int index : vertIndices) {
             l.add(this.vertices.get(index));
         }

@@ -17,6 +17,8 @@ import plccSettings.Settings;
 import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
 import proteinstructure.Molecule;
+import proteinstructure.Ligand;
+import proteinstructure.RNA;
 import tools.DP;
 
 /**
@@ -26,7 +28,7 @@ import tools.DP;
  *
  * @author as
  */
-public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
+public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraphModellingLanguageFormat {
 
     /**
      * PDB identifier.
@@ -50,7 +52,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Checks whether a residue contact satisifies the minimal sequential
+     * Checks whether a residue contact satisfies the minimal sequential
      * residue distance rule.
      *
      * @param minSeqDist the minimal allowed seq dist
@@ -80,7 +82,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Checks whether a residue contact satisifies the maximal sequential
+     * Checks whether a residue contact satisfies the maximal sequential
      * residue distance rule.
      *
      * @param maxSeqDist the max allowed seq dist
@@ -115,7 +117,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph
      */
-    public PPIGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
+    public PPIGraph(List<Molecule> vertices, ArrayList<MolContactInfo> contacts) {
         super(vertices);
         for (int i = 0; i < contacts.size(); i++) {
             if (contactSatisfiesRules(contacts.get(i))) {
@@ -136,8 +138,8 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      */
     public final boolean addPPIEdgeFromRCI(MolContactInfo rci) {
         if (rci.describesPPIContact()) {
-            Residue resA = rci.getResA();
-            Residue resB = rci.getResB();
+            Molecule resA = rci.getResA();
+            Molecule resB = rci.getResB();
             
             // check that both are residues (null if e.g. RNA)
             if (resA == null || resB == null) {
@@ -244,11 +246,12 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
             
             }
-            else
-                if(!(molecule instanceof Residue)){
-                    gmlf.append("    rna \"");
-                }
-            
+            else if (molecule instanceof RNA) {
+                gmlf.append("    rna \"");
+            }
+            else {
+                gmlf.append("    lig \"");
+            }
             gmlf.append(endNode).append("\n");
         }
 
@@ -327,7 +330,6 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     public ArrayList<String> toFanMod() {
         StringBuilder sbAag = new StringBuilder();
         StringBuilder sbIdx = new StringBuilder();
-        Residue residue;
         Molecule molecule;
         HashMap<Integer, Integer> indexTable = new HashMap<Integer, Integer>();
 
