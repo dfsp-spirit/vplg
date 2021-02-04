@@ -7,13 +7,17 @@
  */
 package proteingraphs;
 
+import java.util.Arrays;
+import plccSettings.Settings;
+import tools.TextTools;
+
 /**
  * These constants are for the writers and parsers, e.g., the GMLGraphParser.
  * @author spirit
  */
 public class VertexProperty {
     
-    public static final String FGNOTATIONLABEL = "fg_notation_label";
+    public static final String FGNOTATIONLABEL = TextTools.formatAsCaseStyle(Arrays.asList("FG", "notation", "label"), Settings.getBoolean("plcc_B_gml_snake_case"));
     public static final String LABEL = "label";
     public static final String VERTEXID = "id";
     public static final String COLOR = "color";

@@ -56,6 +56,7 @@ import proteinstructure.Molecule;
 import proteinstructure.Residue;
 import proteinstructure.SSE;
 import tools.DP;
+import tools.TextTools;
 
 /**
  *
@@ -1435,6 +1436,8 @@ public class ComplexGraph extends UAdjListGraph {
      */
     public boolean writeToFileGML(File file) {
         
+        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        
         // - - - Checks - - -
 
         if (!file.exists()) {
@@ -1473,7 +1476,7 @@ public class ComplexGraph extends UAdjListGraph {
         gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
             @Override
             public String getAttribute() {
-                return "mol_name";
+                return TextTools.formatAsCaseStyle(Arrays.asList("mol", "name"), snakeCase);
             }
 
             @Override
@@ -1491,7 +1494,7 @@ public class ComplexGraph extends UAdjListGraph {
         gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
             @Override
             public String getAttribute() {
-                return "chain_length";
+                return TextTools.formatAsCaseStyle(Arrays.asList("chain", "length"), snakeCase);
             }
 
             @Override
@@ -1532,20 +1535,20 @@ public class ComplexGraph extends UAdjListGraph {
 
         });
        
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_all_res_res_contacts", numAllInteractionsMap));  // same as label but as int = without '"' // only underscore allowed (by Cytoscape)
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("normalized_weight", normalizedEdgeWeigth));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("lucid_normalized_weight", lucidNormalizedEdgeWeight));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixcoil_contacts", numHelixCoilInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandstrand_contacts", numStrandStrandInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandcoil_contacts", numStrandCoilInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilcoil_contacts", numCoilCoilInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "all", "res", "res", "contacts"), snakeCase), numAllInteractionsMap));  // same as label but as int = without '"' // only underscore allowed (by Cytoscape)
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("normalized", "weight"), snakeCase), normalizedEdgeWeigth));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("lucid", "normalized", "weight"), snakeCase), lucidNormalizedEdgeWeight));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "helix", "helix", "contacts"), snakeCase), numHelixHelixInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "helix", "strand", "contacts"), snakeCase), numHelixStrandInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "helix", "coil", "contacts"), snakeCase), numHelixCoilInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "strand", "strand", "contacts"), snakeCase), numStrandStrandInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "strand", "coil", "contacts"), snakeCase), numStrandCoilInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "coil", "coil", "contacts"), snakeCase), numCoilCoilInteractionsMap));
         if (! Settings.getBoolean("plcc_B_CG_ignore_ligands")) { 
-            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));
-            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandligand_contacts", numStrandLigandInteractionsMap));
-            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilligand_contacts", numCoilLigandInteractionsMap));
-            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_ligandligand_contacts", numLigandLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "helix", "ligand", "contacts"), snakeCase), numHelixLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "strand", "ligand", "contacts"), snakeCase), numStrandLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "coil", "ligand", "contacts"), snakeCase), numCoilLigandInteractionsMap));
+            gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "ligand", "ligand", "contacts"), snakeCase), numLigandLigandInteractionsMap));
         }
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1567,9 +1570,9 @@ public class ComplexGraph extends UAdjListGraph {
         String lastLine = "";
         
         LinkedHashMap<String, String> graphAttributes = new LinkedHashMap<>();
-        graphAttributes.put("ignore_ligands", (Settings.getBoolean("plcc_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
-        graphAttributes.put("min_contacts_for_edge", Settings.getInteger("plcc_I_CG_contact_threshold").toString());  // contact threshold
-        graphAttributes.put("factor_lucid_normalized_weight", minimumNormalizedEdgeWeight.toString());  // factor to reconstruct normalized edge weight
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("ignore", "ligands"), snakeCase), (Settings.getBoolean("plcc_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("min", "contacts", "for", "edge"), snakeCase), Settings.getInteger("plcc_I_CG_contact_threshold").toString());  // contact threshold
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("factor", "lucid", "normalized", "weight"), snakeCase), minimumNormalizedEdgeWeight.toString());  // factor to reconstruct normalized edge weight
 
         for (String GmlLine : GmlLines) {
             if (lastLine.equals("graph [")) {

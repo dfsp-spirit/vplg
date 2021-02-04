@@ -2952,34 +2952,34 @@ E	3	3	3
             } else {
                 gmlf.append("    label \"").append(i).append("-").append(vertex.getSseType()).append("\"\n");
             }
-            gmlf.append("    num_in_chain ").append(vertex.getSSESeqChainNum()).append("\n");            
-            gmlf.append("    num_residues ").append(vertex.getLength()).append("\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("num", "in", "chain"), snakeCase)).append(" ").append(vertex.getSSESeqChainNum()).append("\n");            
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("num", "residues"), snakeCase)).append(" ").append(vertex.getLength()).append("\n");
             
-            gmlf.append("    pdb_res_start \"").append(vertex.getStartPdbResID()).append("\"\n");
-            gmlf.append("    pdb_res_end \"").append(vertex.getEndPdbResID()).append("\"\n");            
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "res", "start"), snakeCase)).append(" \"").append(vertex.getStartPdbResID()).append("\"\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "res", "end"), snakeCase)).append(" \"").append(vertex.getEndPdbResID()).append("\"\n");            
             
-            gmlf.append("    dssp_res_start ").append(vertex.getStartDsspNum()).append("\n");
-            gmlf.append("    dssp_res_end ").append(vertex.getEndDsspNum()).append("\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("DSSP", "res", "start"), snakeCase)).append(" ").append(vertex.getStartDsspNum()).append("\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("DSSP", "res", "end"), snakeCase)).append(" ").append(vertex.getEndDsspNum()).append("\n");
             
-            gmlf.append("    pdb_residues_full \"").append(vertex.getAllPdbResiduesString(",")).append("\"\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "residues", "full"), snakeCase)).append(" \"").append(vertex.getAllPdbResiduesString(",")).append("\"\n");
             
-            gmlf.append("    aa_sequence \"").append(vertex.getAASequence()).append("\"\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("AA", "sequence"), snakeCase)).append(" \"").append(vertex.getAASequence()).append("\"\n");
             
             if(this.isFoldingGraph()) {
-                gmlf.append("    index_in_parent_pg \"").append(((FoldingGraph)this).getVertexIndexListInParentGraph().get(i)).append("\"\n");                
+                gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("index", "in", "parent", "pg"), snakeCase)).append(" \"").append(((FoldingGraph)this).getVertexIndexListInParentGraph().get(i)).append("\"\n");                
             }
             
             if(vertex.isLigandSSE()) {
-                gmlf.append("    lig_name \"").append(vertex.getLigandName3()).append("\"\n");
+                gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("lig", "name"), snakeCase)).append(" \"").append(vertex.getLigandName3()).append("\"\n");
             }
             
             if(this.isComplexGraph()) {
-                gmlf.append("    chain_id \"").append(vertex_chain_name_cg).append("\"\n");
-                gmlf.append("    mol_id \"").append(vertex_mol_id_cg).append("\"\n");                                
+                gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(vertex_chain_name_cg).append("\"\n");
+                gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("mol", "ID"), snakeCase)).append(" \"").append(vertex_mol_id_cg).append("\"\n");                                
             }
         
             
-            gmlf.append("    sse_type \"").append(vertex.getSseType()).append("\"\n");
+            gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("SSE", "type"), snakeCase)).append(" \"").append(vertex.getSseType()).append("\"\n");
             
             gmlf.append("    ").append(VertexProperty.FGNOTATIONLABEL).append(" \"").append(vertex.getLinearNotationLabel()).append("\"\n");
            
