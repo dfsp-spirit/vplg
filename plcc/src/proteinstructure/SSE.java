@@ -80,7 +80,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     /** sequential number of the SSE in it's chain (N-terminus to C-terminus, 0..n). Note that the number in the graph is a property of a DrawSSE only. */
     private Integer sseSeqChainNum = null;         // 
     private String sseType = null;
-    private ArrayList<Residue> residues = null;
+    private ArrayList<Residue> residues = null;  // could probably be deleted as we use molecules instead of residues now
     private ArrayList<Molecule> molecules = null;
     private Chain chain = null;
     private Integer seqSseNumDssp = null;
@@ -205,7 +205,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     public Integer[] getOrientationVector() {
         if (orientationVector == null) {
-            if (hasResidueWithAtoms()) {
+            if (hasMoleculeWithAtoms()) {
                 computeOrientationVector();
             } else {
                 DP.getInstance().w("Tried to get orientation from empty SSE " + this.toString() +"."
@@ -371,15 +371,15 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public Chain getChain() { return(chain); }
     
     /**
-     * Returns the length of this SSE in residues.
-     * @return The number of residues this SSE consists of
+     * Returns the length of this SSE in molecule.
+     * @return The number of molecule this SSE consists of
      */
     public Integer getLength() { return(molecules.size()); }
     
     public Integer getSeqSseNumDssp() { return(seqSseNumDssp); }
 
     /**
-     * Returns the amino acid sequence of this SSE, determined from the 1-letter-code names of its residues.
+     * Returns the amino acid sequence of this SSE, determined from the 1-letter-code names of its molecules.
      * @return the amino acid sequence of this SSE including code for ligands
      */
     public String getAASequence() {
@@ -438,7 +438,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     /**
      * Determines the position of the central atom of this SSE. For real SSEs consisting of amino acids, the central
-     * atom of all alpha carbons is chosen. For ligands, the central atom of the first residue is chosen.
+     * atom of all alpha carbons is chosen. For ligands, the central atom of the first molecule is chosen.
      * @return the position of the central atom of this SSE
      */
     public Position3D getCentralAtomPosition() {
@@ -483,10 +483,10 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     }
     
     /**
-     * Determines whether this SSE currently has at least one residue with at least one atom.
-     * @return whether this SSE currently has at least one residue with at least one atom
+     * Determines whether this SSE currently has at least one molecule with at least one atom.
+     * @return whether this SSE currently has at least one molecule with at least one atom
      */
-    public boolean hasResidueWithAtoms() {
+    public boolean hasMoleculeWithAtoms() {
         if(this.molecules.size() > 0) {
             for(Molecule m : this.molecules) {
                 if(m.hasAtoms()) {
@@ -515,7 +515,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      * @return a string representation of this SSE object.
      */
     public String longStringRep() {
-        return("[SSE] # " + seqSseNumDssp + ", type " + sseType + ", DSSP residues " + this.getStartMolecule().getDsspNum() + ".." + this.getEndMolecule().getDsspNum() + " (length " + this.getLength() + "), sequence='" + this.getAASequence() + "'");
+        return("[SSE] # " + seqSseNumDssp + ", type " + sseType + ", DSSP molecules " + this.getStartMolecule().getDsspNum() + ".." + this.getEndMolecule().getDsspNum() + " (length " + this.getLength() + "), sequence='" + this.getAASequence() + "'");
     }
 
     /**
@@ -585,7 +585,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         }
 
         if(startMol == null || minResNumDssp == MAX_RES) {
-            System.err.println("ERROR: Could not determine start residue of non-empty SSE '" + sseIDPtgl + "' with length " + this.molecules.size() + ".");
+            System.err.println("ERROR: Could not determine start molecule of non-empty SSE '" + sseIDPtgl + "' with length " + this.molecules.size() + ".");
             return null;
         }
 
@@ -593,10 +593,10 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     }
 
     /**
-     * Determines the DSSP residue number of the first residue in this SSE. You have to make sure
-     * that the SSE is non-empty (has >= 1 residues) before calling this.
+     * Determines the DSSP number of the first molecule in this SSE. You have to make sure
+     * that the SSE is non-empty (has >= 1 molecule) before calling this.
      *
-     * @return The DSSP residue number of the first residue of this SSE.
+     * @return The DSSP number of the first molecule of this SSE.
      */
     public Integer getStartDsspNum() {
         Molecule m = this.getStartMolecule();
@@ -653,7 +653,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     }
     
     /**
-     * Returns the 3-letter ligand residue name from the PDB file name (e.g., ICT for isocitric acid) of this residue. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
+     * Returns the 3-letter ligand name from the PDB file name (e.g., ICT for isocitric acid) of this molecule. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
      * @return a string of length 3, or the empty string if this is not a ligand SSE
      */
     public String getLigandName3() {
@@ -672,7 +672,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     }
     
     /**
-     * Returns the trimmed 3-letter ligand residue name from the PDB file name (e.g., 'ICT' for isocitric acid or 'NA' for sodium ion) of this residue. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
+     * Returns the trimmed 3-letter ligand name from the PDB file name (e.g., 'ICT' for isocitric acid or 'NA' for sodium ion) of this molecule. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
      * @return a string of length 1 - 3
      */
     public String getTrimmedLigandName3() {
@@ -728,7 +728,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public Molecule getEndMolecule() {
 
         if(molecules.size() < 1) {
-            System.err.println("ERROR: Empty SSE '" + sseIDPtgl + "' has no end residue. Check size before asking.");
+            System.err.println("ERROR: Empty SSE '" + sseIDPtgl + "' has no end molecule. Check size before asking.");
             System.exit(-1);
         }
 
@@ -748,7 +748,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         }
 
         if(endMol == null || maxResNumDssp == -1) {
-            System.err.println("ERROR: Could not determine end residue of non-empty SSE '" + sseIDPtgl + "' with length " + this.molecules.size() + ".");
+            System.err.println("ERROR: Could not determine end molecule of non-empty SSE '" + sseIDPtgl + "' with length " + this.molecules.size() + ".");
             System.exit(1);
         }
 
@@ -766,6 +766,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     /**
      * Adds the residue r to this SSE.
+     * Could probably be deleted as we use molecules instead of residues now.
      * @param r 
      */
     public void addResidue(Residue r) { 
@@ -792,16 +793,16 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
      */
     public void setSeqSseChainNum(Integer s) { this.sseSeqChainNum = s; }
 
-    public void addResiduesAtStart(ArrayList<Molecule> rl) {
+    public void addMoleculesAtStart(ArrayList<Molecule> rl) {
         
         ArrayList<Molecule> rearrangedResidues = new ArrayList<>();
   
-        // new first residues
+        // new first molecule
         for (Integer i = 0; i < rl.size(); i++) {
             rearrangedResidues.add(rl.get(i));
         }
         
-        // old residues
+        // old molecules
         for (int i = 0; i < molecules.size(); i++) {
             rearrangedResidues.add(molecules.get(i));
         }
@@ -812,9 +813,9 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     /**
      * Determines the distance of the SSE to the SSE s in the primary structure. This means it returns
-     * the number of residues between the SSEs in the AA sequence. This is based on DSSP residue numbers.
+     * the number of molecules between the SSEs in the AA sequence. This is based on DSSP numbers.
      * @param s the other SSE
-     * @return the distance in residues (difference in DSSP residue numbers)
+     * @return the distance in molecule (difference in DSSP numbers)
      */
     public Integer getPrimarySeqDistanceInAminoAcidsTo(SSE s) {
         
@@ -830,7 +831,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         //}
        
         
-        // determine which residue comes first (N=>C terminus)
+        // determine which molecule comes first (N=>C terminus)
         if(s.getStartDsspNum() < this.getStartDsspNum()) {
             d = this.getStartDsspNum() - s.getEndDsspNum() - 1;
         }
@@ -847,7 +848,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     
     /**
-     * A comparator that compares a pair of SSEs. They are considered identical if they are from the same chain AND their DSSP start residues and DSSP end residues are identical.
+     * A comparator that compares a pair of SSEs. They are considered identical if they are from the same chain AND their DSSP start molecules and DSSP end molecules are identical.
      * @param s the other SSE
      * @return true if they are equal according to the definition given above, false otherwise
      */

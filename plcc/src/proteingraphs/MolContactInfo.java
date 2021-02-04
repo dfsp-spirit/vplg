@@ -29,9 +29,9 @@ public class MolContactInfo {
     //  Just to be sure a copy of these lines can be found below. The length of all of these is 12.
     
     private Integer[] numPairContacts;
-    // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
+    // The positions in the numPairContacts array hold the number of contacts of each type for a pair of molecule:
     // Some cheap vars to make things easier to understand (a poor replacement for #define):
-    public static final Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
+    public static final Integer TT = 0;         //  0 = total number of contacts            (all molecule type combinations)
     public static final Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
     public static final Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
     public static final Integer BC = 3;         //  3 = # of backbone-sidechain contacts    (protein - protein only)
@@ -79,8 +79,8 @@ public class MolContactInfo {
     
     
     // The different values in 'XY' vs 'YX' are only produced by the the sequential order of the
-    //  residues (e.g., the ligand came fist: this was treated as an 'LB' contact, otherwise it
-    //  had been treated as an 'BL' contact (note that residue pairs are compared only once by the
+    //  molecules (e.g., the ligand came fist: this was treated as an 'LB' contact, otherwise it
+    //  had been treated as an 'BL' contact (note that molecule pairs are compared only once by the
     //  loop in Main.calculateAllContacts()). Saving this separately seems strange but we have to
     //  do it because geom_neo does it and we want our output to be compatible with it.
 
@@ -90,12 +90,12 @@ public class MolContactInfo {
     private Integer[] minContactDistances;
     // Holds the minimal distances of contacts of the appropriate type (see numPairContacts, index 0 is unused)
 
-    private Integer[] contactAtomIndexInResidueA;
-    // Holds the number Atom x has in its residue a for the contact with minimal distance of that type.
+    private Integer[] contactAtomIndexInMoleculeA;
+    // Holds the number Atom x has in its molecule a for the contact with minimal distance of that type.
     // See minContactDistances and numPairContacts; index 0 is unused; index 5 + 6 are also unused (atom is obvious)
 
-    private Integer[] contactAtomIndexInResidueB;
-    // Holds the number Atom y has in its residue b for the contact with minimal distance of that type.
+    private Integer[] contactAtomIndexInMoleculeB;
+    // Holds the number Atom y has in its molecule b for the contact with minimal distance of that type.
     // See minContactDistances and numPairContacts; index 0 is unused; index 5 + 6 are also unused because the atom is
     //  fixed for these (HB1: backbone N, HB2: backbone O)
 
@@ -122,8 +122,8 @@ public class MolContactInfo {
 
         numPairContacts = npcs;
         minContactDistances = mcds;
-        contactAtomIndexInResidueA = can_a;
-        contactAtomIndexInResidueB = can_b;
+        contactAtomIndexInMoleculeA = can_a;
+        contactAtomIndexInMoleculeB = can_b;
         molA = a;
         molB = b;
         dist = d;
@@ -148,8 +148,8 @@ public class MolContactInfo {
 
         numPairContacts = npcs;
         minContactDistances = mcds;
-        contactAtomIndexInResidueA = can_a;
-        contactAtomIndexInResidueB = can_b;
+        contactAtomIndexInMoleculeA = can_a;
+        contactAtomIndexInMoleculeB = can_b;
         molA = a;
         molB = b;
         dist = d;
@@ -162,10 +162,10 @@ public class MolContactInfo {
     
     
     /**
-     * Creates an empty ResContactInfo between the two residues and fills in their distance. All other values
+     * Creates an empty MolContactInfo between the two molecules and fills in their distance. All other values
      * are set to zero or not initialized.
-     * @param a the first Residue
-     * @param b the second Residue
+     * @param a the first molecule
+     * @param b the second molecule
      */
     public MolContactInfo(Molecule a, Molecule b) {
         molA = a;
@@ -174,15 +174,15 @@ public class MolContactInfo {
         numTotalLigContactsPair = 0;
         
         
-        numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
-        minContactDistances = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
-        contactAtomIndexInResidueA = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
-        contactAtomIndexInResidueB = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        numPairContacts = new Integer[Main.NUM_MOLECULE_PAIR_CONTACT_TYPES];
+        minContactDistances = new Integer[Main.NUM_MOLECULE_PAIR_CONTACT_TYPES];
+        contactAtomIndexInMoleculeA = new Integer[Main.NUM_MOLECULE_PAIR_CONTACT_TYPES];
+        contactAtomIndexInMoleculeB = new Integer[Main.NUM_MOLECULE_PAIR_CONTACT_TYPES];
         
         Arrays.fill(numPairContacts, 0);
         Arrays.fill(minContactDistances, Integer.MAX_VALUE);
-        Arrays.fill(contactAtomIndexInResidueA, -1);
-        Arrays.fill(contactAtomIndexInResidueB, -1);
+        Arrays.fill(contactAtomIndexInMoleculeA, -1);
+        Arrays.fill(contactAtomIndexInMoleculeB, -1);
     }
 
     /*
@@ -206,12 +206,12 @@ public class MolContactInfo {
     }
 
 
-    /** Returns a string indicating whether residue A is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
-     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").  
+    /** Returns a string indicating whether molecule A is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
+     * @return  a string indicating whether molecule B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").  
      */
     public String getResTypeStringA() {  if(this.molA.isAA()) { return("PRT"); } else if(this.molA.isLigand()) { return("LIG"); } else if(this.molA.isRNA()) { return("RNA"); } else { return("OTH"); } }
-    /** Returns a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
-     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
+    /** Returns a string indicating whether molecule B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
+     * @return  a string indicating whether molecule B is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").
      */
     public String getResTypeStringB() {  if(this.molB.isAA()) { return("PRT"); } else if(this.molB.isLigand()) { return("LIG"); } else if(this.molB.isRNA()) { return("RNA"); } else { return("OTH"); } }
 
@@ -236,140 +236,140 @@ public class MolContactInfo {
     public Integer getHB2Dist() { return(minContactDistances[BH]); }
 
     public Integer getBBContactDist() { return(minContactDistances[BB]); }
-    public Integer getBBContactAtomNumA() { return(contactAtomIndexInResidueA[BB] + 1); }   // The '+1' is required because geom_neo starts the atom index at '1' but we start it at '0'.
-    public Integer getBBContactAtomNumB() { return(contactAtomIndexInResidueB[BB] + 1); }   //  This also means that we HAVE to init the atom index arrays in Main.calculateAtomContactsBetweenResidues()
+    public Integer getBBContactAtomNumA() { return(contactAtomIndexInMoleculeA[BB] + 1); }   // The '+1' is required because geom_neo starts the atom index at '1' but we start it at '0'.
+    public Integer getBBContactAtomNumB() { return(contactAtomIndexInMoleculeB[BB] + 1); }   //  This also means that we HAVE to init the atom index arrays in Main.calculateAtomContactsBetweenResidues()
                                                                                             //  with '-1'.  This return statement will add 1, and '0' means 'no contact' for geom_neo. :)
     public Integer getCBContactDist() { return(minContactDistances[CB]); }
-    public Integer getCBContactAtomNumA() { return(contactAtomIndexInResidueA[CB] + 1); }
-    public Integer getCBContactAtomNumB() { return(contactAtomIndexInResidueB[CB] + 1); }
+    public Integer getCBContactAtomNumA() { return(contactAtomIndexInMoleculeA[CB] + 1); }
+    public Integer getCBContactAtomNumB() { return(contactAtomIndexInMoleculeB[CB] + 1); }
 
     public Integer getBCContactDist() { return(minContactDistances[BC]); }
-    public Integer getBCContactAtomNumA() { return(contactAtomIndexInResidueA[BC] + 1); }
-    public Integer getBCContactAtomNumB() { return(contactAtomIndexInResidueB[BC] + 1); }
+    public Integer getBCContactAtomNumA() { return(contactAtomIndexInMoleculeA[BC] + 1); }
+    public Integer getBCContactAtomNumB() { return(contactAtomIndexInMoleculeB[BC] + 1); }
 
     public Integer getCCContactDist() { return(minContactDistances[CC]); }
-    public Integer getCCContactAtomNumA() { return(contactAtomIndexInResidueA[CC] + 1); }
-    public Integer getCCContactAtomNumB() { return(contactAtomIndexInResidueB[CC] + 1); }
+    public Integer getCCContactAtomNumA() { return(contactAtomIndexInMoleculeA[CC] + 1); }
+    public Integer getCCContactAtomNumB() { return(contactAtomIndexInMoleculeB[CC] + 1); }
 
     public Integer getBLContactDist() { return(minContactDistances[BL]); }
-    public Integer getBLContactAtomNumA() { return(contactAtomIndexInResidueA[BL] + 1); }
-    public Integer getBLContactAtomNumB() { return(contactAtomIndexInResidueB[BL] + 1); }
+    public Integer getBLContactAtomNumA() { return(contactAtomIndexInMoleculeA[BL] + 1); }
+    public Integer getBLContactAtomNumB() { return(contactAtomIndexInMoleculeB[BL] + 1); }
 
     public Integer getLBContactDist() { return(minContactDistances[LB]); }
-    public Integer getLBContactAtomNumA() { return(contactAtomIndexInResidueA[LB] + 1); }
-    public Integer getLBContactAtomNumB() { return(contactAtomIndexInResidueB[LB] + 1); }
+    public Integer getLBContactAtomNumA() { return(contactAtomIndexInMoleculeA[LB] + 1); }
+    public Integer getLBContactAtomNumB() { return(contactAtomIndexInMoleculeB[LB] + 1); }
 
     public Integer getCLContactDist() { return(minContactDistances[CL]); }
-    public Integer getCLContactAtomNumA() { return(contactAtomIndexInResidueA[CL] + 1); }
-    public Integer getCLContactAtomNumB() { return(contactAtomIndexInResidueB[CL] + 1); }
+    public Integer getCLContactAtomNumA() { return(contactAtomIndexInMoleculeA[CL] + 1); }
+    public Integer getCLContactAtomNumB() { return(contactAtomIndexInMoleculeB[CL] + 1); }
 
     public Integer getLCContactDist() { return(minContactDistances[LC]); }
-    public Integer getLCContactAtomNumA() { return(contactAtomIndexInResidueA[LC] + 1); }
-    public Integer getLCContactAtomNumB() { return(contactAtomIndexInResidueB[LC] + 1); }
+    public Integer getLCContactAtomNumA() { return(contactAtomIndexInMoleculeA[LC] + 1); }
+    public Integer getLCContactAtomNumB() { return(contactAtomIndexInMoleculeB[LC] + 1); }
 
     public Integer getLLContactDist() { return(minContactDistances[LL]); }
-    public Integer getLLContactAtomNumA() { return(contactAtomIndexInResidueA[LL] + 1); }
-    public Integer getLLContactAtomNumB() { return(contactAtomIndexInResidueB[LL] + 1); }
+    public Integer getLLContactAtomNumA() { return(contactAtomIndexInMoleculeA[LL] + 1); }
+    public Integer getLLContactAtomNumB() { return(contactAtomIndexInMoleculeB[LL] + 1); }
     
     public Integer getIVDWContactDist() { return(minContactDistances[IVDW]); }
-    public Integer getIVDWContactAtomNumA() { return(contactAtomIndexInResidueA[IVDW] + 1); }
-    public Integer getIVDWContactAtomNumB() { return(contactAtomIndexInResidueB[IVDW] + 1); }
+    public Integer getIVDWContactAtomNumA() { return(contactAtomIndexInMoleculeA[IVDW] + 1); }
+    public Integer getIVDWContactAtomNumB() { return(contactAtomIndexInMoleculeB[IVDW] + 1); }
     
     public Integer getBBHBContactDist() { return(minContactDistances[BBHB]); }
-    public Integer getBBHBContactAtomNumA() { return(contactAtomIndexInResidueA[BBHB] + 1); }
-    public Integer getBBHBContactAtomNumB() { return(contactAtomIndexInResidueB[BBHB] + 1); }
+    public Integer getBBHBContactAtomNumA() { return(contactAtomIndexInMoleculeA[BBHB] + 1); }
+    public Integer getBBHBContactAtomNumB() { return(contactAtomIndexInMoleculeB[BBHB] + 1); }
     
     public Integer getBBBHContactDist() { return(minContactDistances[BBBH]); }
-    public Integer getBBBHContactAtomNumA() { return(contactAtomIndexInResidueA[BBBH] + 1); }
-    public Integer getBBBHContactAtomNumB() { return(contactAtomIndexInResidueB[BBBH] + 1); }
+    public Integer getBBBHContactAtomNumA() { return(contactAtomIndexInMoleculeA[BBBH] + 1); }
+    public Integer getBBBHContactAtomNumB() { return(contactAtomIndexInMoleculeB[BBBH] + 1); }
     
     public Integer getBCHBContactDist() { return(minContactDistances[BCHB]); }
-    public Integer getBCHBContactAtomNumA() { return(contactAtomIndexInResidueA[BCHB] + 1); }
-    public Integer getBCHBContactAtomNumB() { return(contactAtomIndexInResidueB[BCHB] + 1); }
+    public Integer getBCHBContactAtomNumA() { return(contactAtomIndexInMoleculeA[BCHB] + 1); }
+    public Integer getBCHBContactAtomNumB() { return(contactAtomIndexInMoleculeB[BCHB] + 1); }
     
     public Integer getBCBHContactDist() { return(minContactDistances[BCBH]); }
-    public Integer getBCBHContactAtomNumA() { return(contactAtomIndexInResidueA[BCBH] + 1); }
-    public Integer getBCBHContactAtomNumB() { return(contactAtomIndexInResidueB[BCBH] + 1); }
+    public Integer getBCBHContactAtomNumA() { return(contactAtomIndexInMoleculeA[BCBH] + 1); }
+    public Integer getBCBHContactAtomNumB() { return(contactAtomIndexInMoleculeB[BCBH] + 1); }
     
     public Integer getCBHBContactDist() { return(minContactDistances[CBHB]); }
-    public Integer getCBHBContactAtomNumA() { return(contactAtomIndexInResidueA[CBHB] + 1); }
-    public Integer getCBHBContactAtomNumB() { return(contactAtomIndexInResidueB[CBHB] + 1); }
+    public Integer getCBHBContactAtomNumA() { return(contactAtomIndexInMoleculeA[CBHB] + 1); }
+    public Integer getCBHBContactAtomNumB() { return(contactAtomIndexInMoleculeB[CBHB] + 1); }
     
     public Integer getCBBHContactDist() { return(minContactDistances[CBBH]); }
-    public Integer getCBBHContactAtomNumA() { return(contactAtomIndexInResidueA[CBBH] + 1); }
-    public Integer getCBBHContactAtomNumB() { return(contactAtomIndexInResidueB[CBBH] + 1); }
+    public Integer getCBBHContactAtomNumA() { return(contactAtomIndexInMoleculeA[CBBH] + 1); }
+    public Integer getCBBHContactAtomNumB() { return(contactAtomIndexInMoleculeB[CBBH] + 1); }
     
     public Integer getCCHBContactDist() { return(minContactDistances[CCHB]); }
-    public Integer getCCHBContactAtomNumA() { return(contactAtomIndexInResidueA[CCHB] + 1); }
-    public Integer getCCHBContactAtomNumB() { return(contactAtomIndexInResidueB[CCHB] + 1); }
+    public Integer getCCHBContactAtomNumA() { return(contactAtomIndexInMoleculeA[CCHB] + 1); }
+    public Integer getCCHBContactAtomNumB() { return(contactAtomIndexInMoleculeB[CCHB] + 1); }
     
     public Integer getCCBHContactDist() { return(minContactDistances[CCBH]); }
-    public Integer getCCBHContactAtomNumA() { return(contactAtomIndexInResidueA[CCBH] + 1); }
-    public Integer getCCBHContactAtomNumB() { return(contactAtomIndexInResidueB[CCBH] + 1); }
+    public Integer getCCBHContactAtomNumA() { return(contactAtomIndexInMoleculeA[CCBH] + 1); }
+    public Integer getCCBHContactAtomNumB() { return(contactAtomIndexInMoleculeB[CCBH] + 1); }
     
     public Integer getNHPIContactDist() { return(minContactDistances[NHPI]); }
-    public Integer getNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[NHPI] + 1); }
-    public Integer getNHPIContactAtomNumB() { return(contactAtomIndexInResidueB[NHPI] + 1); }
+    public Integer getNHPIContactAtomNumA() { return(contactAtomIndexInMoleculeA[NHPI] + 1); }
+    public Integer getNHPIContactAtomNumB() { return(contactAtomIndexInMoleculeB[NHPI] + 1); }
     
     public Integer getPINHContactDist() { return(minContactDistances[PINH]); }
-    public Integer getPINHContactAtomNumA() { return(contactAtomIndexInResidueA[PINH] + 1); }
-    public Integer getPINHContactAtomNumB() { return(contactAtomIndexInResidueB[PINH] + 1); }
+    public Integer getPINHContactAtomNumA() { return(contactAtomIndexInMoleculeA[PINH] + 1); }
+    public Integer getPINHContactAtomNumB() { return(contactAtomIndexInMoleculeB[PINH] + 1); }
     
     public Integer getCAHPIContactDist() { return(minContactDistances[CAHPI]); }
-    public Integer getCAHPIContactAtomNumA() { return(contactAtomIndexInResidueA[CAHPI] + 1); }
-    public Integer getCAHPIContactAtomNumB() { return(contactAtomIndexInResidueB[CAHPI] + 1); }
+    public Integer getCAHPIContactAtomNumA() { return(contactAtomIndexInMoleculeA[CAHPI] + 1); }
+    public Integer getCAHPIContactAtomNumB() { return(contactAtomIndexInMoleculeB[CAHPI] + 1); }
     
     public Integer getPICAHContactDist() { return(minContactDistances[PICAH]); }
-    public Integer getPICAHContactAtomNumA() { return(contactAtomIndexInResidueA[PICAH] + 1); }
-    public Integer getPICAHContactAtomNumB() { return(contactAtomIndexInResidueB[PICAH] + 1); }
+    public Integer getPICAHContactAtomNumA() { return(contactAtomIndexInMoleculeA[PICAH] + 1); }
+    public Integer getPICAHContactAtomNumB() { return(contactAtomIndexInMoleculeB[PICAH] + 1); }
     
     public Integer getCNHPIContactDist() { return(minContactDistances[CNHPI]); }
-    public Integer getCNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[CNHPI] + 1); }
-    public Integer getCNHPIContactAtomNumB() { return(contactAtomIndexInResidueB[CNHPI] + 1); }
+    public Integer getCNHPIContactAtomNumA() { return(contactAtomIndexInMoleculeA[CNHPI] + 1); }
+    public Integer getCNHPIContactAtomNumB() { return(contactAtomIndexInMoleculeB[CNHPI] + 1); }
     
     public Integer getPICNHContactDist() { return(minContactDistances[PICNH]); }
-    public Integer getPICNHContactAtomNumA() { return(contactAtomIndexInResidueA[PICNH] + 1); }
-    public Integer getPICNHContactAtomNumB() { return(contactAtomIndexInResidueB[PICNH] + 1); }
+    public Integer getPICNHContactAtomNumA() { return(contactAtomIndexInMoleculeA[PICNH] + 1); }
+    public Integer getPICNHContactAtomNumB() { return(contactAtomIndexInMoleculeB[PICNH] + 1); }
     
     public Integer getSHPIContactDist() { return(minContactDistances[SHPI]); }
-    public Integer getSHPIContactAtomNumA() { return(contactAtomIndexInResidueA[SHPI] + 1); }
-    public Integer getSHPIContactAtomNumB() { return(contactAtomIndexInResidueB[SHPI] + 1); }
+    public Integer getSHPIContactAtomNumA() { return(contactAtomIndexInMoleculeA[SHPI] + 1); }
+    public Integer getSHPIContactAtomNumB() { return(contactAtomIndexInMoleculeB[SHPI] + 1); }
     
     public Integer getPISHContactDist() { return(minContactDistances[PISH]); }
-    public Integer getPISHContactAtomNumA() { return(contactAtomIndexInResidueA[PISH] + 1); }
-    public Integer getPISHContactAtomNumB() { return(contactAtomIndexInResidueB[PISH] + 1); }
+    public Integer getPISHContactAtomNumA() { return(contactAtomIndexInMoleculeA[PISH] + 1); }
+    public Integer getPISHContactAtomNumB() { return(contactAtomIndexInMoleculeB[PISH] + 1); }
     
     public Integer getXOHPIContactDist() { return(minContactDistances[XOHPI]); }
-    public Integer getXOHPIContactAtomNumA() { return(contactAtomIndexInResidueA[XOHPI] + 1); }
-    public Integer getXOHPIContactAtomNumB() { return(contactAtomIndexInResidueB[XOHPI] + 1); }
+    public Integer getXOHPIContactAtomNumA() { return(contactAtomIndexInMoleculeA[XOHPI] + 1); }
+    public Integer getXOHPIContactAtomNumB() { return(contactAtomIndexInMoleculeB[XOHPI] + 1); }
     
     public Integer getPIXOHContactDist() { return(minContactDistances[PIXOH]); }
-    public Integer getPIXOHContactAtomNumA() { return(contactAtomIndexInResidueA[PIXOH] + 1); }
-    public Integer getPIXOHContactAtomNumB() { return(contactAtomIndexInResidueB[PIXOH] + 1); }
+    public Integer getPIXOHContactAtomNumA() { return(contactAtomIndexInMoleculeA[PIXOH] + 1); }
+    public Integer getPIXOHContactAtomNumB() { return(contactAtomIndexInMoleculeB[PIXOH] + 1); }
     
     public Integer getPROCDHPIContactDist() { return(minContactDistances[PROCDHPI]); }
-    public Integer getPROCDHPIContactAtomNumA() { return(contactAtomIndexInResidueA[PROCDHPI] + 1); }
-    public Integer getPROCDHPIContactAtomNumB() { return(contactAtomIndexInResidueB[PROCDHPI] + 1); }
+    public Integer getPROCDHPIContactAtomNumA() { return(contactAtomIndexInMoleculeA[PROCDHPI] + 1); }
+    public Integer getPROCDHPIContactAtomNumB() { return(contactAtomIndexInMoleculeB[PROCDHPI] + 1); }
     
     public Integer getPIPROCDHContactDist() { return(minContactDistances[PIPROCDH]); }
-    public Integer getPIPROCDHContactAtomNumA() { return(contactAtomIndexInResidueA[PIPROCDH] + 1); }
-    public Integer getPIPROCDHContactAtomNumB() { return(contactAtomIndexInResidueB[PIPROCDH] + 1); }   
+    public Integer getPIPROCDHContactAtomNumA() { return(contactAtomIndexInMoleculeA[PIPROCDH] + 1); }
+    public Integer getPIPROCDHContactAtomNumB() { return(contactAtomIndexInMoleculeB[PIPROCDH] + 1); }   
     
     public Integer getCCAHCOContactDist() { return(minContactDistances[CCAHCO]); }
-    public Integer getCCAHCOContactAtomNumA() { return(contactAtomIndexInResidueA[CCAHCO] + 1); }
-    public Integer getCCAHCOContactAtomNumB() { return(contactAtomIndexInResidueB[CCAHCO] + 1); }
+    public Integer getCCAHCOContactAtomNumA() { return(contactAtomIndexInMoleculeA[CCAHCO] + 1); }
+    public Integer getCCAHCOContactAtomNumB() { return(contactAtomIndexInMoleculeB[CCAHCO] + 1); }
     
     public Integer getCCOCAHContactDist() { return(minContactDistances[CCOCAH]); }
-    public Integer getCCOCAHContactAtomNumA() { return(contactAtomIndexInResidueA[CCOCAH] + 1); }
-    public Integer getCCOCAHContactAtomNumB() { return(contactAtomIndexInResidueB[CCOCAH] + 1); }
+    public Integer getCCOCAHContactAtomNumA() { return(contactAtomIndexInMoleculeA[CCOCAH] + 1); }
+    public Integer getCCOCAHContactAtomNumB() { return(contactAtomIndexInMoleculeB[CCOCAH] + 1); }
     
     public Integer getBCAHCOContactDist() { return(minContactDistances[BCAHCO]); }
-    public Integer getBCAHCOContactAtomNumA() { return(contactAtomIndexInResidueA[BCAHCO] + 1); }
-    public Integer getBCAHCOContactAtomNumB() { return(contactAtomIndexInResidueB[BCAHCO] + 1); }
+    public Integer getBCAHCOContactAtomNumA() { return(contactAtomIndexInMoleculeA[BCAHCO] + 1); }
+    public Integer getBCAHCOContactAtomNumB() { return(contactAtomIndexInMoleculeB[BCAHCO] + 1); }
     
     public Integer getBCOCAHContactDist() { return(minContactDistances[BCOCAH]); }
-    public Integer getBCOCAHContactAtomNumA() { return(contactAtomIndexInResidueA[BCOCAH] + 1); }
-    public Integer getBCOCAHContactAtomNumB() { return(contactAtomIndexInResidueB[BCOCAH] + 1); }
+    public Integer getBCOCAHContactAtomNumA() { return(contactAtomIndexInMoleculeA[BCOCAH] + 1); }
+    public Integer getBCOCAHContactAtomNumB() { return(contactAtomIndexInMoleculeB[BCOCAH] + 1); }
     
     
 // the getters for statistics follow
@@ -423,24 +423,6 @@ public class MolContactInfo {
     // DEBUG only
     public Molecule getMolA() { return(molA); }
     public Molecule getMolB() { return(molB); }
-    
-    // Return Mol as Res if possible, otherwise null
-    public Residue getResA() {
-        if (molA instanceof Residue) {
-            return (Residue) molA;
-        } else {
-            return null;
-        }
-    }
-    
-    // Return Mol as Res if possible, otherwise null
-    public Residue getResB() {
-        if (molB instanceof Residue) {
-            return (Residue) molB;
-        } else {
-            return null;
-        }
-    }
     
     /**
      * Determines whether the molecule pair described by this RCI is in any contact, i.e., has contacts of any type.

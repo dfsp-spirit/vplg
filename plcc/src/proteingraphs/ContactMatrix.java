@@ -77,7 +77,7 @@ public class ContactMatrix {
 
     
     /**
-     * Defines which chain should be considered (only contacts between residues from that chain will count). This is used by fillFromContactList() and has to be set before calling that function.
+     * Defines which chain should be considered (only contacts between molecules from that chain will count). This is used by fillFromContactList() and has to be set before calling that function.
      * @param cID the PDB chain ID, e.g. "A". This has to be a valid chain ID that occurs in the current PDB file.
      */
     public void restrictToChain(String cID) {
@@ -108,19 +108,19 @@ public class ContactMatrix {
             molA = rc.getMolA();
             molB = rc.getMolB();
 
-            // Only handle this contact if both residues belong to the chain we are interested in (or if we are interested in all chains)
+            // Only handle this contact if both molecules belong to the chain we are interested in (or if we are interested in all chains)
             if( (molA.getChainID().equals(this.handleChain) && molB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
                 
                 
 
-                // We need to get the SSEs for the residues now. Note that they may not be part of any SSE
+                // We need to get the SSEs for the molecules now. Note that they may not be part of any SSE
                 //  in our list (they may be part of an SSE of another chain or no valid SSE, e.g. a coil).
                 aSSEPos = getSSEPosOfDsspResidue(molA.getDsspNum());
                 bSSEPos = getSSEPosOfDsspResidue(molB.getDsspNum());
                
                 if(aSSEPos < 0 || bSSEPos < 0) {
-                    // At least one of these residues is not part of one of the SEEs. This can happen if it is part
-                    // of a coiled region. Just skip this residue pair.
+                    // At least one of these molecules is not part of one of the SEEs. This can happen if it is part
+                    // of a coiled region. Just skip this molecule pair.
                     //System.out.println("* Ignored DSSP contact pair " + a.getDsspResNum() + System.getProperty("file.separator") + b.getDsspResNum() + ", not part of any SSE in list.");
                     contNumIgnored++;
                     continue;
@@ -133,7 +133,7 @@ public class ContactMatrix {
                         continue;
                     }
 
-                    // Fill the residue level SSE contact matrix
+                    // Fill the molecule level SSE contact matrix
                     this.resContSSE[aSSEPos][bSSEPos]++;
                     this.resContSSE[bSSEPos][aSSEPos]++;
                     
@@ -141,7 +141,7 @@ public class ContactMatrix {
                     
                     Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");//;   
                                        // See comment above, the maximum number of contacts of a certain type that
-                                       // is counted for a residue pair. 
+                                       // is counted for a molecule pair. 
                                        // The PTGL uses a setting of 1.
                     
                     Integer numc;   // just a temp var for current number of contacts
@@ -178,7 +178,7 @@ public class ContactMatrix {
                     this.addContacts("LL", aSSEPos, bSSEPos, Math.min(numc , mpt));
 
                         // ***** Fill the other half of the matrix [ (y/x) instead of (x/y) ] *****
-                        // We should not do this! If a residue A has a BC contact to a residue B, it does NOT mean that
+                        // We should not do this! If a molecule A has a BC contact to a molecule B, it does NOT mean that
                         // B has a BC contact to A if we differentiate between BC and CB contacts!
 
                     
@@ -243,7 +243,7 @@ public class ContactMatrix {
     }
 
     /**
-     * Prints the residue contact matrix to STDOUT.
+     * Prints the molecule contact matrix to STDOUT.
      */
     public void printResContMatrix() {
 
@@ -311,12 +311,12 @@ public class ContactMatrix {
     
 
     /**
-     * Determines the SSE (by its position in the SSE list) that contains the residue with the
-     * given DSSP residue number. Note that some residues are not part of any SSE (those in coiled regions).
-     * It works by comparing the given DSSP residue number with the start and end residue numbers of all SSEs
+     * Determines the SSE (by its position in the SSE list) that contains the molecule with the
+     * given DSSP number. Note that some molecules are not part of any SSE (those in coiled regions).
+     * It works by comparing the given DSSP number with the start and end numbers of all SSEs
      * in the SSE list of the ContactMatrix.
-     * @param dsspResNum the DSSP residue number
-     * @return the SSE number if the residue was found in an SSE, -1 otherwise
+     * @param dsspResNum the DSSP number
+     * @return the SSE number if the molecule was found in an SSE, -1 otherwise
      */
     public Integer getSSEPosOfDsspResidue(Integer dsspResNum) {
         Integer pos = -1;
@@ -347,8 +347,8 @@ public class ContactMatrix {
 
     /**
      * Determines the position of an SSE with the given DSSP start and end numbers in the SSE list.
-     * @param dsspStart the DSSP residue number of the 1st residue of the SSE
-     * @param dsspEnd the DSSP residue number of the last residue of the SSE
+     * @param dsspStart the DSSP number of the 1st molecule of the SSE
+     * @param dsspEnd the DSSP number of the last molecule of the SSE
      * @return the SSE index in the list if such an SSE was found, -1 otherwise
      */
     public Integer getSsePositionInList(Integer dsspStart, Integer dsspEnd) {
@@ -744,10 +744,10 @@ public class ContactMatrix {
         
         // pre-processing only for double difference required
         if (Settings.getBoolean("plcc_B_spatrel_use_dd")) {
-            // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string 
+            // Turn list into map to speed up stuff afterwards. The map has as key the molecule unique string 
             //   (jnw_2019: more like the number of the SSE it is part of), and as value a list of all contacts 
-            //   of that residue. This is done only once, and saves us from sequentially iterating through the 
-            //   contact list to find the ones for the current residue (|R|^2) times later.
+            //   of that molecule. This is done only once, and saves us from sequentially iterating through the 
+            //   contact list to find the ones for the current molecule (|R|^2) times later.
             for(MolContactInfo rci : contList) {
                 resASSEPos = getSSEPosOfDsspResidue(rci.getMolA().getDsspNum());
                 resBSSEPos = getSSEPosOfDsspResidue(rci.getMolB().getDsspNum());

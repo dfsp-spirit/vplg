@@ -138,7 +138,7 @@ public class Main {
     
     /** The number of different contact types which are stored for a pair of residues. See calculateAtomContactsBetweenResidues() and
      the MolContactInfo class for details and usage. */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 15;
+    public static final Integer NUM_MOLECULE_PAIR_CONTACT_TYPES = 15;
     
     /**
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
@@ -2366,7 +2366,7 @@ public class Main {
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
-                ArrayList<Molecule> residuesFromMolecules = new ArrayList<>(resFromMolecules(molecules)); // resFromMolecules creates Residue objects, but we need Molecule objects
+                ArrayList<Molecule> residuesFromMolecules = new ArrayList<>(resFromMolecules(molecules));   // resFromMolecules creates Residue objects, but we need Molecule objects
                 cInfo = calculateAllContactsAlternativeModel(residuesFromMolecules);
             }
             else {
@@ -5806,7 +5806,7 @@ public class Main {
         MolContactInfo result = null;
 
 
-        Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        Integer[] numPairContacts = new Integer[Main.NUM_MOLECULE_PAIR_CONTACT_TYPES];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
         // Some cheap vars to make things easier to understand (a replacement for #define):
         /*
@@ -12664,7 +12664,7 @@ public class Main {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
                                 //curSSE.addResidues(nextSSE.getResidues());
-                                nextSSE.addResiduesAtStart(curSSE.getMolecules());
+                                nextSSE.addMoleculesAtStart(curSSE.getMolecules());
                                 currentSSEmergedIntoNext = true;
                                 //i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
                             }                                                                                    
@@ -12745,8 +12745,8 @@ public class Main {
                     }
                     
                     //add residues
-                    newSSE.addResiduesAtStart(curSSE.getMolecules());
-                    newSSE.addResiduesAtStart(nextSSE.getMolecules());
+                    newSSE.addMoleculesAtStart(curSSE.getMolecules());
+                    newSSE.addMoleculesAtStart(nextSSE.getMolecules());
                     
                     //set new sequential number of the SSE
                     newSSE.setSeqSseNumDssp(newList.size() + 1);

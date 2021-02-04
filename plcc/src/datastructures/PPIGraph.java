@@ -52,7 +52,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
     }
 
     /**
-     * Checks whether a residue contact satisfies the minimal sequential
+     * Checks whether a molecule contact satisfies the minimal sequential
      * residue distance rule.
      *
      * @param minSeqDist the minimal allowed seq dist
@@ -70,7 +70,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
                 //different chains, add contact
                 return true;
             } else {
-                // same chain, gotta check residue distance
+                // same chain, gotta check molecule distance
                 int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if (seqDist < minSeqDist) {
                     return false;
@@ -82,7 +82,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
     }
 
     /**
-     * Checks whether a residue contact satisfies the maximal sequential
+     * Checks whether a molecule contact satisfies the maximal sequential
      * residue distance rule.
      *
      * @param maxSeqDist the max allowed seq dist
@@ -100,7 +100,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
                 //different chains, do NOT add contact
                 return false;
             } else {
-                // same chain, gotta check residue distance
+                // same chain, gotta check molecule distance
                 int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if (seqDist > maxSeqDist) {
                     return false;
@@ -132,7 +132,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
      * Automatically adds an edge from a MolContactInfo object if applicable.
      * Note that the edge is only added if the RCI describes a contact.
      *
-     * @param rci the MolContactInfo object, must be for 2 residues which are
+     * @param rci the MolContactInfo object, must be for 2 molecule which are
  part of this graph
      * @return true if the edge was added, false otherwise
      */
@@ -141,7 +141,7 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
             Molecule resA = rci.getMolA();
             Molecule resB = rci.getMolB();
             
-            // check that both are residues (null if e.g. RNA)
+            // check that both are molecule
             if (resA == null || resB == null) {
                 return false;
             }
@@ -161,18 +161,18 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
                 StringBuilder sb = new StringBuilder();
                 sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + resA.getFancyName() + " and " + resB.getFancyName() + ".");
                 if (indexResA < 0 && indexResB < 0) {
-                    sb.append(" BOTH residues not found.\n");
+                    sb.append(" BOTH molecules not found.\n");
                     if ((!resA.isAA()) && (!resB.isAA())) {
                         notFoundIsorAreLigands = Boolean.TRUE;
                     }
                 } else {
                     if (indexResA < 0) {
-                        sb.append(" FIRST residue not found.\n");
+                        sb.append(" FIRST molecule not found.\n");
                         if (!resA.isAA()) {
                             notFoundIsorAreLigands = Boolean.TRUE;
                         }
                     } else {  // indexResA < 0
-                        sb.append(" SECOND residue not found.\n");
+                        sb.append(" SECOND molecule not found.\n");
                         if (!resB.isAA()) {
                             notFoundIsorAreLigands = Boolean.TRUE;
                         }
@@ -277,11 +277,11 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
     }
 
     /**
-     * Returns the 3D euclidian distance between the Residues at indices i and j
+     * Returns the 3D euclidian distance between the molecules at indices i and j
      * in this graph.
      *
-     * @param i the residue i by index
-     * @param j the residue j by index
+     * @param i the molecule i by index
+     * @param j the molecule j by index
      * @return the euclidian distance
      */
     public int getEdgeDistance(int i, int j) {
