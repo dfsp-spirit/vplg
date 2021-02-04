@@ -81,8 +81,7 @@ public class Chain implements java.io.Serializable {
     /**
      * Returns a list of all ligand residues in this chain.
      * @return a list of all ligand residues in this chain
-     * First checks if this molecule is empty and if this molecule is an Instance of RNA 
-     * For this method we need to convert the molecule object into a residue object 
+     * For this method we need to convert the molecule object into a ligand object 
      */
     public ArrayList<Ligand> getAllLigandResidues() {
         ArrayList<Ligand> ligands = new ArrayList<>();     
@@ -113,7 +112,7 @@ public class Chain implements java.io.Serializable {
     
        /**
      * Returns all molecules of class Residue belonging to this chain as output type Molecule.
-     * @return ArrayList of residues
+     * @return ArrayList of residues which are type Molecule
      */
     public ArrayList<Molecule> getAllAAResiduesAsTypeMolecule() {
         ArrayList<Molecule> thisResidues = new ArrayList<>();

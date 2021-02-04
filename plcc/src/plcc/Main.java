@@ -2366,7 +2366,8 @@ public class Main {
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
-                cInfo = calculateAllContactsAlternativeModel(resFromMolecules(molecules));
+                ArrayList<Molecule> residuesFromMolecules = new ArrayList<>(resFromMolecules(molecules)); // resFromMolecules creates Residue objects, but we need Molecule objects
+                cInfo = calculateAllContactsAlternativeModel(residuesFromMolecules);
             }
             else {
                 if (Settings.getBoolean("plcc_B_chain_spheres_speedup")) {
@@ -4937,12 +4938,12 @@ public class Main {
      * @param res a list of residues
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<MolContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
+    public static ArrayList<MolContactInfo> calculateAllContactsAlternativeModel(List<Molecule> mol) {
 
         System.out.println("\n *** Calculation of interchain contacts. Still WIP! ***");
         FileParser.silent = false;
-        Residue a, b;
-        Integer rs = res.size();
+        Molecule a, b;
+        Integer rs = mol.size();
         
         // jnw_2019: switch rna off for alternative model
         if (Settings.getBoolean("plcc_B_include_rna")) {
@@ -4957,13 +4958,13 @@ public class Main {
         
 
         for(Integer i = 0; i < rs; i++) {
-            a = res.get(i);
+            a = mol.get(i);
             
             //DEBUG
             //System.out.println("calculatePiEffects: Residue " + a.getFancyName() + " has " + a.getHydrogenAtoms().size() + " H atoms.");
 
             for(Integer j = i + 1; j < rs; j++) {
-                b = res.get(j);
+                b = mol.get(j);
                 numResContactsChecked++;
 
                                                      
@@ -6442,7 +6443,7 @@ public class Main {
      * @param b one of the residues of the residue pair
      * @return A MolContactInfo object with information on the pi-effects between 'a' and 'b'.
      */
-    public static MolContactInfo calculatePiEffects(Residue a, Residue b) {
+    public static MolContactInfo calculatePiEffects(Molecule a, Molecule b) {
         
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
@@ -8515,7 +8516,7 @@ public class Main {
      * @param b one of the residues of the residue pair
      * @return A MolContactInfo object with information on the atom contacts between 'a' and 'b'.
      */
-    public static MolContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Residue a, Residue b) {
+    public static MolContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Molecule a, Molecule b) {
 
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();

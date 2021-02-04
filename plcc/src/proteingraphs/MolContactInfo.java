@@ -17,7 +17,7 @@ import proteinstructure.Molecule;
 
 
 /**
- * This class implements a residue level contact, i.e., all information required about the contact between a pair (a, b) of Residue objects.
+ * This class implements a molecule level contact, i.e., all information required about the contact between a pair (a, b) of Molecule objects.
  * @author ts
  */
 public class MolContactInfo {
@@ -107,16 +107,16 @@ public class MolContactInfo {
     private ArrayList<Atom[]> atomAtomContacts;
 
     /**
-     * Constructor for a residue pair contact between the residues (a, b).
+     * Constructor for a molecule pair contact between the molecules (a, b).
      * 
-     * @param npcs array holding the number of atom contacts of all different types (e.g., BB, BC, CB, ...) of this residue pair.
+     * @param npcs array holding the number of atom contacts of all different types (e.g., BB, BC, CB, ...) of this molecule pair.
      * @param mcds array holding the minimum contact distances of all different types (BB, ...)
-     * @param can_a array holding the atom indices of the contact atoms of the different types (BB, ...) in Residue a
-     * @param can_b array holding the atom indices of the contact atoms of the different types (BB, ...) in Residue b
-     * @param a the first Residue of (a, b)
-     * @param b the second Residue of (a, b)
-     * @param d the distance of this residue pair (residue center to residue center)
-     * @param nlc the number of total ligand contacts of this residue pair 
+     * @param can_a array holding the atom indices of the contact atoms of the different types (BB, ...) in molecule a
+     * @param can_b array holding the atom indices of the contact atoms of the different types (BB, ...) in molecule b
+     * @param a the first molecule of (a, b)
+     * @param b the second molecule of (a, b)
+     * @param d the distance of this molecule pair (molecule center to molecule center)
+     * @param nlc the number of total ligand contacts of this molecule pair 
      */    
     public MolContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Molecule a, Molecule b, Integer d, Integer nlc, Integer nrc) {
 
@@ -133,18 +133,18 @@ public class MolContactInfo {
     
     
     /**
-     * Constructor for a residue pair contact between the residues (a, b).
+     * Constructor for a molecule pair contact between the molecules (a, b).
      * 
-     * @param npcs array holding the number of atom contacts of all different types (e.g., BB, BC, CB, ...) of this residue pair.
+     * @param npcs array holding the number of atom contacts of all different types (e.g., BB, BC, CB, ...) of this molecule pair.
      * @param mcds array holding the minimum contact distances of all different types (BB, ...)
-     * @param can_a array holding the atom indices of the contact atoms of the different types (BB, ...) in Residue a
-     * @param can_b array holding the atom indices of the contact atoms of the different types (BB, ...) in Residue b
-     * @param a the first Residue of (a, b)
-     * @param b the second Residue of (a, b)
-     * @param d the distance of this residue pair (residue center to residue center)
-     * @param nlc the number of total ligand contacts of this residue pair 
+     * @param can_a array holding the atom indices of the contact atoms of the different types (BB, ...) in molecule a
+     * @param can_b array holding the atom indices of the contact atoms of the different types (BB, ...) in molecule b
+     * @param a the first molecule of (a, b)
+     * @param b the second molecule of (a, b)
+     * @param d the distance of this molecule pair (molecule center to molecule center)
+     * @param nlc the number of total ligand contacts of this molecule pair 
      */    
-    public MolContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Residue a, Residue b, Integer d, Integer nlc, Integer nrc, ArrayList<String> aact, ArrayList<Atom[]> aac) {
+    public MolContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Molecule a, Molecule b, Integer d, Integer nlc, Integer nrc, ArrayList<String> aact, ArrayList<Atom[]> aac) {
 
         numPairContacts = npcs;
         minContactDistances = mcds;
@@ -375,6 +375,7 @@ public class MolContactInfo {
 // the getters for statistics follow
     public Integer getNumContactsTotal() { return(numPairContacts[TT]); }
     public Integer getNumLigContactsTotal() { return(numTotalLigContactsPair); }
+    public Integer getNumRnaContactsTotal() { return(numTotalRnaContactsPair); }
     public Integer getNumContactsBB() { return(numPairContacts[BB]); }
     public Integer getNumContactsBC() { return(numPairContacts[BC]); }
     public Integer getNumContactsCB() { return(numPairContacts[CB]); }
@@ -442,7 +443,7 @@ public class MolContactInfo {
     }
     
     /**
-     * Determines whether the residue pair described by this RCI is in any contact, i.e., has contacts of any type.
+     * Determines whether the molecule pair described by this RCI is in any contact, i.e., has contacts of any type.
      * @return true if this RCI contains any kind of contact
      */
     public boolean describesAnyContact() {
@@ -450,8 +451,8 @@ public class MolContactInfo {
     }
 
     /**
-     * Determines whether the residue pair described by this RCI has enough contacts on atom levels to count as PPI.
-     * For the residue pair to be in contact, at least two contacts of any kind or one disulphide bridge contact must present.
+     * Determines whether the molecule pair described by this RCI has enough contacts on atom levels to count as PPI.
+     * For the pair to be in contact, at least two contacts of any kind or one disulphide bridge contact must present.
      * @return true if this RCI contains a PPI contact
      */
     public boolean describesPPIContact() {

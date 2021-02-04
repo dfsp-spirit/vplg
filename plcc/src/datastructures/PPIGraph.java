@@ -138,8 +138,8 @@ public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGrap
      */
     public final boolean addPPIEdgeFromRCI(MolContactInfo rci) {
         if (rci.describesPPIContact()) {
-            Molecule resA = rci.getResA();
-            Molecule resB = rci.getResB();
+            Molecule resA = rci.getMolA();
+            Molecule resB = rci.getMolB();
             
             // check that both are residues (null if e.g. RNA)
             if (resA == null || resB == null) {

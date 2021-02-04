@@ -31,7 +31,7 @@ public class Atom implements java.io.Serializable {
     private String modelID = null;
     private Model model = null;
     private Integer pdbAtomNumber = null;       // atom number from pdb file
-    private Molecule molecule = null;             // Residue this Atom belongs to
+    private Molecule molecule = null;             // Molecule this Atom belongs to
     private Integer type = null;               // atom type:  0=AA, 1=Ligand, 2=Ignored HETATM (e.g. 'DOD'-molecule atoms) 3=Ignored ATOM (e.g. H, Q)
     private Integer pdbResNum = null;
     private Integer dsspResNum = null;
@@ -70,9 +70,6 @@ public class Atom implements java.io.Serializable {
     public Boolean isProteinAtom() { return this.type == ATOMTYPE_AA; }
     public Boolean isOtherAtom() { return this.type == ATOMTYPE_IGNORED_LIGAND; }
     public Boolean isRnaAtom() { return this.type == ATOMTYPE_RNA; }
-    
-    public Boolean isProteinOrRnaAtom() { return (this.type == ATOMTYPE_AA || this.type == ATOMTYPE_RNA); }
-
     
     
     /**
