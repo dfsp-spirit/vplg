@@ -30,6 +30,8 @@ import os
 import argparse
 import logging
 import traceback
+import fileinput
+
 
 
 ########### functions ###########
@@ -86,8 +88,7 @@ except ModuleNotFoundError as exception:
     sys.exit(1)
 """
 
-import fileinput
-            
+           
 ########### command line parser ###########
 
 ## create the parser
@@ -113,17 +114,15 @@ loudness.add_argument('-d',
                       action='store_true',
                       help='print everything including debug information')
 
-cl_parser.add_argument('-p',
-                       '--programmfolder',
-                       metavar = 'path',
-                       default = '',
-                       help = "specify a path to this programm's files. Otherwise the current folder is used.")
-
-cl_parser.add_argument('-i',
-                       '--inputfolder',
-                       metavar = 'path',
+cl_parser.add_argument('-id',
+                       '--inputdirectory',
                        default = '',
                        help = 'specify a path to your input files. Otherwise the current folder is used.')
+
+cl_parser.add_argument('-od',
+                       '--outputdirectory',
+                       default = '',
+                       help = 'specify a path to your output files. Otherwise the current folder is used.')
 
 cl_parser.add_argument('-o',
                        '--outputfile',
@@ -153,63 +152,70 @@ if (args.outputfile != ""):
         logging.error("Specified output file '%s' is not writable. Exiting now.", args.outputfile)
         sys.exit(1)
 
-if (args.inputfolder != ""):
-    if(os.access(args.inputfolder, os.R_OK)):
-        i_folder = args.inputfolder
+# input directory
+if (args.inputdirectory != ""):
+    if(os.path.isdir(args.inputdirectory)):
+        i_dir = args.inputdirectory
     else:
-        logging.error("Specified input folder '%s' is not readable. Exiting now.", args.inputfolder)
+        logging.error("Specified input directory '%s' is not readable. Exiting now.", args.inputdirectory)
         sys.exit(1)
 else:
-    i_folder = '.'
+    i_dir = os.getcwd() + '/'
 
-if (args.programmfolder != ""):
-    if(os.access(args.programmfolder, os.R_OK)):
-        p_folder = args.programmfolder
+# output directory
+if (args.outputdirectory != ""):
+    if(os.path.isdir(args.inputdirectory)):
+        o_dir = args.outputdirectory
     else:
-        logging.error("Specified programm folder '%s' is not readable. Exiting now.", args.programmfolder)
+        logging.error("Specified output directory '%s' is not writable. Exiting now.", args.outputdirectory)
         sys.exit(1)
 else:
-    p_folder = '.'
+    o_dir = os.getcwd() + '/'
 
-# check argument(s)
-"""
-if len(sys.argv) < 3:
-    log("Missing argument(s).", "e")
-    sys.exit()
-"""
 
 ########### vamos ###########
 
 # TODO add your code here
 
-tableColumns = "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA "
-tableCnt = 0
+for allfile in os.listdir(i_dir):
 
-for allfile in os.listdir(i_folder):
-    cnt = 0
-    
     if allfile.endswith(".dssp"):
-        for line in fileinput.input(allfile, inplace = True):
-            log('counter: '+ str(cnt), 'd')            
+        cnt = 0
+        data = []
+        with open(i_dir + allfile) as f:
+            for line in f:
+                data.append(line)
+        f.close()
+    
+        output = open(o_dir+allfile, "w")
+        
+        #for line in fileinput.input(i_dir + allfile, inplace=True):
+        for line in data:
+            log('line: ' + line, 'd')
+            log('counter: ', 'd')
+            log(cnt, 'd')
+            
             if ("  #  RESIDUE AA" == line[0:15]):
                 chain = "           CHAIN AUTHCHAIN "
-                #line = line + chain
-                line = line.rstrip('\n')
-                line = line.replace(line, line + chain + '\n')
-                #tableCnt = cnt
+                new_line = line.rstrip('\n')
+                if (line != new_line + chain + '\n'):
+                    #line = line.replace(line, new_line + chain + '\n')
+                    line = new_line + chain + '\n'
+                else:
+                    line = line
                 cnt +=1
-            #elif (line[11] != ' ') and (tableCnt > 0) and (tableCnt != cnt):
             elif (line[11] != ' ') and (cnt > 0):
                 log(line[11], 'd')
                 chain_id = "                " + line[11] + "         " + line[11]
-                #line = line + chain_id
-                line = line.rstrip('\n')
-                line = line.replace(line, line + chain_id + '\n')
-                #cnt +=1
+                new_line = line.rstrip('\n')
+                if (line != new_line + chain_id + '\n'):
+                    #line = line.replace(line, new_line + chain_id + '\n')
+                    line = new_line + chain_id + '\n'
             else:
                 line = line
-                #cnt +=1
-            sys.stdout.write(line)
+            output.write(line)
+            #sys.stdout.write(line)
+        output.close()
             
 log('finish dssp file overwritting','i')
 
