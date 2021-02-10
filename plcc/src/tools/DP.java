@@ -16,7 +16,7 @@ import plccSettings.Settings;
 public class DP {
     private static DP instance = null;
     
-    public static final String appTag = Settings.getApptag() + " ";
+    public static final String appTag = Settings.getApptag();
     
     public static final String errorTag = "[ERROR] ";
     public static final String warningTag = "[WARNING] ";
