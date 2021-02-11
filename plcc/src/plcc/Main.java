@@ -170,7 +170,7 @@ public class Main {
     /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
     static Boolean useFileFromCommandline = true;
     
-    // Lists of residues and RNAs. They are initilized as null and created once from molecules the first time the function
+    // Lists of residues, ligands and RNAs. They are initilized as null and created once from molecules the first time the function
     //   resFromMolecules or rnaFromMolecules is called
     static ArrayList<Residue> residues = null;
     static ArrayList<RNA> rnas = null;
@@ -2494,7 +2494,7 @@ public class Main {
                 System.out.println("Writing DSSP ligand file for residues...");
             }
             //writeDsspLigFile(dsspFile, dsspLigFile, cInfo, residues);
-            writeOrderedDsspLigFile(dsspFile, dsspLigFile, resFromMolecules(molecules));
+            writeOrderedDsspLigFile(dsspFile, dsspLigFile, molecules);
 
             // write chains file
             if(! silent) {
@@ -3042,7 +3042,7 @@ public class Main {
                     theChain.add(c);
                     
                     // compute chainName contacts
-                    cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
+                    cInfoThisChain = calculateAllContactsLimitedByChain(molecules, c.getPdbChainID());
                                         
                     if(Settings.getBoolean("plcc_B_AAgraph_perchain")) {
                         AAGraph aag = new AAGraph(c.getMolecules(), cInfoThisChain);
@@ -3095,7 +3095,7 @@ public class Main {
                     }
                     
                     if(separateContactsByChain) {
-                        calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
+                        calculateSSEGraphsForChains(theChain, cInfoThisChain, pdbid, outputDir);
                     }
                     
                     if(Settings.getBoolean("plcc_B_useDB")) {
@@ -3114,7 +3114,7 @@ public class Main {
             }
             
             if( ! separateContactsByChain){  // no chainName separation active                
-                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
+                calculateSSEGraphsForChains(handleChains, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     if( ! DBManager.getAutoCommit()) {
@@ -3505,12 +3505,11 @@ public class Main {
     /**
      * Calculates all SSE graph types which are configured in the config file for all given chains.
      * @param allChains a list of chains, each chainName will be handled separately
-     * @param resList a list of residues
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
-    public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<MolContactInfo> resContacts, String pdbid, String outputDir) {
+    public static void calculateSSEGraphsForChains(List<Chain> allChains, ArrayList<MolContactInfo> resContacts, String pdbid, String outputDir) {
         Boolean silent = Settings.getBoolean("plcc_B_silent");
                
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
@@ -4294,7 +4293,7 @@ public class Main {
         // Calculate Complex Graph
         if(Settings.getBoolean("plcc_B_complex_graphs")) {
             // calculate ALBELIG CG           
-            calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
+            calculateComplexGraph(allChains, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
             
             // test: also calculate ALBE CG
             //calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBE);
@@ -5097,8 +5096,6 @@ public class Main {
         int numberResTotal = 0;
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<>();
-        Residue res1, res2;
-        Ligand lig1, lig2;
         Molecule mol1, mol2;
 
         // variables for statistics
@@ -5487,7 +5484,7 @@ public class Main {
     
     /**
      * Calculates all contacts between the residues in mols.
-     * @param mols A list of Residue objects.
+     * @param mols A list of Molecule objects.
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
     public static ArrayList<MolContactInfo> calculateAllContacts(ArrayList<Molecule> mols) {
@@ -5625,15 +5622,15 @@ public class Main {
     
     /**
      * Calculates all contacts between the residues in res.
-     * @param res A list of Residue objects.
+     * @param mols list of molecule objects.
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<MolContactInfo> calculateAllContactsLimitedByChain(List<Residue> res, String handledChain) {
+    public static ArrayList<MolContactInfo> calculateAllContactsLimitedByChain(List<Molecule> mols, String handledChain) {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
                 
-        Residue a, b;
-        Integer rs = res.size();
+        Molecule a, b;
+        Integer rs = mols.size();
         String chainTag = "Chain " + handledChain + ": ";
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
@@ -5674,7 +5671,7 @@ public class Main {
         
         for(Integer i = 0; i < rs; i++) {
 
-            a = res.get(i);
+            a = mols.get(i);
             numResToSkip = 0;
             
             if( ! a.getChainID().equals(handledChain)) {
@@ -5690,7 +5687,7 @@ public class Main {
             
             for(Integer j = i + 1; j < rs; j++) {
 
-                b = res.get(j);
+                b = mols.get(j);
                 if( ! b.getChainID().equals(handledChain)) {
                     if( ! (includeLigandsFromOtherChains && b.isLigand())) {
                         numResPairsSkippedWrongChain++;
@@ -5725,7 +5722,7 @@ public class Main {
                         }
                         else {
                             // We should ignore ligand contacts
-                            if(a.getType().equals(Residue.RESIDUE_TYPE_LIGAND) || b.getType().equals(Residue.RESIDUE_TYPE_LIGAND)) {
+                            if(a.getType().equals(Molecule.RESIDUE_TYPE_LIGAND) || b.getType().equals(Molecule.RESIDUE_TYPE_LIGAND)) {
                                 // This IS a ligand contact so ignore it
                                 numIgnoredLigandContacts++;
                                 // System.out.println("  Ignored ligand contact between DSSP residues " + a.getDsspNum() + " and " + b.getDsspNum() + ".");
@@ -5777,7 +5774,7 @@ public class Main {
             }
             
             if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
-                System.out.println("  " + chainTag + "Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+                System.out.println("  " + chainTag + "Configured to ignore ligands and other types, ignored " + numIgnoredLigandContacts + " contacts.");
             }
         }
         
@@ -10749,17 +10746,18 @@ public class Main {
     
     
     /**
-     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chainName. 
+     * Writes the SSE info file that contains DSSP SSE and PLCC style SSE for each residue and ligand of the given chainName. 
      * @param mapFile the path to the output file
      * @param c the chainName to consider (all residues of this chainName will be used)
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
         String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
-        ArrayList<Residue> res = c.getAllAAResidues();
-                
+        ArrayList<Molecule> mols = c.getMolecules();
         
-        for (Residue r : res) {
-            s += "" + r.getPdbNum() + "|" + r.getDsspNum() + "|" + r.getSSEStringDssp() + "|" + r.getSSETypePlcc() + "\n";
+        for (Molecule r : mols) {
+            if (r.isAA() || r.isLigand()) {
+                s += "" + r.getPdbNum() + "|" + r.getDsspNum() + "|" + r.getSSEStringDssp() + "|" + r.getSSETypePlcc() + "\n";
+            }
         }
         
         IO.stringToTextFile(mapFile, s);
@@ -10767,7 +10765,7 @@ public class Main {
     
     
     /**
-     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chainName. 
+     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues and ligands of the given chainName. 
      * @param mapFile the path to the output file
      * @param c the chainName to consider (all residues of this chainName will be used)
      */
@@ -10775,7 +10773,7 @@ public class Main {
 
         FileWriter mapFW = null;
         PrintWriter mapFH = null;
-        ArrayList<Residue> res = c.getAllAAResidues();
+        ArrayList<Molecule> mol = c.getMolecules();
 
         // open files
         try {
@@ -10790,8 +10788,10 @@ public class Main {
         }
 
 
-        for (Residue r : res) {
-            mapFH.print("PDB|" + r.getPdbNum() + "|DSSP|" + r.getDsspNum() + "\n");
+        for (Molecule m : mol) {
+            if (m.isAA() || m.isLigand()) {
+                mapFH.print("PDB|" + m.getPdbNum() + "|DSSP|" + m.getDsspNum() + "\n");
+            }
         }
         
         //chainFH.printf("%d\n", chains.size());
@@ -10913,6 +10913,7 @@ public class Main {
      * @param contacts the contacts to consider
      * @param res the residues to consider
      */
+    @Deprecated
     public static Boolean writeDsspLigFile(String dsspFile, String dsspLigFile, ArrayList<MolContactInfo> contacts, ArrayList<Residue> res) {
         
         DP.getInstance().w("writeDsspLigFile(): This function is deprecated, use writeOrderedDsspLigFile() instead.\n");
@@ -11004,7 +11005,7 @@ public class Main {
      * @return true if it worked out. Note though that this is considered critical.
      * 
      */
-    public static Boolean writeOrderedDsspLigFile(String dsspFile, String dsspLigFile, List<Residue> res) {
+    public static Boolean writeOrderedDsspLigFile(String dsspFile, String dsspLigFile, List<Molecule> mols) {
 
         File dFile = new File(dsspFile);
         File dligFile = new File(dsspLigFile);
@@ -11020,20 +11021,20 @@ public class Main {
 
         System.out.println("  DSSP ligand output file set to '" + dsspLigFile + "', file created.");
 
-        Residue r;
+        Molecule m;
 
-        for(Integer i = 0; i < res.size(); i++) {
+        for(Integer i = 0; i < mols.size(); i++) {
 
-            r = res.get(i);
+            m = mols.get(i);
 
-            if(r.isLigand()) {
+            if(m.isLigand()) {
                 
                 dligFile = new File(dsspLigFile);
 
                 try {
-                    insertLigandLineIntoDsspligFile(dligFile, getLastLineOfChain(dligFile, r.getChainID()), r);
+                    insertLigandLineIntoDsspligFile(dligFile, getLastLineOfChain(dligFile, m.getChainID()), (Ligand) m);
                 } catch(Exception cf) {
-                    System.err.println("ERROR: Failed to insert line for ligand residue '" + r.getFancyName() + "' into dssplig file: '" + cf.getMessage() + "'.");
+                    System.err.println("ERROR: Failed to insert line for ligand residue '" + m.getFancyName() + "' into dssplig file: '" + cf.getMessage() + "'.");
                     cf.printStackTrace();
                     System.exit(1);
                 }
@@ -11098,7 +11099,7 @@ public class Main {
      * @param lineno the line number
      * @param r the residue that should be added at the specified line number
      */
-    public static void insertLigandLineIntoDsspligFile(File inFile, int lineno, Residue r)
+    public static void insertLigandLineIntoDsspligFile(File inFile, int lineno, Ligand l)
        throws Exception {
      // temp file
      File outFile = new File("dssplig.tmp");
@@ -11129,7 +11130,7 @@ public class Main {
 
             // Print DSSP residue number, PDB residue number, chainName, AA name in 1 letter code and SSE summary letter for ligand
             //      '   47   47 A E  E'
-            out.printf(loc, "  %3d  %3d %1s %1s  %1s", r.getDsspNum(), r.getPdbNum(), r.getChainID(), r.getAAName1(), Settings.get("plcc_S_ligSSECode"));
+            out.printf(loc, "  %3d  %3d %1s %1s  %1s", l.getDsspNum(), l.getPdbNum(), l.getChainID(), l.getAAName1(), Settings.get("plcc_S_ligSSECode"));
 
             // Print structure detail block (empty for ligand), beta bridge 1 partner residue number (always 0 for ligands), beta bridge 2 partner residue number (always 0 for ligands),
             //  bet sheet label (empty (" ") for ligands) and solvent accessible surface (SAS) of this residue (not required by PTGL, just set to some value)
@@ -11142,7 +11143,7 @@ public class Main {
             out.printf(loc, "   %4d,%4.1f  %4d,%4.1f  %4d,%4.1f  %4d,%4.1f", 0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0);
 
             // Print the TCO, KAPPA, ALPHA, PHI and PSI angles. Then the center atom coordinates. That's it.
-            out.printf(loc, "  %6.3f%6.1f%6.1f%6.1f%6.1f %6.1f %6.1f %6.1f\n", -0.5, 55.5, 55.5, 55.5, 55.5, (r.getCenterAtom().getCoordX() / 10.0f), (r.getCenterAtom().getCoordY() / 10.0f), (r.getCenterAtom().getCoordZ() / 10.0f));
+            out.printf(loc, "  %6.3f%6.1f%6.1f%6.1f%6.1f %6.1f %6.1f %6.1f\n", -0.5, 55.5, 55.5, 55.5, 55.5, (l.getCenterAtom().getCoordX() / 10.0f), (l.getCenterAtom().getCoordY() / 10.0f), (l.getCenterAtom().getCoordZ() / 10.0f));
        }
        
        i++;
@@ -11309,6 +11310,7 @@ public class Main {
      * @param contacts the contacts to consider for the script.
      * @return the script as a single string. note that the string may consist of multiple lines.
      */
+    @Deprecated
     public static String getPymolSelectionScript(ArrayList<MolContactInfo> contacts) {
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
@@ -11438,14 +11440,14 @@ public class Main {
         //so we always have to query which variables belong to which instance and do a typecast.
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
-        ArrayList<Residue> ligRes = new ArrayList<Residue>();
-        ArrayList<Residue> ligCont = new ArrayList<Residue>();
+        ArrayList<Ligand> ligRes = new ArrayList<Ligand>();
+        ArrayList<Ligand> ligCont = new ArrayList<Ligand>();
      
         String scriptLig = "";
         String scriptThisLigCont = "";
 
         MolContactInfo c = null;
-        Residue r = null;
+        Molecule r = null;
         // Select all residues of the protein that have ligand contacts
 
         for (Integer i = 0; i < contacts.size(); i++) {
@@ -11464,7 +11466,7 @@ public class Main {
                 }
                 if(c.getMolA().isLigand()) {
                     if( ! ligRes.contains(c.getMolA())) {
-                        ligRes.add((Residue)c.getMolA());
+                        ligRes.add((Ligand)c.getMolA());
                     }
                  
                 }
@@ -11477,7 +11479,7 @@ public class Main {
                 }
                 if(c.getMolB().isLigand()) {
                     if( ! ligRes.contains(c.getMolB())) {
-                        ligRes.add((Residue)c.getMolB());
+                        ligRes.add((Ligand)c.getMolB());
                     }
                 }
 
@@ -11504,7 +11506,7 @@ public class Main {
                 scriptLig += "select lig_" + r.getName3().trim() + r.getPdbNum() + ", chain " + r.getChainID() + " and resi " + r.getPdbNum() + "\n";
 
                 // create the list of contact residues for this ligand
-                ligCont = new ArrayList<Residue>();
+                ligCont = new ArrayList<Ligand>();
                 for(Integer j = 0; j < contacts.size(); j++) {
 
                     c = contacts.get(j);
@@ -11517,11 +11519,11 @@ public class Main {
                         
                         
                         // first residue A is this ligand, so the other one is the contact residue
-                        ligCont.add((Residue)c.getMolB());
+                        ligCont.add((Ligand)c.getMolB());
                     }
                     else if(c.getDsspNumB().equals(r.getDsspNum())) {
                         // second residue B is this ligand, so the other one is the contact residue
-                        ligCont.add((Residue)c.getMolA());
+                        ligCont.add((Ligand)c.getMolA());
                     }
                     else {
                         // The current ligand is not involved in this contact
@@ -11567,14 +11569,14 @@ public class Main {
      * @return true if python file could be written, otherwise false.
      */
     public static Boolean getPymolSelectionScriptPPI (ArrayList<MolContactInfo> contacts, String pdbid) {
-        ArrayList<Residue> protRes = new ArrayList<Residue>();  // all residues of interchain protein contacts
-        ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
-        ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
-        ArrayList<Residue> issRes = new ArrayList<Residue>();   // all residues of interchain sulfur bridge contacts
-        ArrayList<Residue> bbRes = new ArrayList<Residue>();    // all residues of interchain backbone-backbone h-bridge contacts
-        ArrayList<Residue> bcRes = new ArrayList<Residue>();    // all residues of interchain backbone-sidechain h-bridge contacts
-        ArrayList<Residue> cbRes = new ArrayList<Residue>();      // all residues of interchain sidechain-backbone h-bridge contacts
-        ArrayList<Residue> ccRes = new ArrayList<Residue>();    // all residues of interchain sidechain-sidechain h-bridge contacts
+        ArrayList<Molecule> protRes = new ArrayList<Molecule>();  // all residues of interchain protein contacts
+        ArrayList<Molecule> ligRes = new ArrayList<Molecule>();   // all residues of ligand contacts
+        ArrayList<Molecule> ivdwRes = new ArrayList<Molecule>();  // all residues of interchain van der Waals contacts
+        ArrayList<Molecule> issRes = new ArrayList<Molecule>();   // all residues of interchain sulfur bridge contacts
+        ArrayList<Molecule> bbRes = new ArrayList<Molecule>();    // all residues of interchain backbone-backbone h-bridge contacts
+        ArrayList<Molecule> bcRes = new ArrayList<Molecule>();    // all residues of interchain backbone-sidechain h-bridge contacts
+        ArrayList<Molecule> cbRes = new ArrayList<Molecule>();      // all residues of interchain sidechain-backbone h-bridge contacts
+        ArrayList<Molecule> ccRes = new ArrayList<Molecule>();    // all residues of interchain sidechain-sidechain h-bridge contacts
         
         String script = "";
         String scriptProt = "";
@@ -11639,7 +11641,7 @@ public class Main {
                 }
                 if(c.getMolA().isLigand()) {
                     if( ! ligRes.contains(c.getMolA())) {
-                        ligRes.add((Residue)c.getMolA());
+                        ligRes.add((Ligand)c.getMolA());
                     }
                 }
                 
@@ -11651,7 +11653,7 @@ public class Main {
                 }
                 if(c.getMolB().isLigand()) {
                     if( ! ligRes.contains(c.getMolB())) {
-                        ligRes.add((Residue)c.getMolB());
+                        ligRes.add((Ligand)c.getMolB());
                     }
                 }
                 }
@@ -12483,14 +12485,15 @@ public class Main {
      * @param cID the chainName ID
      * @return the filtered list of residues
      */
-    public static ArrayList<Residue> filterResidueListByChain(ArrayList<Residue> resList, String cID) {
+    @Deprecated
+    public static ArrayList<Residue> filterResidueListByChain(ArrayList<Residue> molList, String cID) {
         ArrayList<Residue> filteredList = new ArrayList<Residue>();
-        Residue r;
+        Residue m;
 
-        for(Integer i = 0; i < resList.size(); i++) {
-            r = resList.get(i);
-            if(r.getChainID().equals(cID)) {
-                filteredList.add(r);
+        for(Integer i = 0; i < molList.size(); i++) {
+            m = molList.get(i);
+            if(m.getChainID().equals(cID)) {
+                filteredList.add(m);
             }
         }
         
@@ -13096,13 +13099,12 @@ public class Main {
     /**
      * Calculates complex graph types which are configured in the config file for all given chains.
      * @param allChains a list of chains, each chainName will be handled separately
-     * @param resList a list of residues
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      * @param graphType the graph type, one of the constants like SSEGraph.GRAPHTYPE_ALBE 
      */
-    public static void calculateComplexGraph(List<Chain> allChains, List<Residue> resList, List<MolContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
+    public static void calculateComplexGraph(List<Chain> allChains, List<MolContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
@@ -13597,7 +13599,7 @@ public class Main {
                 // OK, now we handle the ligands
                 Chain lc = ligandSSE.getChain();
                 String ligChainName = ligandSSE.getChain().getPdbChainID();
-                Integer ligRes = ligandSSE.getStartResidue().getPdbNum();
+                Integer ligRes = ligandSSE.getStartMolecule().getPdbNum();
                 String lign3 = ligandSSE.getTrimmedLigandName3();
                 ligName = ligChainName + "-" + ligRes + "-" + lign3;  // something like "A-234-ICT", meaning isocitric acid, PDB residue 234 of chainName A
                 

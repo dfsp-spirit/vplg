@@ -529,6 +529,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
     /**
      * Returns the first Residue of this SSE (N- to C-terminus).
+     * Could probably be deleted as molecules are now used instead of residues.
      * @return the Residue object
      */
     public Residue getStartResidue() {
@@ -693,6 +694,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
 
     /**
      * Returns the last Residue (i.e., the one with the highest DSSP number) of this SSE.
+     * Could probably be deleted as molecules are now used instead of residues.
      */
     public Residue getEndResidue() {
 

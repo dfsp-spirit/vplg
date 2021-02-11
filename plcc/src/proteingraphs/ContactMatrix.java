@@ -355,8 +355,8 @@ public class ContactMatrix {
 
         for(Integer i = 0; i < this.sseList.size(); i++) {
 
-            if(this.sseList.get(i).getStartResidue().getDsspNum().equals(dsspStart)) {
-                if(this.sseList.get(i).getEndResidue().getDsspNum().equals(dsspEnd)) {
+            if(this.sseList.get(i).getStartMolecule().getDsspNum().equals(dsspStart)) {
+                if(this.sseList.get(i).getEndMolecule().getDsspNum().equals(dsspEnd)) {
                     return(i);
                 }
             }
