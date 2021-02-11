@@ -882,7 +882,7 @@ public class Main {
                             syntaxError();
                         }
                         else {
-                            Settings.set("plcc_S_output_dir", outputDir);
+                            Settings.set("plcc_S_output_dir", args[i + 1]);
                             argsUsed[i] = true;
                             argsUsed[i+1] = true;
                         }
@@ -2084,7 +2084,7 @@ public class Main {
 
         output_dir = new File(outputDir);
         if(! (output_dir.exists() && output_dir.isDirectory())) {
-            System.err.println("ERROR: output directory '" + outputDir + "' not found. Exiting.");
+            DP.getInstance().e("Main", "output directory '" + outputDir + "' not found. Exiting.");
             System.exit(1);
         }
 
