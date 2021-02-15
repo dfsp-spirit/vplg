@@ -214,15 +214,17 @@ log("Version " + version, "i")
 
 # TODO add your code here
 
-
 # read file in
-print("Reading file in")
+log("Reading file in", 'i')
 with open(fp1, "r") as f:
-    gml_lines = f.read().split("\n")
+    #gml_lines = f.read().split("\n")
+    gml_lines = []
+    for line in f:
+        gml_lines.append(line)
 
 
 # create dict
-print("Creating dictionary")
+log("Creating dictionary",'i')
 alledges = {}
 allnodes = []
 node_section = False
@@ -254,15 +256,18 @@ for line in gml_lines:
             edge_section = False
 
 #print(alledges)
-print(allnodes)
+log(allnodes,'i')
 
 
 with open(fp2, "r") as f2:
-    gml_lines2 = f2.read().split("\n")
+    #gml_lines2 = f2.read().split("\n")
+    gml_lines2 = []
+    for line in f2:
+        gml_lines2.append(line)
 
 
 # create dict
-print("Creating dictionary")
+log("Creating dictionary",'i')
 alledges2 = {}
 allnodes2 = []
 node_section = False
@@ -294,7 +299,7 @@ for line in gml_lines2:
             edge_section = False
 
 #print(alledges2)
-print(allnodes2)
+log(allnodes2,'i')
 
 #node degree
 def countDegree( nodeName, edges):
@@ -307,8 +312,8 @@ def countDegree( nodeName, edges):
         nodeDegree.append((i, counter))
     return nodeDegree
 
-print(countDegree( allnodes, alledges))
-print(countDegree( allnodes2, alledges2))
+log(countDegree( allnodes, alledges),'i')
+log(countDegree( allnodes2, alledges2),'i')
 
 keys = []
 graph1Val = [] # all edge weights of graph 1
