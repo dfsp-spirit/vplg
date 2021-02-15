@@ -191,9 +191,6 @@ for allfile in os.listdir(i_dir):
         
         #for line in fileinput.input(i_dir + allfile, inplace=True):
         for line in data:
-            log('line: ' + line, 'd')
-            log('counter: ', 'd')
-            log(cnt, 'd')
             
             if ("  #  RESIDUE AA" == line[0:15]):
                 chain = "           CHAIN AUTHCHAIN "
@@ -205,7 +202,6 @@ for allfile in os.listdir(i_dir):
                     line = line
                 cnt +=1
             elif (line[11] != ' ') and (cnt > 0):
-                log(line[11], 'd')
                 chain_id = "                " + line[11] + "         " + line[11]
                 new_line = line.rstrip('\n')
                 if (line != new_line + chain_id + '\n'):

@@ -225,15 +225,11 @@ fileNO = [1, 667, 1334, 2000]
 
 
 log(__file__, 'i')
-log(i_dir, 'd')
 
 #get number of files in os.listdir(i_dir) to avoid going through the modified ones several times
 number_files = len(os.listdir(i_dir))
 
-log(number_files, 'd')
-
 for allfile in os.listdir(i_dir):
-    log(allfile, 'd')
     if allfile.endswith(".pdb"):
         data = []
         with open(i_dir + allfile) as f:
@@ -251,7 +247,6 @@ for allfile in os.listdir(i_dir):
         prevLine = ''
         addNo = 0
         for line in data:
-            #log(line, 'd')
             #header
             if (cnt == 0) and (compnd != ''):
                 line = line + str(header)
