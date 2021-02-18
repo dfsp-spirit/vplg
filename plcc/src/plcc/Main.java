@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Tim Schäfer 2012. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author ts
  */
@@ -11129,8 +11129,8 @@ public class Main {
      * Prints a short note on how to use this program to STDOUT. Called if the user runs the program without command line arguments (most likely because he does not know about them).
      */
     public static void usage_short() {
-        System.out.println("This program is part of VPLG, http://vplg.sourceforge.net. Copyright MolBI Group 2012 - 2014.");
-        System.out.println("VPLG is free software and comes without any warranty. See LICENSE for details.");        
+        System.out.println("This program is part of PTGLtools, http://vplg.sourceforge.net. Copyright MolBI Group 2012 - 2014.");
+        System.out.println("PTGLtools is free software and comes without any warranty. See LICENSE for details.");        
         System.out.println("USAGE:         java -jar plcc.jar <pdbid> [OPTIONS]");
         System.out.println("DETAILED HELP: java -jar plcc.jar --help");
     }
@@ -12036,11 +12036,11 @@ public class Main {
         sb.append("#!/usr/bin/env python");
         sb.append(blankLine);
         
-        sb.append("# This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.");
+        sb.append("# This file is part of the PTGLtools software package.");
         sb.append(lineSep);
         sb.append("# *");
         sb.append(lineSep);
-        sb.append("# * Copyright Tim Schaefer 2012. VPLG is free software, see the LICENSE and README files for details");
+        sb.append("# * Copyright Tim Schaefer 2012. PTGLtools is free software, see the LICENSE and README files for details");
         sb.append(lineSep);
         sb.append("# * author Andreas Scheck");
         sb.append(lineSep);
@@ -12048,7 +12048,7 @@ public class Main {
         sb.append(blankLine);
         sb.append("\"\"\"");
         sb.append(lineSep);
-        sb.append("    This is a small script for visualizing different types of chemical bonds, calculated with the VPLG software, in PyMol.");
+        sb.append("    This is a small script for visualizing different types of chemical bonds, calculated with the PTGLtools software, in PyMol.");
         sb.append(lineSep);
         sb.append("    Fetch the protein you want to inspect in PyMol and then run this python script, created for that specific protein,");
         sb.append(lineSep);
@@ -13240,7 +13240,7 @@ public class Main {
             System.out.println("    Spatial relation matrix calculated.");
         }
         
-        // This graph is still required because it is used for drawing the VPLG-style picture
+        // This graph is still required because it is used for drawing the PTGLtools-style picture
         ProtGraph SseCg = chainCM.toProtGraph();                        
         SseCg.declareProteinGraph();      // this is declared a CG after setting info, see below.  
         

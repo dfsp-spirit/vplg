@@ -1,5 +1,5 @@
 #!/bin/sh
-## fill_database.sh -- fill the VPLG database from the PDB and DSSP files in this directory
+## fill_database.sh -- fill the PTGLtools database from the PDB and DSSP files in this directory
 ## This script assumes that plcc.jar and some PDB/DSSP files are in this directory. It also assumes the DB is setup correctly.
 ## NOTE: Using coils is broken (in various ways).
 
@@ -38,7 +38,7 @@ if [ -f $NODSSP_LIST ]; then
 fi
 
 if [ "$SILENT" = "NO" ]; then
-  echo "$APPTAG Adding all PDB files in this directory to the VPLG database... (assuming they are named '<pdbid>.pdb')"
+  echo "$APPTAG Adding all PDB files in this directory to the PTGLtools database... (assuming they are named '<pdbid>.pdb')"
 fi
 
 for PDBFILE in *.pdb;

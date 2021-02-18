@@ -1,13 +1,13 @@
-The VPLG FAQ
+The PTGLtools FAQ
 =============
 
-This file contains tips for getting VPLG running in FAQ format.
+This file contains tips for getting PTGLtools running in FAQ format.
 
 
-Q: I want to make VPLG use the database, what do I need to do?
+Q: I want to make PTGLtools use the database, what do I need to do?
 A: Follow these steps: 
         1) Install and configure the postgresql database server (Package system under Linux, from the PostgreSQL website under Windows).
-        2) Create the database role (user) and the database you want VPLG to use. As the postgres user:
+        2) Create the database role (user) and the database you want PTGLtools to use. As the postgres user:
  
 	myuser@srv> su postgres           
 	postgres@srv> psql
@@ -26,7 +26,7 @@ A: At the RCSB Protein Data Bank website, at http://www.rcsb.org/.
 Q: Where do I get DSSP files?
 A: At several serves listed at the DSSP website, http://swift.cmbi.ru.nl/gv/dssp/.
 
-Q: I have downloaded a new version of VPLG. When I run it, I see INFO messages that tell me a certain setting is not defined in the config file. What's up?
+Q: I have downloaded a new version of PTGLtools. When I run it, I see INFO messages that tell me a certain setting is not defined in the config file. What's up?
 A: The new version introduces a new settings that is not in your old config file. You have several options now: 1.) You ignore this. This means that the internal default value of the setting will be used and the INFO message will keep appearing. 2.) You edit your config file and add the setting and a sane value to it. This way, the messages will disappear and you will keep any changes you made to the default config file. 3.) You delete your config file. The plcc program will create a new config file the next time you run it, and this config file will have the setting listed with its default value. You will loose any changes you made to the old config file, of course.
 
 Q: I need a list of all settings available in the config file and their defaults.

@@ -1,8 +1,8 @@
-How to install VPLG
+How to install PTGLtools
 ===================
 
 
-Make sure you have Java >= 1.6 installed (the JRE will do, you do not need the SDK). You can run 'java -version' if
+Make sure you have Java >= 1.8 installed (the JRE will do, you do not need the SDK). You can run 'java -version' if
 in doubt. 
 
 
@@ -10,9 +10,9 @@ After unpacking the release archive, all tools can be run directly from the resu
 
 
    cd my_downloads_directory/
-   unzip vplg-<version>.zip
+   unzip PTGLtools-<version>.zip
 
-   cd vplg/
+   cd PTGLtools/
    java -jar plcc.jar                            or
    java -jar vpg.jar                             or
    java -jar splitpdb.jar

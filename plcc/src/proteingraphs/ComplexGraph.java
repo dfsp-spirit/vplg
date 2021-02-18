@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Marcus Kessler 2013. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Marcus Kessler 2013. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author Marcus Kessler
  * modified by TS

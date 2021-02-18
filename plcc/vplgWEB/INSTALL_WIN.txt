@@ -1,4 +1,4 @@
-How to install a VPLGWeb web server under Windows
+How to install a PTGLtoolsWeb web server under Windows
 =================================================
 
 I: Download
@@ -39,10 +39,10 @@ II: Install and Setup
         password: 
         charset:  UTF8
 
-2.4) Extract VPLG to some path (we assume <VPLG> here) and make sure Java JRE >= 1.6 is installes
+2.4) Extract PTGLtools to some path (we assume <PTGLtools> here) and make sure Java JRE >= 1.6 is installes
 2.4.1) Run 'java -jar plcc.jar' once to create the config file
 2.4.2) Edit the config file <HOME>/.plcc_settings to ensure that the database credentials are correct (the settings are named plcc_S_db_*)
-2.4.3) Run 'java -jar plcc.jar NONE -r' to create the database tables which are used by VPLGWeb
+2.4.3) Run 'java -jar plcc.jar NONE -r' to create the database tables which are used by PTGLtoolsWeb
 
       
 III: Access and use

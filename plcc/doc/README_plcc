@@ -1,4 +1,4 @@
-This is the README for the *plcc* (Protein Ligand Contact Computation) program, which is part of *VPLG* (Visualization of Protein Ligand Graphs).
+This is the README for the *plcc* (Protein Ligand Contact Computation) program, which is part of *PTGLtools*.
 
 
 Description
@@ -28,7 +28,7 @@ Running the program
 To run *plcc*, you need a PDB file and a DSSP file of a protein. Get PDB files from the RCSB Protein Data Bank website. DSSP files are
 produced by running DSSP (the *dsspcmbi* program) on the PDB file or downloading them from the Structure Server at http://swift.cmbi.kun.nl/swift/servers/moddssp-submit.html. 
 
-DSSP only works for PDB-files that do NOT include multiple models, so NMR files will have to be split into several files. Use the *splitpdb* program that comes with *VPLG* for this task. Alternatively, another program for this task is available on the DSSP website.
+DSSP only works for PDB-files that do NOT include multiple models, so NMR files will have to be split into several files. Use the *splitpdb* program that comes with *PTGLtools* for this task. Alternatively, another program for this task is available on the DSSP website.
 
 If you have *<pdbid>.pdb* and *<pdbid>.dssp* in the plcc directory, all you have to do is this:
   
@@ -122,7 +122,7 @@ A: You can download them at http://www.rcsb.org/pdb/ or from one of the FTP or R
 Q: Where do I get DSSP input files?
 A: These files are generated from a model in a PDB file. Two options exist to get them: 1.) You can download them at MRS (http://mrs.cmbi.ru.nl/mrs-5/), which is linked on the DSSP website. Make sure to select DSSP in the database dropdown menu. 2.) You can generate them from a PDB file using the DSSP program which is available at http://swift.cmbi.ru.nl/gv/dssp/.
 
-Q: I have downloaded a new version of VPLG. When I run it, I see INFO messages that tell me a certain setting is not defined in the config file. What's up?
+Q: I have downloaded a new version of PTGLtools. When I run it, I see INFO messages that tell me a certain setting is not defined in the config file. What's up?
 A: The new version introduces a new settings that is not in your old config file. You have several options now: 1.) You ignore this. This means that the internal default value of the setting will be used and the INFO message will keep appearing. 2.) You edit your config file and add the setting and a sane value to it. This way, the messages will disappear and you will keep any changes you made to the default config file. 3.) You delete your config file. The plcc program will create a new config file the next time you run it, and this config file will have the setting listed with its default value. You will loose any changes you made to the old config file, of course.
 
 Q: I need a list of all settings availbale in the config file and their defaults.
@@ -154,7 +154,7 @@ A: The version is always printed when you run plcc, so running the software with
 Author, Website and Contact
 ============================
 
-*VPLG* was written by Tim Schaefer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It is based on earlier ideas by Ina Koch and Patrick May. See http://www.bioinformatik.uni-frankfurt.de for contact information. My personal website is at http://rcmd.org/.
+*PTGLtools* (formerly labeled VPLG) was written by Tim Schaefer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It is based on earlier ideas by Ina Koch and Patrick May. See http://www.bioinformatik.uni-frankfurt.de for contact information. My personal website is at http://rcmd.org/.
 
 
 
