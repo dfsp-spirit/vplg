@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Tim Schäfer 2012. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author ts
  */
@@ -75,11 +75,11 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
         // write graph header and meta data
         sb.append("graph [\n");
         sb.append("  id ").append(1).append("\n");
-        sb.append("  label \"" + "VPLG Protein Graph " + "\"\n");
+        sb.append("  label \"" + "PTGLtools Protein Graph " + "\"\n");
         sb.append("  comment \"").append(this.getPdbid()).append("-").append(this.getChain()).append("\"\n");
         sb.append("  directed 0\n");
         sb.append("  isplanar 0\n");
-        sb.append("  creator \"VPLG\"\n");
+        sb.append("  creator \"PTGLtools\"\n");
         
         // write vertices
         

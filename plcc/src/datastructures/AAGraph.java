@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Tim Schäfer 2012. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author ts
  */
@@ -399,8 +399,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         gml.append("graph [\n");
         gml.append("  id ").append(1).append("\n");
-        gml.append("  label \"" + "VPLG Amino acid contact stats matrix ").append(label_pdbid).append(label_chainid).append("\"\n");
-        gml.append("  comment \"" + "VPLG Amino acid contact stats matrix  ").append(label_pdbid).append("\"\n");
+        gml.append("  label \"" + "PTGLtools Amino acid contact stats matrix ").append(label_pdbid).append(label_chainid).append("\"\n");
+        gml.append("  comment \"" + "PTGLtools Amino acid contact stats matrix  ").append(label_pdbid).append("\"\n");
         gml.append("  directed 0\n");
         gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
         gml.append("  creator \"PLCC\"\n");
@@ -571,8 +571,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         gmlf.append("graph [\n");
         gmlf.append("  id ").append(1).append("\n");
-        gmlf.append("  label \"" + "VPLG Protein Graph ").append(label_pdbid).append(label_chainid).append("\"\n");
-        gmlf.append("  comment \"" + "VPLG Protein Graph ").append(label_pdbid).append("\"\n");
+        gmlf.append("  label \"" + "PTGLtools Protein Graph ").append(label_pdbid).append(label_chainid).append("\"\n");
+        gmlf.append("  comment \"" + "PTGLtools Protein Graph ").append(label_pdbid).append("\"\n");
         gmlf.append("  directed 0\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
         gmlf.append("  creator \"PLCC\"\n");

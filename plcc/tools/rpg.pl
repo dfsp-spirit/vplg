@@ -200,7 +200,7 @@ sub get_header_string {
 	if($format == "gml") {
 		$header .= "graph [\n";
 		$header .= "  id 1\n";
-		$header .= "  label \"VPLG Protein Graph\"\n";
+		$header .= "  label \"PTGLtools Protein Graph\"\n";
 		$header .= "  comment \"pdbid=$pdbid|chainid=$chain|graphtype=$graphtype\"\n";
 		$header .= "  directed 0\n";
 		$header .= "  isplanar 0\n";

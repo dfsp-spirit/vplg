@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Jan Niclas Wolf 2020. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Jan Niclas Wolf 2020. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author jnw
  */
@@ -306,7 +306,7 @@ class Section {
                         + "This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. "
                         + "The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc."));
                 settings.add(new Setting("plcc_B_output_textfiles_dir_tree_html", 'B', "false", "Whether to write HTML navigation files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well."));
-                settings.add(new Setting("plcc_B_output_textfiles_dir_tree_core_html", 'B', "false", "Whether to write the core VPLGweb HTML files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well. "
+                settings.add(new Setting("plcc_B_output_textfiles_dir_tree_core_html", 'B', "false", "Whether to write the core PTGLweb HTML files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well. "
                         + "These are the main page, search form and other stuff which is only needed once for the whole website."));
                 settings.add(new Setting("plcc_B_html_add_complex_graph_data", 'B', "true", "Whether to write data on the complex graph to the protein result HTML webpage (if available)."));
                 break;

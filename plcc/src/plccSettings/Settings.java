@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Jan Niclas Wolf 2020. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Jan Niclas Wolf 2020. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author jnw
  */
@@ -198,7 +198,7 @@ public class Settings {
 
         // header
         formattedString += "##### PLCC SETTINGS #####\n\n";
-        formattedString += "# This file contains the settings for VPLG's PLCC as key-value pairs per line. The character after 'plcc' indicates which data type is expected: "
+        formattedString += "# This file contains the settings for PTGLtools's PLCC as key-value pairs per line. The character after 'plcc' indicates which data type is expected: "
                 + "B(oolean), S(tring), I(nteger) or F(loat)\n";
         formattedString += "# The file is structured in sections which either belong to user, advanced or developer settings.\n\n";
         

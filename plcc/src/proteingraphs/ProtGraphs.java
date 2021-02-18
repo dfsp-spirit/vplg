@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Tim Schäfer 2012. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author ts
  */
@@ -513,7 +513,7 @@ public class ProtGraphs {
      * Reads a file that has to contain a graph in PLCC graph format version 2 and turns it into a protein graph. Note that this can be used for drawing a protein graph
      * from a file, but it does NOT restore the complete graph because information on the atoms and residues is not contained in the graph file.
      *
-     * @param graphString a string in VPLG format representing the graph
+     * @param graphString a string in PTGL format representing the graph
      * @return the created graph
      */
     public static ProtGraph fromPlccGraphFormatStringV2(String graphString) {

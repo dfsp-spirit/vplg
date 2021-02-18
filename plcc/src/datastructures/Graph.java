@@ -1,7 +1,7 @@
 /*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ * This file is part of the PTGLtools software package.
  *
- * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
+ * Copyright Tim Schäfer 2012. PTGLtools is free software, see the LICENSE and README files for details.
  *
  * @author ts
  */
@@ -468,7 +468,7 @@ public abstract class Graph<V> implements ITrivialGraphFormat, IGraphMLFormat {
         
         gmlf += "graph [\n";
         gmlf += "  id " + 1 + "\n";
-        gmlf += "  label \"" + "VPLG Protein Graph" + "\"\n";
+        gmlf += "  label \"" + "PTGLtools Protein Graph" + "\"\n";
         gmlf += "  comment \"" + comment + "\"\n";
         gmlf += "  directed 0\n";
         gmlf += "  isplanar 1\n";

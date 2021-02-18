@@ -27,13 +27,13 @@ $ECHO "$APPTAG Checking whether to run commands. Current time is $DATESTR."
 ########## settings -- edit these ##############
 
 # The process ID file. You only need to change this if you run this script in parallel for different commands on the same server.
-PIDFILE=/var/run/rur_vplg-copy-results.pid
+PIDFILE=/var/run/rur_PTGLtools-copy-results.pid
 
 # The command that should be executed (unless it still runs). This most likely takes some time.
 #COMMAND="/usr/bin/rsync -rh /tmp/results/ /srv/www/htdocs/myapp/data/results/"
 
 ### Note that you will have to configure password-less authentication via ssh (using SSH-keys) for the rsync command to work.
-COMMAND="/usr/bin/rsync -rhe ssh ts@odysseus.bioinformatik.uni-frankfurt.de:/shares/modshare/vplg_all_nodes_output/ /srv/www/ptgl3/"
+COMMAND="/usr/bin/rsync -rhe ssh ts@odysseus.bioinformatik.uni-frankfurt.de:/shares/modshare/PTGLtools_all_nodes_output/ /srv/www/ptgl3/"
 
 
 ########## end of settings -- no need to edit below this line ##########

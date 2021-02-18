@@ -1,4 +1,4 @@
-This is the README for the openMPI version of the vplg cluster scripts.
+This is the README for the openMPI version of the PTGLtools cluster scripts.
 
 Written by ts.
 
@@ -17,7 +17,7 @@ USING THESE SCRIPTS
 
 You should use the following steps to run the MPI version:
 
-0) 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_cluster/plcc_run/' subdirectory. Install dsspcmbi.
+0) 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your PTGLtools installation to the 'plcc_cluster/plcc_run/' subdirectory. Install dsspcmbi.
 
 1) Adapt settings in settings_statistics.cfg and the other script files (output path, plcc command line options, path to dssp, etc.).
 1.1) Run PLCC once with ''(to make it create the config at ~/.plcc_settings) and edit the settings, e.g., database server credentials, in ~/.plcc_settings

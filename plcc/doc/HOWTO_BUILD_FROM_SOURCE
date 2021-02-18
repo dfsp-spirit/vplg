@@ -1,7 +1,7 @@
-This documentation is part of *VPLG* (Visualization of Protein Ligand Graphs).
+This documentation is part of *PTGLtools*.
 
 
-HOW TO BUILD THE VPLG PROGRAMS FROM SOURCE
+HOW TO BUILD THE PTGLtools PROGRAMS FROM SOURCE
 ===========================================
 
 The *plcc*, *vpg* and *splitpdb* programs are all written in Java and their source code directories contain the NetBeans project files, so building them is very easy if you have the NetBeans IDE. (NetBeans is free software and you can get it at http://netbeans.org/.)
