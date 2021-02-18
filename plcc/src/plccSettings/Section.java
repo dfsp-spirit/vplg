@@ -383,7 +383,7 @@ class Section {
                 
             case "Disabled":
                 settings.add(new Setting("plcc_B_parse_binding_sites", 'B', "false", "[DISABLED] Whether to parse binding site data from the REMARK 800 and SITE lines of legacy PDB file."));
-                settings.add(new Setting("plcc_B_write_lig_geolig", 'B', "false", "[DISABLED] Determines whether ligand contacts are included in the <pdbid>.geolig file."));
+                settings.add(new Setting("plcc_B_write_lig_geolig", 'B', "true", "[DISABLED] Determines whether ligand contacts are included in the <pdbid>.geolig file."));
                 settings.add(new Setting("plcc_B_consider_all_ligands_for_each_chain", 'B', "false", "[DISABLED] Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with. WARNING: This setting is ignored and off atm."));
                 settings.add(new Setting("plcc_B_complex_graph_same", 'B', "false", "[DISABLED] Determines whether the complex graph is drawn with all nodes of the same type."));
                 settings.add(new Setting("plcc_B_complex_graph_mere", 'B', "false", "[DISABLED] Determines whether the complex graph is drawn with nodes of different type for each mere."));
