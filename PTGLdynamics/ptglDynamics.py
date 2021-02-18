@@ -124,7 +124,6 @@ cl_parser = argparse.ArgumentParser(description="This is a pipeline that reads s
 
 ## add arguments
 
-
 # add mutually exclusive group for silent / verbose
 loudness = cl_parser.add_mutually_exclusive_group()
 loudness.add_argument('-s',
@@ -180,6 +179,7 @@ cl_parser.add_argument('-p',
                        help = 'to execute only the specified scripts.')
 
 cl_parser.add_argument('-u',
+<<<<<<< HEAD
                        '--sub-dir-structure',
                        action='store_true',
                        help='display the results in sub directories in the output directory.')
