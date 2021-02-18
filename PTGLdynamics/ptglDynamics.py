@@ -82,10 +82,15 @@ def log(message, level=""):
             output_file.write(message + "\n")
             
 def new_directory(name):
+    """Creates a new directory 'name' if it does not exist yet. Returns the absolute path of that directory"""
     if not os.path.isdir(name):
         os.makedirs(name)
-    return os.path.realpath(name)
+    return os.path.abspath(name)
 
+def get_working_dir(new_dir):
+    """Changes the working directory to the given path and returns the new working directory"""
+    os.chdir(new_dir)
+    return os.getcwd() + '/'
 
 ########### configure logger ###########
 
@@ -109,7 +114,10 @@ except ModuleNotFoundError as exception:
 ########### command line parser ###########
 
 ## create the parser
-cl_parser = argparse.ArgumentParser(description="This is a pipeline that reads several snapshots in pdb-format. The pipeline runs plcc on each of them and compares the differences in between their Complex Graph outputs. If not specified otherwise the results are written in the current folder in csv-format.",
+cl_parser = argparse.ArgumentParser(description="This is a pipeline that reads several snapshots in pdb-format. " +
+                                    "The pipeline runs plcc on each of them and compares the differences in between their Complex Graph outputs. "+
+                                    "If not specified otherwise the results are written in the current folder in csv-format. " +
+                                    "Use: 'python3 <path>/ptglDynamics.py <arguments>' to run the programm.",
                                     fromfile_prefix_chars="@")
 
 ## add arguments
@@ -182,16 +190,22 @@ cl_parser.add_argument('-b',
                        help = 'a string with the arguments for toLegacyPDB you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -b="<arguments and their inputs>" ')
 
 cl_parser.add_argument('-e',
+                       '--dsspcmbi_args',
+                       type = str,
+                       default = '',
+                       help = 'a string with the arguments for dsspcmbi you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -e="<arguments and their inputs>" ')
+
+cl_parser.add_argument('-f',
                        '--postProcessDssp_args',
                        type = str,
                        default = '',
-                       help = 'a string with the arguments for postProcessDssp you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -e="<arguments and their inputs>" ')
+                       help = 'a string with the arguments for postProcessDssp you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -f="<arguments and their inputs>" ')
 
-cl_parser.add_argument('-f',
+cl_parser.add_argument('-g',
                        '--gmlCompareEdgeWeightsAndSubsets_args',
                        type = str,
                        default = '',
-                       help = 'a string with the arguments for gmlCompareEdgeWeightsAndSubsets you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -f="<arguments and their inputs>" ')
+                       help = 'a string with the arguments for gmlCompareEdgeWeightsAndSubsets you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -g="<arguments and their inputs>" ')
 
 
 args = cl_parser.parse_args()
@@ -223,7 +237,7 @@ if (args.inputdirectory != ""):
         logging.error("Specified input directory '%s' is not readable. Exiting now.", args.inputdirectory)
         sys.exit(1)
 else:
-    i_dir = os.getcwd() + '/'
+    i_dir = os.getcwd()
     
 
 # output directory
@@ -234,7 +248,7 @@ if (args.outputdirectory != ""):
         logging.error("Specified output directory '%s' is not writable. Exiting now.", args.outputdirectory)
         sys.exit(1)
 else:
-    o_dir = os.getcwd() + '/'
+    o_dir = os.getcwd()
     
     
 # output directory
@@ -268,7 +282,7 @@ else:
     add_plcc_args = ''
 
 # toLegacyPDB arguments
-if (args.toLegacyPDB_args != []):
+if (args.toLegacyPDB_args != ''):
     add_toLegacyPDB_args = args.toLegacyPDB_args
 else:
     add_toLegacyPDB_args = ''
@@ -278,12 +292,18 @@ if (args.postProcessDssp_args != ''):
     add_postProcessDssp_args = args.postProcessDssp_args
 else:
     add_postProcessDssp_args = ''
-
+    
 # gmlCompareEdgeWeightsAndSubsets arguments
 if (args.gmlCompareEdgeWeightsAndSubsets_args != ''):
     add_gmlComparison_args = args.gmlCompareEdgeWeightsAndSubsets_args
 else:
     add_gmlComparison_args = ''
+
+# gmlCompareEdgeWeightsAndSubsets arguments
+if (args.dsspcmbi_args != ''):
+    add_dsspcmbi_args = args.dsspcmbi_args
+else:
+    add_dsspcmbi_args = ''
 
 ########### vamos ###########
 
@@ -293,117 +313,157 @@ log("Version " + version, "i")
 
 
 
-#general variables
+############### Declaration of variables ###############
 dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'plcc':'plcc', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
-curr_path = os.path.dirname(__file__)
-curr_wd = os.getcwd()
-plccJarPath = os.path.dirname(curr_path) + '/plcc/dist/plcc.jar'
+ptglDynamics_path = os.path.dirname(__file__)
+plccJarPath = os.path.dirname(ptglDynamics_path) + '/plcc/dist/plcc.jar'
 
-#Variables of Command Line Arguments
-cmd_start = 'python3 ' + curr_path + '/codes/'
+cmd_start = 'python3 ' + ptglDynamics_path + '/codes/'
 
+i_dir = os.path.abspath(i_dir) + '/'
+o_dir = os.path.abspath(o_dir) + '/'
 
-pdb_o_dir = i_dir
-dssp_o_dir = i_dir
-#plcc_o_dir = i_dir
-plcc_o_dir = curr_wd
+pdb_dir = i_dir
+dssp_dir = i_dir
+plcc_dir = i_dir
 gml_dir = i_dir
-log("i_dir: " + i_dir, 'd')
+
+work_dir = get_working_dir(i_dir)
+
+log("work_dir: ", 'd')
+log(work_dir, 'd')
 log("programm list: ", 'd')
 log(programm_list, 'd')
 
+
+################## Go through the given Programms and execute them #####################
 for elem in programm_list:
     log("elem: " + elem, 'd')
+    
+    # Get the output directory
     if (args.subdirectorystructure) and (dir_names[elem] != ''):
-        out_path = new_directory(o_dir + dir_names[elem]) + '/'
+        os.chdir(o_dir)
+        out_dir = new_directory(dir_names[elem]) + '/'
+        os.chdir(work_dir)
     else:
-        out_path = o_dir
+        out_dir = o_dir
         
     #execute different scripts:
     if (elem == 'toLegacyPDB.py'):
+
+        work_dir = get_working_dir(pdb_dir)
         #exec_string = cmd_start + elem + ' -id ' + i_dir + ' -od ' + out_path + cmd_compound + ' -d &> toLegacyPDB_out.txt'
-        exec_string = cmd_start + elem + ' ' + add_toLegacyPDB_args + ' -id ' + i_dir + ' -od ' + out_path + cmd_compound
+        exec_string = cmd_start + elem + ' ' + add_toLegacyPDB_args + ' -id ' + work_dir + ' -od ' + out_dir + cmd_compound
         log('exec_string ' + exec_string, 'd')
+        os.chdir(out_dir)
         os.system(exec_string)
-        pdb_o_dir = out_path
+        pdb_dir = os.path.abspath(out_dir) + '/'
         
       
     elif (elem == 'dsspcmbi'):
-        
-        for pdb in os.listdir(pdb_o_dir):
+
+        work_dir = get_working_dir(pdb_dir)
+        for pdb in os.listdir(work_dir):
             if pdb.endswith(".pdb"):
-                dssp = out_path + pathlib.Path(pdb).stem + '.dssp'
-                exec_string = curr_path + '/codes/' + elem + ' ' + pdb_o_dir + pdb + ' ' + dssp
+                dssp = out_dir + pathlib.Path(pdb).stem + '.dssp'
+                exec_string = ptglDynamics_path + '/codes/' + elem + ' ' + work_dir + pdb + ' ' + dssp  + ' ' + add_dsspcmbi_args
                 log('exec_string ' + exec_string, 'd')
+                os.chdir(out_dir)
                 os.system(exec_string)
-        dssp_o_dir = out_path
+                os.chdir(work_dir)
+        dssp_dir = os.path.abspath(out_dir) + '/'
+
     
     elif (elem == 'postProcessDssp.py'):
+
+        work_dir = get_working_dir(dssp_dir)
         #exec_string = cmd_start + elem + ' -id ' + dssp_o_dir + ' -od ' + out_path + ' -d &> post_process_out.txt'
-        exec_string = cmd_start + elem + ' ' + add_postProcessDssp_args + ' -id ' + dssp_o_dir + ' -od ' + out_path
+        exec_string = cmd_start + elem + ' ' + add_postProcessDssp_args + ' -id ' + work_dir + ' -od ' + out_dir
         log('exec_string ' + exec_string, 'd')
+        os.chdir(out_dir)
         os.system(exec_string)
-        dssp_o_dir = out_path
-       
+        dssp_dir = os.path.abspath(out_dir) + '/'
+
     
     elif (elem == 'plcc'):
-        for pdb in os.listdir(pdb_o_dir):
+
+        work_dir = get_working_dir(pdb_dir)
+        for pdb in os.listdir(work_dir):
             if (pdb.endswith(".pdb")):
                 pdb_id = pathlib.Path(pdb).stem
                 pdb_id_folder = ''
                 if(args.subdirectorystructure):
-                    pdb_id_folder = new_directory(out_path + pdb_id)
+                    os.chdir(out_dir)
+                    pdb_id_folder = new_directory(pdb_id)
+                    os.chdir(work_dir)
                 else:
-                    pdb_id_folder = out_path
-                
-                pdb = pdb_o_dir + pdb
-                dssp = dssp_o_dir + pathlib.Path(pdb).stem + '.dssp'
+                    pdb_id_folder = out_dir
+
+                dssp = dssp_dir + pathlib.Path(pdb).stem + '.dssp'
                 
                 #plcc = 'java -jar ' + plccJarPath + ' ' + pdb_id + ' -p ' + pdb + ' -d ' + dssp + ' -o ' + pdb_id_folder + ' -O g' 
-                
-                plcc = 'java -jar ' + plccJarPath + ' ' + pdb_id + ' ' + add_plcc_args + ' -p ' + pdb + ' -d ' + dssp + ' -o ' + pdb_id_folder
-                log(plcc,'d')        
+                plcc = 'java -jar ' + plccJarPath + ' ' + pdb_id + ' ' + add_plcc_args + ' -p ' + work_dir + pdb + ' -d ' + dssp + ' -o ' + pdb_id_folder
+                #plcc = 'java -jar ' + plccJarPath + ' ' + pdb_id + ' ' + add_plcc_args + ' -p ' + pdb + ' -d ' + dssp + ' -o ' + pdb_id_folder
+                log(plcc,'d') 
+                os.chdir(out_dir)
                 os.system(plcc)
+                os.chdir(work_dir)
         
-        #plcc_o_dir = out_path
+        plcc_dir = os.path.abspath(out_dir) + '/'
         
         
     elif (elem == 'gmlCompareEdgeWeightsAndSubsets.py'):
+
+        work_dir = get_working_dir(plcc_dir)
+        log('plcc_dir: ' + plcc_dir,'d')
         prevGml = ''
-        for entry in os.listdir(plcc_o_dir):
+        for entry in os.listdir(work_dir):
+            log(entry, 'd')
+            #log("absolute: " + plcc_o_dir + "/" + entry, "d")
             if (os.path.isdir(entry)):
-                for gml in os.listdir(entry):
+
+                temp_work_dir = get_working_dir(entry)
+                for gml in os.listdir(temp_work_dir):
+                    log('in dir: ' + gml, 'd')
                     if gml.endswith("complex_chains_albelig_CG.gml"):
+                        log(out_dir,'d')
                         try:
-                            shutil.copy(gml, out_path + gml)
+                            shutil.copy(gml, out_dir + gml)
                         except shutil.SameFileError:
                             log("Source and destination represents the same file.", 'i')
-                            pass
+                            #pass
 
                         if prevGml != '':
-                            gmlComparison = cmd_start + elem +' ' + add_gmlComparison_args + ' -i1 ' + out_path + prevGml + ' -i2 ' + out_path + gml + ' -od ' + o_dir
+                            os.chdir(out_dir)
+                            gmlComparison = cmd_start + elem +' ' + add_gmlComparison_args + ' -i1 ' + prevGml + ' -i2 ' + gml + ' -od ' + o_dir
                             log(gmlComparison,'d')
                             os.system(gmlComparison)
+                            os.chdir(temp_work_dir)
                         #log(prevGml +' '+gml,'i')
                         prevGml = gml
+                os.chdir('../')
             else:
+                log('not in dir: ' + entry, 'd')
                 if entry.endswith("complex_chains_albelig_CG.gml"):
                     try:
-                        shutil.copy(entry, out_path + entry)
+                        shutil.copy(entry, out_dir + entry)
                     except shutil.SameFileError:
                         log("Source and destination represents the same file.", 'i')
-                        pass
+                        #pass
 
                     if prevGml != '':
-                        gmlComparison = cmd_start + elem + ' ' + add_gmlComparison_args + ' -i1 ' + out_path + prevGml + ' -i2 ' + out_path + entry + ' -od ' + o_dir
+                        os.chdir(out_dir)
+                        gmlComparison = cmd_start + elem +' ' + add_gmlComparison_args + ' -i1 ' + prevGml + ' -i2 ' + entry + ' -od ' + o_dir
                         log(gmlComparison,'d')
                         os.system(gmlComparison)
+                        os.chdir(work_dir)
                     #log(prevGml +' '+ entry, 'i')
                     prevGml = entry
     
-        gml_dir = out_path
+        gml_dir = os.path.abspath(out_dir) + '/'
 
 
+log("All done, exiting ptglDynamics.", 'i')
 
 # tidy up
 if (args.outputfile != ""):

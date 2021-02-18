@@ -160,7 +160,8 @@ if (args.inputdirectory != ""):
         logging.error("Specified input directory '%s' is not readable. Exiting now.", args.inputdirectory)
         sys.exit(1)
 else:
-    i_dir = os.getcwd() + '/'
+    #i_dir = os.getcwd() + '/'
+    i_dir = os.getcwd()
 
 # output directory
 if (args.outputdirectory != ""):
@@ -170,12 +171,16 @@ if (args.outputdirectory != ""):
         logging.error("Specified output directory '%s' is not writable. Exiting now.", args.outputdirectory)
         sys.exit(1)
 else:
-    o_dir = os.getcwd() + '/'
+    #o_dir = os.getcwd() + '/'
+    o_dir = os.getcwd()
 
 
 ########### vamos ###########
 
 # TODO add your code here
+o_dir = os.path.abspath(o_dir) + '/'
+os.chdir(i_dir)
+i_dir = os.getcwd() + '/'
 
 for allfile in os.listdir(i_dir):
 
@@ -186,20 +191,21 @@ for allfile in os.listdir(i_dir):
             for line in f:
                 data.append(line)
         f.close()
-    
-        output = open(o_dir+allfile, "w")
+        
+        os.chdir(o_dir)
+        output = open(allfile, "w")
         
         #for line in fileinput.input(i_dir + allfile, inplace=True):
         for line in data:
             
-            if ("  #  RESIDUE AA" == line[0:15]):
+            if ("  #  RESIDUE AA" == line[0:15]) and ("CHAIN AUTHCHAIN" not in line):
                 chain = "           CHAIN AUTHCHAIN "
                 new_line = line.rstrip('\n')
-                if (line != new_line + chain + '\n'):
+                #if (line != new_line + chain + '\n'):
                     #line = line.replace(line, new_line + chain + '\n')
-                    line = new_line + chain + '\n'
-                else:
-                    line = line
+                line = new_line + chain + '\n'
+                #else:
+                 #   line = line
                 cnt +=1
             elif (line[11] != ' ') and (cnt > 0):
                 chain_id = "                " + line[11] + "         " + line[11]
@@ -212,6 +218,7 @@ for allfile in os.listdir(i_dir):
             output.write(line)
             #sys.stdout.write(line)
         output.close()
+        os.chdir(i_dir)
             
 log('finish dssp file overwritting','i')
 

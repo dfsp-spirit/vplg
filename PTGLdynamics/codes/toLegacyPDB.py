@@ -191,7 +191,8 @@ if (args.inputdirectory != ""):
         logging.error("Specified input directory '%s' is does not exist. Exiting now.", args.inputdirectory)
         sys.exit(1)
 else:
-    i_dir = os.getcwd() + '/'
+    #i_dir = os.getcwd() + '/'
+    i_dir = os.getcwd()
 
 # output directory
 if (args.outputdirectory != ""):
@@ -201,7 +202,8 @@ if (args.outputdirectory != ""):
         logging.error("Specified output directory '%s' does not exist. Exiting now.", args.outputdirectory)
         sys.exit(1)
 else:
-    o_dir = os.getcwd() + '/'
+    #o_dir = os.getcwd() + '/'
+    o_dir = os.getcwd()
 
 
 ########### vamos ###########
@@ -211,6 +213,10 @@ log("Version " + version, "i")
 # TODO add your code here
 
 _start_time = time.time()
+o_dir = os.path.abspath(o_dir) + '/'
+os.chdir(i_dir)
+i_dir = os.getcwd()
+
 
 #reading COMPND.txt file which is the header of a  pdb file
 if compnd != '':
@@ -232,12 +238,13 @@ number_files = len(os.listdir(i_dir))
 for allfile in os.listdir(i_dir):
     if allfile.endswith(".pdb"):
         data = []
-        with open(i_dir + allfile) as f:
+        with open(allfile) as f:
             for line in f:
                 data.append(line)
         f.close()
         
-        output = open(o_dir+allfile, "w")
+        os.chdir(o_dir)
+        output = open(allfile, "w")
         
         cnt = 0
         hetatms = ''
@@ -290,6 +297,7 @@ for allfile in os.listdir(i_dir):
                 prevChainID = line[21]
             cnt += 1 
         output.close()
+        os.chdir(i_dir)
 
 log('finish pdb file overwritting', 'i')
 log("-- %s seconds ---"% (time.time()- _start_time), 'i')
