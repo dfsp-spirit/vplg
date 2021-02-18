@@ -160,7 +160,6 @@ if (args.inputdirectory != ""):
         logging.error("Specified input directory '%s' is not readable. Exiting now.", args.inputdirectory)
         sys.exit(1)
 else:
-    #i_dir = os.getcwd() + '/'
     i_dir = os.getcwd()
 
 # output directory
@@ -171,7 +170,6 @@ if (args.outputdirectory != ""):
         logging.error("Specified output directory '%s' is not writable. Exiting now.", args.outputdirectory)
         sys.exit(1)
 else:
-    #o_dir = os.getcwd() + '/'
     o_dir = os.getcwd()
 
 

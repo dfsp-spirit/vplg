@@ -191,7 +191,6 @@ if (args.inputdirectory != ""):
         logging.error("Specified input directory '%s' is does not exist. Exiting now.", args.inputdirectory)
         sys.exit(1)
 else:
-    #i_dir = os.getcwd() + '/'
     i_dir = os.getcwd()
 
 # output directory
@@ -202,7 +201,6 @@ if (args.outputdirectory != ""):
         logging.error("Specified output directory '%s' does not exist. Exiting now.", args.outputdirectory)
         sys.exit(1)
 else:
-    #o_dir = os.getcwd() + '/'
     o_dir = os.getcwd()
 
 
@@ -215,7 +213,7 @@ log("Version " + version, "i")
 _start_time = time.time()
 o_dir = os.path.abspath(o_dir) + '/'
 os.chdir(i_dir)
-i_dir = os.getcwd()
+i_dir = os.getcwd() + '/'
 
 
 #reading COMPND.txt file which is the header of a  pdb file
