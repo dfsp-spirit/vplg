@@ -179,7 +179,6 @@ cl_parser.add_argument('-p',
                        help = 'to execute only the specified scripts.')
 
 cl_parser.add_argument('-u',
-<<<<<<< HEAD
                        '--sub-dir-structure',
                        action='store_true',
                        help='display the results in sub directories in the output directory.')
