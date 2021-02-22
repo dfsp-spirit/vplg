@@ -1,8 +1,8 @@
-/plcc/build/
-/plcc/dist/
-/plcc/nbproject/private/
-/plcc/nbproject/configs/
-/plcc/nbproject/genfiles.properties
+/PTGLgraphComputation/build/
+/PTGLgraphComputation/dist/
+/PTGLgraphComputation/nbproject/private/
+/PTGLgraphComputation/nbproject/configs/
+/PTGLgraphComputation/nbproject/genfiles.properties
 
 .directory
 
