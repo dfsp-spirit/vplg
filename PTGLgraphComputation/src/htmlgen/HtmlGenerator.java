@@ -22,7 +22,7 @@ import resultcontainers.ProteinChainResults;
 import resultcontainers.ProteinResults;
 import proteinstructure.SSE;
 import proteingraphs.SSEGraph;
-import plccSettings.Settings;
+import Settings.Settings;
 
 public class HtmlGenerator {
     
@@ -758,7 +758,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         
         // ------------------------ complex graph info ----------------------
-        if(Settings.getBoolean("plcc_B_complex_graphs") && Settings.getBoolean("plcc_B_html_add_complex_graph_data")) {
+        if(Settings.getBoolean("PTGLgraphComputation_B_complex_graphs") && Settings.getBoolean("PTGLgraphComputation_B_html_add_complex_graph_data")) {
             
             String compGraphSubDir = "ALL";
             

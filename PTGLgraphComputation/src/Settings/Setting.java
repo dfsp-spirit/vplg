@@ -6,7 +6,7 @@
  * @author jnw
  */
 
-package plccSettings;
+package Settings;
 
 import java.util.ArrayList;
 import tools.DP;

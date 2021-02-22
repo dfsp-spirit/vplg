@@ -22,7 +22,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import proteingraphs.Position2D;
-import plccSettings.Settings;
+import Settings.Settings;
 
 /**
  * A page layout that holds all non-SSE-specific information about the drawing process, e.g. the
@@ -81,28 +81,28 @@ public class PageLayout {
     
     private void init(Integer numVerts) {
         this.numVerts = numVerts;
-        this.minImgHeight = Settings.getInteger("plcc_I_img_min_img_height");
+        this.minImgHeight = Settings.getInteger("PTGLgraphComputation_I_img_min_img_height");
         
-        this.marginLeft = Settings.getInteger("plcc_I_img_margin_left");
-        this.marginTop = Settings.getInteger("plcc_I_img_margin_top");
-        this.marginRight = Settings.getInteger("plcc_I_img_margin_right");
-        this.marginBottom = Settings.getInteger("plcc_I_img_margin_bottom");
+        this.marginLeft = Settings.getInteger("PTGLgraphComputation_I_img_margin_left");
+        this.marginTop = Settings.getInteger("PTGLgraphComputation_I_img_margin_top");
+        this.marginRight = Settings.getInteger("PTGLgraphComputation_I_img_margin_right");
+        this.marginBottom = Settings.getInteger("PTGLgraphComputation_I_img_margin_bottom");
         
         this.headerStart = new Position2D(marginLeft,  marginTop);        
-        this.headerHeight = Settings.getInteger("plcc_I_img_header_height");
-        this.footerHeight = Settings.getInteger("plcc_I_img_footer_height");
+        this.headerHeight = Settings.getInteger("PTGLgraphComputation_I_img_header_height");
+        this.footerHeight = Settings.getInteger("PTGLgraphComputation_I_img_footer_height");
         this.footerWidth = 0;
         
-        this.textLineHeight = Settings.getInteger("plcc_I_img_text_line_height");
+        this.textLineHeight = Settings.getInteger("PTGLgraphComputation_I_img_text_line_height");
         
         this.imgStart = new Position2D(headerStart.x,  headerStart.y + headerHeight);
         
         
-        this.minPageWidth = Settings.getInteger("plcc_I_img_minPageWidth");
-        this.minPageHeight = Settings.getInteger("plcc_I_img_minPageHeight");                
+        this.minPageWidth = Settings.getInteger("PTGLgraphComputation_I_img_minPageWidth");
+        this.minPageHeight = Settings.getInteger("PTGLgraphComputation_I_img_minPageHeight");                
         
-        this.vertDist = Settings.getInteger("plcc_I_img_vert_dist");
-        this.vertRadius = Settings.getInteger("plcc_I_img_vert_radius");
+        this.vertDist = Settings.getInteger("PTGLgraphComputation_I_img_vert_dist");
+        this.vertRadius = Settings.getInteger("PTGLgraphComputation_I_img_vert_radius");
         this.isForKEY = false;
     }
     
@@ -164,7 +164,7 @@ public class PageLayout {
      */
     public Integer getImageAreaHeight() {
         Integer h = this.getMaxArcHeight() + (2 * vertRadius);
-        Integer min = Settings.getInteger("plcc_I_img_min_img_height");        
+        Integer min = Settings.getInteger("PTGLgraphComputation_I_img_min_img_height");        
         return(h < min ? min : h);
     }
     
@@ -183,7 +183,7 @@ public class PageLayout {
             h = (this.getMaxVertDist() / 4) + 100;
         }
         
-        Integer min = Settings.getInteger("plcc_I_img_min_arc_height");
+        Integer min = Settings.getInteger("PTGLgraphComputation_I_img_min_arc_height");
         return(h < min ? min : h);    
     }
     
@@ -218,7 +218,7 @@ public class PageLayout {
      * @return the font as java.awt.Font.
      */
     public Font getStandardFont() {
-        return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size")));
+        return(new Font(Settings.get("PTGLgraphComputation_S_img_default_font"), Font.PLAIN, Settings.getInteger("PTGLgraphComputation_I_img_default_font_size")));
     }
     
     /**
@@ -226,7 +226,7 @@ public class PageLayout {
      * @return the font as java.awt.Font.
      */
     public Font getStandardFontBold() {
-        return(new Font(Settings.get("plcc_S_img_default_font"), Font.BOLD, Settings.getInteger("plcc_I_img_default_font_size")));
+        return(new Font(Settings.get("PTGLgraphComputation_S_img_default_font"), Font.BOLD, Settings.getInteger("PTGLgraphComputation_I_img_default_font_size")));
     }
     
     
@@ -248,7 +248,7 @@ public class PageLayout {
      * @return the font as java.awt.Font.
      */
     public Font getLegendFont() {
-        return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_legend_font_size")));
+        return(new Font(Settings.get("PTGLgraphComputation_S_img_default_font"), Font.PLAIN, Settings.getInteger("PTGLgraphComputation_I_img_legend_font_size")));
     }
     
         

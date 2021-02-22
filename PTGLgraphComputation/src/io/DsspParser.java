@@ -11,7 +11,7 @@ package io;
 // imports
 import java.util.ArrayList;
 import java.util.HashMap;
-import plccSettings.Settings;
+import Settings.Settings;
 import proteinstructure.AminoAcid;
 import proteinstructure.Residue;
 import proteinstructure.SSE;
@@ -48,7 +48,7 @@ public class DsspParser {
      */
     protected static void initVariables(String df) {
         dsspFile = df;
-        silent = Settings.getBoolean("plcc_B_silent");
+        silent = Settings.getBoolean("PTGLgraphComputation_B_silent");
         
         // read all lines of the files into lists
         if(! silent) {
@@ -228,7 +228,7 @@ public class DsspParser {
             if(dLine.substring(13, 14).equals("!")) {       // chain brake
                 chainBreakDssps.add(Integer.valueOf(dLine.substring(0, 5).trim()));
                 if(! silent) {
-                    if (! Settings.getBoolean("plcc_B_no_chain_break_info")) {
+                    if (! Settings.getBoolean("PTGLgraphComputation_B_no_chain_break_info")) {
                         System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
                     }
                 }

@@ -50,7 +50,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
-import plccSettings.Settings;
+import Settings.Settings;
 import proteinstructure.Chain;
 import proteinstructure.Molecule;
 import proteinstructure.Residue;
@@ -150,7 +150,7 @@ public class ComplexGraph extends UAdjListGraph {
         
         // preprocess chains if required
         List<Chain> preprocessedChains;
-        if (Settings.getBoolean("plcc_B_CG_ignore_ligands")) {
+        if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedChains = new ArrayList<>();
             for (Chain tmpChain : chains) {
                 Chain newChain = new Chain(tmpChain.getPdbChainID());
@@ -169,7 +169,7 @@ public class ComplexGraph extends UAdjListGraph {
         
         // preprocess res contacts if required
         List<MolContactInfo> preprocessedResContacts;
-        if (Settings.getBoolean("plcc_B_CG_ignore_ligands")) {
+        if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedResContacts = new ArrayList<>();
             for (MolContactInfo tmpMci : resContacts) {
                 if (! tmpMci.isLigandContact()) {
@@ -204,7 +204,7 @@ public class ComplexGraph extends UAdjListGraph {
             // get AA sequence string for each chainName
             for(Residue resi : tmpChain.getResidues()) {
                 
-                if ( ! Settings.get("plcc_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
+                if ( ! Settings.get("PTGLgraphComputation_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
                     if (chainResAASeq[i] != null) {
                         chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
                     } else {
@@ -221,7 +221,7 @@ public class ComplexGraph extends UAdjListGraph {
      * @param chains All chains of this complex graph
      */
     private void createHomologueChainsMatrix(List<Chain> chains) {
-    if(! Settings.getBoolean("plcc_B_silent")) {
+    if(! Settings.getBoolean("PTGLgraphComputation_B_silent")) {
             System.out.println("  Computing CG contacts.");
         }
     
@@ -289,10 +289,10 @@ public class ComplexGraph extends UAdjListGraph {
         }
         
         // inform here if edge threshold is >1 (below it would result in multiple prints)
-        if (Settings.getInteger("plcc_I_CG_contact_threshold") > 1) {    
-            if (! Settings.getBoolean("plcc_B_silent")) {
+        if (Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold") > 1) {    
+            if (! Settings.getBoolean("PTGLgraphComputation_B_silent")) {
                 System.out.println("  Complex graph contact threshold for edges is set to "
-                        + Settings.getInteger("plcc_I_CG_contact_threshold").toString()
+                        + Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold").toString()
                         + ". Resulting graphs may differ from default setting '1' where all "
                         + "edges are drawn.");
             }
@@ -746,7 +746,7 @@ public class ComplexGraph extends UAdjListGraph {
 
     public Boolean chainsHaveEnoughContacts(Integer A, Integer B) {
         if (this.numChainInteractions[A][B] != null) {
-            return this.numChainInteractions[A][B] >= Settings.getInteger("plcc_I_CG_contact_threshold");
+            return this.numChainInteractions[A][B] >= Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold");
         } else {
             return false;
         }
@@ -803,7 +803,7 @@ public class ComplexGraph extends UAdjListGraph {
                 Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        if(! Settings.getBoolean("plcc_B_silent")) {
+        if(! Settings.getBoolean("PTGLgraphComputation_B_silent")) {
             System.out.println("    SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " skipped (contact involved coils).");
         }
     }
@@ -991,7 +991,7 @@ public class ComplexGraph extends UAdjListGraph {
         //BufferedImage bi = new BufferedImage(pl.getPageWidth(), pl.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
         SVGGraphics2D ig2;
 
-        //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {                    
+        //if(Settings.get("PTGLgraphComputation_S_img_output_format").equals("SVG")) {                    
         // Apache Batik SVG library, using W3C DOM tree implementation
         // Get a DOMImplementation.
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
@@ -1022,13 +1022,13 @@ public class ComplexGraph extends UAdjListGraph {
     // ------------------------- Draw header -------------------------
         // check width of header string
         String proteinHeader = "The chain complex graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges().size() + "].";
-        String addInfo = "(Interchain contact threshold is set to " + Settings.getInteger("plcc_I_CG_contact_threshold") + ". Neglected edges: " + cg.neglectedEdges + ")";
+        String addInfo = "(Interchain contact threshold is set to " + Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold") + ". Neglected edges: " + cg.neglectedEdges + ")";
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
         String chainName;    // the SSE number in the primary structure, N to C terminus
         String chainNumber;  // the SSE number in this graph, 1..(this.size)
 
-        if (Settings.getBoolean("plcc_B_graphimg_header")) {
+        if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
             //i2.drawString(addInfo, pl.headerStart.x, pl.headerStart.y + pl.textLineHeight);((1f/x*(molID-2)) - (int)(1f/x*(molID-2)))
         }
@@ -1136,7 +1136,7 @@ public class ComplexGraph extends UAdjListGraph {
             labelPosX = leftVertPosX + arcWidth / 2 + 2;
             labelPosY = arcTopLeftY + spacerY - 5;
             //draw labels on arcs
-            Font labelfont = new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size") - 5);
+            Font labelfont = new Font(Settings.get("PTGLgraphComputation_S_img_default_font"), Font.PLAIN, Settings.getInteger("PTGLgraphComputation_I_img_default_font_size") - 5);
             ig2.setFont(labelfont);
             ig2.setPaint(Color.BLACK);
             
@@ -1266,7 +1266,7 @@ public class ComplexGraph extends UAdjListGraph {
          }
          */
     // ************************************* footer **************************************
-        if (Settings.getBoolean("plcc_B_graphimg_footer")) {
+        if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_footer")) {
 
         // Draw the vertex numbering into the footer
         
@@ -1365,7 +1365,7 @@ public class ComplexGraph extends UAdjListGraph {
             
             
             /*
-             if(Settings.getBoolean("plcc_B_graphimg_legend")) {
+             if(Settings.getBoolean("PTGLgraphComputation_B_graphimg_legend")) {
              if(iChainID != -1){
              SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4)), pl, pg);
              }
@@ -1377,7 +1377,7 @@ public class ComplexGraph extends UAdjListGraph {
         }
 
     // all done, write the image to disk
-        //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {
+        //if(Settings.get("PTGLgraphComputation_S_img_output_format").equals("SVG")) {
     //boolean useCSS = true;
         //FileOutputStream fos = new FileOutputStream(new File("/tmp/mySVG.svg"));
         //Writer out = new OutputStreamWriter(fos, "UTF-8");
@@ -1415,7 +1415,7 @@ public class ComplexGraph extends UAdjListGraph {
             DP.getInstance().e("Could not write protein graph file : '" + ex.getMessage() + "'.");
         }
 
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (!Settings.getBoolean("PTGLgraphComputation_B_silent")) {
             StringBuilder sb = new StringBuilder();
             sb.append("      Output complex graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -1436,7 +1436,7 @@ public class ComplexGraph extends UAdjListGraph {
      */
     public boolean writeToFileGML(File file) {
         
-        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        Boolean snakeCase = Settings.getBoolean("PTGLgraphComputation_B_gml_snake_case");
         
         // - - - Checks - - -
 
@@ -1544,7 +1544,7 @@ public class ComplexGraph extends UAdjListGraph {
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "strand", "strand", "contacts"), snakeCase), numStrandStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "strand", "coil", "contacts"), snakeCase), numStrandCoilInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "coil", "coil", "contacts"), snakeCase), numCoilCoilInteractionsMap));
-        if (! Settings.getBoolean("plcc_B_CG_ignore_ligands")) { 
+        if (! Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) { 
             gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "helix", "ligand", "contacts"), snakeCase), numHelixLigandInteractionsMap));
             gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "strand", "ligand", "contacts"), snakeCase), numStrandLigandInteractionsMap));
             gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(TextTools.formatAsCaseStyle(Arrays.asList("num", "coil", "ligand", "contacts"), snakeCase), numCoilLigandInteractionsMap));
@@ -1570,8 +1570,8 @@ public class ComplexGraph extends UAdjListGraph {
         String lastLine = "";
         
         LinkedHashMap<String, String> graphAttributes = new LinkedHashMap<>();
-        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("ignore", "ligands"), snakeCase), (Settings.getBoolean("plcc_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
-        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("min", "contacts", "for", "edge"), snakeCase), Settings.getInteger("plcc_I_CG_contact_threshold").toString());  // contact threshold
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("ignore", "ligands"), snakeCase), (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("min", "contacts", "for", "edge"), snakeCase), Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold").toString());  // contact threshold
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("factor", "lucid", "normalized", "weight"), snakeCase), minimumNormalizedEdgeWeight.toString());  // factor to reconstruct normalized edge weight
 
         for (String GmlLine : GmlLines) {

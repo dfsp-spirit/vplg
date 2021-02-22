@@ -84,7 +84,7 @@ import graphformats.IGEXFFormat;
 import graphformats.IManualSVGFormat;
 import graphformats.ISimpleProteinGraphFormat;
 import io.IO;
-import plccSettings.Settings;
+import Settings.Settings;
 import static proteingraphs.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 import tools.TextTools;
@@ -2855,7 +2855,7 @@ E	3	3	3
     public String getOneLineMetadataString() {
         String sep = "";
         try {
-            sep = Settings.get("plcc_S_graph_metadata_splitstring");
+            sep = Settings.get("PTGLgraphComputation_S_graph_metadata_splitstring");
         } catch(java.lang.NullPointerException e) {
             // no settings object yet
             return "";
@@ -2880,13 +2880,13 @@ E	3	3	3
     @Override
     public String toGraphModellingLanguageFormat() {
         
-        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        Boolean snakeCase = Settings.getBoolean("PTGLgraphComputation_B_gml_snake_case");
         
         StringBuilder gmlf = new StringBuilder();
         
         // we put meta data in comments for GML language graphs
         try {
-            if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
+            if(Settings.getBoolean("PTGLgraphComputation_B_add_metadata_comments_GML")) {
                 for(String key : this.metadata.keySet()) {
                     gmlf.append("//[PTGLtools_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
                 }
@@ -3022,7 +3022,7 @@ E	3	3	3
         StringBuilder dlf = new StringBuilder();
         
         // put meta data in comments for DOT language graphs
-        if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
+        if(Settings.getBoolean("PTGLgraphComputation_B_add_metadata_comments_GML")) {
             for(String key : this.metadata.keySet()) {
                 dlf.append("#[PTGLtools_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
             }
@@ -3152,7 +3152,7 @@ E	3	3	3
     public String toKavoshFormat() {
         StringBuilder kf = new StringBuilder();
         
-        if(Settings.getBoolean("plcc_B_kavosh_format_directed")) {
+        if(Settings.getBoolean("PTGLgraphComputation_B_kavosh_format_directed")) {
             kf.append(this.numVertices()).append("\n");
 
             for(Integer i = 0; i < this.getSize(); i++) {
@@ -3322,7 +3322,7 @@ E	3	3	3
     
     @Override
     public String toGEXFFormat() {
-        String version = Settings.get("plcc_S_gexf_format_version");
+        String version = Settings.get("PTGLgraphComputation_S_gexf_format_version");
         if(version.equals("1.2")) {
             return this.toGEXFFormatDraft12();
         }

@@ -8,7 +8,7 @@
 
 package proteinstructure;
 
-import plccSettings.Settings;
+import Settings.Settings;
 
 /**
  * A helper class which converts various representations and names of amino acids. You can use it to convert the
@@ -282,7 +282,7 @@ public class AminoAcid {
      * Retuns fake 1 letter AA name for ligands
      * @return the AA code used for ligands, from the settings file
      */
-    public static String getLigandName1() { return(Settings.get("plcc_S_ligAACode")); }
+    public static String getLigandName1() { return(Settings.get("PTGLgraphComputation_S_ligAACode")); }
 
 
     /**

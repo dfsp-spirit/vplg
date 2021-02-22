@@ -25,7 +25,7 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import plccSettings.Settings;
+import Settings.Settings;
 import tools.DP;
 import tools.MathTools;
 
@@ -53,11 +53,11 @@ public class SimpleGraphDrawer {
     public static Integer SETTING_MIN_DEGREE_TO_DRAW = 10;
     
     public static Font getStandardFont() {
-        return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size")));
+        return(new Font(Settings.get("PTGLgraphComputation_S_img_default_font"), Font.PLAIN, Settings.getInteger("PTGLgraphComputation_I_img_default_font_size")));
     }
     
     public static Font getSmallFont() {
-        return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, 6));
+        return(new Font(Settings.get("PTGLgraphComputation_S_img_default_font"), Font.PLAIN, 6));
     }
     
     private static Integer[] vertGridPosition(int i) {
@@ -96,7 +96,7 @@ public class SimpleGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write simple graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (!Settings.getBoolean("PTGLgraphComputation_B_silent")) {
             StringBuilder sb = new StringBuilder();
             sb.append("      Output simple graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {

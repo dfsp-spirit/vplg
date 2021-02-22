@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import plcc.Main;
-import plccSettings.Settings;
+import Settings.Settings;
 
 /**
  *

@@ -7,7 +7,7 @@
  */
 package tools;
 
-import plccSettings.Settings;
+import Settings.Settings;
 
 /**
  * A debug printer. This is a singleton.
@@ -48,7 +48,7 @@ public class DP {
     public void w(String msg, int... optionalNumberLeadingSpaces) {
         Boolean doWarn = true;
         try {
-            doWarn = ( ! Settings.getBoolean("plcc_B_no_warn"));
+            doWarn = ( ! Settings.getBoolean("PTGLgraphComputation_B_no_warn"));
         } catch(Exception e) {
             // the settings have not been inited yet, so assume that we should warn
             //System.err.println("WARNING: No settings yet.");
@@ -70,7 +70,7 @@ public class DP {
     public void w(String srcTag, String msg, int... optionalNumberLeadingSpaces) {
         Boolean doWarn = true;
         try {
-            doWarn = ( ! Settings.getBoolean("plcc_B_no_warn"));
+            doWarn = ( ! Settings.getBoolean("PTGLgraphComputation_B_no_warn"));
         } catch(Exception e) {
             // the settings have not been inited yet, so assume that we should warn
             //System.err.println("WARNING: No settings yet.");

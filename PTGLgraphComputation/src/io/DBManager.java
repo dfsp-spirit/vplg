@@ -28,7 +28,7 @@ import plcc.Main;
 import motifs.MotifSearchTools;
 import motifs.Motifs;
 import resultcontainers.PTGLNotationFoldResult;
-import plccSettings.Settings;
+import Settings.Settings;
 import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;
@@ -54,98 +54,98 @@ public class DBManager {
         
     
     /** Name of the table which stores info on a PDB protein, identified by the PDB ID. */
-    static String tbl_protein = "plcc_protein";
-    static String tbl_macromolecule = "plcc_macromolecule";
-    static String tbl_chain = "plcc_chain";
-    static String tbl_nm_chaintomacromolecule = "plcc_nm_chaintomacromolecule";
-    static String tbl_sse = "plcc_sse";
-    static String tbl_proteingraph = "plcc_graph";
-    static String tbl_foldinggraph = "plcc_foldinggraph";
-    static String tbl_complexgraph = "plcc_complexgraph";
-    static String tbl_stats_proteingraph = "plcc_stats_proteingraph";
-    static String tbl_stats_complexgraph = "plcc_stats_complexgraph";
-    static String tbl_stats_aagraph = "plcc_stats_aagraph";
-    static String tbl_stats_customgraph = "plcc_stats_customgraph";
-    static String tbl_graphletcount = "plcc_graphlets";
-    static String tbl_graphletcount_complex = "plcc_complex_graphlets";    
-    static String tbl_graphletcount_aa = "plcc_aa_graphlets";    
-    static String tbl_motif = "plcc_motif";
-    static String tbl_motiftype = "plcc_motiftype";
-    static String tbl_representative_chains = "plcc_representative_chains";
-    static String tbl_ligand = "plcc_ligand";
-    static String tbl_nm_ligandtochain = "plcc_nm_ligandtochain";
-    static String tbl_nm_ssetoproteingraph = "plcc_nm_ssetoproteingraph";
-    static String tbl_nm_ssetofoldinggraph = "plcc_nm_ssetofoldinggraph";
-    static String tbl_nm_chaintomotif = "plcc_nm_chaintomotif";
-    static String tbl_aagraph = "plcc_aagraph";
-    static String tbl_aatypeinteractions_absolute = "plcc_aatypeinteractions";
-    static String tbl_aatypeinteractions_normalized = "plcc_aatypeinteractions_normalized";
+    static String tbl_protein = "PTGLgraphComputation_protein";
+    static String tbl_macromolecule = "PTGLgraphComputation_macromolecule";
+    static String tbl_chain = "PTGLgraphComputation_chain";
+    static String tbl_nm_chaintomacromolecule = "PTGLgraphComputation_nm_chaintomacromolecule";
+    static String tbl_sse = "PTGLgraphComputation_sse";
+    static String tbl_proteingraph = "PTGLgraphComputation_graph";
+    static String tbl_foldinggraph = "PTGLgraphComputation_foldinggraph";
+    static String tbl_complexgraph = "PTGLgraphComputation_complexgraph";
+    static String tbl_stats_proteingraph = "PTGLgraphComputation_stats_proteingraph";
+    static String tbl_stats_complexgraph = "PTGLgraphComputation_stats_complexgraph";
+    static String tbl_stats_aagraph = "PTGLgraphComputation_stats_aagraph";
+    static String tbl_stats_customgraph = "PTGLgraphComputation_stats_customgraph";
+    static String tbl_graphletcount = "PTGLgraphComputation_graphlets";
+    static String tbl_graphletcount_complex = "PTGLgraphComputation_complex_graphlets";    
+    static String tbl_graphletcount_aa = "PTGLgraphComputation_aa_graphlets";    
+    static String tbl_motif = "PTGLgraphComputation_motif";
+    static String tbl_motiftype = "PTGLgraphComputation_motiftype";
+    static String tbl_representative_chains = "PTGLgraphComputation_representative_chains";
+    static String tbl_ligand = "PTGLgraphComputation_ligand";
+    static String tbl_nm_ligandtochain = "PTGLgraphComputation_nm_ligandtochain";
+    static String tbl_nm_ssetoproteingraph = "PTGLgraphComputation_nm_ssetoproteingraph";
+    static String tbl_nm_ssetofoldinggraph = "PTGLgraphComputation_nm_ssetofoldinggraph";
+    static String tbl_nm_chaintomotif = "PTGLgraphComputation_nm_chaintomotif";
+    static String tbl_aagraph = "PTGLgraphComputation_aagraph";
+    static String tbl_aatypeinteractions_absolute = "PTGLgraphComputation_aatypeinteractions";
+    static String tbl_aatypeinteractions_normalized = "PTGLgraphComputation_aatypeinteractions_normalized";
     
     /** Name of the table which stores info on SSE types, e.g., alpha-helix, beta-strand and ligand. */
-    static String tbl_ssetypes = "plcc_ssetypes";
-    static String tbl_secondat = "plcc_secondat";
+    static String tbl_ssetypes = "PTGLgraphComputation_ssetypes";
+    static String tbl_secondat = "PTGLgraphComputation_secondat";
     
     /** Name of the table which stores info on intra-chain SSE contact types, e.g., parallel, anti-parallel, mixed or ligand. */
-    static String tbl_contacttypes = "plcc_contacttypes";
+    static String tbl_contacttypes = "PTGLgraphComputation_contacttypes";
     
     /** Name of the table which stores info on inter-chain SSE contact types, e.g., van-der-Waals or disulfide bridge. */
-    static String tbl_complexcontacttypes = "plcc_complexcontacttypes";
+    static String tbl_complexcontacttypes = "PTGLgraphComputation_complexcontacttypes";
     
     /** Name of the table which stores info on graph types, e.g., alpha-graph, beta-graph, alphabeta-graph, alphalig-graph, and so on. */
-    static String tbl_graphtypes = "plcc_graphtypes";
+    static String tbl_graphtypes = "PTGLgraphComputation_graphtypes";
     
-    static String tbl_ssecontact = "plcc_contact";
-    static String tbl_ssecontact_complexgraph = "plcc_ssecontact_complexgraph";
-    static String tbl_complex_contact_stats = "plcc_complex_contact";
+    static String tbl_ssecontact = "PTGLgraphComputation_contact";
+    static String tbl_ssecontact_complexgraph = "PTGLgraphComputation_ssecontact_complexgraph";
+    static String tbl_complex_contact_stats = "PTGLgraphComputation_complex_contact";
     
     /** New table that stores linear notations for all graph types. They are distinguished by a graph_type field, like in all other tables. This tables replaces the albe, alpha and beta tables of the PTGL, which were useless from a DB design point of view. */
-    static String tbl_fglinnot = "plcc_fglinnot";
-    static String tbl_graphletsimilarity = "plcc_graphletsimilarity";
-    static String tbl_graphletsimilarity_complex = "plcc_complex_graphletsimilarity";
-    static String tbl_graphletsimilarity_aa = "plcc_aa_graphletsimilarity";
+    static String tbl_fglinnot = "PTGLgraphComputation_fglinnot";
+    static String tbl_graphletsimilarity = "PTGLgraphComputation_graphletsimilarity";
+    static String tbl_graphletsimilarity_complex = "PTGLgraphComputation_complex_graphletsimilarity";
+    static String tbl_graphletsimilarity_aa = "PTGLgraphComputation_aa_graphletsimilarity";
     
     /** Stores info on ligand-centered complex graphs. */
-    static String tbl_ligandcenteredgraph = "plcc_ligandcenteredgraph";
-    static String tbl_nm_lcg_to_chain = "plcc_nm_lcgtochain";
+    static String tbl_ligandcenteredgraph = "PTGLgraphComputation_ligandcenteredgraph";
+    static String tbl_nm_lcg_to_chain = "PTGLgraphComputation_nm_lcgtochain";
     
     /** Name of the table which stores the PTGL alpha linear notation of a folding graph. */
-    //static String tbl_fglinnot_alpha = "plcc_fglinnot_alpha";
+    //static String tbl_fglinnot_alpha = "PTGLgraphComputation_fglinnot_alpha";
     
     /** Name of the table which stores the PTGL beta linear notation of a folding graph. */
-    //static String tbl_fglinnot_beta = "plcc_fglinnot_beta";
+    //static String tbl_fglinnot_beta = "PTGLgraphComputation_fglinnot_beta";
     
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
-    //static String tbl_fglinnot_albe = "plcc_fglinnot_albe";        
+    //static String tbl_fglinnot_albe = "PTGLgraphComputation_fglinnot_albe";        
     
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
-    //static String tbl_fglinnot_alphalig = "plcc_fglinnot_alphalig";
+    //static String tbl_fglinnot_alphalig = "PTGLgraphComputation_fglinnot_alphalig";
     
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
-    //static String tbl_fglinnot_betalig = "plcc_fglinnot_betalig";
+    //static String tbl_fglinnot_betalig = "PTGLgraphComputation_fglinnot_betalig";
     
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
-    //static String tbl_fglinnot_albelig = "plcc_fglinnot_albelig";        
+    //static String tbl_fglinnot_albelig = "PTGLgraphComputation_fglinnot_albelig";        
     
-    static String view_sses = "plcc_view_sses";
-    static String view_chainmotifs = "plcc_view_chainmotifs";
+    static String view_sses = "PTGLgraphComputation_view_sses";
+    static String view_chainmotifs = "PTGLgraphComputation_view_chainmotifs";
     
-    static String view_ssecontacts = "plcc_view_ssetype_contacts";
-    static String view_graphs = "plcc_view_graphs";
-    static String view_foldinggraphs = "plcc_view_foldinggraphs";
-    //static String view_fglinnotsalpha = "plcc_view_fglinnotsalpha";
-    //static String view_fglinnotsbeta = "plcc_view_fglinnotsbeta";
-    //static String view_fglinnotsalbe = "plcc_view_fglinnotsalbe";
-    //static String view_fglinnotsalphalig = "plcc_view_fglinnotsalphalig";
-    //static String view_fglinnotsbetalig = "plcc_view_fglinnotsbetalig";
-    //static String view_fglinnotsalbelig = "plcc_view_fglinnotsalbelig";
-    static String view_fglinnots = "plcc_view_fglinnots";
-    static String view_secondat = "plcc_view_secondat";
-    static String view_graphlets = "plcc_view_graphlets";
-    static String view_graphletsimilarity = "plcc_view_graphletsimilarity";
-    static String view_pgstats = "plcc_view_pgstats";
-    static String view_cgstats = "plcc_view_cgstats";
-    static String view_aagstats = "plcc_view_aagstats";
-    static String view_customstats = "plcc_view_customstats";
+    static String view_ssecontacts = "PTGLgraphComputation_view_ssetype_contacts";
+    static String view_graphs = "PTGLgraphComputation_view_graphs";
+    static String view_foldinggraphs = "PTGLgraphComputation_view_foldinggraphs";
+    //static String view_fglinnotsalpha = "PTGLgraphComputation_view_fglinnotsalpha";
+    //static String view_fglinnotsbeta = "PTGLgraphComputation_view_fglinnotsbeta";
+    //static String view_fglinnotsalbe = "PTGLgraphComputation_view_fglinnotsalbe";
+    //static String view_fglinnotsalphalig = "PTGLgraphComputation_view_fglinnotsalphalig";
+    //static String view_fglinnotsbetalig = "PTGLgraphComputation_view_fglinnotsbetalig";
+    //static String view_fglinnotsalbelig = "PTGLgraphComputation_view_fglinnotsalbelig";
+    static String view_fglinnots = "PTGLgraphComputation_view_fglinnots";
+    static String view_secondat = "PTGLgraphComputation_view_secondat";
+    static String view_graphlets = "PTGLgraphComputation_view_graphlets";
+    static String view_graphletsimilarity = "PTGLgraphComputation_view_graphletsimilarity";
+    static String view_pgstats = "PTGLgraphComputation_view_pgstats";
+    static String view_cgstats = "PTGLgraphComputation_view_cgstats";
+    static String view_aagstats = "PTGLgraphComputation_view_aagstats";
+    static String view_customstats = "PTGLgraphComputation_view_customstats";
 
     
 
@@ -387,7 +387,7 @@ public class DBManager {
      * @return whether the connection succeeded
      */
     public static Boolean initUsingDefaults() {
-        return init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), false);
+        return init(Settings.get("PTGLgraphComputation_S_db_name"), Settings.get("PTGLgraphComputation_S_db_host"), Settings.getInteger("PTGLgraphComputation_I_db_port"), Settings.get("PTGLgraphComputation_S_db_username"), Settings.get("PTGLgraphComputation_S_db_password"), false);
     }
 
     /**
@@ -425,7 +425,7 @@ public class DBManager {
         
         if(conOK) {
             try {                
-                if(! Settings.getBoolean("plcc_B_silent")) {
+                if(! Settings.getBoolean("PTGLgraphComputation_B_silent")) {
                     System.out.println("Connection to " + dbProductName + " " + dbProductVersion + " successful. Autocommit is " + (dbc.getAutoCommit() ? "on" : "off") + ".");                    
                 }
             } catch(Exception e) {
@@ -481,7 +481,7 @@ public class DBManager {
             DP.getInstance().w("DBManager", "computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(): Graphlets for your chose graph type '" + graphType + "' may not be in the database. By default, we compute \"albe\" graphlets only.");
         }
         
-        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        String graphletSimMethod = Settings.get("PTGLgraphComputation_S_search_similar_graphlet_scoretype");
         
         
         Long numScoresComputed = 0L;
@@ -642,7 +642,7 @@ public class DBManager {
      */
     public static Long[] computeGraphletSimilarityScoresForCGsWholeDatabaseAndStoreBest(Integer numberOfTopScoresToSavePerPair) {
                 
-        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        String graphletSimMethod = Settings.get("PTGLgraphComputation_S_search_similar_graphlet_scoretype");
         Long numScoresComputed = 0L;
         Long numScoresSaved = 0L;
         List<String> allPDBs = DBManager.getAllPDBIDsInTheDB(); // more than 100k chains with full PDB in database
@@ -775,7 +775,7 @@ public class DBManager {
         
         Long numPDBsFound = ((Integer)allPDBs.size()).longValue();
         Long numGraphletsFound = 0L;
-        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        String graphletSimMethod = Settings.get("PTGLgraphComputation_S_search_similar_graphlet_scoretype");
         Double[] src_graphlets, cmp_graphlets;
         
         String src_pdb_id, cmp_pdb_id;
@@ -913,7 +913,7 @@ public class DBManager {
      */
     boolean supportsTransactions() throws SQLException {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
 
         return (dbc.getMetaData().supportsTransactions());
     }
@@ -926,7 +926,7 @@ public class DBManager {
      */
     public static int doInsertQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -956,7 +956,7 @@ public class DBManager {
      */
     public static int doUpdateQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -986,7 +986,7 @@ public class DBManager {
      */
     public static int doDeleteQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -1039,7 +1039,7 @@ public class DBManager {
      */
     public static ArrayList<ArrayList<String>> doSelectQuery(String query) {
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
 
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -1156,7 +1156,7 @@ public class DBManager {
      * @return whether it worked out
      */
     public static Boolean dropTables() {
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -1246,7 +1246,7 @@ public class DBManager {
     public static Boolean createTables(Boolean fillTypetables) {
 
 
-        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("PTGLgraphComputation_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -2173,7 +2173,7 @@ connection.close();
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
-        if (Settings.getBoolean("plcc_B_compute_tim")) {
+        if (Settings.getBoolean("PTGLgraphComputation_B_compute_tim")) {
             if(DBManager.chainContainsMotif_TIMBarrel(chain_db_id)) {
                 motif_db_id = Motifs.MOTIFCODE__TIM_BARREL.longValue();
                 rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
@@ -2215,7 +2215,7 @@ connection.close();
                                         
         
         // OK -- all motifs tested
-        if(! Settings.getBoolean("plcc_B_silent")) {
+        if(! Settings.getBoolean("PTGLgraphComputation_B_silent")) {
             if(foundMotifsForChain.size() > 0) {
                 System.out.println("      Found " + foundMotifsForChain.size() + " motives in all folding graph linear notations of " + pdbid + " chain " + chain + ": " + IO.stringListToString(foundMotifsForChain));
             } else {
@@ -2766,7 +2766,7 @@ connection.close();
             else {
                 System.out.println("  -> Database connection FAILED.");
                 DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
-                Settings.set("plcc_B_useDB", "false");
+                Settings.set("PTGLgraphComputation_B_useDB", "false");
             }
        
     }
@@ -3484,7 +3484,7 @@ connection.close();
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
-        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+        if( ! Settings.getBoolean("PTGLgraphComputation_B_no_not_impl_warn")) {
             DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         }
         
@@ -4524,7 +4524,7 @@ connection.close();
             all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
         }
         
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+        if(Settings.getInteger("PTGLgraphComputation_I_debug_level") > 0) {
             DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: START. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
         }
             
@@ -7624,7 +7624,7 @@ connection.close();
             }
         }
         
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+        if(Settings.getInteger("PTGLgraphComputation_I_debug_level") > 0) {
             DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: END. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
         }
         
@@ -8829,7 +8829,7 @@ connection.close();
             }
         }
         
-        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+        if(Settings.getInteger("PTGLgraphComputation_I_debug_level") > 0) {
             DP.getInstance().d("DBManager", "chainContainsMotif_UbiquitinRoll: list of PDB ids: " + IO.stringListToString(all_pdb_ids));
         }
         
@@ -12526,7 +12526,7 @@ connection.close();
      */
     public static Boolean writeNormalizedGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Double[] graphlet_counts) throws SQLException {
 
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_number_of_graphlets");
+        int numReqGraphletTypes = Settings.getInteger("PTGLgraphComputation_I_number_of_graphlets");
         if(graphlet_counts.length != numReqGraphletTypes) {
             System.err.println("ERROR: writeNormalizedGraphletsToDB: Invalid number of graphlet types specified (got " + graphlet_counts.length + ", required " + numReqGraphletTypes + "). Skipping graphlets.");
             return false;
@@ -15075,7 +15075,7 @@ connection.close();
      */
     public static Integer[] getGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
         
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_number_of_graphlets");
+        int numReqGraphletTypes = Settings.getInteger("PTGLgraphComputation_I_number_of_graphlets");
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
@@ -15187,8 +15187,8 @@ connection.close();
      */
     public static Double[] getNormalizedProteinGraphGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
                 
-        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
-        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int graphletStartIndex = Settings.getInteger("PTGLgraphComputation_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = Settings.getInteger("PTGLgraphComputation_I_compute_all_graphlet_similarities_end_graphlet_index");
         int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
@@ -15301,8 +15301,8 @@ connection.close();
      */
     public static Double[] getNormalizedComplexgraphGraphletCounts(String pdb_id) throws SQLException {
                 
-        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
-        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int graphletStartIndex = Settings.getInteger("PTGLgraphComputation_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = Settings.getInteger("PTGLgraphComputation_I_compute_all_graphlet_similarities_end_graphlet_index");
         int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         ResultSetMetaData md;
@@ -15432,8 +15432,8 @@ connection.close();
     public static Double[] getNormalizedAminoacidgraphGraphletCounts(String pdb_id) throws SQLException {
         
         
-        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
-        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int graphletStartIndex = Settings.getInteger("PTGLgraphComputation_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = Settings.getInteger("PTGLgraphComputation_I_compute_all_graphlet_similarities_end_graphlet_index");
         int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         ResultSetMetaData md;

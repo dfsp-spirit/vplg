@@ -22,7 +22,7 @@ import proteinstructure.Residue;
 import proteinstructure.Molecule;
 import tools.DP;
 import tools.TextTools;
-import plccSettings.Settings;
+import Settings.Settings;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -227,8 +227,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     }
     
     private Boolean contactSatisfiesRules(MolContactInfo c) {
-        Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
-        Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
+        Integer minSeqDist = Settings.getInteger("PTGLgraphComputation_I_aag_min_residue_seq_distance_for_contact");
+        Integer maxSeqDist = Settings.getInteger("PTGLgraphComputation_I_aag_max_residue_seq_distance_for_contact");
         Boolean minSeqDistanceCheckPassed = checkMinSeqDistance(minSeqDist, c);
         Boolean maxSeqDistanceCheckPassed = checkMaxSeqDistance(maxSeqDist, c);
         
@@ -395,7 +395,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         String startEdge = "  edge [";
         String endEdge   = "  ]";
         
-        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        Boolean snakeCase = Settings.getBoolean("PTGLgraphComputation_B_gml_snake_case");
         
         gml.append("graph [\n");
         gml.append("  id ").append(1).append("\n");
@@ -556,7 +556,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     @Override
     public String toGraphModellingLanguageFormat() {
         
-        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        Boolean snakeCase = Settings.getBoolean("PTGLgraphComputation_B_gml_snake_case");
         
         StringBuilder gmlf = new StringBuilder();        
         

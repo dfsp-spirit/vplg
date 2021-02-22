@@ -349,7 +349,7 @@ public class FoldingGraph extends SSEGraph {
             Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();            
 
-            if(Settings.getBoolean("plcc_B_graphimg_header")) {
+            if(Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, headerStartX, headerStartY);
             }
 
@@ -426,7 +426,7 @@ public class FoldingGraph extends SSEGraph {
                             else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                             else { ig2.setPaint(Color.LIGHT_GRAY); }
                             
-                            if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                            if(Settings.getBoolean("PTGLgraphComputation_B_key_foldinggraph_arcs_allways_black")) {
                                 ig2.setPaint(Color.BLACK);
                             }
 

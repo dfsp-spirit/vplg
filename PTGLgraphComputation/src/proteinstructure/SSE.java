@@ -13,7 +13,7 @@ package proteinstructure;
 import java.util.ArrayList;
 import tools.Comp3DTools;
 import graphdrawing.IDrawableVertex;
-import plccSettings.Settings;
+import Settings.Settings;
 import proteingraphs.Position3D;
 import proteingraphs.SSEGraph;
 import proteingraphs.SSEGraphVertex;
@@ -141,7 +141,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         }  // from now on: atleast one residue present
         
         // use requested number of residues for the centroid computation or #res - 1 if SSE is not long enough
-        int numResForCentroid = Math.min(Settings.getInteger("plcc_I_spatrel_vector_num_res_centroids"), this.getLength() - 1);
+        int numResForCentroid = Math.min(Settings.getInteger("PTGLgraphComputation_I_spatrel_vector_num_res_centroids"), this.getLength() - 1);
         
         // compute start and end point with respect to the number of residues contributing to each
         // 1) sum up values
@@ -180,18 +180,18 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         
         Double angleDeg = Math.toDegrees(PiEffectCalculations.calculateAngleBetw3DVecs(doubleVectorA, doubleVectorB));
         
-        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+        if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 3) {
             System.out.println("[DEBUG LV 3] Vector-mode angle between " + this.toString() + " and " + otherSSE.toString() + ": " + angleDeg);
         }
         
-        if (angleDeg <= Settings.getInteger("plcc_I_spatrel_max_deg_parallel")) {
-            if (Settings.getInteger("plcc_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning parallel orientation"); }
+        if (angleDeg <= Settings.getInteger("PTGLgraphComputation_I_spatrel_max_deg_parallel")) {
+            if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning parallel orientation"); }
             return SpatRel.PARALLEL;
-        } else if (angleDeg < Settings.getInteger("plcc_I_spatrel_min_deg_antip")) {
-            if (Settings.getInteger("plcc_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning mixed orientation"); }
+        } else if (angleDeg < Settings.getInteger("PTGLgraphComputation_I_spatrel_min_deg_antip")) {
+            if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning mixed orientation"); }
             return SpatRel.MIXED;
         } else if (angleDeg <= 180) {
-            if (Settings.getInteger("plcc_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning antiparallel orientation"); }
+            if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 3) { System.out.println("  [DEBUG LV 3] Assigning antiparallel orientation"); }
             return SpatRel.ANTIPARALLEL;
         } else {
             DP.getInstance().w("Got an unusual angle of " + angleDeg + " between SSEs " + this.toString() + " and " + otherSSE.toString() + "."

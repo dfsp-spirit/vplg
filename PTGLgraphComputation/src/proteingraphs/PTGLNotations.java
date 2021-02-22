@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import plcc.Main;
-import plccSettings.Settings;
+import Settings.Settings;
 import tools.DP;
 
 /**
@@ -103,7 +103,7 @@ public class PTGLNotations {
     public List<PTGLNotationFoldResult> getResults() {
         if(! this.resultsComputed) {
             
-            if(Settings.getBoolean("plcc_B_special_linnot_rules_for_bifurcated_adj_and_red")) {
+            if(Settings.getBoolean("PTGLgraphComputation_B_special_linnot_rules_for_bifurcated_adj_and_red")) {
                 //System.out.println("Using special rules for bifurcated ADJ and RED linear notation strings.");
                 this.computeLinearNotationsExtraRulesForBifurcated();
             }

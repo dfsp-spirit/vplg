@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
-import plccSettings.Settings;
+import Settings.Settings;
 import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
 import proteinstructure.Molecule;
@@ -41,8 +41,8 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     private String chainid;
 
     private Boolean contactSatisfiesRules(MolContactInfo c) {
-        Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
-        Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
+        Integer minSeqDist = Settings.getInteger("PTGLgraphComputation_I_aag_min_residue_seq_distance_for_contact");
+        Integer maxSeqDist = Settings.getInteger("PTGLgraphComputation_I_aag_max_residue_seq_distance_for_contact");
         Boolean minSeqDistanceCheckPassed = checkMinSeqDistance(minSeqDist, c);
         Boolean maxSeqDistanceCheckPassed = checkMaxSeqDistance(maxSeqDist, c);
 
@@ -200,7 +200,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     @Override
     public String toGraphModellingLanguageFormat() {
         
-        Boolean snakeCase = Settings.getBoolean("plcc_B_gml_snake_case");
+        Boolean snakeCase = Settings.getBoolean("PTGLgraphComputation_B_gml_snake_case");
 
         StringBuilder gmlf = new StringBuilder();
 
