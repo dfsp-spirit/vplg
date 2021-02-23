@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 /**
- * Some text format and parsing tools. Some of these are not really used in PLCC, but I needed them for writing my thesis.
+ * Some text format and parsing tools. Some of these are not really used in PTGLgraphComputation, but I needed them for writing my thesis.
  * @author spirit
  */
 public class TextTools {

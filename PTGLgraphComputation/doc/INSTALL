@@ -13,7 +13,7 @@ After unpacking the release archive, all tools can be run directly from the resu
    unzip PTGLtools-<version>.zip
 
    cd PTGLtools/
-   java -jar plcc.jar                            or
+   java -jar PTGLgraphComputation.jar                            or
    java -jar vpg.jar                             or
    java -jar splitpdb.jar
 

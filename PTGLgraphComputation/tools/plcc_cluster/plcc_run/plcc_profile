@@ -1,11 +1,11 @@
 #!/bin/bash
-## plcc startup script by Tim Schaefer
+## PTGLgraphComputation startup script by Tim Schaefer
 # This script is for profiling the app remotely only, it requires the Remote profiling pack for the current JVM (e.g., Java JRE 7, linux64) in the path /home/ts/software/java-profiler/.
 # You also need to calibrate it by running bin/calibrate-<jvm-version>.sh in the profiling pack
 # You can than remotely attach to the app.
 
 
-APPTAG="[PLCC_STARTSCRIPT]"
+APPTAG="[PTGLgraphComputation_STARTSCRIPT]"
 
 ## check for java in PATH
 which java > /dev/null
@@ -31,4 +31,4 @@ if [ ! -d "/home/ts/software/java-profiler/" ]; then
 fi
 
 ## k, run
-$JAVABIN -XX:+UseLinuxPosixThreadCPUClocks -agentpath:/home/ts/software/java-profiler/lib/deployed/jdk16/linux-amd64/libprofilerinterface.so=/home/ts/software/java-profiler/lib,5140 -jar plcc.jar $@ 
+$JAVABIN -XX:+UseLinuxPosixThreadCPUClocks -agentpath:/home/ts/software/java-profiler/lib/deployed/jdk16/linux-amd64/libprofilerinterface.so=/home/ts/software/java-profiler/lib,5140 -jar PTGLgraphComputation.jar $@ 

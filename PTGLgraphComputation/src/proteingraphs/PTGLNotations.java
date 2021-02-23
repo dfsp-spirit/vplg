@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import plcc.Main;
-import Settings.Settings;
+import settings.Settings;
 import tools.DP;
 
 /**

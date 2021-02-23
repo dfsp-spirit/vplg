@@ -40,7 +40,7 @@ for PDBFILE in *.pdb; do
   if [ -f "$DSSPFILE" ]; then
     echo "$APPTAG Processing PDB file $PDBFILE with PDBID $PDBID, using DSSP file $DSSPFILE.";
     let NUM_DSSP_AVAILABLE++
-    PLCC_COMMAND="java -jar plcc.jar $PDBID $PLCC_EXTRA_OPTIONS"
+    PLCC_COMMAND="java -jar PTGLgraphComputation.jar $PDBID $PLCC_EXTRA_OPTIONS"
     echo "$APPTAG PLCC command to be executed is: '$PLCC_COMMAND'.";
     ## run it!
     $PLCC_COMMAND

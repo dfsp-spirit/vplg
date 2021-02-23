@@ -142,13 +142,13 @@ public class SettingsOld {
         defSet("PTGLgraphComputation_I_debug_level", "0", "Debug level. Higher value means more output.");
         defSet("PTGLgraphComputation_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("PTGLgraphComputation_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
-        defSet("PTGLgraphComputation_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
-        defSet("PTGLgraphComputation_B_debug_only_parse", "false", "Exit after parsing. WARNING: When this is true, plcc will abort after parsing and not produce results!");
-        defSet("PTGLgraphComputation_B_debug_only_contact_comp", "false", "Exit after contact computation. WARNING: When this is true, plcc will abort after contact computation and not produce results!");
+        defSet("PTGLgraphComputation_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, PTGLgraphComputation will abort after the first few residues and produce wrong overall results!");
+        defSet("PTGLgraphComputation_B_debug_only_parse", "false", "Exit after parsing. WARNING: When this is true, PTGLgraphComputation will abort after parsing and not produce results!");
+        defSet("PTGLgraphComputation_B_debug_only_contact_comp", "false", "Exit after contact computation. WARNING: When this is true, PTGLgraphComputation will abort after contact computation and not produce results!");
         
-        defSet("PTGLgraphComputation_B_set_pdb_representative_chains_post", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
+        defSet("PTGLgraphComputation_B_set_pdb_representative_chains_post", "false", "Whether this PTGLgraphComputation run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
         defSet("PTGLgraphComputation_B_set_pdb_representative_chains_remove_old_labels_post", "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
-        defSet("PTGLgraphComputation_B_set_pdb_representative_chains_pre", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
+        defSet("PTGLgraphComputation_B_set_pdb_representative_chains_pre", "false", "Whether this PTGLgraphComputation run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
         defSet("PTGLgraphComputation_B_set_pdb_representative_chains_remove_old_labels_pre", "true", "Whether the old labels should be removed from all chains in the info table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
         defSet("PTGLgraphComputation_S_representative_chains_xml_file", "representatives.xml", "The path to the XML file containing the representative PDB chains from the PDB. You can get the file from the RCSB PDB REST web service.");
         defSet("PTGLgraphComputation_B_writeComplexContactCSV", "false", "Whether to write a CSV file containing all contacts used for complex graph computation.");
@@ -181,8 +181,8 @@ public class SettingsOld {
         
         defSet("PTGLgraphComputation_B_output_images_dir_tree", "false", "Whether to write output images to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
         defSet("PTGLgraphComputation_B_output_textfiles_dir_tree", "false", "Whether to write output graph text files to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
-        defSet("PTGLgraphComputation_B_output_textfiles_dir_tree_html", "false", "Whether to write HTML navigation files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well.");
-        defSet("PTGLgraphComputation_B_output_textfiles_dir_tree_core_html", "false", "Whether to write the core VPLGweb HTML files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well. These are the main page, search form and other stuff which is only needed once for the whole website.");
+        defSet("PTGLgraphComputation_B_output_textfiles_dir_tree_html", "false", "Whether to write HTML navigation files to the output directory tree. Only used if PTGLgraphComputation_B_output_textfiles_dir_tree is true as well.");
+        defSet("PTGLgraphComputation_B_output_textfiles_dir_tree_core_html", "false", "Whether to write the core VPLGweb HTML files to the output directory tree. Only used if PTGLgraphComputation_B_output_textfiles_dir_tree is true as well. These are the main page, search form and other stuff which is only needed once for the whole website.");
         defSet("PTGLgraphComputation_B_html_add_complex_graph_data", "true", "Whether to write data on the complex graph to the protein result HTML webpage (if available).");
                 
         defSet("PTGLgraphComputation_B_output_GML", "true", "Whether to save computed protein graphs to text files in Graph Modelling Language format (GML).");
@@ -191,7 +191,7 @@ public class SettingsOld {
         defSet("PTGLgraphComputation_B_output_kavosh", "false", "Whether to save computed protein graphs to text files in Kavosh format.");
         defSet("PTGLgraphComputation_B_output_eld", "false", "Whether to save computed protein graphs to text files in edge list format with a vertex type list file.");
         defSet("PTGLgraphComputation_B_kavosh_format_directed", "true", "Whether to treat the graphs as directed for the Kavosh output. If set to true, each edge (a, b) will appear twice in the output file: once as (a, b) and again as (b, a).");
-        defSet("PTGLgraphComputation_B_output_plcc", "false", "Whether to save computed protein graphs to text files in PLCC format.");
+        defSet("PTGLgraphComputation_B_output_plcc", "false", "Whether to save computed protein graphs to text files in PTGLgraphComputation format.");
         defSet("PTGLgraphComputation_B_output_perlfg", "false", "Whether to save computed protein graphs to text files in the PTGL format used by the Perl script to compute folding graph notations.");
         defSet("PTGLgraphComputation_B_output_json", "true", "Whether to save computed protein graphs to text files in JSON format.");
         defSet("PTGLgraphComputation_B_output_xml", "true", "Whether to save computed protein graphs to text files in XML format.");
@@ -205,7 +205,7 @@ public class SettingsOld {
         defSet("PTGLgraphComputation_B_output_compgraph_DOT", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in DOT language Format (DOT).");
         defSet("PTGLgraphComputation_B_output_compgraph_kavosh", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in Kavosh format.");
         defSet("PTGLgraphComputation_B_output_compgraph_eld", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in edge list format with a vertex type list file.");
-        defSet("PTGLgraphComputation_B_output_compgraph_plcc", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in PLCC format.");
+        defSet("PTGLgraphComputation_B_output_compgraph_plcc", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in PTGLgraphComputation format.");
         defSet("PTGLgraphComputation_B_output_compgraph_JSON", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in JSON format.");
         defSet("PTGLgraphComputation_B_output_compgraph_XML", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in XGMML format.");
         defSet("PTGLgraphComputation_B_output_fg_linear_notations_to_file", "true", "Whether to save computed PTGL linear notations of folding graphs to a text file.");
@@ -224,7 +224,7 @@ public class SettingsOld {
         defSet("PTGLgraphComputation_S_temp_dir", ".", "The directory where temporary files can be created. You need write access to it, of course.");
         
         defSet("PTGLgraphComputation_S_img_output_format", "PNG", "Not used for graph images anymore. image output format (valid options: 'PNG', 'JPG')");
-        defSet("PTGLgraphComputation_S_img_output_fileext", ".png", "Not used for graph images anymore, applies to Ramaplot etc only. file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')");
+        defSet("PTGLgraphComputation_S_img_output_fileext", ".png", "Not used for graph images anymore, applies to Ramaplot etc only. file extension of output images (should fit PTGLgraphComputation_S_img_output_format more or less, e.g. '.png', '.jpg')");
         defSet("PTGLgraphComputation_B_skip_empty_chains", "true", "whether to completely skip chains which do not contain any DSSP SSEs (i.e., contain only ligands).");                
         
         // new output format settings
@@ -265,11 +265,11 @@ public class SettingsOld {
 
         // Folding graphs: "KEY", "ADJ", "RED", "SEQ
         defSet("PTGLgraphComputation_B_folding_graphs", "false", "Determines whether folding graphs (connected components of the protein graph) are computed. This does NOT mean they are drawn.");
-        defSet("PTGLgraphComputation_B_foldgraphtype_KEY", "true", "Determines whether KEY notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
-        defSet("PTGLgraphComputation_B_foldgraphtype_ADJ", "true", "Determines whether ADJ notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
-        defSet("PTGLgraphComputation_B_foldgraphtype_RED", "true", "Determines whether RED notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
-        defSet("PTGLgraphComputation_B_foldgraphtype_SEQ", "true", "Determines whether SEQ notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
-        defSet("PTGLgraphComputation_B_foldgraphtype_DEF", "true", "Determines whether DEF notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
+        defSet("PTGLgraphComputation_B_foldgraphtype_KEY", "true", "Determines whether KEY notation of folding graphs is calculated and drawn (only applies if 'PTGLgraphComputation_B_folding_graphs' is 'true').");
+        defSet("PTGLgraphComputation_B_foldgraphtype_ADJ", "true", "Determines whether ADJ notation of folding graphs is calculated and drawn (only applies if 'PTGLgraphComputation_B_folding_graphs' is 'true').");
+        defSet("PTGLgraphComputation_B_foldgraphtype_RED", "true", "Determines whether RED notation of folding graphs is calculated and drawn (only applies if 'PTGLgraphComputation_B_folding_graphs' is 'true').");
+        defSet("PTGLgraphComputation_B_foldgraphtype_SEQ", "true", "Determines whether SEQ notation of folding graphs is calculated and drawn (only applies if 'PTGLgraphComputation_B_folding_graphs' is 'true').");
+        defSet("PTGLgraphComputation_B_foldgraphtype_DEF", "true", "Determines whether DEF notation of folding graphs is calculated and drawn (only applies if 'PTGLgraphComputation_B_folding_graphs' is 'true').");
         
         // SSE graphs: alpha, beta, albe (=alpha+beta), alphalig, betalig, albelig
         defSet("PTGLgraphComputation_B_calc_draw_graphs", "true", "Whether the SSE graphs are calculated.");
@@ -333,7 +333,7 @@ public class SettingsOld {
         defSet("PTGLgraphComputation_B_uglySQLhacks", "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB");
         defSet("PTGLgraphComputation_I_ligSAS", "20", "The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)");                
         defSet("PTGLgraphComputation_B_force_chain", "false", "Whether to force parsing only a certain PDB chain");
-        defSet("PTGLgraphComputation_S_forced_chain_id", "A", "The forced chain ID, only used when plcc_B_force_chain is true");
+        defSet("PTGLgraphComputation_S_forced_chain_id", "A", "The forced chain ID, only used when PTGLgraphComputation_B_force_chain is true");
         defSet("PTGLgraphComputation_I_lig_min_atoms", "1", "The minimum number of atoms a ligand has to consist of to count as an SSE.");
         defSet("PTGLgraphComputation_I_lig_max_atoms", "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited.");
         defSet("PTGLgraphComputation_B_convert_models_to_chains", "false", "Wether the PDB file should be checked to have multiple models and if so to convert those models to chains");
@@ -343,18 +343,18 @@ public class SettingsOld {
         // similarity stuff
         defSet("PTGLgraphComputation_B_search_similar", "false", "Whether to activate the program mode which searches for the most similar protein");
         defSet("PTGLgraphComputation_B_compute_graphlet_similarities", "false", "Whether to activate the program mode which computes graphlet similarities in the DB and then exits. It depends on other settings which graphlet sims are actually computed.");
-        defSet("PTGLgraphComputation_B_compute_graphlet_similarities_pg", "false", "Whether to compute graphlet similarities for protein graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
-        defSet("PTGLgraphComputation_B_compute_graphlet_similarities_cg", "false", "Whether to compute graphlet similarities for complex graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
-        defSet("PTGLgraphComputation_B_compute_graphlet_similarities_aag", "false", "Whether to compute graphlet similarities for amino acid graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
+        defSet("PTGLgraphComputation_B_compute_graphlet_similarities_pg", "false", "Whether to compute graphlet similarities for protein graphs. Only used if PTGLgraphComputation_B_compute_graphlet_similarities is true.");
+        defSet("PTGLgraphComputation_B_compute_graphlet_similarities_cg", "false", "Whether to compute graphlet similarities for complex graphs. Only used if PTGLgraphComputation_B_compute_graphlet_similarities is true.");
+        defSet("PTGLgraphComputation_B_compute_graphlet_similarities_aag", "false", "Whether to compute graphlet similarities for amino acid graphs. Only used if PTGLgraphComputation_B_compute_graphlet_similarities is true.");
         defSet("PTGLgraphComputation_I_compute_all_graphlet_similarities_num_to_save_in_db", "25", "The number of the most similar protein chain to store in the database after graphlet similarity computation. Set to n to store the n most similar for each chain.");
         defSet("PTGLgraphComputation_I_compute_all_graphlet_similarities_start_graphlet_index", "0", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the first (start) graphlet used. Do not forget to also set the end index properly. This is inclusive.");
         defSet("PTGLgraphComputation_I_compute_all_graphlet_similarities_end_graphlet_index", "29", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the last (end) graphlet used. Do not forget to also set the start index properly. This is inclusive.");
-        defSet("PTGLgraphComputation_S_search_similar_PDBID", "8icd", "Used only when plcc_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search.");
-        defSet("PTGLgraphComputation_S_search_similar_chainID", "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
-        defSet("PTGLgraphComputation_S_search_similar_graphtype", "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
-        defSet("PTGLgraphComputation_I_search_similar_num_results", "5", "Used only when plcc_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB).");
+        defSet("PTGLgraphComputation_S_search_similar_PDBID", "8icd", "Used only when PTGLgraphComputation_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search.");
+        defSet("PTGLgraphComputation_S_search_similar_chainID", "A", "Used only when PTGLgraphComputation_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
+        defSet("PTGLgraphComputation_S_search_similar_graphtype", "albelig", "Used only when PTGLgraphComputation_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
+        defSet("PTGLgraphComputation_I_search_similar_num_results", "5", "Used only when PTGLgraphComputation_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB).");
         defSet("PTGLgraphComputation_S_search_similar_graphlet_scoretype", "RGF", "The method used to compute a similarity score from a pair of graphlet vectors. Valid options are: RGF=relative graphlet frequency distance, CUS=custom.");
-        defSet("PTGLgraphComputation_S_search_similar_method", "string_sse", "Used only when plcc_B_search_similar is true. The similarity measure to use, valid settings: string_sse, graph_set, graph_compat");
+        defSet("PTGLgraphComputation_S_search_similar_method", "string_sse", "Used only when PTGLgraphComputation_B_search_similar is true. The similarity measure to use, valid settings: string_sse, graph_set, graph_compat");
         
         
         
@@ -367,13 +367,13 @@ public class SettingsOld {
         defSet("PTGLgraphComputation_B_SSEcontactsAtom", "true", "Defines the contact level used to determine SSE contacts. If set to true, the number of atom level. contacts decides whether an SSE contact exists. If set to false, the residue level contacts are used instead.");
         defSet("PTGLgraphComputation_I_max_contacts_per_type", "1", "The maximum number of contacts of a certain type that is counted for a residue pair. Simply set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). The PTGL uses a setting of 1 (so if a pair has 3 B/B cotacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)");
         defSet("PTGLgraphComputation_B_forceBackboneContacts", "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone.");
-        defSet("PTGLgraphComputation_B_skip_too_large", "false", "Whether to abort if the protein has more than 'plcc_I_skip_num_atoms_threshold' atoms.");
-        defSet("PTGLgraphComputation_I_skip_num_atoms_threshold", "80000", "The maximal number of atoms per PDB file if 'plcc_B_skip_too_large' is true. In that case, PLCC will abort for PDB files with more atoms (for cluster mode).");
+        defSet("PTGLgraphComputation_B_skip_too_large", "false", "Whether to abort if the protein has more than 'PTGLgraphComputation_I_skip_num_atoms_threshold' atoms.");
+        defSet("PTGLgraphComputation_I_skip_num_atoms_threshold", "80000", "The maximal number of atoms per PDB file if 'PTGLgraphComputation_B_skip_too_large' is true. In that case, PTGLgraphComputation will abort for PDB files with more atoms (for cluster mode).");
         defSet("PTGLgraphComputation_B_alternate_aminoacid_contact_model", "false", "Use alternate residue contact model by Andreas. Skips all computations except AA graphs. EXP.");
         defSet("PTGLgraphComputation_B_alternate_aminoacid_contact_model_with_ligands", "false", "Use alternate residue contact model including ligands by Andreas. Skips all computations except AA graphs. EXP.");
         defSet("PTGLgraphComputation_B_quit_after_aag", "false", "Whether to quit the program after computation of amino acid graphs, prevents further work.");
         defSet("PTGLgraphComputation_B_chain_spheres_speedup", "true", "Whether to use contact computation speedup based on comparison of chain spheres.");
-        defSet("PTGLgraphComputation_B_centroid_method", "true", "Whether to use centroid of atoms instead of C_alpha for contact computation. Recommended use only with plcc_B_chain_spheres_speedup.");
+        defSet("PTGLgraphComputation_B_centroid_method", "true", "Whether to use centroid of atoms instead of C_alpha for contact computation. Recommended use only with PTGLgraphComputation_B_chain_spheres_speedup.");
         
         // SSE definitions
         defSet("PTGLgraphComputation_I_min_SSE_length", "3", "the minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)");
@@ -586,7 +586,7 @@ public class SettingsOld {
         }
 
         try {
-            cfg.store(new FileOutputStream(file), "These are the settings for plcc. See the documentation for info on them.");
+            cfg.store(new FileOutputStream(file), "These are the settings for PTGLgraphComputation. See the documentation for info on them.");
             res = true;
         } catch(Exception e) {
             DP.getInstance().w("Settings: Could not write current properties to file '" + file + "'.");
@@ -612,7 +612,7 @@ public class SettingsOld {
         }
 
         try {
-            def.store(new FileOutputStream(file), "These are the default settings for plcc. See the documentation for info on them.");
+            def.store(new FileOutputStream(file), "These are the default settings for PTGLgraphComputation. See the documentation for info on them.");
             res = true;
         } catch(Exception e) {
             DP.getInstance().w("Settings: Could not write default settings to file '" + file + "'.");
@@ -635,7 +635,7 @@ public class SettingsOld {
      */
     public static Boolean writeDocumentedDefaultFile(String file) {
         
-        String contents = "# This is the documented default config file for plcc.";
+        String contents = "# This is the documented default config file for PTGLgraphComputation.";
         
         for (Map.Entry<Object, Object> entry : def.entrySet()) {
             String key = (String)entry.getKey();

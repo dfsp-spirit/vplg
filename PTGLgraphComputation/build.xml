@@ -7,22 +7,22 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="plcc" default="default" basedir=".">
-    <description>Builds, tests, and runs the project plcc.</description>
+<project name="PTGLgraphComputation" default="default" basedir=".">
+    <description>Builds, tests, and runs the project PTGLgraphComputation.</description>
     <import file="nbproject/build-impl.xml"/>
 	
     <!-- Continuous Integration target added by TS for Jenkins. Builds and runs the tests. -->
     <target depends="test,jar,javadoc,package-for-store" description="Build and test distribution, continous integration target for Jenkins CI server." name="ci"/>
 	
 	
-	<!-- This target packages all library JAR files into the plcc.jar JAR file. -->
+	<!-- This target packages all library JAR files into the PTGLgraphComputation.jar JAR file. -->
 	  <target name="package-for-store" depends="jar">
 
         <!-- Change the value of this property to be the name of your JAR,
              minus the .jar extension. It should not have spaces.
              <property name="store.jar.name" value="MyJarName"/>
         -->
-        <property name="store.jar.name" value="plcc"/>
+        <property name="store.jar.name" value="PTGLgraphComputation"/>
 
 
         <!-- don't edit below this line -->
@@ -108,7 +108,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="plcc-impl.jar">
+        <target name="run" depends="PTGLgraphComputation-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>

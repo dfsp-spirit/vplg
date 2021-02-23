@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import plcc.Main;
-import Settings.Settings;
+import settings.Settings;
 import tools.DP;
 
 /**
@@ -39,10 +39,10 @@ abstract public class Molecule {
     public Integer dsspNum = null;   
     public String Name3 = null; // guess what
     public String AAName1 = null;
-    public String sseString = null;                        // initially the SSE column from the DSSP file, may be the empty string "" because not all molecules are assigned an SSE by DSSP, gets replaced by PLCC SSE string later
+    public String sseString = null;                        // initially the SSE column from the DSSP file, may be the empty string "" because not all molecules are assigned an SSE by DSSP, gets replaced by PTGLgraphComputation SSE string later
     public SSE sse = null;
     public String sseStringDssp = "?";
-    public String plccSSEType = "N";                       // not part of any PLCC SSE by default
+    public String plccSSEType = "N";                       // not part of any PTGLgraphComputation SSE by default
     public Boolean isPartOfDsspSse = false;                // whether this molecule is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* molecules)
     protected Integer centerSphereRadius = null;
     private Integer[] centroidCoords = null;               // x,y,z coordinates of residue centroid

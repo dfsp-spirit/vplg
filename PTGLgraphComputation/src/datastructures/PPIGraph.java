@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
-import Settings.Settings;
+import settings.Settings;
 import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
 import proteinstructure.Molecule;
@@ -219,7 +219,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
         gmlf.append("  comment \"" + "PTGLtools Protein Graph ").append(label_pdbid).append("\"\n");
         gmlf.append("  directed 0\n");
         gmlf.append("  isplanar 0\n");
-        gmlf.append("  creator \"PLCC\"\n");
+        gmlf.append("  creator \"PTGLgraphComputation\"\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "ID"), snakeCase)).append(" \"").append(this.pdbid).append("\"\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(this.chainid).append("\"\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("graph", "type"), snakeCase)).append(" \"" + "aa_graph" + "\"\n");

@@ -19,7 +19,7 @@ import proteingraphs.SSEGraph;
 
 /**
  * A protein ligand graph, which uses SSEs as vertices and has both edge and vertex types. This is a sparse
- * implementation built on adjacency lists. It is based on the SPARGEL library. You need to add SPARGEL to the PLCC dependencies.
+ * implementation built on adjacency lists. It is based on the SPARGEL library. You need to add SPARGEL to the PTGLgraphComputation dependencies.
  * @author ts
  * @param <V> the vertex type
  */

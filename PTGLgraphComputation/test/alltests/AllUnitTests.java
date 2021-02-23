@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit tests for PLCC.
+ * Unit tests for PTGLgraphComputation.
  *
  * @author ts
  */

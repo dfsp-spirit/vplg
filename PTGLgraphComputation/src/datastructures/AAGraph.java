@@ -22,7 +22,7 @@ import proteinstructure.Residue;
 import proteinstructure.Molecule;
 import tools.DP;
 import tools.TextTools;
-import Settings.Settings;
+import settings.Settings;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -403,7 +403,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         gml.append("  comment \"" + "PTGLtools Amino acid contact stats matrix  ").append(label_pdbid).append("\"\n");
         gml.append("  directed 0\n");
         gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
-        gml.append("  creator \"PLCC\"\n");
+        gml.append("  creator \"PTGLgraphComputation\"\n");
         gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "ID"), snakeCase)).append(" \"").append(this.pdbid).append("\"\n");
         gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(this.chainid).append("\"\n");
         gml.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("graph", "type"), snakeCase)).append(" \"" + "aa_graph" + "\"\n");
@@ -575,7 +575,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         gmlf.append("  comment \"" + "PTGLtools Protein Graph ").append(label_pdbid).append("\"\n");
         gmlf.append("  directed 0\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
-        gmlf.append("  creator \"PLCC\"\n");
+        gmlf.append("  creator \"PTGLgraphComputation\"\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("PDB", "ID"), snakeCase)).append(" \"").append(this.pdbid).append("\"\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("chain", "ID"), snakeCase)).append(" \"").append(this.chainid).append("\"\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("graph", "type"), snakeCase)).append(" \"" + "aa_graph" + "\"\n");

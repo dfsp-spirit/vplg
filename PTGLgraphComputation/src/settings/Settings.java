@@ -6,7 +6,7 @@
  * @author jnw
  */
 
-package Settings;
+package settings;
 
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import java.io.File;
@@ -179,9 +179,9 @@ public class Settings {
         } else {
             // create default settings file
             DP.getInstance().w(PACKAGE_TAG, "Could not load settings from properties file, trying to create it.");
-            DP.getInstance().i(PACKAGE_TAG, "If you have used PLCC previously and just upgraded to a new version, you might want to use your "
-                    + "previous settings file. It should be located at your home directory and be named '.plcc_settings'. Simply rename it to "
-                    + "'plcc_settings.txt' and rerun PLCC once. It creates the newly formatted settings file for you with your previous settings.");
+            DP.getInstance().i(PACKAGE_TAG, "If you have used PTGLgraphComputation previously and just upgraded to a new version, you might want to use your "
+                    + "previous settings file. It should be located at your home directory and be named '.PTGLgraphComputation_settings'. Simply rename it to "
+                    + "'PTGLgraphComputation_settings.txt' and rerun PTGLgraphComputation once. It creates the newly formatted settings file for you with your previous settings.");
             if (IO.writeStringToFile(asFormattedString(), DEFAULT_FILE.getAbsolutePath(), false)) {
                 createdDefaultFile = true;
             } else {
@@ -197,8 +197,8 @@ public class Settings {
         String lastSectionType = "";  // used to track in which type of section we are: User, Advanced, Developer
 
         // header
-        formattedString += "##### PLCC SETTINGS #####\n\n";
-        formattedString += "# This file contains the settings for PTGLtools's PLCC as key-value pairs per line. The character after 'plcc' indicates which data type is expected: "
+        formattedString += "##### PTGLgraphComputation SETTINGS #####\n\n";
+        formattedString += "# This file contains the settings for PTGLtools's PTGLgraphComputation as key-value pairs per line. The character after 'PTGLgraphComputation' indicates which data type is expected: "
                 + "B(oolean), S(tring), I(nteger) or F(loat)\n";
         formattedString += "# The file is structured in sections which either belong to user, advanced or developer settings.\n\n";
         
@@ -326,7 +326,7 @@ public class Settings {
     
     /**
      * Returns the version string. This is NOT guaranteed to be a number.
-     * @return the PLCC version
+     * @return the PTGLgraphComputation version
      */
     public static String getVersion() {
         return("0.98.3");
@@ -338,7 +338,7 @@ public class Settings {
      * @return the apptag
      */
     public static String getApptag() {
-        return("[PLCC] ");
+        return("[PTGLgraphComputation] ");
     }
     
     
@@ -367,7 +367,7 @@ public class Settings {
     
     /**
      * Creates an array of the output image formats for protein graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
+     * @return the output formats, collected from settings like 'PTGLgraphComputation_B_img_output_format_PNG'
      */
     public static IMAGEFORMAT[] getProteinGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<>();
@@ -388,7 +388,7 @@ public class Settings {
     
     /**
      * Creates an array of the output image formats for aa graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_AAG_output_format_PNG'
+     * @return the output formats, collected from settings like 'PTGLgraphComputation_B_img_AAG_output_format_PNG'
      */
     public static IMAGEFORMAT[] getAminoAcidGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<>();
@@ -406,7 +406,7 @@ public class Settings {
     
     /**
      * Creates an array of the output image formats for folding graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_FG_output_format_PNG'
+     * @return the output formats, collected from settings like 'PTGLgraphComputation_B_img_FG_output_format_PNG'
      */
     public static IMAGEFORMAT[] getFoldingGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<>();
@@ -427,7 +427,7 @@ public class Settings {
     
     /**
      * Creates an array of the output image formats for complex graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_CG_output_format_PNG'
+     * @return the output formats, collected from settings like 'PTGLgraphComputation_B_img_CG_output_format_PNG'
      */
     public static IMAGEFORMAT[] getComplexGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();

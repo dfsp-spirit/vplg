@@ -7,7 +7,7 @@
  */
 package tools;
 
-import Settings.Settings;
+import settings.Settings;
 
 /**
  * A debug printer. This is a singleton.

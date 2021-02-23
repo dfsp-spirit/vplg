@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
-import Settings.Settings;
+import settings.Settings;
 import proteingraphs.MolContactInfo;
 import proteingraphs.ProtGraph;
 import proteinstructure.BindingSite;

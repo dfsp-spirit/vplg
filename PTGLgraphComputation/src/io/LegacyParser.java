@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import Settings.Settings;
+import settings.Settings;
 import proteingraphs.MolContactInfo;
 import proteingraphs.ProtGraph;
 import proteinstructure.AminoAcid;
@@ -273,7 +273,7 @@ class LegacyParser {
                     }
                 } catch (NumberFormatException e) {
                     DP.getInstance().w("FP", "NumberFormatException while parsing the PDB-File.");
-                    DP.getInstance().w("FP", "Trying to go on now. Set plcc_B_parse_binding_sites=false "
+                    DP.getInstance().w("FP", "Trying to go on now. Set PTGLgraphComputation_B_parse_binding_sites=false "
                             + "if insertion codes are used in the SITE fields "
                             + "(skips the detection of binding sites then).");
                 }                
@@ -355,7 +355,7 @@ class LegacyParser {
             
   
             if(Settings.getBoolean("PTGLgraphComputation_B_round_coordinates")) {
-            // PLCC style: round the coordinates
+            // PTGLgraphComputation style: round the coordinates
                 oCoordXf = Float.valueOf((curLinePDB.substring(30, 38)).trim()) * 10;
                 oCoordYf = Float.valueOf((curLinePDB.substring(38, 46)).trim()) * 10;
                 oCoordZf = Float.valueOf((curLinePDB.substring(46, 54)).trim()) * 10;
@@ -658,7 +658,7 @@ class LegacyParser {
                 DP.getInstance().w(" the PDB file into separate models for DSSP, the current DSSP file is broken.");
                 DP.getInstance().w(" I parse that file and rely on it. You know the deal: garbage in, garbage out.");
                 DP.getInstance().w(" I'll continue but you have been warned. ;)");
-                DP.getInstance().w(" (Set 'plcc_B_split_dsspfile_warning' to 'false' in the config file to suppress this message.)");
+                DP.getInstance().w(" (Set 'PTGLgraphComputation_B_split_dsspfile_warning' to 'false' in the config file to suppress this message.)");
                 System.err.println("*************************************** WARNING ******************************************");
             }
         }
@@ -1874,7 +1874,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             
             System.out.println("Comparing external ResContact #" + contNum + ": DSSP pair " + resADsspNum + ", " + resBDsspNum + " with radii " + resAColSphereRadius + "," + resBColSphereRadius +  " in CA dist " + resDist + " ...");
                                     
-            // compare with our data, i.e., check the number of geom_neo contacts which were not accepted by plcc
+            // compare with our data, i.e., check the number of geom_neo contacts which were not accepted by PTGLgraphComputation
             
             Boolean found = false;
             radDif1 = radDif2 = distDif = 0;
@@ -1917,12 +1917,12 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 }
             }
             if(!found) {
-                System.out.println("  NOT found by plcc: DSSP contact pair " + resADsspNum + ", " + resBDsspNum + " not in plcc internal contact list.");
+                System.out.println("  NOT found by PTGLgraphComputation: DSSP contact pair " + resADsspNum + ", " + resBDsspNum + " not in PTGLgraphComputation internal contact list.");
             }                                 
         }
         
         // We should also check for contacts which occur in our data but not in the comparison file, i.e.,
-        //  the number of plcc contacts which were not accepted by geom_neo 
+        //  the number of PTGLgraphComputation contacts which were not accepted by geom_neo 
         Integer dsspResA, dsspResB;
         for(MolContactInfo rc : ourContacts) {
             dsspResA = rc.getDsspNumA();
@@ -1950,9 +1950,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         System.out.println("Parsed " + numParsed + " of " + lines.size() + " lines of file '" + filePath + "', ignored " + numIgnored + " (1st line is always empty so 1 is expected here).");
         System.out.println("File contains " + numParsed + " residue contacts, we found " + (ourContacts.size() - numLigContactsIgnored) + " (and " + numLigContactsIgnored + " ligand contacts).");
         System.out.println("Maximum differences: residue collision sphere radius=" + maxRadDif + ", distance=" + maxDistDif + ". (sumDif=" + sumDif + ", sumDifAbs=" + sumDifAbs + ", avgDif=" + avgDif + ", avgDifAbs=" + avgDifAbs + ")");
-        System.out.println("Number of geom_neo contacts which were not detected by plcc: " + numGeomNeoContactsMissingInPlcc + ".");
-        System.out.println("Number of plcc contacts which were not detected by geom_neo: " + numPlccContactsMissingInGeomNeo + ".");
-        System.out.println("Number of ligand contacts ignored in plcc list: " + numLigContactsIgnored + ".");
+        System.out.println("Number of geom_neo contacts which were not detected by PTGLgraphComputation: " + numGeomNeoContactsMissingInPlcc + ".");
+        System.out.println("Number of PTGLgraphComputation contacts which were not detected by geom_neo: " + numPlccContactsMissingInGeomNeo + ".");
+        System.out.println("Number of ligand contacts ignored in PTGLgraphComputation list: " + numLigContactsIgnored + ".");
     }
     
     
@@ -2059,7 +2059,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             
             
             numParsed++;
-            bet_neo_contact_exists[sseANum][sseBNum] = 1;     // the -1 is required because plcc starts indices at 0, not 1
+            bet_neo_contact_exists[sseANum][sseBNum] = 1;     // the -1 is required because PTGLgraphComputation starts indices at 0, not 1
             //bet_neo_contact_exists[sseB - 1][sseA - 1] = 1;       // Don't do this, they are ordered in there and i<j holds for each contact pair (i, j)
             
             // -----------------------------------------------
@@ -2070,7 +2070,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             }
             else {
                 found = false;
-                System.out.println("  NOT found by plcc: potential SSE contact num pair (" + sseANum + ", " + sseBNum + ") not in internal accepted contact list.");
+                System.out.println("  NOT found by PTGLgraphComputation: potential SSE contact num pair (" + sseANum + ", " + sseBNum + ") not in internal accepted contact list.");
                 numBetNeoContactsMissingInPlcc++;                
             }
         }
@@ -2090,7 +2090,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     continue;
                 }
                 
-                // If plcc list a contact here...
+                // If PTGLgraphComputation list a contact here...
                 if(pg.sseContactExistsPos(sseAIndex, sseBIndex)) {
                     
                     // ...check whether it also exists in bet_neo
@@ -2105,10 +2105,10 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         // print results
         System.out.println("Parsed " + numParsed + " of " + lines.size() + " lines of file '" + compareSSEContactsFile + "', ignored " + numIgnored + " (1st line is always empty so 1 is expected here).");
         System.out.println("File contains " + numParsed + " potential SSE contacts, we found " + (pg.numSSEContacts() - numLigContactsIgnored) + " accepted contacts (and " + numLigContactsIgnored + " ligand contacts).");
-        System.out.println("Note that the geom_neo list contains all potential SSE contacts (not filtered by rule set yet), while the plcc list contains only accepted contacts.");
-        System.out.println("Number of bet_neo contacts which were not detected by plcc: " + numBetNeoContactsMissingInPlcc + " (but read above).");
-        System.out.println("Number of plcc contacts which were not detected by bet_neo: " + numPlccContactsMissingInBetNeo + ".");
-        System.out.println("Number of ligand contacts ignored in plcc list: " + numLigContactsIgnored + ".");                
+        System.out.println("Note that the geom_neo list contains all potential SSE contacts (not filtered by rule set yet), while the PTGLgraphComputation list contains only accepted contacts.");
+        System.out.println("Number of bet_neo contacts which were not detected by PTGLgraphComputation: " + numBetNeoContactsMissingInPlcc + " (but read above).");
+        System.out.println("Number of PTGLgraphComputation contacts which were not detected by bet_neo: " + numPlccContactsMissingInBetNeo + ".");
+        System.out.println("Number of ligand contacts ignored in PTGLgraphComputation list: " + numLigContactsIgnored + ".");                
     }
      
      

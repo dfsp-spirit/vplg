@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import proteingraphs.Position3D;
-import Settings.Settings;
+import settings.Settings;
 
 
 /**

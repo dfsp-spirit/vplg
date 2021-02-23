@@ -8,7 +8,7 @@
 package proteingraphs;
 
 import java.util.Arrays;
-import Settings.Settings;
+import settings.Settings;
 import tools.TextTools;
 
 /**

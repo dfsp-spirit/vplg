@@ -84,7 +84,7 @@ import graphformats.IGEXFFormat;
 import graphformats.IManualSVGFormat;
 import graphformats.ISimpleProteinGraphFormat;
 import io.IO;
-import Settings.Settings;
+import settings.Settings;
 import static proteingraphs.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 import tools.TextTools;
@@ -2909,7 +2909,7 @@ E	3	3	3
         gmlf.append("  directed 0\n");
         gmlf.append("  ").append(TextTools.formatAsCaseStyle(Arrays.asList("is", "planar"), snakeCase)).append(" 0\n");
         try {
-            gmlf.append("  creator \"PLCC version ").append(Settings.getVersion()).append("\"\n");
+            gmlf.append("  creator \"PTGLgraphComputation version ").append(Settings.getVersion()).append("\"\n");
         }catch(java.lang.NullPointerException e) {
             // no settings object yet, assume not to write stuff
         }
@@ -3027,7 +3027,7 @@ E	3	3	3
                 dlf.append("#[PTGLtools_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
             }
 
-            dlf.append("#[PTGLtools_METADATA] creator=PLCC version ").append(Settings.getVersion()).append("\n");
+            dlf.append("#[PTGLtools_METADATA] creator=PTGLgraphComputation version ").append(Settings.getVersion()).append("\n");
         }
         
         String graphLabel = "ProteinGraph";

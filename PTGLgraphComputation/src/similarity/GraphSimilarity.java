@@ -19,7 +19,7 @@ import proteingraphs.CompatGraph;
 import io.DBManager;
 import proteingraphs.ProtGraph;
 import proteingraphs.SSEGraph;
-import Settings.Settings;
+import settings.Settings;
 import static similarity.SimilarityByGraphlets.getRandIntegerArray;
 
 /**

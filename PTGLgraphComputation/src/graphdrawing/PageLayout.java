@@ -22,7 +22,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import proteingraphs.Position2D;
-import Settings.Settings;
+import settings.Settings;
 
 /**
  * A page layout that holds all non-SSE-specific information about the drawing process, e.g. the

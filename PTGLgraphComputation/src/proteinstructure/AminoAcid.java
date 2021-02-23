@@ -8,7 +8,7 @@
 
 package proteinstructure;
 
-import Settings.Settings;
+import settings.Settings;
 
 /**
  * A helper class which converts various representations and names of amino acids. You can use it to convert the

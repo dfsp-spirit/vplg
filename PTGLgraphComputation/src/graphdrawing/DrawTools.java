@@ -40,7 +40,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import proteingraphs.FoldingGraph;
 import proteingraphs.Position2D;
-import Settings.Settings;
+import settings.Settings;
 import tools.DP;
 
 /**

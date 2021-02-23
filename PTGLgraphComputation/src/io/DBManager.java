@@ -28,7 +28,7 @@ import plcc.Main;
 import motifs.MotifSearchTools;
 import motifs.Motifs;
 import resultcontainers.PTGLNotationFoldResult;
-import Settings.Settings;
+import settings.Settings;
 import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;

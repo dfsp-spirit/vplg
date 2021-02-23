@@ -6,7 +6,7 @@
  * @author jnw
  */
 
-package Settings;
+package settings;
 
 import java.util.ArrayList;
 import tools.DP;
@@ -16,7 +16,7 @@ import tools.DP;
  * @author jnw
  */
 class Setting {
-    final private String name;  // name of the setting, should have format: plcc_D_NAME, where D is the data type
+    final private String name;  // name of the setting, should have format: PTGLgraphComputation_D_NAME, where D is the data type
     final private char dataType;  // values can only be saved as string, so we need to know, which data type they should have, capital letter
     final private String defaultValue;  // hard coded default value
     final private String documentation;  // documentation string
@@ -37,7 +37,7 @@ class Setting {
     
     /**
      * Constructor for SingleSetting.
-     * @param name name of the setting, should have format: plcc_D_NAME, where D is the data type
+     * @param name name of the setting, should have format: PTGLgraphComputation_D_NAME, where D is the data type
      * @param dataType data type of the setting
      * @param defaultValue hard coded default value of the setting
      * @param documentation
@@ -125,7 +125,7 @@ class Setting {
             return overwrittenValue;
         } else {
             // default value not overwritten
-            // TODO if plcc_B_warn_cfg_fallback_to_default warn
+            // TODO if PTGLgraphComputation_B_warn_cfg_fallback_to_default warn
             // System.out.println("INFO: Settings: Using internal default value '" + s + "' for setting '" + key + "'. Edit config file to override.");
             return defaultValue;
         }

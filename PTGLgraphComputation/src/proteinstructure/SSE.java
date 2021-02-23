@@ -13,7 +13,7 @@ package proteinstructure;
 import java.util.ArrayList;
 import tools.Comp3DTools;
 import graphdrawing.IDrawableVertex;
-import Settings.Settings;
+import settings.Settings;
 import proteingraphs.Position3D;
 import proteingraphs.SSEGraph;
 import proteingraphs.SSEGraphVertex;

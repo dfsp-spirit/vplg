@@ -11,7 +11,7 @@ package io;
 // imports
 import java.util.ArrayList;
 import java.util.HashMap;
-import Settings.Settings;
+import settings.Settings;
 import proteinstructure.AminoAcid;
 import proteinstructure.Residue;
 import proteinstructure.SSE;

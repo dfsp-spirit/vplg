@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import plcc.Main;
-import Settings.Settings;
+import settings.Settings;
 
 
 /**

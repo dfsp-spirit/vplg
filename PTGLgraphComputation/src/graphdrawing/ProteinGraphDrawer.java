@@ -44,7 +44,7 @@ import resultcontainers.PTGLNotationFoldResult;
 import proteingraphs.Position2D;
 import proteingraphs.ProtGraph;
 import proteingraphs.SSEGraph;
-import Settings.Settings;
+import settings.Settings;
 import proteingraphs.SpatRel;
 import proteinstructure.AminoAcid;
 import proteinstructure.Chain;

@@ -13,7 +13,7 @@ import proteinstructure.SSE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import io.IO;
-import Settings.Settings;
+import settings.Settings;
 import tools.DP;
 import plcc.Main;
 

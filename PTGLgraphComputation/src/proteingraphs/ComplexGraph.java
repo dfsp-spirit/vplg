@@ -50,7 +50,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
-import Settings.Settings;
+import settings.Settings;
 import proteinstructure.Chain;
 import proteinstructure.Molecule;
 import proteinstructure.Residue;
@@ -111,7 +111,7 @@ public class ComplexGraph extends UAdjListGraph {
      * @param pdbid RSCB PDB ID
      * @param chains
      * @param resContacts
-     * @param createConInfo Whether contact info for writing of GML should be created. Usually pass plcc_B_writeComplexContactCSV setting.
+     * @param createConInfo Whether contact info for writing of GML should be created. Usually pass PTGLgraphComputation_B_writeComplexContactCSV setting.
      */
     public ComplexGraph(String pdbid, List<Chain> chains, List<MolContactInfo> resContacts, Boolean createConInfo) {
         this.pdbid = pdbid;
@@ -1594,7 +1594,7 @@ public class ComplexGraph extends UAdjListGraph {
             return contactInfo;
         }
         else {
-            DP.getInstance().w("Tried to get CG's contact info despite setting plcc_B_writeComplexContactCSV was off. Returning null.");
+            DP.getInstance().w("Tried to get CG's contact info despite setting PTGLgraphComputation_B_writeComplexContactCSV was off. Returning null.");
             return null;
         }
     }

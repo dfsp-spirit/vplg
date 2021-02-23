@@ -22,7 +22,7 @@ import resultcontainers.ProteinChainResults;
 import resultcontainers.ProteinResults;
 import proteinstructure.SSE;
 import proteingraphs.SSEGraph;
-import Settings.Settings;
+import settings.Settings;
 
 public class HtmlGenerator {
     

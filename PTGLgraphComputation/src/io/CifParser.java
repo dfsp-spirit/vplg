@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import Settings.Settings;
+import settings.Settings;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
 import proteinstructure.Chain;
@@ -740,7 +740,7 @@ class CifParser {
         }
 
         // coordX
-        // for information on difference between ptgl and plcc style look in old parser
+        // for information on difference between ptgl and PTGLgraphComputation style look in old parser
         if (Settings.getBoolean("PTGLgraphComputation_B_round_coordinates")) {
             oCoordXf = Float.valueOf(lineData[colHeaderPosMap.get("Cartn_x")]) * 10;
             coordX = Math.round(oCoordXf);

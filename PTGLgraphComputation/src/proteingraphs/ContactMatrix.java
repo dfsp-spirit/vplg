@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import Settings.Settings;
+import settings.Settings;
 //import org.jgrapht.graph.*;
 /**
  * Represents an SSE level contact matrix for a protein chain. Includes information on all SSE types, i.e., it is not
@@ -712,7 +712,7 @@ public class ContactMatrix {
      * @param contList a list of residue level contacts that are used to determine SSE contacts
      * @param computeAll whether the spatial relation of SSE pairs which have too few residue level contacts 
      *        to be counted as an SSE contact (according to the definitions of this program) should also be computed.
-     *        This is only useful for debugging geo.dat issues (see the '-y' command line option of plcc) and 
+     *        This is only useful for debugging geo.dat issues (see the '-y' command line option of PTGLgraphComputation) and 
      *        slows the process down, therefore it should be set to 'false' if in doubt.
      * 
      */

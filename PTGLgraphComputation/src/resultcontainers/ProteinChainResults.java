@@ -19,7 +19,7 @@ import java.util.List;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 
 /**
- * A data structure to store the PLCC results for a chain, i.e., all the graphs and their output files.
+ * A data structure to store the PTGLgraphComputation results for a chain, i.e., all the graphs and their output files.
  * @author ts
  */
 public class ProteinChainResults {

@@ -1,8 +1,8 @@
 #!/bin/bash
-## plcc startup script by Tim Schaefer
+## PTGLgraphComputation startup script by Tim Schaefer
 
 
-APPTAG="[PLCC_STARTSCRIPT]"
+APPTAG="[PTGLgraphComputation_STARTSCRIPT]"
 
 ## check for java in PATH
 which java > /dev/null
@@ -24,4 +24,4 @@ fi
 echo "$APPTAG Using java binary from '$JAVABIN'."
 
 ## k, run
-$JAVABIN -jar plcc.jar $@
+$JAVABIN -jar PTGLgraphComputation.jar $@

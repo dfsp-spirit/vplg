@@ -102,7 +102,7 @@ import tools.PlccUtilities;
 import tools.XMLContentHandlerPDBRepresentatives;
 import tools.XMLErrorHandlerJAX;
 import tools.XMLParserJAX;
-import Settings.Settings;
+import settings.Settings;
 
 /**
  * This is the Main class of plcc.
@@ -498,7 +498,7 @@ public class Main {
                         useFileFromCommandline = false;
                         // The config file has already been created before parsing the command line if it did not exist, so we just do nothing here.
                         // We intentionally keep this option so we do not need to run other commands to get a config.
-                        System.out.println("Tried to create PLCC config file at '" + Settings.getDefaultConfigFilePath() + "' (see above). Exiting.");
+                        System.out.println("Tried to create PTGLgraphComputation config file at '" + Settings.getDefaultConfigFilePath() + "' (see above). Exiting.");
                         argsUsed[i] = true;
                         checkArgsUsage(args, argsUsed);
                         System.exit(0);
@@ -1519,7 +1519,7 @@ public class Main {
                         if (numSettingsLoaded > 0) {
                             outputToBePrintedUnlessSilent.append("  Loaded ").append(numSettingsLoaded).append(" settings as requested by command line argument from properties file ").append(args[i + 1]).append(".\n");
                         } else {
-                            outputToBePrintedUnlessSilent.append("  Could not load any settings from properties file ").append(args[i + 1]).append(". Does the file exist and contain PLCC settings?\n");
+                            outputToBePrintedUnlessSilent.append("  Could not load any settings from properties file ").append(args[i + 1]).append(". Does the file exist and contain PTGLgraphComputation settings?\n");
                         }
                         argsUsed[i] = argsUsed[i+1] = true;
                     }
@@ -1715,7 +1715,7 @@ public class Main {
                         System.out.println(" PG graphlet similarity done. Found " + res[0] + " PGs (used ALBE graph type) and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                     }
                     if(res[0] <= 1) {
-                        System.err.println(" WARNING: Database needs to contain at least 2 protein graphs to compute PG graphlet similarity. Run PLCC to add protein graphs to the database (and then GraphletAnalyzer to compute graphlet counts for them).");
+                        System.err.println(" WARNING: Database needs to contain at least 2 protein graphs to compute PG graphlet similarity. Run PTGLgraphComputation to add protein graphs to the database (and then GraphletAnalyzer to compute graphlet counts for them).");
                     }
                     if(res[0] >= 2 && res[1] == 0) {
                         System.err.println(" WARNING: Found protein graphs but no graphlet counts for them in the database. (Did you run GraphletAnalyzer on the GML files to compute and save graphlet counts to the database?)");
@@ -1736,7 +1736,7 @@ public class Main {
                         System.out.println(" CG graphlet similarity done. Found " + res[0] + " CGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                     }
                     if(res[0] <= 1) {
-                        System.err.println(" WARNING: Database needs to contain at least 2 complex graphs to compute CG graphlet similarity. Run PLCC to add complex graphs to the database (and then GraphletAnalyzer to compute graphlet counts for them).");
+                        System.err.println(" WARNING: Database needs to contain at least 2 complex graphs to compute CG graphlet similarity. Run PTGLgraphComputation to add complex graphs to the database (and then GraphletAnalyzer to compute graphlet counts for them).");
                     }
                     if(res[0] >= 2 && res[1] == 0) {
                         System.err.println(" WARNING: Found complex graphs but no graphlet counts for them in the database. (Did you run GraphletAnalyzer on the GML files to compute and save graphlet counts to the database?)");
@@ -1759,7 +1759,7 @@ public class Main {
                         System.out.println(" AAG graphlet similarity done. Found " + res[0] + " AAGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                     }
                     if(res[0] <= 1) {
-                        System.err.println(" WARNING: Database needs to contain at least 2 amino acid graphs to compute AAG graphlet similarity. Run PLCC to add amino acid graphs to the database (and then GraphletAnalyzer to compute graphlet counts for them).");
+                        System.err.println(" WARNING: Database needs to contain at least 2 amino acid graphs to compute AAG graphlet similarity. Run PTGLgraphComputation to add amino acid graphs to the database (and then GraphletAnalyzer to compute graphlet counts for them).");
                     }
                     if(res[0] >= 2 && res[1] == 0) {
                         System.err.println(" WARNING: Found amino acid graphs but no graphlet counts for them in the database. (Did you run GraphletAnalyzer on the GML files to compute and save graphlet counts to the database?)");
@@ -1884,7 +1884,7 @@ public class Main {
                     if(numChainsInDB > 0) {
                         System.err.println("WARNING: Database already contains " + numChainsInDB + " chains. (Did you intend to run the POST version of this command?)");
                     }
-                    System.out.println("This command should be run BEFORE adding data to the database. It is only required if you want PLCC to compute graph statistics for representative chains during the update. You still need to explicitely tell PLCC to do this via command line options.");
+                    System.out.println("This command should be run BEFORE adding data to the database. It is only required if you want PTGLgraphComputation to compute graph statistics for representative chains during the update. You still need to explicitely tell PTGLgraphComputation to do this via command line options.");
                     
                     // remove the old marking in list table if required
                     if(Settings.getBoolean("PTGLgraphComputation_B_set_pdb_representative_chains_remove_old_labels_pre")) {
@@ -10696,7 +10696,7 @@ public class Main {
      * @param c the chainName to consider (all residues of this chainName will be used)
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
-        String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
+        String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PTGLgraphComputation assignment>";
         ArrayList<Residue> res = c.getResidues();
                 
         

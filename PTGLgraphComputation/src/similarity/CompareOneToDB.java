@@ -16,7 +16,7 @@ import java.util.Collections;
 import io.DBManager;
 import proteingraphs.ProtGraph;
 import proteingraphs.ProtGraphs;
-import Settings.Settings;
+import settings.Settings;
 
 /**
  * This class implements methods that compare an element against the whole database.

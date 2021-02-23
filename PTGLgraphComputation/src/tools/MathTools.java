@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Some math tools for PLCC.
+ * Some math tools for PTGLgraphComputation.
  * @author spirit
  */
 public class MathTools {
