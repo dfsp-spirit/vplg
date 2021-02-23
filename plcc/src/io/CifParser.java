@@ -344,11 +344,11 @@ class CifParser {
         ArrayList<Atom> deletedAtoms;
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
-        Residue r;
+        Molecule m;
         for(int i = 0; i < FileParser.s_molecules.size(); i++) {
-            if (FileParser.s_molecules.get(i) instanceof Residue) {
-                r = (Residue) FileParser.s_molecules.get(i);
-                deletedAtoms = r.chooseYourAltLoc();
+//            if (FileParser.s_molecules.get(i) instanceof Residue) {
+                m = FileParser.s_molecules.get(i);
+                deletedAtoms = m.chooseYourAltLoc();
 
 
                 if(deletedAtoms.size() > 0) {
@@ -363,7 +363,7 @@ class CifParser {
                         DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
                     }
                 }
-            }
+//            }
         }
         
         // create all protein meta data from entityInformation
