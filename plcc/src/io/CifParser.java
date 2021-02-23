@@ -346,24 +346,22 @@ class CifParser {
         int numResiduesAffected = 0;
         Molecule m;
         for(int i = 0; i < FileParser.s_molecules.size(); i++) {
-//            if (FileParser.s_molecules.get(i) instanceof Residue) {
-                m = FileParser.s_molecules.get(i);
-                deletedAtoms = m.chooseYourAltLoc();
+            m = FileParser.s_molecules.get(i);
+            deletedAtoms = m.chooseYourAltLoc();
 
 
-                if(deletedAtoms.size() > 0) {
-                    numResiduesAffected++;
+            if(deletedAtoms.size() > 0) {
+                numResiduesAffected++;
+            }
+
+            //delete atoms from global atom list as well
+            for(Atom a : deletedAtoms) {
+                if(FileParser.s_atoms.remove(a)) {
+                    numAtomsDeletedAltLoc++;
+                } else {
+                    DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
                 }
-
-                //delete atoms from global atom list as well
-                for(Atom a : deletedAtoms) {
-                    if(FileParser.s_atoms.remove(a)) {
-                        numAtomsDeletedAltLoc++;
-                    } else {
-                        DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
-                    }
-                }
-//            }
+            }
         }
         
         // create all protein meta data from entityInformation
@@ -806,11 +804,15 @@ class CifParser {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
                         if(Settings.getInteger("plcc_I_debug_level") >= 1) {
-                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand or RNA.");
+                            System.out.println("   PDB: Found a ligand, RNA or free (modified) amino acid at PDB# " + molNumPDB + ". Free amino acids are treated as ligands.");
                         }
                 }
 
             } else {
+                
+                if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                    System.out.println("    [DEBUG LV 1] Found an amino acid at PDB# " + molNumPDB + " that is not listed in the DSSP file (might be at a chain break). Parsing it as part of a chain.");
+                }
                 
                 // sometimes residues are missing from the dssp file if they are incomplete (mostly at chain breaks)
                 // in this case, they have to be parsed here
