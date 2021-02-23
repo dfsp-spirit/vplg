@@ -37,9 +37,9 @@ II: Install and Setup
         charset:  UTF8
 
 2.4) Extract PTGLtools to some path (we assume <PTGLtools> here) and make sure Java JRE >= 1.6 is installed
-2.4.1) Run 'java -jar plcc.jar' once to create the config file
-2.4.2) Edit the config file ~/.plcc_settings to ensure that the database credentials are correct (the settings are named plcc_S_db_*)
-2.4.3) Run 'java -jar plcc.jar NONE -r' to create the database tables which are used by PTGLtoolsWeb
+2.4.1) Run 'java -jar PTGLgraphComputation.jar' once to create the config file
+2.4.2) Edit the config file ~/.PTGLgraphComputation_settings to ensure that the database credentials are correct (the settings are named PTGLgraphComputation_S_db_*)
+2.4.3) Run 'java -jar PTGLgraphComputation.jar NONE -r' to create the database tables which are used by PTGLtoolsWeb
 
       
 III: Access and use

@@ -1,13 +1,13 @@
-The PTGLtools FAQ
+The PTGLgraphComputation FAQ
 =============
 
 This file contains tips for getting PTGLtools running in FAQ format.
 
 
-Q: I want to make PTGLtools use the database, what do I need to do?
+Q: I want to make PTGLgraphComputation use the database, what do I need to do?
 A: Follow these steps: 
         1) Install and configure the postgresql database server (Package system under Linux, from the PostgreSQL website under Windows).
-        2) Create the database role (user) and the database you want PTGLtools to use. As the postgres user:
+        2) Create the database role (user) and the database you want PTGLgraphComputation to use. As the postgres user:
  
 	myuser@srv> su postgres           
 	postgres@srv> psql
@@ -34,9 +34,6 @@ A: The list should be in the file doc/PTGLgraphComputation_settings.txt of your 
 
 Q: When using -u or -r, the database connection fails and I am 100% sure that the DB address (host, port, dbname) and credentials (user, password) are ok. What's wrong?
 A: You may need to get a newer JDBC driver for your JVM and PostgreSQL server version from http://jdbc.postgresql.org/. It should be a jar file and you need to copy/rename it to '/lib/postgresql-jdbc.jar', overwriting the current file. The current file is for Java 1.6 and Postgresql 8.4. The JDBC driver for Java 1.6 and PostgreSQL 9.0 is in that dir as well, all you have to do is rename it as described above. Also note that, if you are NOT using a password for your DB user and have set authentication to TRUST in pg_hba.conf for your user, the line for your user has to appear before the 'all' line!
-
-Q: I want to analyze protein-protein interactions. Is PTGLgraphComputation the correct tool for this? 
-A: No, PTGLgraphComputation works on the chain level and does only consider contacts between protein residues (and SSEs) of a chain and ligand contacts to this chain. Contact between different macromolecular structures (quaternary protein structure, protein-protein interactions) are ignored.
 
 Q: Which molecules (PDB records) are considered to be a ligand by PTGLgraphComputation? 
 A: All molecules that have HETATM records, with the exception of the following solvents: water (HOH), deuterated water (DOD), methanol (MOH).

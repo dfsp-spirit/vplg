@@ -1,5 +1,5 @@
 #!/bin/bash
-## This script runs the 'reduce' program to (strip and re-) add hydrogens to a PDB file, then it runs plcc on the file with the command line options passed to this script.
+## This script runs the 'reduce' program to (strip and re-) add hydrogens to a PDB file, then it runs PTGLgraphComputation on the file with the command line options passed to this script.
 ## Written by TS, APR 2016
 ## Usage: ./plcc_hydrogens <plcc_options>
 ##        The first arg should be a PDB identifier (e.g., '8icd' if you have the files '8icd.pdb' and '8icd.dssp' in this directory.)
@@ -28,14 +28,14 @@ PDBFILE_ADDED_HYD="${PDBFILE}"
 REDUCE_PROGRAM="./reduce"
 
 if [ -z "$1" ]; then
-  echo "$APPTAG Usage: $0 <plcc options>."
+  echo "$APPTAG Usage: $0 <PTGLgraphComputation options>."
   echo "$APPTAG The first argument should be the basename of a PDB file contained in this directory (e.g., '8icd' if you have the files '8icd.pdb' and '8icd.dssp' in this directory)."
   echo "$APPTAG Note that you must also provide the '--alt-aa-contacts' option for this script to make any sense."
   exit 1
 fi
 
 if [ -z "$2" ]; then
-  echo "$APPTAG WARNING: Note that you must provide the '--alt-aa-contacts' option for this script to make any sense (otherwise the added hydrogens will just be ignored by plcc)."
+  echo "$APPTAG WARNING: Note that you must provide the '--alt-aa-contacts' option for this script to make any sense (otherwise the added hydrogens will just be ignored by PTGLgraphComputation)."
 fi
 
 if [ ! -f "$PDBFILE" ]; then
@@ -54,8 +54,8 @@ $($REDUCE_PROGRAM -Trim -Quiet $PDBFILE > $PDBFILE_STRIPPED_HYD)
 echo "$APPTAG Adding hydrogens to PDB file '$PDBFILE_STRIPPED_HYD' with reduce... (will save output at '$PDBFILE_ADDED_HYD')"
 $($REDUCE_PROGRAM -build -DB reduce_wwPDB_het_dict.txt -Quiet $PDBFILE_STRIPPED_HYD > $PDBFILE_ADDED_HYD)
 
-echo "$APPTAG New PDB file with added hydrogens written to '$PDBFILE_ADDED_HYD'. Running plcc."
-## done, run plcc
+echo "$APPTAG New PDB file with added hydrogens written to '$PDBFILE_ADDED_HYD'. Running PTGLgraphComputation."
+## done, run PTGLgraphComputation
 
-java -jar plcc.jar $@
+java -jar PTGLgraphComputation.jar $@
 

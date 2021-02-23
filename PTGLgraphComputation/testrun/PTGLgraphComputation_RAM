@@ -8,4 +8,4 @@ if [ $? -ne 0 ]; then
 fi
 
 ## k, run
-java -jar plcc.jar $@
+java -Xms5G -Xms5G -jar PTGLgraphComputation.jar $@

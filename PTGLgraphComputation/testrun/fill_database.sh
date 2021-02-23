@@ -1,6 +1,6 @@
 #!/bin/sh
 ## fill_database.sh -- fill the PTGLtools database from the PDB and DSSP files in this directory
-## This script assumes that plcc.jar and some PDB/DSSP files are in this directory. It also assumes the DB is setup correctly.
+## This script assumes that PTGLgraphComputation.jar and some PDB/DSSP files are in this directory. It also assumes the DB is setup correctly.
 ## NOTE: Using coils is broken (in various ways).
 
 
@@ -11,10 +11,10 @@ RUN_GRAPHLETANALYSER_ALSO_FOR_COMPLEXGRAPHS="YES"
 RUN_GRAPHLETANALYSER_ALSO_FOR_AMINOACIDGRAPHS="YES"
 
 
-#PLCC_OPTIONS="-f -u -k -s --complex-graphs --aa-graphs"
-PLCC_OPTIONS="--cluster  --compute-graph-metrics --silent"
-PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
-## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree' or other options which include it (e.g., --cluster)
+#PTGLgraphComputation_OPTIONS="-f -u -k -s --complex-graphs --aa-graphs"
+PTGLgraphComputation_OPTIONS="--cluster  --compute-graph-metrics --silent"
+PTGLgraphComputation_RUNS_IN_SUBDIR_TREE_MODE="YES"
+## IMPORTANT: set this to "YES" if PTGLgraphComputation is run with '-k' / '--output-subdir-tree' or other options which include it (e.g., --cluster)
 
 DELETE_CLUSTER_CHAINS_FILE="NO"
 SILENT="YES"
@@ -24,7 +24,7 @@ SILENT="YES"
 APPTAG="[FDB]"
 NODSSP_LIST="dssp_files_missing.lst"
 
-PLCC_OUTPUT_DIR="."
+PTGLgraphComputation_OUTPUT_DIR="."
 
 ## cannot run GA under windows/cygwin
 if [ "$OSTYPE" = "cygwin" -a "$RUN_GRAPHLETANALYSER" = "YES" ]; then
@@ -61,7 +61,7 @@ do
 	if [ ! -r $DSSPFILE ]; then
 	   echo "$filename" >> $NODSSP_LIST
 	else
-	    java -Xmx4096M -jar plcc.jar $filename $PLCC_OPTIONS	    
+	    java -Xmx4096M -jar PTGLgraphComputation.jar $filename $PTGLgraphComputation_OPTIONS	    
 	fi
 	
 	if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then
@@ -75,10 +75,10 @@ do
                 #MID2PDBCHARS=${PDBID:1:2}
 		MID2PDBCHARS=$(echo $PDBID | cut -c 2-3)
                 
-		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
+		CHAINS_FILE="${PTGLgraphComputation_OUTPUT_DIR}/${PDBID}.chains"
 		
 		if [ ! -f "$CHAINS_FILE" ]; then
-		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
+		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PTGLgraphComputation command line option?"
 	        else
 	                if [ "$SILENT" = "NO" ]; then
 	                  echo "$APPTAG Chains file found at '$CHAINS_FILE'."
@@ -87,10 +87,10 @@ do
 	                ## run GA for the protein graphs of all chains
 			for CHAIN in $(cat ${CHAINS_FILE});
 			do
-			        if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then			            
-			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/${CHAIN}/${PDBID}_${CHAIN}_albe_PG.gml"
+			        if [ "$PTGLgraphComputation_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then			            
+			            ALBE_GML_GRAPHFILE="${PTGLgraphComputation_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/${CHAIN}/${PDBID}_${CHAIN}_albe_PG.gml"
 			        else
-			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
+			            ALBE_GML_GRAPHFILE="${PTGLgraphComputation_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
 			        fi
 
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
@@ -105,10 +105,10 @@ do
 
 			## now also compute the graphlet counts for CGs
 			if [ "$RUN_GRAPHLETANALYSER_ALSO_FOR_COMPLEXGRAPHS" = "YES" ]; then
-			    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
-				ALBELIG_GML_COMPLEXGRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_complex_sses_albelig_CG.gml"
+			    if [ "$PTGLgraphComputation_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
+				ALBELIG_GML_COMPLEXGRAPHFILE="${PTGLgraphComputation_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_complex_sses_albelig_CG.gml"
 			    else
-				ALBELIG_GML_COMPLEXGRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_aagraph.gml"
+				ALBELIG_GML_COMPLEXGRAPHFILE="${PTGLgraphComputation_OUTPUT_DIR}/${PDBID}_aagraph.gml"
 			    fi
 			
 			    if [ -f "$ALBELIG_GML_COMPLEXGRAPHFILE" ]; then
@@ -123,10 +123,10 @@ do
 			
 			## now also compute the graphlet counts for AAGs
 			if [ "$RUN_GRAPHLETANALYSER_ALSO_FOR_AMINOACIDGRAPHS" = "YES" ]; then
-			    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
-				ALBE_GML_AMINOACIDGRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_aagraph.gml"
+			    if [ "$PTGLgraphComputation_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
+				ALBE_GML_AMINOACIDGRAPHFILE="${PTGLgraphComputation_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_aagraph.gml"
 			    else
-				ALBE_GML_AMINOACIDGRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_aagraph.gml"
+				ALBE_GML_AMINOACIDGRAPHFILE="${PTGLgraphComputation_OUTPUT_DIR}/${PDBID}_aagraph.gml"
 			    fi
 			
 			    if [ -f "$ALBE_GML_AMINOACIDGRAPHFILE" ]; then

@@ -1,10 +1,10 @@
-This is the README for the *PTGLgraphComputation* (Protein Ligand Contact Computation) program, which is part of *PTGLtools*.
+This is the README for the *PTGLgraphComputation* (formerly labeled PLCC) program, which is part of *PTGLtools*.
 
 
 Description
 ===========
 
-The *PTGLgraphComputation* program is the heart of the *VPGL* software package. It parses the PDB file and and the DSSP file of a protein and computes all atom, residue and SSE level contacts for each chain in the file. Optionally, the protein graph and its connected components (*folding graphs*) can then be computed and visualized.
+The *PTGLgraphComputation* program is the heart of the *PTGLtools* software package. It parses the PDB file and and the DSSP file of a protein and computes all atom, residue and SSE level contacts for each chain in the file. Optionally, the protein graph and its connected components (*folding graphs*) can then be computed and visualized.
 
 Contact information and statistics, meta data files and the protein graph (both as a PNG image file and as a text file in *PTGLgraphComputation*'s own graph file format) are written to output files. Writing the SSE data and the SSE level contacts (and thus implicitely the protein graph) to a database is also supported.
 
