@@ -989,7 +989,7 @@ class CifParser {
                     //resIndexDSSP[resNumDSSP] = resIndex;
                     //resIndexPDB[molNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                     if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                        System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspNum() + ").");
+                        System.out.println("   PDB: Added ligand monomer '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspNum() + ").");
                         System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                     }
 
@@ -1054,10 +1054,16 @@ class CifParser {
                         // add Atom to list of atoms of current molecule as well as list of all atoms
                         FileParser.s_atoms.add(a);
                         if (checkType(Molecule.RESIDUE_TYPE_AA)){
+                            if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                                System.out.println("    [DEBUG LV 2] New AA atom added: " + a.toString());
+                            }
                             a.setAtomtype(Atom.ATOMTYPE_AA);
                             lastMol.addAtom(a);
                         }
                         if (checkType(Molecule.RESIDUE_TYPE_RNA)){
+                            if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                                System.out.println("    [DEBUG LV 2] New RNA atom added: " + a.toString());
+                            }
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
                             a.setMolecule(rna);
                             rna.addAtom(a);
@@ -1067,6 +1073,9 @@ class CifParser {
             }
             else {
                 if (! (lig == null)){
+                    if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                       System.out.println("    [DEBUG LV 2] New ligand atom added: " + a.toString());
+                    }
                     lig.addAtom(a);
                     a.setMolecule(lig);
                     FileParser.s_atoms.add(a);
