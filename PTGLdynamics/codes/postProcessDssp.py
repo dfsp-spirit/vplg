@@ -31,6 +31,7 @@ import argparse
 import logging
 import traceback
 import fileinput
+import re
 
 
 
@@ -69,6 +70,19 @@ def log(message, level=""):
             global output_file
             output_file.write(message + "\n")
 
+def sorted_nicely( l ):
+    """ Sorts the given iterable in the way that is expected.
+    creates a list for each file consisting of the different int and string parts of the name
+    afterwards the file list is sorted considering those changed names only
+ 
+    Required arguments:
+    l -- The iterable to be sorted.
+    
+ 
+    """
+    convert = lambda text: int(text) if text.isdigit() else text
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(l, key = alphanum_key)
 
 ########### configure logger ###########
 
@@ -180,7 +194,10 @@ o_dir = os.path.abspath(o_dir) + '/'
 os.chdir(i_dir)
 i_dir = os.getcwd() + '/'
 
-for allfile in os.listdir(i_dir):
+list_i_dir = os.listdir(i_dir)
+list_i_dir = sorted_nicely(list_i_dir)
+
+for allfile in list_i_dir:
 
     if allfile.endswith(".dssp"):
         cnt = 0

@@ -44,6 +44,8 @@ import logging
 import traceback
 import pathlib
 import shutil
+import re
+import time
 
 
 ########### functions ###########
@@ -92,6 +94,20 @@ def get_working_dir(new_dir):
     os.chdir(new_dir)
     return os.getcwd() + '/'
 
+def sorted_nicely( l ):
+    """ Sorts the given iterable in the way that is expected.
+    creates a list for each file consisting of the different int and string parts of the name
+    afterwards the file list is sorted considering those changed names only
+ 
+    Required arguments:
+    l -- The iterable to be sorted.
+    
+ 
+    """
+    convert = lambda text: int(text) if text.isdigit() else text
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(l, key = alphanum_key)
+
 ########### configure logger ###########
 
 logging.basicConfig(format = "[%(levelname)s] %(message)s")
@@ -117,7 +133,7 @@ However, in the command line call the hyphen is used: --input-dir <path> """
 
 ## create the parser
 cl_parser = argparse.ArgumentParser(description="This is a pipeline that reads several snapshots in pdb-format. " +
-                                    "The pipeline runs plcc on each of them and compares the differences in between their Complex Graph outputs. "+
+                                    "The pipeline runs PTGLgraphComputation on each of them and compares the differences in between their Complex Graph outputs. "+
                                     "If not specified otherwise the results are written in the current folder in csv-format. " +
                                     "Use: 'python3 <path>/ptglDynamics.py <arguments>' to run the programm.",
                                     fromfile_prefix_chars="@")
@@ -175,7 +191,7 @@ cl_parser.add_argument('-p',
                        metavar = 'programms',
                        nargs = "*",
                        type = str,
-                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'plcc', 'gmlCompareEdgeWeightsAndSubsets.py'],
+                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py'],
                        help = 'to execute only the specified scripts.')
 
 cl_parser.add_argument('-u',
@@ -184,11 +200,11 @@ cl_parser.add_argument('-u',
                        help='display the results in sub directories in the output directory.')
 
 cl_parser.add_argument('-a',
-                       '--plcc-args',
-                       metavar = 'plcc-args',
+                       '--PTGLgraphComputation-args',
+                       metavar = 'PTGLgraphComputation-args',
                        type = str,
                        default = '',
-                       help = 'a string with the plcc arguments you want to use and its values to execute plcc in different ways using plccs command line arguments. Insert arguments like this: -a="<arguments and their inputs>" ')
+                       help = 'a string with the PTGLgraphComputation arguments you want to use and its values to execute PTGLgraphComputation in different ways using PTGLgraphComputations command line arguments. Insert arguments like this: -a="<arguments and their inputs>" ')
 
 cl_parser.add_argument('-b',
                        '--toLegacyPDB-args',
@@ -283,18 +299,18 @@ else:
 programm_list = []
 if (args.programms != []):
     for programm in args.programms:
-        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'plcc', 'gmlCompareEdgeWeightsAndSubsets.py']:
+        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py']:
             programm_list.append(programm)
         else:
             logging.error("Specified programm '%s' is not part of the ptglDynamics pipeline. Continuing without it.", programm)
 else:
-    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'plcc', 'gmlCompareEdgeWeightsAndSubsets.py']
+    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py']
     
-# plcc arguments
-if (args.plcc_args != ''):
-    add_plcc_args = args.plcc_args
+# PTGLgraphComputation arguments
+if (args.PTGLgraphComputation_args != ''):
+    add_PTGLgraphComputation_args = args.PTGLgraphComputation_args
 else:
-    add_plcc_args = ''
+    add_PTGLgraphComputation_args = ''
 
 # toLegacyPDB arguments
 if (args.toLegacyPDB_args != ''):
@@ -322,9 +338,9 @@ else:
     
 # different dssp folders
 if (args.different_dssp_folders):
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'plcc':'plcc', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
 else:
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'plcc':'plcc', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
 
 ########### vamos ###########
 
@@ -335,8 +351,10 @@ log("Version " + version, "i")
 
 
 ############### Declaration of variables ###############
+_start_time = time.time()
+
 ptglDynamics_path = os.path.dirname(__file__)
-plcc_path = os.path.dirname(ptglDynamics_path) + '/plcc/dist/plcc.jar'
+PTGLgraphComputation_path = os.path.dirname(ptglDynamics_path) + '/plcc/dist/plcc.jar'
 
 cmd_start = 'python3 ' + ptglDynamics_path + '/codes/'
 
@@ -345,10 +363,11 @@ o_dir = os.path.abspath(o_dir) + '/'
 
 pdb_dir = i_dir
 dssp_dir = i_dir
-plcc_dir = i_dir
+PTGLgraphComputation_dir = i_dir
 gml_dir = i_dir
 
 work_dir = get_working_dir(i_dir)
+list_work_dir = []
 
 log("work_dir: ", 'd')
 log(work_dir, 'd')
@@ -378,11 +397,17 @@ for elem in programm_list:
         os.system(exec_string)
         pdb_dir = os.path.abspath(out_dir) + '/'
         
+        log('toLegacyPDB computations are done.', 'i')
+        
       
     elif (elem == 'dsspcmbi'):
 
         work_dir = get_working_dir(pdb_dir)
-        for pdb in os.listdir(work_dir):
+        
+        list_work_dir = os.listdir(work_dir)
+        list_work_dir = sorted_nicely(list_work_dir)
+        
+        for pdb in list_work_dir:
             if pdb.endswith(".pdb"):
                 dssp = out_dir + pathlib.Path(pdb).stem + '.dssp'
                 exec_string = ptglDynamics_path + '/codes/' + elem + ' ' + work_dir + pdb + ' ' + dssp  + ' ' + add_dsspcmbi_args
@@ -391,6 +416,8 @@ for elem in programm_list:
                 os.system(exec_string)
                 os.chdir(work_dir)
         dssp_dir = os.path.abspath(out_dir) + '/'
+        
+        log('dsspcmbi computations are done.', 'i')
 
     
     elif (elem == 'postProcessDssp.py'):
@@ -401,13 +428,23 @@ for elem in programm_list:
         os.chdir(out_dir)
         os.system(exec_string)
         dssp_dir = os.path.abspath(out_dir) + '/'
+        
+        log('postProcessDssp computations are done.', 'i')
 
     
-    elif (elem == 'plcc'):
+    elif (elem == 'PTGLgraphComputation'):
 
         work_dir = get_working_dir(pdb_dir)
-        for pdb in os.listdir(work_dir):
+        
+        list_work_dir = os.listdir(work_dir)
+        list_work_dir = sorted_nicely(list_work_dir)
+        len_work_dir = len(list_work_dir)
+        
+        counter = 0;
+        
+        for pdb in list_work_dir:
             if (pdb.endswith(".pdb")):
+                
                 pdb_id = pathlib.Path(pdb).stem
                 pdb_id_folder = ''
                 if(args.sub_dir_structure):
@@ -419,28 +456,38 @@ for elem in programm_list:
 
                 dssp = dssp_dir + pathlib.Path(pdb).stem + '.dssp'
 
-                plcc = 'java -jar ' + plcc_path + ' ' + pdb_id + ' ' + add_plcc_args + ' -p ' + work_dir + pdb + ' -d ' + dssp + ' -o ' + pdb_id_folder
+                PTGLgraphComputation = 'java -jar ' + PTGLgraphComputation_path + ' ' + pdb_id + ' ' + add_PTGLgraphComputation_args + ' -p ' + work_dir + pdb + ' -d ' + dssp + ' -o ' + pdb_id_folder
 
-                log(plcc,'d') 
+                log(PTGLgraphComputation,'d') 
                 os.chdir(out_dir)
-                os.system(plcc)
+                os.system(PTGLgraphComputation)
                 os.chdir(work_dir)
+                
+                counter = counter + 1
+                if(counter % 5 == 0):
+                    log(str(counter) + ' / ' + str(len_work_dir) + ' file computations with PTGLgraphComputation are done.', 'i')
         
-        plcc_dir = os.path.abspath(out_dir) + '/'
+        PTGLgraphComputation_dir = os.path.abspath(out_dir) + '/'
         
         
     elif (elem == 'gmlCompareEdgeWeightsAndSubsets.py'):
 
-        work_dir = get_working_dir(plcc_dir)
-        log('plcc_dir: ' + plcc_dir,'d')
+        work_dir = get_working_dir(PTGLgraphComputation_dir)
+        log('PTGLgraphComputation_dir: ' + PTGLgraphComputation_dir,'d')
         prevGml = ''
-        for entry in os.listdir(work_dir):
+        list_work_dir = os.listdir(work_dir)
+        list_work_dir = sorted_nicely(list_work_dir)
+        for entry in list_work_dir:
             log(entry, 'd')
-
+            
             if (os.path.isdir(entry)):
 
                 temp_work_dir = get_working_dir(entry)
-                for gml in os.listdir(temp_work_dir):
+                list_temp_work_dir = os.listdir(temp_work_dir)
+                log(list_temp_work_dir,'d')
+                
+                list_temp_work_dir = sorted_nicely(list_temp_work_dir);
+                for gml in list_temp_work_dir:
                     log('in dir: ' + gml, 'd')
                     if gml.endswith("complex_chains_albelig_CG.gml"):
                         log(out_dir,'d')
@@ -474,10 +521,13 @@ for elem in programm_list:
                         os.system(gml_comparison)
                         os.chdir(work_dir)
                     prevGml = entry
-    
+           
         gml_dir = os.path.abspath(out_dir) + '/'
+        
+        log('gmlCompareEdgeWeightsAndSubsets computations are done.', 'i')
 
 
+log("-- %s seconds ---"% (time.time()- _start_time), 'i')
 log("All done, exiting ptglDynamics.", 'i')
 
 # tidy up
