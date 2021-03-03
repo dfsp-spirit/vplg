@@ -1,27 +1,12 @@
-###############################
-########### HOW TO ############
-###### USE THIS TEMPLATE ######
-"""
-- argparse
-    - describe what the script does (see TODO)
-    - add command line arguments with it
-    - argument file can be specified with @filepath
-- logging
-    - use the function 'log' for each and every print!
-        -> d(ebug) for debug messages
-        -> i(nfo) for status and meta information
-        -> w(arning), e(rror), c(ritical) for more severe messages
-        -> without a level to print results and if required obligatory prints
-- command line option 'silent' should suppress those obligatory prints so that only results are printed
-- pipelining
-    - write the results with -o to an output file to use as next input or
-    - use 'silent' mode (if obligatory prints exist) and pipe the output to stdout directly to next script
-        -> all debug, info, warning etc. are printed to stderr
-- imports from not built-in modules in the respective section with error handling and useful prints where to find the module and if possible how to install it
-        
-(Remove this HOW TO and have fun programming!)
-"""
+########### settings ###########
 
+# This script's version as MAJOR.MINOR.PATCH
+#   major: big (re-)implementation, new user interface, new overall architecture
+#   minor: new functions, git merge
+#   patch: fixes, small changes
+#   no version change: fix typos, changes to comments, debug prints, small changes to non-result output, changes within git branch
+# -> only increment with commit / push / merge not while programming
+version = "1.0.0"  # TODO version of this template, change this to 1.0.0 for a new script or 2.0.0 if you upgrade another script to this template's architecture
 
 ########### built-in imports ###########
 
@@ -84,26 +69,28 @@ def sorted_nicely( l ):
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
     return sorted(l, key = alphanum_key)
 
+def check_dir_args(argument):
+    """Checks directory arguments and returns its value if the directory exists or exits the program otherwise."""
+    
+    if( argument != ""):
+        if(os.path.isdir(argument)):
+            return argument
+        else:
+            logging.error("Specified directory '%s' does not exist. Exiting now.", argument)
+            sys.exit(1)
+    else:
+        return os.getcwd()
+
 ########### configure logger ###########
 
 logging.basicConfig(format = "[%(levelname)s] %(message)s")
             
             
 ########### not built-in imports ###########
-
-# EXAMPLE - can be removed
-"""
-    from pygmlparser.Parser import Parser
-except ModuleNotFoundError as exception:
-    log(exception,"e")
-    traceback.print_exc()
-    log("  Module from https://github.com/hasii2011/PyGMLParser seems to be missing.", "e")
-    log("  Try installing it with 'pip3 install PyGMLParser'. Exiting now.", "e")
-    sys.exit(1)
-"""
-
-           
+          
 ########### command line parser ###########
+"""Arguments with hyphen like '--input-dir' are called with an underscore within the programm: args.input_dir
+However, in the command line call the hyphen is used: --input-dir <path> """
 
 ## create the parser
 cl_parser = argparse.ArgumentParser(description="Post processing of old dssp files to adjust them to plcc. As an input a folder that contains .dssp files is given. The modified .dssp files are written to an output folder.",
@@ -128,13 +115,15 @@ loudness.add_argument('-d',
                       action='store_true',
                       help='print everything including debug information')
 
-cl_parser.add_argument('-id',
-                       '--inputdirectory',
+cl_parser.add_argument('-i',
+                       '--input-dir',
+                       metavar = 'input-directory',
                        default = '',
                        help = 'specify a path to your input files. Otherwise the current folder is used.')
 
-cl_parser.add_argument('-od',
-                       '--outputdirectory',
+cl_parser.add_argument('-p',
+                       '--output-dir',
+                       metavar = 'input-directory',
                        default = '',
                        help = 'specify a path to your output files. Otherwise the current folder is used.')
 
@@ -167,50 +156,34 @@ if (args.outputfile != ""):
         sys.exit(1)
 
 # input directory
-if (args.inputdirectory != ""):
-    if(os.path.isdir(args.inputdirectory)):
-        i_dir = args.inputdirectory
-    else:
-        logging.error("Specified input directory '%s' is not readable. Exiting now.", args.inputdirectory)
-        sys.exit(1)
-else:
-    i_dir = os.getcwd()
+input_dir = check_dir_args(args.input_dir)
+    
 
 # output directory
-if (args.outputdirectory != ""):
-    if(os.path.isdir(args.inputdirectory)):
-        o_dir = args.outputdirectory
-    else:
-        logging.error("Specified output directory '%s' is not writable. Exiting now.", args.outputdirectory)
-        sys.exit(1)
-else:
-    o_dir = os.getcwd()
+output_dir = check_dir_args(args.output_dir)
 
 
 ########### vamos ###########
 
-# TODO add your code here
-o_dir = os.path.abspath(o_dir) + '/'
-os.chdir(i_dir)
-i_dir = os.getcwd() + '/'
+output_dir = os.path.abspath(output_dir) + '/'
+os.chdir(input_dir)
+input_dir = os.getcwd() + '/'
 
-list_i_dir = os.listdir(i_dir)
-list_i_dir = sorted_nicely(list_i_dir)
+list_input_dir = os.listdir(input_dir)
+list_input_dir = sorted_nicely(list_input_dir)
 
-for allfile in list_i_dir:
+for allfile in list_input_dir:
 
     if allfile.endswith(".dssp"):
         cnt = 0
         data = []
-        with open(i_dir + allfile) as f:
+        with open(input_dir + allfile) as f:
             for line in f:
                 data.append(line)
-        f.close()
         
-        os.chdir(o_dir)
+        os.chdir(output_dir)
         output = open(allfile, "w")
         
-        #for line in fileinput.input(i_dir + allfile, inplace=True):
         for line in data:
             
             if ("  #  RESIDUE AA" == line[0:15]) and ("CHAIN AUTHCHAIN" not in line):
@@ -226,14 +199,12 @@ for allfile in list_i_dir:
                 chain_id = "                " + line[11] + "         " + line[11]
                 new_line = line.rstrip('\n')
                 if (line != new_line + chain_id + '\n'):
-                    #line = line.replace(line, new_line + chain_id + '\n')
                     line = new_line + chain_id + '\n'
             else:
                 line = line
             output.write(line)
-            #sys.stdout.write(line)
         output.close()
-        os.chdir(i_dir)
+        os.chdir(input_dir)
             
 log('finish dssp file overwritting','i')
 

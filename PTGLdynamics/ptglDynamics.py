@@ -1,29 +1,3 @@
-#################################################
-#################### HOW TO #####################
-############### USE THIS TEMPLATE ###############
-"""
-- argparse
-    - describe what the script does (see TODO)
-    - add command line arguments with it
-    - argument file can be specified with @filepath
-- logging
-    - use the function 'log' for each and every print!
-        -> d(ebug) for debug messages
-        -> i(nfo) for status and meta information
-        -> w(arning), e(rror), c(ritical) for more severe messages
-        -> without a level to print results and if required obligatory non-result prints
-            -> command line option 'silent' should suppress those obligatory prints so that only results are printed
-- pipelining
-    - write the results with -o to an output file to use as next input or
-    - use 'silent' mode (if obligatory prints exist) and pipe the output of stdout directly to next script
-        -> all debug, info, warning etc. are printed to stderr
-- imports from not built-in modules in the respective section with error handling and useful prints where to find the module and if possible how to install it
-- change version to your script's version (see TODO)
-        
-(Remove this HOW TO and have fun programming!)
-"""
-
-
 ########### settings ###########
 
 # This script's version as MAJOR.MINOR.PATCH
@@ -108,23 +82,32 @@ def sorted_nicely( l ):
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
     return sorted(l, key = alphanum_key)
 
+
+def check_dir_args(argument):
+    """Checks directory arguments and returns its value if the directory exists or exits the program otherwise."""
+    
+    if( argument != ""):
+        if(os.path.isdir(argument)):
+            return argument
+        else:
+            logging.error("Specified directory '%s' does not exist. Exiting now.", argument)
+            sys.exit(1)
+    else:
+        return os.getcwd()
+    
+def check_arguments_args(argument):
+    """Checks if the given argument is empty. Returns the given value."""
+    if(argument != ""):
+        return argument
+    else:
+        return ""
+
 ########### configure logger ###########
 
 logging.basicConfig(format = "[%(levelname)s] %(message)s")
             
             
 ########### not built-in imports ###########
-
-# EXAMPLE - can be removed
-"""
-    from pygmlparser.Parser import Parser
-except ModuleNotFoundError as exception:
-    log(exception,"e")
-    traceback.print_exc()
-    log("  Module from https://github.com/hasii2011/PyGMLParser seems to be missing.", "e")
-    log("  Try installing it with 'pip3 install PyGMLParser'. Exiting now.", "e")
-    sys.exit(1)
-"""
 
             
 ########### command line parser ###########
@@ -168,13 +151,13 @@ cl_parser.add_argument('-o',
                        default = '',
                        help = 'save results to file')
 
-cl_parser.add_argument('-id',
+cl_parser.add_argument('-i',
                        '--input-dir',
                        metavar = 'input-directory',
                        default = '',
                        help = 'specify a path to your input files. Otherwise the current folder is used.')
 
-cl_parser.add_argument('-od',
+cl_parser.add_argument('-p',
                        '--output-dir',
                        metavar = 'output-directory',
                        default = '',
@@ -186,20 +169,26 @@ cl_parser.add_argument('-c',
                        default = '',
                        help = 'to integrate a header in pdb files specify the path of your compound file.')
 
-cl_parser.add_argument('-p',
-                       '--programms',
-                       metavar = 'programms',
+cl_parser.add_argument('-a',
+                       '--applications',
+                       metavar = 'applications',
                        nargs = "*",
                        type = str,
                        default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py'],
                        help = 'to execute only the specified scripts.')
+
+cl_parser.add_argument('-m',
+                       '--dssp-input-dir',
+                       metavar = 'dssp-input-dir',
+                       default = '',
+                       help = 'to specify a different input directory for dssp files if only applications after the dssp and pdb modification are executed.')
 
 cl_parser.add_argument('-u',
                        '--sub-dir-structure',
                        action='store_true',
                        help='display the results in sub directories in the output directory.')
 
-cl_parser.add_argument('-a',
+cl_parser.add_argument('-k',
                        '--PTGLgraphComputation-args',
                        metavar = 'PTGLgraphComputation-args',
                        type = str,
@@ -261,28 +250,13 @@ if (args.outputfile != ""):
         sys.exit(1)
 
 # input directory
-if (args.input_dir != ""):
-    if(os.path.isdir(args.input_dir)):
-        i_dir = args.input_dir
-    else:
-        logging.error("Specified input directory '%s' is not readable. Exiting now.", args.inputdirectory)
-        sys.exit(1)
-else:
-    i_dir = os.getcwd()
+input_dir = check_dir_args(args.input_dir)
     
 
 # output directory
-if (args.output_dir != ""):
-    if(os.path.isdir(args.output_dir)):
-        o_dir = args.output_dir
-    else:
-        logging.error("Specified output directory '%s' is not writable. Exiting now.", args.outputdirectory)
-        sys.exit(1)
-else:
-    o_dir = os.getcwd()
+original_output_dir = check_dir_args(args.output_dir)
     
-    
-# output directory
+# compoundfile directory
 if (args.compoundfile != ""):
     if(os.access(args.compoundfile, os.R_OK)):
         compound = os.path.abspath(args.compoundfile)
@@ -295,59 +269,44 @@ else:
     compound = ''
     cmd_compound = ''
 
-# list of programms
+# list of applications
 programm_list = []
-if (args.programms != []):
-    for programm in args.programms:
+if (args.applications != []):
+    for programm in args.applications:
         if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py']:
             programm_list.append(programm)
         else:
             logging.error("Specified programm '%s' is not part of the ptglDynamics pipeline. Continuing without it.", programm)
 else:
     programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py']
-    
+
+# dssp directory
+dssp_input_dir = check_dir_args(args.dssp_input_dir)
+
 # PTGLgraphComputation arguments
-if (args.PTGLgraphComputation_args != ''):
-    add_PTGLgraphComputation_args = args.PTGLgraphComputation_args
-else:
-    add_PTGLgraphComputation_args = ''
+add_PTGLgraphComputation_args = check_arguments_args(args.PTGLgraphComputation_args)
 
 # toLegacyPDB arguments
-if (args.toLegacyPDB_args != ''):
-    add_toLegacyPDB_args = args.toLegacyPDB_args
-else:
-    add_toLegacyPDB_args = ''
+add_toLegacyPDB_args = check_arguments_args(args.toLegacyPDB_args)
 
 # postProcessDssp arguments
-if (args.postProcessDssp_args != ''):
-    add_postProcessDssp_args = args.postProcessDssp_args
-else:
-    add_postProcessDssp_args = ''
+add_postProcessDssp_args = check_arguments_args(args.postProcessDssp_args)
     
 # gmlCompareEdgeWeightsAndSubsets arguments
-if (args.gmlCompareEdgeWeightsAndSubsets_args != ''):
-    add_gml_comparison_args = args.gmlCompareEdgeWeightsAndSubsets_args
-else:
-    add_gml_comparison_args = ''
+add_gml_comparison_args = check_arguments_args(args.gmlCompareEdgeWeightsAndSubsets_args)
 
-# gmlCompareEdgeWeightsAndSubsets arguments
-if (args.dsspcmbi_args != ''):
-    add_dsspcmbi_args = args.dsspcmbi_args
-else:
-    add_dsspcmbi_args = ''
+# dsspcmbi arguments
+add_dsspcmbi_args = check_arguments_args(args.dsspcmbi_args)
     
 # different dssp folders
 if (args.different_dssp_folders):
     dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
 else:
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv'}
 
 ########### vamos ###########
 
 log("Version " + version, "i")
-
-# TODO add your code here
-
 
 
 ############### Declaration of variables ###############
@@ -358,15 +317,21 @@ PTGLgraphComputation_path = os.path.dirname(ptglDynamics_path) + '/plcc/dist/plc
 
 cmd_start = 'python3 ' + ptglDynamics_path + '/codes/'
 
-i_dir = os.path.abspath(i_dir) + '/'
-o_dir = os.path.abspath(o_dir) + '/'
+input_dir = os.path.abspath(input_dir) + '/'
+original_output_dir = os.path.abspath(original_output_dir) + '/'
 
-pdb_dir = i_dir
-dssp_dir = i_dir
-PTGLgraphComputation_dir = i_dir
-gml_dir = i_dir
+pdb_dir = input_dir
 
-work_dir = get_working_dir(i_dir)
+# define dssp_dir considering that it can be specified via command line
+if(dssp_input_dir == os.getcwd()):
+    dssp_dir = input_dir
+else:
+    dssp_dir = os.path.abspath(dssp_input_dir) + '/'
+
+PTGLgraphComputation_dir = input_dir
+gml_dir = input_dir
+
+work_dir = get_working_dir(input_dir)
 list_work_dir = []
 
 log("work_dir: ", 'd')
@@ -375,23 +340,29 @@ log("programm list: ", 'd')
 log(programm_list, 'd')
 
 
-################## Go through the given Programms and execute them #####################
+################## Go through the given applications and execute them #####################
 for elem in programm_list:
     log("elem: " + elem, 'd')
     
     # Get the output directory
     if (args.sub_dir_structure) and (dir_names[elem] != ''):
-        os.chdir(o_dir)
+        os.chdir(original_output_dir)
         out_dir = new_directory(dir_names[elem]) + '/'
         os.chdir(work_dir)
+        
+        if(elem == "gmlCompareEdgeWeightsAndSubsets.py"):
+            os.chdir(original_output_dir)
+            gml_dir = new_directory("gml") + '/'
+            os.chdir(work_dir)
+        
     else:
-        out_dir = o_dir
+        out_dir = original_output_dir
         
     #execute different scripts:
     if (elem == 'toLegacyPDB.py'):
 
         work_dir = get_working_dir(pdb_dir)
-        exec_string = cmd_start + elem + ' ' + add_toLegacyPDB_args + ' -id ' + work_dir + ' -od ' + out_dir + cmd_compound
+        exec_string = cmd_start + elem + ' ' + add_toLegacyPDB_args + ' -i ' + work_dir + ' -p ' + out_dir + cmd_compound
         log('exec_string ' + exec_string, 'd')
         os.chdir(out_dir)
         os.system(exec_string)
@@ -423,7 +394,7 @@ for elem in programm_list:
     elif (elem == 'postProcessDssp.py'):
 
         work_dir = get_working_dir(dssp_dir)
-        exec_string = cmd_start + elem + ' ' + add_postProcessDssp_args + ' -id ' + work_dir + ' -od ' + out_dir
+        exec_string = cmd_start + elem + ' ' + add_postProcessDssp_args + ' -i ' + work_dir + ' -p ' + out_dir
         log('exec_string ' + exec_string, 'd')
         os.chdir(out_dir)
         os.system(exec_string)
@@ -463,7 +434,7 @@ for elem in programm_list:
                 os.system(PTGLgraphComputation)
                 os.chdir(work_dir)
                 
-                counter = counter + 1
+                counter += 1
                 if(counter % 5 == 0):
                     log(str(counter) + ' / ' + str(len_work_dir) + ' file computations with PTGLgraphComputation are done.', 'i')
         
@@ -490,15 +461,16 @@ for elem in programm_list:
                 for gml in list_temp_work_dir:
                     log('in dir: ' + gml, 'd')
                     if gml.endswith("complex_chains_albelig_CG.gml"):
-                        log(out_dir,'d')
+                        log(gml_dir,'d')
                         try:
-                            shutil.copy(gml, out_dir + gml)
+                            shutil.copy(gml, gml_dir + gml)
                         except shutil.SameFileError:
                             log("Source and destination represents the same file.", 'i')
-
+                        
+                        log(prevGml,'d')
                         if prevGml != '':
-                            os.chdir(out_dir)
-                            gmlComparison = cmd_start + elem +' ' + add_gml_comparison_args + ' -i1 ' + prevGml + ' -i2 ' + gml + ' -od ' + o_dir
+                            os.chdir(gml_dir)
+                            gmlComparison = cmd_start + elem +' ' + add_gml_comparison_args + ' -a ' + prevGml + ' -b ' + gml + ' -p ' + out_dir
                             log(gmlComparison,'d')
                             os.system(gmlComparison)
                             os.chdir(temp_work_dir)
@@ -509,20 +481,18 @@ for elem in programm_list:
                 log('not in dir: ' + entry, 'd')
                 if entry.endswith("complex_chains_albelig_CG.gml"):
                     try:
-                        shutil.copy(entry, out_dir + entry)
+                        shutil.copy(entry, gml_dir + entry)
                     except shutil.SameFileError:
                         log("Source and destination represents the same file.", 'i')
 
 
                     if prevGml != '':
-                        os.chdir(out_dir)
-                        gml_comparison = cmd_start + elem +' ' + add_gml_comparison_args + ' -i1 ' + prevGml + ' -i2 ' + entry + ' -od ' + o_dir
+                        os.chdir(gml_dir)
+                        gml_comparison = cmd_start + elem +' ' + add_gml_comparison_args + ' -a ' + prevGml + ' -b ' + entry + ' -p ' + out_dir
                         log(gmlComparison,'d')
                         os.system(gml_comparison)
                         os.chdir(work_dir)
                     prevGml = entry
-           
-        gml_dir = os.path.abspath(out_dir) + '/'
         
         log('gmlCompareEdgeWeightsAndSubsets computations are done.', 'i')
 

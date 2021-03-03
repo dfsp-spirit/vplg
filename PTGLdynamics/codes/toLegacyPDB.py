@@ -1,29 +1,3 @@
-#################################################
-#################### HOW TO #####################
-############### USE THIS TEMPLATE ###############
-"""
-- argparse
-    - describe what the script does (see TODO)
-    - add command line arguments with it
-    - argument file can be specified with @filepath
-- logging
-    - use the function 'log' for each and every print!
-        -> d(ebug) for debug messages
-        -> i(nfo) for status and meta information
-        -> w(arning), e(rror), c(ritical) for more severe messages
-        -> without a level to print results and if required obligatory non-result prints
-            -> command line option 'silent' should suppress those obligatory prints so that only results are printed
-- pipelining
-    - write the results with -o to an output file to use as next input or
-    - use 'silent' mode (if obligatory prints exist) and pipe the output of stdout directly to next script
-        -> all debug, info, warning etc. are printed to stderr
-- imports from not built-in modules in the respective section with error handling and useful prints where to find the module and if possible how to install it
-- change version to your script's version (see TODO)
-        
-(Remove this HOW TO and have fun programming!)
-"""
-
-
 ########### settings ###########
 
 # This script's version as MAJOR.MINOR.PATCH
@@ -99,6 +73,19 @@ def sorted_nicely( l ):
     return sorted(l, key = alphanum_key)
 
 
+def check_dir_args(argument):
+    """Checks directory arguments and returns its value if the directory exists or exits the program otherwise."""
+    
+    if( argument != ""):
+        if(os.path.isdir(argument)):
+            return argument
+        else:
+            logging.error("Specified directory '%s' does not exist. Exiting now.", argument)
+            sys.exit(1)
+    else:
+        return os.getcwd()
+    
+    
 
 ########### configure logger ###########
 
@@ -106,23 +93,13 @@ logging.basicConfig(format = "[%(levelname)s] %(message)s")
             
             
 ########### not built-in imports ###########
-
-# EXAMPLE - can be removed
-"""
-    from pygmlparser.Parser import Parser
-except ModuleNotFoundError as exception:
-    log(exception,"e")
-    traceback.print_exc()
-    log("  Module from https://github.com/hasii2011/PyGMLParser seems to be missing.", "e")
-    log("  Try installing it with 'pip3 install PyGMLParser'. Exiting now.", "e")
-    sys.exit(1)
-"""
-
             
 ########### command line parser ###########
+"""Arguments with hyphen like '--input-dir' are called with an underscore within the programm: args.input_dir
+However, in the command line call the hyphen is used: --input-dir <path> """
 
 ## create the parser
-cl_parser = argparse.ArgumentParser(description="Overwrites a crocket pdb file to the official pdb-format.",
+cl_parser = argparse.ArgumentParser(description="Overwrites a differing pdb file to legacy pdb-format. To be more specific: C-terminal oxygens are changed from OT1 to O and from OT2 to OXT. The chain identifier in column 22 was added. TER-lines were added to identify the ending of protein chains.",
                                     fromfile_prefix_chars="@")
 
 ## add arguments
@@ -160,21 +137,23 @@ cl_parser.add_argument('-c',
                        default = '',
                        help='The COMPND.txt file is used as a header for the pdb files.')
 
-cl_parser.add_argument('-id',
-                       '--inputdirectory',
+cl_parser.add_argument('-i',
+                       '--input-dir',
+                       metavar = 'input-directory',
                        default = '',
                        help = 'specify a path to your input directory. Otherwise the current folder is used.')
 
-cl_parser.add_argument('-od',
-                       '--outputdirectory',
+cl_parser.add_argument('-p',
+                       '--output-dir',
+                       metavar = 'output-directory',
                        default = '',
-                       help = 'specify a path to your output files. Otherwise the current folder is used.')
+                       help = 'specify a path to your output directory. Otherwise the current folder is used.')
 
 args = cl_parser.parse_args()
 
 
 ########### check arguments ###########
-'.'
+
 # assign log level
 log_level = logging.WARNING
 if (args.debug):
@@ -201,37 +180,22 @@ if (args.compndfile != ""):
 else:
     compnd = ''
 
-# input folder
-if (args.inputdirectory != ""):
-    if(os.path.isdir(args.inputdirectory)):
-        i_dir = args.inputdirectory
-    else:
-        logging.error("Specified input directory '%s' is does not exist. Exiting now.", args.inputdirectory)
-        sys.exit(1)
-else:
-    i_dir = os.getcwd()
+# input directory
+input_dir = check_dir_args(args.input_dir)
+    
 
 # output directory
-if (args.outputdirectory != ""):
-    if(os.path.isdir(args.outputdirectory)):
-        o_dir = args.outputdirectory
-    else:
-        logging.error("Specified output directory '%s' does not exist. Exiting now.", args.outputdirectory)
-        sys.exit(1)
-else:
-    o_dir = os.getcwd()
+output_dir = check_dir_args(args.output_dir)
 
 
 ########### vamos ###########
 
 log("Version " + version, "i")
 
-# TODO add your code here
-
 _start_time = time.time()
-o_dir = os.path.abspath(o_dir) + '/'
-os.chdir(i_dir)
-i_dir = os.getcwd() + '/'
+output_dir = os.path.abspath(output_dir) + '/'
+os.chdir(input_dir)
+input_dir = os.getcwd() + '/'
 
 
 #reading COMPND.txt file which is the header of a  pdb file
@@ -248,21 +212,20 @@ fileNO = [1, 667, 1334, 2000]
 
 log(__file__, 'i')
 
-#get number of files in os.listdir(i_dir) to avoid going through the modified ones several times
-number_files = len(os.listdir(i_dir))
+#get number of files in os.listdir(input_dir) to avoid going through the modified ones several times
+number_files = len(os.listdir(input_dir))
 
-list_i_dir = os.listdir(i_dir)
-list_i_dir = sorted_nicely(list_i_dir)
+list_input_dir = os.listdir(input_dir)
+list_input_dir = sorted_nicely(list_input_dir)
 
-for allfile in list_i_dir:
+for allfile in list_input_dir:
     if allfile.endswith(".pdb"):
         data = []
         with open(allfile) as f:
             for line in f:
                 data.append(line)
-        f.close()
         
-        os.chdir(o_dir)
+        os.chdir(output_dir)
         output = open(allfile, "w")
         
         cnt = 0
@@ -276,7 +239,6 @@ for allfile in list_i_dir:
             #header
             if (cnt == 0) and (compnd != ''):
                 line = line + str(header)
-                #sys.stdout.write(line)
                 output.write(line)
             
             if 'ATOM' == line[0:4]:
@@ -284,39 +246,35 @@ for allfile in list_i_dir:
                     chainID = line[75:76]
                 else:
                     chainID = line[21]
-                #line = line.replace(line, line[:21]+chainID +line[22::])
+
                 line = line[:21]+chainID +line[22::]
                 if line[17:20] not in aaCode:
-                    #line = line.replace(line, 'HETATM'+line[6:])
                     line = 'HETATM'+line[6:]
-                    #hetatms=hetatms+str(line)
                 if line[13:16] == 'OT1':
-                    #line = line.replace(line, line[:13]+'OXT'+line[16::])
                     line = line[:13]+'OXT'+line[16::]
                 elif line[13:16] == 'OT2':
-                    #line = line.replace(line, line[:13]+'O  '+line[16::])
                     line = line[:13]+'O  '+line[16::]
                 currChainID = line[21]
                 prevTER = False
                 if (currChainID != prevChainID) and (cnt != 1):
                     numberofSpaces = len(line[6:11])- len(str(prevAtomID+1))
-                    addNo = addNo +1 #ATOM ID hochzaehlen
+                    addNo += 1 #ATOM ID hochzaehlen
                     ter_line = 'TER   '+str(numberofSpaces*' ')+str(prevAtomID+1)+'      '+prevLine[17:26]
                     output.write(ter_line + '\n')
                     line = line[0:6]+str(numberofSpaces*' ')+str(prevAtomID+2)+line[11::]
-                    addNo = addNo +1 #ATOM ID hochzaehlen
-                    prevAtomID = prevAtomID +2
+                    addNo += 1 #ATOM ID hochzaehlen
+                    prevAtomID += 2
                 else:
                     numberofSpaces = len(line[6:11])- len(str(prevAtomID+1))
                     line = line[0:6]+str(numberofSpaces*' ')+str(prevAtomID+1)+line[11::]
-                    prevAtomID = prevAtomID + 1
-                #sys.stdout.write(line)
+                    prevAtomID += 1
+
                 output.write(line)
                 prevLine = line
                 prevChainID = line[21]
             cnt += 1 
         output.close()
-        os.chdir(i_dir)
+        os.chdir(input_dir)
 
 log('finish pdb file overwritting', 'i')
 log("-- %s seconds ---"% (time.time()- _start_time), 'i')
