@@ -1570,6 +1570,8 @@ public class ComplexGraph extends UAdjListGraph {
         String lastLine = "";
         
         LinkedHashMap<String, String> graphAttributes = new LinkedHashMap<>();
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("creator"), snakeCase), "\"PTGLgraphComputation\"");
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("version"), snakeCase), "\"" + Settings.getVersion() + "\"");
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("ignore", "ligands"), snakeCase), (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("min", "contacts", "for", "edge"), snakeCase), Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold").toString());  // contact threshold
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("factor", "lucid", "normalized", "weight"), snakeCase), minimumNormalizedEdgeWeight.toString());  // factor to reconstruct normalized edge weight
