@@ -810,8 +810,8 @@ class CifParser {
 
             } else {
                 
-                if(Settings.getInteger("plcc_I_debug_level") >= 1) {
-                    System.out.println("    [DEBUG LV 1] Found an amino acid at PDB# " + molNumPDB + " that is not listed in the DSSP file (might be at a chain break). Parsing it as part of a chain.");
+                if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                    System.out.println("    [DEBUG LV 2] Found an amino acid at PDB# " + molNumPDB + " that is not listed in the DSSP file (might be at a chain break). Parsing it as part of a chain.");
                 }
                 
                 // sometimes residues are missing from the dssp file if they are incomplete (mostly at chain breaks)
@@ -894,7 +894,6 @@ class CifParser {
                 rna.setEntityID(entityID);
                 
                 lastMol = rna;
-                //tmpChain.addMolecule(lastMol);
                                 
                 if(FileParser.isIgnoredLigRes(molNamePDB)) {
                     // RNA chains can contain ligands that should be ignored such as water
