@@ -194,7 +194,7 @@ public class Main {
         Date computationStartTime = new Date();
         StringBuilder outputToBePrintedUnlessSilent = new StringBuilder();
         
-        outputToBePrintedUnlessSilent.append("[======================== plcc -- Protein-Ligand Contact Calculation ========================]\n");
+        outputToBePrintedUnlessSilent.append("[======================== PTGLgraphComputation ========================]\n");
         outputToBePrintedUnlessSilent.append("Init... (Version ").append(version).append(")\n");
         
         // *************************************************** load default settings from config file *************************************

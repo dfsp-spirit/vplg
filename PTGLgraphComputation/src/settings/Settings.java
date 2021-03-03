@@ -24,6 +24,14 @@ import io.IO;
  */
 public class Settings {
     
+    // PTGLgraphComputation's version as MAJOR.MINOR.PATCH
+    //   major: big (re-)implementation, new user interface, new overall architecture
+    //   minor: new functions / features, git merges of branches
+    //   patch: (hot-)fixes, small changes
+    //   no version change: fix typos, changes to comments, debug prints, small changes to non-result output, changes within git branch
+    // -> only increment with commit / push / merge not while programming
+    static final private String VERSION = "3.1.0";
+    
     static ArrayList<Section> sections;  // holds the setting sections in their correct order
     // WARNING: Following data structures MUST be filled after sections have been filled
     static HashMap<String, String> mapSettingNameToSectionName;  // Maps settings names (=keys) to the section names they are in
@@ -329,7 +337,7 @@ public class Settings {
      * @return the PTGLgraphComputation version
      */
     public static String getVersion() {
-        return("0.98.3");
+        return(VERSION);
     }
     
     
