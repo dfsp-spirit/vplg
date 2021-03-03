@@ -18,6 +18,8 @@ import settings.Settings;
 import proteingraphs.MolContactInfo;
 import proteinstructure.Residue;
 import proteinstructure.Molecule;
+import proteinstructure.Ligand;
+import proteinstructure.RNA;
 import tools.DP;
 import tools.TextTools;
 
@@ -28,7 +30,7 @@ import tools.TextTools;
  *
  * @author as
  */
-public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
+public class PPIGraph extends SparseGraph<Molecule, AAEdgeInfo> implements IGraphModellingLanguageFormat {
 
     /**
      * PDB identifier.
@@ -52,7 +54,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Checks whether a residue contact satisifies the minimal sequential
+     * Checks whether a molecule contact satisfies the minimal sequential
      * residue distance rule.
      *
      * @param minSeqDist the minimal allowed seq dist
@@ -70,7 +72,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 //different chains, add contact
                 return true;
             } else {
-                // same chain, gotta check residue distance
+                // same chain, gotta check molecule distance
                 int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if (seqDist < minSeqDist) {
                     return false;
@@ -82,7 +84,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Checks whether a residue contact satisifies the maximal sequential
+     * Checks whether a molecule contact satisfies the maximal sequential
      * residue distance rule.
      *
      * @param maxSeqDist the max allowed seq dist
@@ -100,7 +102,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 //different chains, do NOT add contact
                 return false;
             } else {
-                // same chain, gotta check residue distance
+                // same chain, gotta check molecule distance
                 int seqDist = Math.abs(molA.getPdbNum() - molB.getPdbNum());
                 if (seqDist > maxSeqDist) {
                     return false;
@@ -117,7 +119,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph
      */
-    public PPIGraph(List<Residue> vertices, ArrayList<MolContactInfo> contacts) {
+    public PPIGraph(List<Molecule> vertices, ArrayList<MolContactInfo> contacts) {
         super(vertices);
         for (int i = 0; i < contacts.size(); i++) {
             if (contactSatisfiesRules(contacts.get(i))) {
@@ -132,16 +134,16 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
      * Automatically adds an edge from a MolContactInfo object if applicable.
      * Note that the edge is only added if the RCI describes a contact.
      *
-     * @param rci the MolContactInfo object, must be for 2 residues which are
+     * @param rci the MolContactInfo object, must be for 2 molecule which are
  part of this graph
      * @return true if the edge was added, false otherwise
      */
     public final boolean addPPIEdgeFromRCI(MolContactInfo rci) {
         if (rci.describesPPIContact()) {
-            Residue resA = rci.getResA();
-            Residue resB = rci.getResB();
+            Molecule resA = rci.getMolA();
+            Molecule resB = rci.getMolB();
             
-            // check that both are residues (null if e.g. RNA)
+            // check that both are molecule
             if (resA == null || resB == null) {
                 return false;
             }
@@ -161,18 +163,18 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 StringBuilder sb = new StringBuilder();
                 sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + resA.getFancyName() + " and " + resB.getFancyName() + ".");
                 if (indexResA < 0 && indexResB < 0) {
-                    sb.append(" BOTH residues not found.\n");
+                    sb.append(" BOTH molecules not found.\n");
                     if ((!resA.isAA()) && (!resB.isAA())) {
                         notFoundIsorAreLigands = Boolean.TRUE;
                     }
                 } else {
                     if (indexResA < 0) {
-                        sb.append(" FIRST residue not found.\n");
+                        sb.append(" FIRST molecule not found.\n");
                         if (!resA.isAA()) {
                             notFoundIsorAreLigands = Boolean.TRUE;
                         }
                     } else {  // indexResA < 0
-                        sb.append(" SECOND residue not found.\n");
+                        sb.append(" SECOND molecule not found.\n");
                         if (!resB.isAA()) {
                             notFoundIsorAreLigands = Boolean.TRUE;
                         }
@@ -248,11 +250,12 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 gmlf.append("    ").append(TextTools.formatAsCaseStyle(Arrays.asList("SSE", "type"), snakeCase)).append(" \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
             
             }
-            else
-                if(!(molecule instanceof Residue)){
-                    gmlf.append("    rna \"");
-                }
-            
+            else if (molecule instanceof RNA) {
+                gmlf.append("    rna \"");
+            }
+            else {
+                gmlf.append("    lig \"");
+            }
             gmlf.append(endNode).append("\n");
         }
 
@@ -278,11 +281,11 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     }
 
     /**
-     * Returns the 3D euclidian distance between the Residues at indices i and j
+     * Returns the 3D euclidian distance between the molecules at indices i and j
      * in this graph.
      *
-     * @param i the residue i by index
-     * @param j the residue j by index
+     * @param i the molecule i by index
+     * @param j the molecule j by index
      * @return the euclidian distance
      */
     public int getEdgeDistance(int i, int j) {
@@ -331,7 +334,6 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
     public ArrayList<String> toFanMod() {
         StringBuilder sbAag = new StringBuilder();
         StringBuilder sbIdx = new StringBuilder();
-        Residue residue;
         Molecule molecule;
         HashMap<Integer, Integer> indexTable = new HashMap<Integer, Integer>();
 

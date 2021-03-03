@@ -30,6 +30,7 @@ import proteinstructure.Chain;
 import proteinstructure.Model;
 import proteinstructure.ProtMetaInfo;
 import proteinstructure.Residue;
+import proteinstructure.Ligand;
 import resultcontainers.ProteinResults;
 import tools.DP;
 
@@ -990,7 +991,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         lf = ln = ls = "";
 
         modelID = "1";          // default model
-        Residue lig;
+        Ligand lig;
         Integer pLineNum = 0;
         String pLine = "";
 
@@ -1039,7 +1040,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     curLigNum++;
 
                     // create new Residue from info, we'll have to see whether we really add it below though
-                    lig = new Residue();
+                    lig = new Ligand();
                     lig.setPdbNum(resNumPDB);
                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                     resNumDSSP = DsspParser.getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number

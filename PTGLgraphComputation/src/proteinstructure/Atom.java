@@ -31,7 +31,7 @@ public class Atom implements java.io.Serializable {
     private String modelID = null;
     private Model model = null;
     private Integer pdbAtomNumber = null;       // atom number from pdb file
-    private Molecule molecule = null;             // Residue this Atom belongs to
+    private Molecule molecule = null;             // Molecule this Atom belongs to
     private Integer type = null;               // atom type:  0=AA, 1=Ligand, 2=Ignored HETATM (e.g. 'DOD'-molecule atoms) 3=Ignored ATOM (e.g. H, Q)
     private Integer pdbResNum = null;
     private Integer dsspResNum = null;
@@ -69,8 +69,7 @@ public class Atom implements java.io.Serializable {
     public Boolean isLigandAtom() { return this.type == ATOMTYPE_LIGAND; }
     public Boolean isProteinAtom() { return this.type == ATOMTYPE_AA; }
     public Boolean isOtherAtom() { return this.type == ATOMTYPE_IGNORED_LIGAND; }
-    public Boolean isRNA() {return this.type == ATOMTYPE_RNA;}
-
+    public Boolean isRnaAtom() { return this.type == ATOMTYPE_RNA; }
     
     
     /**
@@ -166,21 +165,30 @@ public class Atom implements java.io.Serializable {
         Integer atomRadiusThis;
         Integer atomRadiusOther;
         
+
         Integer radProt = Settings.getInteger("PTGLgraphComputation_I_aa_atom_radius");
         Integer radLig = Settings.getInteger("PTGLgraphComputation_I_lig_atom_radius");
+        Integer radRna = Settings.getInteger("PTGLgraphComputation_I_rna_atom_radius");
 
-        if(this.isLigandAtom()) {
-            atomRadiusThis = radLig;
-        }
-        else {
+
+        if(this.isProteinAtom()) {
             atomRadiusThis = radProt;
         }
-        
-        if(a.isLigandAtom()) {
-            atomRadiusOther = radLig;
+        else if (this.isRnaAtom()) {
+            atomRadiusThis = radRna;
         }
         else {
+            atomRadiusThis = radLig;
+        }
+        
+        if(a.isProteinAtom()) {
             atomRadiusOther = radProt;
+        }
+        else if (a.isRnaAtom()) {
+            atomRadiusOther = radRna;
+        }
+        else {
+            atomRadiusOther = radLig;
         }
 
 
