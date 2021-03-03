@@ -805,14 +805,14 @@ class CifParser {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
 
-                        if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                        if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                             System.out.println("   PDB: Found a ligand, RNA or free (modified) amino acid at PDB# " + molNumPDB + ". Free amino acids are treated as ligands.");
                         }
                 }
 
             } else {
                 
-                if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
                     System.out.println("    [DEBUG LV 2] Found an amino acid at PDB# " + molNumPDB + " that is not listed in the DSSP file (might be at a chain break). Parsing it as part of a chain.");
                 }
                 
@@ -919,7 +919,7 @@ class CifParser {
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
-                    if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                    if(Settings.getInteger("PTGLgraphComputation_I_debug_level") > 0) {
                         if(! silent) {
                             DP.getInstance().d("New RNA molecule named " + molNamePDB + ", DSSPNumber " + rna.getDsspNum() + ", added in PDB line " + molNumPDB + " to chain " + chainID + ".");
                         }
@@ -1055,14 +1055,14 @@ class CifParser {
                         // add Atom to list of atoms of current molecule as well as list of all atoms
                         FileParser.s_atoms.add(a);
                         if (checkType(Molecule.RESIDUE_TYPE_AA)){
-                            if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                            if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
                                 System.out.println("    [DEBUG LV 2] New AA atom added: " + a.toString());
                             }
                             a.setAtomtype(Atom.ATOMTYPE_AA);
                             lastMol.addAtom(a);
                         }
                         if (checkType(Molecule.RESIDUE_TYPE_RNA)){
-                            if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                            if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
                                 System.out.println("    [DEBUG LV 2] New RNA atom added: " + a.toString());
                             }
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
@@ -1074,7 +1074,7 @@ class CifParser {
             }
             else {
                 if (! (lig == null)){
-                    if(Settings.getInteger("plcc_I_debug_level") >= 2) {
+                    if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
                        System.out.println("    [DEBUG LV 2] New ligand atom added: " + a.toString());
                     }
                     lig.addAtom(a);
