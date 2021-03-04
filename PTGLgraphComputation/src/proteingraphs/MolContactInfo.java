@@ -204,6 +204,14 @@ public class MolContactInfo {
     public Boolean isLigandContact() {
         return molA.isLigand() || molB.isLigand();
     }
+    
+        /**
+     * Whether one or both molecules are RNA.
+     * @return 
+     */
+    public Boolean isRnaContact() {
+        return molA.isRNA() || molB.isRNA();
+    }
 
 
     /** Returns a string indicating whether molecule A is a protein residue ("PRT"), a ligand ("LIG"), an RNA residue ("RNA"), or something else ("OTH").

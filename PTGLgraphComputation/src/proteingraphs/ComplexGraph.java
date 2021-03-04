@@ -153,13 +153,13 @@ public class ComplexGraph extends UAdjListGraph {
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedChains = new ArrayList<>();
             for (Chain tmpChain : chains) {
-                Chain newChain = new Chain(tmpChain.getPdbChainID());
-                // only get AAResidues
-                for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
-                    newChain.addMolecule(tmpMol);
+                    Chain newChain = new Chain(tmpChain.getPdbChainID());
+                    // only get AAResidues
+                    for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
+                        newChain.addMolecule(tmpMol);
+                    }
+                    preprocessedChains.add(newChain);
                 }
-                preprocessedChains.add(newChain);
-            }
         } else {
             preprocessedChains = chains;
         }
@@ -193,7 +193,7 @@ public class ComplexGraph extends UAdjListGraph {
         for(Integer i = 0; i < chains.size(); i++) {
             Chain tmpChain = chains.get(i);
             Vertex v = createVertex();
-            
+             
             proteinNodeMap.put(v, tmpChain.getPdbChainID());
             molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
             chainLengthMap.put(v, tmpChain.getAllAAResidues().size());
