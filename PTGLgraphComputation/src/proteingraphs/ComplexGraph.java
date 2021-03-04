@@ -39,6 +39,7 @@ import org.w3c.dom.Document;
 import io.DBManager;
 import io.FileParser;
 import io.IO;
+import io.FileParser;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -96,6 +97,7 @@ public class ComplexGraph extends UAdjListGraph {
     private final Set<String> molIDs;  // Contains the mol IDs for all chains. Used to get number of mol IDs (= size)
     private final String[] chainResAASeq;
     public Integer neglectedEdges;
+    public Boolean includeRna = Settings.getBoolean("PTGLgraphComputation_B_include_rna");
     
 
     /**
@@ -153,13 +155,17 @@ public class ComplexGraph extends UAdjListGraph {
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedChains = new ArrayList<>();
             for (Chain tmpChain : chains) {
+//                if (tmpChain.getMoleculeType().equals("polyribonucleotide") && ! includeRna) {
                     Chain newChain = new Chain(tmpChain.getPdbChainID());
                     // only get AAResidues
                     for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
                         newChain.addMolecule(tmpMol);
                     }
                     preprocessedChains.add(newChain);
-                }
+//                } else {
+//                    continue;
+//                }
+            }
         } else {
             preprocessedChains = chains;
         }
@@ -172,9 +178,18 @@ public class ComplexGraph extends UAdjListGraph {
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedResContacts = new ArrayList<>();
             for (MolContactInfo tmpMci : resContacts) {
-                if (! tmpMci.isLigandContact()) {
+                if (tmpMci.isRnaContact()) {
+                    System.out.println("isrna");
+                    if (! includeRna) {
+                        System.out.println("notinclude");
+                        continue;
+                    }
+                } else {
+                    System.out.println("notrna");
+                    if (! tmpMci.isLigandContact()) {
                     preprocessedResContacts.add(tmpMci);
-                }
+                    }
+                }  
             }
         } else {
             preprocessedResContacts = resContacts;
@@ -190,9 +205,22 @@ public class ComplexGraph extends UAdjListGraph {
      * @param chains All chains of this complex graph
      */
     private void createVertices(List<Chain> chains) {
+        System.out.println("isthier");
+        System.out.println("chains "+ chains.size());
+        ArrayList<Chain> allChains = FileParser.getChains();
+        System.out.println("all " + allChains.size());
+        Vertex v;
         for(Integer i = 0; i < chains.size(); i++) {
             Chain tmpChain = chains.get(i);
-            Vertex v = createVertex();
+            
+            for (Integer j = 0; j < allChains.size(); j++) {
+                System.out.println("tmp " + tmpChain.getPdbChainID());
+                System.out.println("all " + allChains.get(j).getPdbChainID());
+                if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {
+                    System.out.println("istgleich");
+                }
+            }
+            v = createVertex();
              
             proteinNodeMap.put(v, tmpChain.getPdbChainID());
             molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
