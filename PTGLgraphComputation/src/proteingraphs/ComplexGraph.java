@@ -289,6 +289,7 @@ public class ComplexGraph extends UAdjListGraph {
             ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
                       
             Integer chainAint = Integer.parseInt(chainA.toString());
+            System.out.println("chainAint "+ chainAint); //TODELETE
             Integer chainBint = Integer.parseInt(chainB.toString());
                        
             // We only want interchain contacts
