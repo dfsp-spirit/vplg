@@ -233,11 +233,11 @@ public class ComplexGraph extends UAdjListGraph {
      * @param chains All chains of this complex graph. Hint: these chains are not the same objects as the ones that are parsed
      */
     private void createVertices(List<Chain> chains) {
-        ArrayList<Chain> allChains = FileParser.getChains();
-        Vertex v;
+        ArrayList<Chain> allChains = FileParser.getChains();    // since the input chains are not the same objects as the parsed chains and therefore do not have all their attributes,
+        Vertex v;                                               // we need to compare the input chains to the parsed chains to find out if they are RNA
         for(Integer i = 0; i < chains.size(); i++) {
             Chain tmpChain = chains.get(i);
-            for (Integer j = 0; j < allChains.size(); j++) {    // loop through chains to find match the chains and find out if they are RNA
+            for (Integer j = 0; j < allChains.size(); j++) {    // loop through chains to find matches
                 if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {     // if the chains match, check their molecule type
                     if (allChains.get(j).getMoleculeType().equals("polyribonucleotide") && ! includeRna) {
                         continue;
