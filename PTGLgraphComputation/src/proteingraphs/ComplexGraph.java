@@ -151,23 +151,41 @@ public class ComplexGraph extends UAdjListGraph {
         chainResAASeq = new String[numberChains];
         
         // preprocess chains if required
-        List<Chain> preprocessedChains;
+        List<Chain> preprocessedChains = new ArrayList<>();
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
-            preprocessedChains = new ArrayList<>();
             for (Chain tmpChain : chains) {
-//                if (tmpChain.getMoleculeType().equals("polyribonucleotide") && ! includeRna) {
-                    Chain newChain = new Chain(tmpChain.getPdbChainID());
-                    // only get AAResidues
-                    for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
+                Chain newChain = new Chain(tmpChain.getPdbChainID());
+                if (tmpChain.getMoleculeType().equals("polyribonucleotide") && includeRna) {
+                    for (Molecule tmpMol : tmpChain.getAllRnaResidues()) {
+                        // lig off, rna on
                         newChain.addMolecule(tmpMol);
                     }
-                    preprocessedChains.add(newChain);
-//                } else {
-//                    continue;
-//                }
+                }
+                for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
+                    // lig off, rna off/on
+                    newChain.addMolecule(tmpMol);
+                }
+                preprocessedChains.add(newChain);
             }
         } else {
-            preprocessedChains = chains;
+            if (includeRna) {
+                // lig on, rna on
+                preprocessedChains = chains;
+            } else {
+                for (Chain tmpChain : chains) {
+                    Chain newChain = new Chain(tmpChain.getPdbChainID());
+                    if (tmpChain.getMoleculeType().equals("polyribonucleotide")) {
+                        // lig on, rna off
+                        continue;
+                    } else {
+                        for (Molecule tmpMol : tmpChain.getMolecules()) {
+                            // lig on, rna off
+                            newChain.addMolecule(tmpMol);
+                        }
+                    }
+                    preprocessedChains.add(newChain);
+                }
+            }
         }
         
         createVertices(preprocessedChains);
@@ -178,21 +196,31 @@ public class ComplexGraph extends UAdjListGraph {
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedResContacts = new ArrayList<>();
             for (MolContactInfo tmpMci : resContacts) {
-                if (tmpMci.isRnaContact()) {
-                    System.out.println("isrna");
-                    if (! includeRna) {
-                        System.out.println("notinclude");
-                        continue;
-                    }
+                if (tmpMci.isRnaContact() && ! includeRna) {
+                    // lig off, rna off
+                    continue;
                 } else {
-                    System.out.println("notrna");
                     if (! tmpMci.isLigandContact()) {
-                    preprocessedResContacts.add(tmpMci);
+                        // lig off, rna on
+                        preprocessedResContacts.add(tmpMci);
                     }
                 }  
             }
         } else {
-            preprocessedResContacts = resContacts;
+            if (includeRna) {
+                // lig on, rna on
+                preprocessedResContacts = resContacts;
+            } else {
+                preprocessedResContacts = new ArrayList<>();
+                for (MolContactInfo tmpMci : resContacts) {
+                    if (tmpMci.isRnaContact()) {
+                        // lig on, rna off
+                        continue;
+                    } else {
+                        preprocessedResContacts.add(tmpMci);
+                    }
+                }
+            }
         }
         
         calculateNumChainInteractions(preprocessedResContacts);
@@ -202,44 +230,42 @@ public class ComplexGraph extends UAdjListGraph {
     
     /**
      * Creates the vertices, fills corresponding maps and fills amino acid sequence.
-     * @param chains All chains of this complex graph
+     * @param chains All chains of this complex graph. Hint: these chains are not the same objects as the ones that are parsed
      */
     private void createVertices(List<Chain> chains) {
-        System.out.println("isthier");
-        System.out.println("chains "+ chains.size());
         ArrayList<Chain> allChains = FileParser.getChains();
-        System.out.println("all " + allChains.size());
         Vertex v;
         for(Integer i = 0; i < chains.size(); i++) {
             Chain tmpChain = chains.get(i);
-            
-            for (Integer j = 0; j < allChains.size(); j++) {
-                System.out.println("tmp " + tmpChain.getPdbChainID());
-                System.out.println("all " + allChains.get(j).getPdbChainID());
-                if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {
-                    System.out.println("istgleich");
-                }
-            }
-            v = createVertex();
+            for (Integer j = 0; j < allChains.size(); j++) {    // loop through chains to find match the chains and find out if they are RNA
+                if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {     // if the chains match, check their molecule type
+                    if (allChains.get(j).getMoleculeType().equals("polyribonucleotide") && ! includeRna) {
+                        continue;
+                    }
+                    else {
+                        v = createVertex();
              
-            proteinNodeMap.put(v, tmpChain.getPdbChainID());
-            molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
-            chainLengthMap.put(v, tmpChain.getAllAAResidues().size());
-            
-            molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
-            mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getAllAAResidues().size());
+                        proteinNodeMap.put(v, tmpChain.getPdbChainID());
+                        molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
+                        chainLengthMap.put(v, tmpChain.getAllAAResidues().size());
 
-            // get AA sequence string for each chainName
-            for(Residue resi : tmpChain.getAllAAResidues()) {
-                
-                if ( ! Settings.get("PTGLgraphComputation_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
-                    if (chainResAASeq[i] != null) {
-                        chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
-                    } else {
-                        chainResAASeq[i] = resi.getAAName1();
+                        molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
+                        mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getAllAAResidues().size());
+
+                        // get AA sequence string for each chainName
+                        for(Residue resi : tmpChain.getAllAAResidues()) {
+
+                            if ( ! Settings.get("PTGLgraphComputation_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
+                                if (chainResAASeq[i] != null) {
+                                    chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
+                                } else {
+                                    chainResAASeq[i] = resi.getAAName1();
+                                }
+                            }
+                        }
                     }
                 }
-            }
+            } 
         }
     }
     
@@ -289,7 +315,7 @@ public class ComplexGraph extends UAdjListGraph {
             ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
                       
             Integer chainAint = Integer.parseInt(chainA.toString());
-            System.out.println("chainAint "+ chainAint); //TODELETE
+            //System.out.println("chaina " + chainA); //TODELETE
             Integer chainBint = Integer.parseInt(chainB.toString());
                        
             // We only want interchain contacts
