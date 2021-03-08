@@ -1,0 +1,37 @@
+The program files for step 1 - 3 are located in the "codes" directory and can be executed with the script ptglDynamics.py or on their own.
+
+1.) Pre-processing of file in PDB file format
+The python script toLegacyPDB.py converts files in legacy PDB file format.
+
+PTGL can identify molecule names due to the COMND part of the protein.
+Node in GML of CG file generated with COMPND.txt as input  
+	node [
+		id 0
+		label "1"
+		mol_name "NADH-QUINONE OXIDOREDUCTASE SUBUNIT 1"
+	]
+
+and without COMPND part
+
+	node [
+		id 0
+		label "A"
+		mol_name ""
+	]
+ 
+toLegacyPDB.py changes all files with the ending .pdb in the specified directory.
+
+
+2.) Generate DSSP file with DSSP program:
+Only executable on Linux environment !
+command:
+./dsspcmbi pdbfilename.pdb > pdbfilename.dssp
+
+
+3.) Analysis of Complex graphs (CGs)
+gmlCompareEdgeWeightsAndSubsets.py expects two CGs as input and generates a CSV file with the differences of the edge weights. 
+Then, the edges that are either present in the first graph but not in the second graph and vice versa 
+are listed. If both graphs have identical edges, they have the same connectivity and show no structural 
+change.
+
+optional [4.) Analysis of Protein graphs (PGs)]
