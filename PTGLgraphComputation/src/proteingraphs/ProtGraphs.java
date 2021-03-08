@@ -297,7 +297,7 @@ public class ProtGraphs {
                     // We can now create the vertex object (a fake SSE)
                     sse = new SSE("H");
                     r = new Residue(vertex, vertex);        // make sure it has a start/end residue
-                    sse.addResidue(r);
+                    sse.addMolecule(r);
                     sse.setSeqSseChainNum(vertex);  // this is not true and makes no sense with a non-PG, of course
                     sses.add(sse);
                 }
@@ -615,7 +615,7 @@ public class ProtGraphs {
                     r.setChainID(chain);
                     r.setiCode(" ");
                     
-                    sse.addResidue(r);
+                    sse.addMolecule(r);
                     //sequenceStringIndex++;        // unused, see comment on AA sequence above
                 }                               
                 
@@ -780,7 +780,7 @@ public class ProtGraphs {
                 res.setiCode(" ");
                 
                 // add Residue to SSE
-                sse.addResidue(res);                
+                sse.addMolecule(res);                
                 
                 resNumOffset++;
             }

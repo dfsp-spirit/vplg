@@ -402,6 +402,7 @@ public class FileParser {
 
     /**
      * Calls getResidueFromList and returns its value with printing of error message if null returned.
+     * Only residues, no ligands or RNA can be found.
      * @param resNumPDB
      * @param chainID
      * @param iCode
@@ -425,6 +426,7 @@ public class FileParser {
     /**
      * Tries to get the residue with the given PDB residue number, chain ID and insertion code from the internal list of all residues.
      * Always starts at index of last hit (beginning with 0), i.e. rotates through list.
+     * Only residues, no ligands or RNA can be found.
      * @param resNumPDB the PDB residue number
      * @param chainID the chain ID of the residue
      * @param iCode the insertion code of the residue
@@ -468,6 +470,7 @@ public class FileParser {
 
     /**
      * Finds the residue with PDB residue number 'p' of chain 'chID' with iCode 'ic' in the residue list.
+     * Only residues, no ligands or RNA can be found.
      * @param p pdb residue number
      * @param chID chain id
      * @param ic insert code, may be null if you don't care

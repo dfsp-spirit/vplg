@@ -35,6 +35,7 @@ import graphdrawing.DrawTools;
 import graphformats.GraphFormats;
 import proteinstructure.Model;
 import proteinstructure.Residue;
+import proteinstructure.Ligand;
 import proteinstructure.Chain;
 import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
@@ -137,13 +138,13 @@ public class Main {
     
     /** The number of different contact types which are stored for a pair of residues. See calculateAtomContactsBetweenResidues() and
      the MolContactInfo class for details and usage. */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 12;
+    public static final Integer NUM_MOLECULE_PAIR_CONTACT_TYPES = 15;
     
     /**
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the MolContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 41;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 44;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -169,10 +170,11 @@ public class Main {
     /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
     static Boolean useFileFromCommandline = true;
     
-    // Lists of residues and RNAs. They are initilized as null and created once from molecules the first time the function
+    // Lists of residues, ligands and RNAs. They are initilized as null and created once from molecules the first time the function
     //   resFromMolecules or rnaFromMolecules is called
     static ArrayList<Residue> residues = null;
     static ArrayList<RNA> rnas = null;
+    static ArrayList<Ligand> ligands = null;
     
 
     public static void checkArgsUsage(String[] args, Boolean[] argsUsed) {
@@ -228,7 +230,7 @@ public class Main {
         ArrayList<Model> models = new ArrayList<Model>();
         ArrayList<Chain> chains = new ArrayList<Chain>();
         ArrayList<Molecule> molecules = new ArrayList<Molecule>();
-        ArrayList<Residue> residuesWithoutLigands;
+        ArrayList<Molecule> residuesWithoutLigands;
         HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
@@ -881,6 +883,7 @@ public class Main {
                         }
                         else {
                             Settings.set("PTGLgraphComputation_S_output_dir", args[i + 1]);
+
                             argsUsed[i] = true;
                             argsUsed[i+1] = true;
                         }
@@ -2285,7 +2288,7 @@ public class Main {
             if (a.isProteinAtom()){
                 atomCountRes += 1;
             }
-            if (a.isRNA()){
+            if (a.isRnaAtom()){
                 atomCountRna += 1;
             }
             if (a.isLigandAtom()){
@@ -2297,11 +2300,11 @@ public class Main {
             if (! Settings.getBoolean("PTGLgraphComputation_B_include_rna")) {
                 // RNA off
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
-                        " Residues, " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountLig + " Ligand Atoms)).");
+                        " Molecules (" + resFromMolecules(molecules).size() + " Residues, " + ligandsFromMolecules(molecules).size() + " Ligands, " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountLig + " Ligand Atoms)).");
             } else {
                 // RNA on
                 System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + molecules.size() + 
-                        " Molecules (" + resFromMolecules(molecules).size() + " Residues and " + rnaFromMolecules(molecules).size() +
+                        " Molecules (" + resFromMolecules(molecules).size() + " Residues, " + ligandsFromMolecules(molecules).size() + " Ligands and " + rnaFromMolecules(molecules).size() +
                         " RNAs), " + atoms.size() + " Atoms (" + atomCountRes + " Residue Atoms, " + atomCountRna + " RNA Atoms, " + atomCountLig + " Ligand Atoms)).");
             }
         }
@@ -2364,7 +2367,8 @@ public class Main {
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             if(Settings.getBoolean("PTGLgraphComputation_B_alternate_aminoacid_contact_model") || Settings.getBoolean("PTGLgraphComputation_B_alternate_aminoacid_contact_model_with_ligands")) {
-                cInfo = calculateAllContactsAlternativeModel(resFromMolecules(molecules));
+                ArrayList<Molecule> residuesFromMolecules = new ArrayList<>(resFromMolecules(molecules));   // resFromMolecules creates Residue objects, but we need Molecule objects
+                cInfo = calculateAllContactsAlternativeModel(residuesFromMolecules);
             }
             else {
                 if (Settings.getBoolean("PTGLgraphComputation_B_chain_spheres_speedup")) {
@@ -2491,7 +2495,7 @@ public class Main {
                 System.out.println("Writing DSSP ligand file for residues...");
             }
             //writeDsspLigFile(dsspFile, dsspLigFile, cInfo, residues);
-            writeOrderedDsspLigFile(dsspFile, dsspLigFile, resFromMolecules(molecules));
+            writeOrderedDsspLigFile(dsspFile, dsspLigFile, molecules);
 
             // write chains file
             if(! silent) {
@@ -2503,7 +2507,7 @@ public class Main {
             if(! silent) {
                 System.out.println("Writing ligand file for residues...");
             }
-            writeLigands(ligandsFile, pdbid, resFromMolecules(molecules));
+            writeLigands(ligandsFile, pdbid, ligandsFromMolecules(molecules));
             
             // write residue mapping files
             if(! silent) {
@@ -2604,7 +2608,7 @@ public class Main {
             for(Chain c : handleChains) {
                 plotPath = outputDir + fs + pdbid + "_" + c.getPdbChainID() + "_plot";
                 label = "Ramachandran plot of PDB entry " + pdbid + ", chain " + c.getPdbChainID() + "";
-                drawRamachandranPlot(plotPath, c.getResidues(), label);
+                drawRamachandranPlot(plotPath, c.getAllAAResidues(), label);
             }
         }
                         
@@ -2651,7 +2655,7 @@ public class Main {
                     if (Settings.getBoolean("PTGLgraphComputation_B_alternate_aminoacid_contact_model") || Settings.getBoolean("PTGLgraphComputation_B_alternate_aminoacid_contact_model_with_ligands")) {
 
                         PPIGraph ppig;
-                        ppig = new PPIGraph(residues, cInfo);
+                        ppig = new PPIGraph(molecules, cInfo);
                         ppig.setPdbid(pdbid);
                         ppig.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                         // write the PPI graph to disc
@@ -2704,13 +2708,13 @@ public class Main {
                     
                     Boolean skipLigandsForAAGraphs = ( ! Settings.getBoolean("PTGLgraphComputation_B_aminoacidgraphs_include_ligands"));
                     if(skipLigandsForAAGraphs) {
-                        for(Residue r : residues) {
-                            if(r.isAA()) { residuesWithoutLigands.add(r); }
+                        for(Molecule m : molecules) {
+                            if(m.isAA()) { residuesWithoutLigands.add(m); }
                         }
                         aag = new AAGraph(residuesWithoutLigands, cInfo);
                     }
                     else {
-                        aag = new AAGraph(residues, cInfo);
+                        aag = new AAGraph(molecules, cInfo);
                     }
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
@@ -2801,7 +2805,7 @@ public class Main {
                                         
                                         Set<Integer> s = aag.findResidues("A", 153, null);
                                         
-                                        List<Residue> l = aag.getResiduesFromSetByIndex(s);
+                                        List<Molecule> l = aag.getResiduesFromSetByIndex(s);
                                         System.out.println("Pymol select script for " + l.size() + " of the " + aag.getSize() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
                                     }
                                     
@@ -2919,11 +2923,12 @@ public class Main {
                     if(Settings.getBoolean("PTGLgraphComputation_B_draw_aag")) {
                         Map<Integer, Color> cmap = new HashMap<>();
                         // fill color map
-                        Color c;
+                        Color c = null;
                         Boolean use3Colors = false;
                         for(int i = 0; i < aag.getNumVertices(); i++) {
-                            Residue r = aag.getVertex(i);
-                            if(r != null) {
+                            Molecule m = aag.getVertex(i);
+                            if(m != null && m.isAA()) {
+                                Residue r = (Residue) m;
                                 if(use3Colors) {
                                     c = ProteinGraphDrawer.getChemProp3Color(r.getChemicalProperty3OneLetterString());
                                 } else {
@@ -2939,9 +2944,9 @@ public class Main {
                         Map<Integer, String> lmap = new HashMap<>();
                         String l;
                         for(int i = 0; i < aag.getNumVertices(); i++) {
-                            Residue r = aag.getVertex(i);
-                            if(r != null) {
-                                l = r.getAAName1();
+                            Molecule m = aag.getVertex(i);
+                            if(m != null) {
+                                l = m.getAAName1();
                                 if(l != null) {
                                     lmap.put(i, l);
                                 }
@@ -3038,10 +3043,11 @@ public class Main {
                     theChain.add(c);
                     
                     // compute chainName contacts
-                    cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
-                    
+                    cInfoThisChain = calculateAllContactsLimitedByChain(molecules, c.getPdbChainID());
+                                        
                     if(Settings.getBoolean("PTGLgraphComputation_B_AAgraph_perchain")) {
-                        AAGraph aag = new AAGraph(c.getResidues(), cInfoThisChain);
+                        AAGraph aag = new AAGraph(c.getMolecules(), cInfoThisChain);
+
                         aag.setPdbid(pdbid);
                         aag.setChainid(c.getPdbChainID());
                         
@@ -3091,7 +3097,7 @@ public class Main {
                     }
                     
                     if(separateContactsByChain) {
-                        calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
+                        calculateSSEGraphsForChains(theChain, cInfoThisChain, pdbid, outputDir);
                     }
                     
                     if(Settings.getBoolean("PTGLgraphComputation_B_useDB")) {
@@ -3110,7 +3116,7 @@ public class Main {
             }
             
             if( ! separateContactsByChain){  // no chainName separation active                
-                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
+                calculateSSEGraphsForChains(handleChains, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("PTGLgraphComputation_B_useDB")) {
                     if( ! DBManager.getAutoCommit()) {
@@ -3501,12 +3507,11 @@ public class Main {
     /**
      * Calculates all SSE graph types which are configured in the config file for all given chains.
      * @param allChains a list of chains, each chainName will be handled separately
-     * @param resList a list of residues
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
-    public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<MolContactInfo> resContacts, String pdbid, String outputDir) {
+    public static void calculateSSEGraphsForChains(List<Chain> allChains, ArrayList<MolContactInfo> resContacts, String pdbid, String outputDir) {
         Boolean silent = Settings.getBoolean("PTGLgraphComputation_B_silent");
                
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
@@ -3591,7 +3596,7 @@ public class Main {
                         Long chainDbId = DBManager.getDBChainID(pdbid, chain);
                         
                         if(chainDbId >= 1) {
-                            for(Residue ligand : c.getAllLigandResidues()) {
+                            for(Ligand ligand : c.getAllLigandResidues()) {
                                 ligName3Trimmed = ligand.getTrimmedName3();
                                 
                                 // TODO: these 3 lines are not thread-safe, running several plcc instances in parallel may lead to race conditions
@@ -3616,9 +3621,9 @@ public class Main {
 
             // determine SSEs for this chainName
             if(! silent) {
-                System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getResidues().size() + " residues.");
+                System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getAllAAResidues().size() + " residues.");
             }
-            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
+            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getAllAAResidues());
             
             if(chainDsspSSEs.isEmpty()) {
                 if(Settings.getBoolean("PTGLgraphComputation_B_skip_empty_chains")) {
@@ -3645,7 +3650,7 @@ public class Main {
                 printSSEList(chainPtglSSEs, "PTGL");
             }
             
-            chainLigSSEs = createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
+            chainLigSSEs = createAllLigandSSEsFromResidueList(c.getAllLigandResidues(), chainDsspSSEs);
             allChainSSEs = mergeSSEs(chainPtglSSEs, chainLigSSEs);
             if(! silent) {
                 System.out.println("    Added " + chainLigSSEs.size() + " ligand SSEs to the SSE list, now at " + allChainSSEs.size() + " SSEs.");
@@ -4290,7 +4295,7 @@ public class Main {
         // Calculate Complex Graph
         if(Settings.getBoolean("PTGLgraphComputation_B_complex_graphs")) {
             // calculate ALBELIG CG           
-            calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
+            calculateComplexGraph(allChains, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
             
             // test: also calculate ALBE CG
             //calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBE);
@@ -4934,12 +4939,12 @@ public class Main {
      * @param res a list of residues
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<MolContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
+    public static ArrayList<MolContactInfo> calculateAllContactsAlternativeModel(List<Molecule> mol) {
 
         System.out.println("\n *** Calculation of interchain contacts. Still WIP! ***");
         FileParser.silent = false;
-        Residue a, b;
-        Integer rs = res.size();
+        Molecule a, b;
+        Integer rs = mol.size();
         
         // jnw_2019: switch rna off for alternative model
         if (Settings.getBoolean("PTGLgraphComputation_B_include_rna")) {
@@ -4954,13 +4959,13 @@ public class Main {
         
 
         for(Integer i = 0; i < rs; i++) {
-            a = res.get(i);
+            a = mol.get(i);
             
             //DEBUG
             //System.out.println("calculatePiEffects: Residue " + a.getFancyName() + " has " + a.getHydrogenAtoms().size() + " H atoms.");
 
             for(Integer j = i + 1; j < rs; j++) {
-                b = res.get(j);
+                b = mol.get(j);
                 numResContactsChecked++;
 
                                                      
@@ -5031,7 +5036,7 @@ public class Main {
     }
     
     
-    private static long calculateSkipNeighborNum(Residue res1, Residue res2, int maxSequenceNeighborDist, int currentSeqPos, int SeqLength) {
+    private static long calculateSkipNeighborNum(Molecule mol1, Molecule mol2, int maxSequenceNeighborDist, int currentSeqPos, int SeqLength) {
         // jnw_2019: following taken from old contact computation and adopted such that maxSeqNeighDist without ligands and within each chain
         //   See there for comments how sequence neigbhor skip works in general (removed here for brevity)
         
@@ -5040,10 +5045,10 @@ public class Main {
             int combinedAtomRadius = 0;
             long spaceBetweenResidues, numResToSkip;
 
-            combinedAtomRadius += (res1.isLigand()) ? Settings.getInteger("PTGLgraphComputation_I_lig_atom_radius") : Settings.getInteger("PTGLgraphComputation_I_aa_atom_radius");
-            combinedAtomRadius += (res2.isLigand()) ? Settings.getInteger("PTGLgraphComputation_I_lig_atom_radius") : Settings.getInteger("PTGLgraphComputation_I_aa_atom_radius");
+            combinedAtomRadius += (mol1.isLigand()) ? Settings.getInteger("PTGLgraphComputation_I_lig_atom_radius") : Settings.getInteger("PTGLgraphComputation_I_aa_atom_radius"); //TODO: RNA ergänzen?
+            combinedAtomRadius += (mol2.isLigand()) ? Settings.getInteger("PTGLgraphComputation_I_lig_atom_radius") : Settings.getInteger("PTGLgraphComputation_I_aa_atom_radius");
 
-            spaceBetweenResidues = res1.distTo(res2) - (combinedAtomRadius + res1.getSphereRadius() + res2.getSphereRadius() + justToBeSure);
+            spaceBetweenResidues = mol1.distTo(mol2) - (combinedAtomRadius + mol1.getSphereRadius() + mol2.getSphereRadius() + justToBeSure);
 
             //DEBUG
             /*
@@ -5059,7 +5064,7 @@ public class Main {
                 numResToSkip = spaceBetweenResidues / maxSequenceNeighborDist;
 
                 if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
-                    System.out.println("  [DEBUG LV 2] Residue skipping kicked in for DSSP res " + res1.getDsspNum() + ", skipped " + numResToSkip + " residues after " + res2.getDsspNum() + " in distance " + res1.distTo(res2));
+                    System.out.println("  [DEBUG LV 2] Residue skipping kicked in for DSSP res " + mol1.getDsspNum() + ", skipped " + numResToSkip + " residues after " + mol2.getDsspNum() + " in distance " + mol1.distTo(mol2));
                 }
 
                 // preserve correct statistics if skip
@@ -5093,8 +5098,7 @@ public class Main {
         int numberResTotal = 0;
         MolContactInfo rci;
         ArrayList<MolContactInfo> contactInfo = new ArrayList<>();
-        Residue res1, res2;
-        //Molecule mol1, mol2;
+        Molecule mol1, mol2;
 
         // variables for statistics
         long numResContactsChecked, numResContactsPossible, numResContactsImpossible, chainSkippedRes, seqNeighSkippedResIntraChain, seqNeighSkippedResInterChain;
@@ -5117,10 +5121,11 @@ public class Main {
                 continue;
             }
             
-            int chainANumberResidues = chainA.getResidues().size();
-            ArrayList<Residue> AAResiduesA = new ArrayList<>();
-            ArrayList<Residue> ligResiduesA = new ArrayList<>();
+            int chainANumberResidues = chainA.getMolecules().size();
+            ArrayList<Molecule> AAResiduesA = new ArrayList<>(); // list for residues and polymeric RNA     TODO: change name
+            ArrayList<Ligand> ligResiduesA = new ArrayList<>();
             AAResiduesA.addAll(chainA.getAllAAResidues());
+            AAResiduesA.addAll(chainA.getAllRnaResidues());
             ligResiduesA.addAll(chainA.getAllLigandResidues());
             
             numberResTotal += chainANumberResidues;
@@ -5130,32 +5135,32 @@ public class Main {
             // - - - contacts within chains (incl sequence neighbor skip)  - - -
             //
             // multiple loops: 
-            // 1) res1 = AA
-            //   1.1) res2 = AA -> seq neigh skip
+            // 1) res1 = AA/RNA
+            //   1.1) res2 = AA/RNA -> seq neigh skip
             //   HINT: 1.2) res2 = lig NOT needed (same as Lig-AA, but no skip possible)
-            // 2) res1 = lig
-            //   2.1) res2 = AA -> seq neigh skip
+            // 2) res1 = lig (or single nucleotide RNA which is handled as ligand)
+            //   2.1) res2 = AA/RNA -> seq neigh skip
             //   2.2) res2 = lig -> no skip possible b/c we do not calculate MaxSeqNeighborDist for ligands
             
             // 1)
             for (int i = 0; i < AAResiduesA.size(); i++) {
-                res1 = AAResiduesA.get(i);
+                mol1 = AAResiduesA.get(i);
                 
                 // 1.1)
                 for (int j = i + 1; j < AAResiduesA.size(); j++) {
-                    res2 = AAResiduesA.get(j);
+                    mol2 = AAResiduesA.get(j);
 
                     if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
-                        System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 1.1) " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                        System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 1.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                     }
                     
                     numResContactsChecked++;
 
                     // We only need to check on atom level if the center spheres overlap
-                    if (res1.contactPossibleWithMolecule(res2)) {                                        
+                    if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                         numResContactsPossible++;
 
-                        rci = calculateAtomContactsBetweenResidues(res1, res2);
+                        rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                         if( rci != null) {
                             // There were atoms contacts!
                             // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5164,7 +5169,7 @@ public class Main {
                     }
                     else {
                         numResContactsImpossible++;
-                        numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
+                        numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                         j += numResToSkip;
                         seqNeighSkippedResIntraChain += numResToSkip;
                     }
@@ -5175,25 +5180,25 @@ public class Main {
             // can be skipped if plcc_B_write_lig_geolig = false
             if (Settings.getBoolean("PTGLgraphComputation_B_write_lig_geolig")) {
                 for (int i = 0; i < ligResiduesA.size(); i++) {
-                    res1 = ligResiduesA.get(i);
+                    mol1 = ligResiduesA.get(i);
                                        
                     // 2.1)
                     // here we have to start at j = 0 b/c it is another list!
                     for (int j = 0; j < AAResiduesA.size(); j++) {
 
-                        res2 = AAResiduesA.get(j);
+                        mol2 = AAResiduesA.get(j);
 
                         if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
-                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 2.1) " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 2.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
                         numResContactsChecked++;
 
                         // We only need to check on atom level if the center spheres overlap
-                        if (res1.contactPossibleWithMolecule(res2)) {                                        
+                        if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                             numResContactsPossible++;
 
-                            rci = calculateAtomContactsBetweenResidues(res1, res2);
+                            rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                             if( rci != null) {
                                 // There were atoms contacts!
                                 contactInfo.add(rci);
@@ -5201,7 +5206,7 @@ public class Main {
                         }
                         else {
                             numResContactsImpossible++;
-                            numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
+                            numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                             j += numResToSkip;
                             seqNeighSkippedResIntraChain += numResToSkip;
                         }
@@ -5210,19 +5215,20 @@ public class Main {
                     // 2.2)
                     for(int j = i + 1; j < ligResiduesA.size(); j++) {
 
-                        res2 = ligResiduesA.get(j);
+                        mol2 = ligResiduesA.get(j);
 
                         if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
-                            System.out.println("  [DEBUG LV 1] Checking DSSP (loop 2.2) pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                            
+                            System.out.println("  [DEBUG LV 1] Checking DSSP (loop 2.2) pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
                         numResContactsChecked++;
 
                         // We only need to check on atom level if the center spheres overlap
-                        if(res1.contactPossibleWithMolecule(res2)) {                                        
+                        if(mol1.contactPossibleWithMolecule(mol1)) {                                        
                             numResContactsPossible++;
 
-                            rci = calculateAtomContactsBetweenResidues(res1, res2);
+                            rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                             if( rci != null) {
                                 // There were atoms contacts!
                                 contactInfo.add(rci);
@@ -5256,7 +5262,7 @@ public class Main {
             for (int l = k + 1; l < chainCount; l++) {
                 
                 chainB = chains.get(l);
-                int chainBNumberResidues = chainB.getResidues().size();
+                int chainBNumberResidues = chainB.getMolecules().size();
                 
                 // skip chain if no (protein) atoms in it
                 if (chainB.getRadiusFromCentroid() == -1) {
@@ -5264,16 +5270,17 @@ public class Main {
                 }
                 
                 // vars for possible swapping of inner and outer loop to maximize skips -> only for loop 1.1) b/c we have no maxSeqNeighborDist for ligands!
-                ArrayList<Residue> innerLoopChainAAs = new ArrayList<>();
-                ArrayList<Residue> outerLoopChainAAs = new ArrayList<>();
+                ArrayList<Molecule> innerLoopChainAAs = new ArrayList<>();
+                ArrayList<Molecule> outerLoopChainAAs = new ArrayList<>();
                 int innerChainMaxSeqNeighborAADist;
                 innerChainMaxSeqNeighborAADist = 0;  // value needs to be initialized for Netbeans, just take something small
 
                 // check chain overlap
                 if (chainA.contactPossibleWithChain(chainB)) {
-                    ArrayList<Residue> AAResiduesB = new ArrayList<>();
-                    ArrayList<Residue> ligResiduesB = new ArrayList<>();
+                    ArrayList<Molecule> AAResiduesB = new ArrayList<>();
+                    ArrayList<Ligand> ligResiduesB = new ArrayList<>();
                     AAResiduesB.addAll(chainB.getAllAAResidues());
+                    AAResiduesB.addAll(chainB.getAllRnaResidues());
                     ligResiduesB.addAll(chainB.getAllLigandResidues());
 
                     Integer chainBMaxSeqNeighborAADist = chainB.getMaxSeqNeighborAADist();
@@ -5292,26 +5299,26 @@ public class Main {
                     // 1)
                     for (int i = 0; i < outerLoopChainAAs.size(); i++) {
 
-                        res1 = outerLoopChainAAs.get(i);
+                        mol1 = outerLoopChainAAs.get(i);
                         
                         // 1.1)
                         // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                         for (int j = 0; j < innerLoopChainAAs.size(); j++) {
-                            res2 = innerLoopChainAAs.get(j);
+                            mol2 = innerLoopChainAAs.get(j);
 
                             if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                 if(! silent) {
-                                    System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                    System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                 }
                             }                
 
                             numResContactsChecked++;
 
                             // We only need to check on atom level if the center spheres overlap
-                            if (res1.contactPossibleWithMolecule(res2)) {                                        
+                            if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                 numResContactsPossible++;
 
-                                rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                 if( rci != null) {
                                     // There were atoms contacts!
                                     // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5320,7 +5327,7 @@ public class Main {
                             }
                             else {
                                 numResContactsImpossible++;
-                                numResToSkip = calculateSkipNeighborNum(res1, res2, innerChainMaxSeqNeighborAADist, j, innerLoopChainAAs.size());
+                                numResToSkip = calculateSkipNeighborNum(mol1, mol2, innerChainMaxSeqNeighborAADist, j, innerLoopChainAAs.size());
                                 j += numResToSkip;
                                 seqNeighSkippedResInterChain += numResToSkip;                            
                             }
@@ -5333,27 +5340,27 @@ public class Main {
                         // 2)
                         for (int i = 0; i < ligResiduesA.size(); i++) {
 
-                            res1 = ligResiduesA.get(i);
+                            mol1 = ligResiduesA.get(i);
                             
                             // 2.1)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                             for (int j = 0; j < AAResiduesB.size(); j++) {
 
-                                res2 = AAResiduesB.get(j);
+                                mol2 = AAResiduesB.get(j);
 
                                 if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithMolecule(res2)) {                                        
+                                if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                     numResContactsPossible++;
 
-                                    rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                    rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                     if( rci != null) {
                                         // There were atoms contacts!
                                         // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5362,7 +5369,7 @@ public class Main {
                                 }
                                 else {
                                     numResContactsImpossible++;
-                                    numResToSkip = calculateSkipNeighborNum(res1, res2, chainBMaxSeqNeighborAADist, j, AAResiduesB.size());
+                                    numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainBMaxSeqNeighborAADist, j, AAResiduesB.size());
                                     j += numResToSkip;
                                     seqNeighSkippedResInterChain += numResToSkip;                            
                                 }
@@ -5372,21 +5379,21 @@ public class Main {
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                             for (int j = 0; j < ligResiduesB.size(); j++) {
 
-                                res2 = ligResiduesB.get(j);
+                                mol2 = ligResiduesB.get(j);
 
                                 if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithMolecule(res2)) {                                        
+                                if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                     numResContactsPossible++;
 
-                                    rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                    rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                     if( rci != null) {
                                         // There were atoms contacts!
                                         // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5405,27 +5412,27 @@ public class Main {
                         // HINT: for this nested loop outer and inner are swapped: this way we can profit from the lig-AA skipping
                         for (int i = 0; i < ligResiduesB.size(); i++) {
 
-                            res1 = ligResiduesB.get(i);
+                            mol1 = ligResiduesB.get(i);
 
                             // 3.1)
                             // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
                             for (int j = 0; j < AAResiduesA.size(); j++) {
 
-                                res2 = AAResiduesA.get(j);
+                                mol2 = AAResiduesA.get(j);
 
                                 if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + res1.getDsspNum() + "/" + res2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
                                 numResContactsChecked++;
 
                                 // We only need to check on atom level if the center spheres overlap
-                                if (res1.contactPossibleWithMolecule(res2)) {                                        
+                                if (mol1.contactPossibleWithMolecule(mol2)) {                                        
                                     numResContactsPossible++;
 
-                                    rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                    rci = calculateAtomContactsBetweenResidues(mol1, mol2);
                                     if( rci != null) {
                                         // There were atoms contacts!
                                         // there cannot be a lig in this contact -> always add without checking for plcc_B_write_lig_geolig
@@ -5434,7 +5441,7 @@ public class Main {
                                 }
                                 else {
                                     numResContactsImpossible++;
-                                    numResToSkip = calculateSkipNeighborNum(res1, res2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
+                                    numResToSkip = calculateSkipNeighborNum(mol1, mol2, chainAMaxSeqNeighborAADist, j, AAResiduesA.size());
                                     j += numResToSkip;
                                     seqNeighSkippedResInterChain += numResToSkip;                            
                                 }
@@ -5479,7 +5486,7 @@ public class Main {
     
     /**
      * Calculates all contacts between the residues in mols.
-     * @param mols A list of Residue objects.
+     * @param mols A list of Molecule objects.
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
     public static ArrayList<MolContactInfo> calculateAllContacts(ArrayList<Molecule> mols) {
@@ -5617,15 +5624,15 @@ public class Main {
     
     /**
      * Calculates all contacts between the residues in res.
-     * @param res A list of Residue objects.
+     * @param mols list of molecule objects.
      * @return A list of MolContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<MolContactInfo> calculateAllContactsLimitedByChain(List<Residue> res, String handledChain) {
+    public static ArrayList<MolContactInfo> calculateAllContactsLimitedByChain(List<Molecule> mols, String handledChain) {
         
         Boolean silent = Settings.getBoolean("PTGLgraphComputation_B_silent");
                 
-        Residue a, b;
-        Integer rs = res.size();
+        Molecule a, b;
+        Integer rs = mols.size();
         String chainTag = "Chain " + handledChain + ": ";
         
         if(Settings.getBoolean("PTGLgraphComputation_B_contact_debug_dysfunct")) {
@@ -5666,7 +5673,7 @@ public class Main {
         
         for(Integer i = 0; i < rs; i++) {
 
-            a = res.get(i);
+            a = mols.get(i);
             numResToSkip = 0;
             
             if( ! a.getChainID().equals(handledChain)) {
@@ -5682,7 +5689,7 @@ public class Main {
             
             for(Integer j = i + 1; j < rs; j++) {
 
-                b = res.get(j);
+                b = mols.get(j);
                 if( ! b.getChainID().equals(handledChain)) {
                     if( ! (includeLigandsFromOtherChains && b.isLigand())) {
                         numResPairsSkippedWrongChain++;
@@ -5717,7 +5724,7 @@ public class Main {
                         }
                         else {
                             // We should ignore ligand contacts
-                            if(a.getType().equals(Residue.RESIDUE_TYPE_LIGAND) || b.getType().equals(Residue.RESIDUE_TYPE_LIGAND)) {
+                            if(a.getType().equals(Molecule.RESIDUE_TYPE_LIGAND) || b.getType().equals(Molecule.RESIDUE_TYPE_LIGAND)) {
                                 // This IS a ligand contact so ignore it
                                 numIgnoredLigandContacts++;
                                 // System.out.println("  Ignored ligand contact between DSSP residues " + a.getDsspNum() + " and " + b.getDsspNum() + ".");
@@ -5767,9 +5774,9 @@ public class Main {
             } else {
                 System.out.println("  " + chainTag + "Ignored ligands assigned to other chains in the PDB file when computing contacts of residues of this chain.");
             }
-            
+
             if( ! Settings.getBoolean("PTGLgraphComputation_B_write_lig_geolig")) {
-                System.out.println("  " + chainTag + "Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+                System.out.println("  " + chainTag + "Configured to ignore ligands and other types, ignored " + numIgnoredLigandContacts + " contacts.");
             }
         }
         
@@ -5798,7 +5805,7 @@ public class Main {
         MolContactInfo result = null;
 
 
-        Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        Integer[] numPairContacts = new Integer[Main.NUM_MOLECULE_PAIR_CONTACT_TYPES];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
         // Some cheap vars to make things easier to understand (a replacement for #define):
         /*
@@ -5818,6 +5825,7 @@ public class Main {
 
 
         Integer numTotalLigContactsPair = 0;
+        Integer numTotalRnaContactsPair = 0;
 
 
 
@@ -6084,8 +6092,50 @@ public class Main {
                             contactAtomNumInResidueA[MolContactInfo.LL] = i;
                             contactAtomNumInResidueB[MolContactInfo.LL] = j;
                         }
-                        
+                                              
 
+                    }
+                    else if((x.isRnaAtom() && y.isProteinAtom()) || (x.isRnaAtom() && y.isLigandAtom())) {
+                        // *************************** RNA - X contact *************************
+                        numTotalRnaContactsPair++;
+                        
+                        // this is an RNA - X contact (X can be protein or ligand)
+                        numPairContacts[MolContactInfo.RX]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[MolContactInfo.RX] < 0) || dist < minContactDistances[MolContactInfo.RX]) {
+                            minContactDistances[MolContactInfo.RX] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.RX] = i;
+                            contactAtomNumInResidueB[MolContactInfo.RX] = j;
+                        }
+                    }
+                    else if((x.isProteinAtom() && y.isRnaAtom()) || (x.isLigandAtom() && y.isRnaAtom())) {
+                        // *************************** X - RNA contact *************************
+                        numTotalRnaContactsPair++;
+                           
+                        // this is an X - RNA contact (X can be protein or ligand)
+                        numPairContacts[MolContactInfo.XR]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[MolContactInfo.XR] < 0) || dist < minContactDistances[MolContactInfo.XR]) {
+                            minContactDistances[MolContactInfo.XR] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.XR] = i;
+                            contactAtomNumInResidueB[MolContactInfo.XR] = j;
+                        }
+                    }
+                    else if(x.isRnaAtom() && y.isRnaAtom()) {
+                        // *************************** RNA - RNA contact *************************
+                        numTotalRnaContactsPair++;
+                           
+                        // this is an RNA - RNA contact
+                        numPairContacts[MolContactInfo.RR]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[MolContactInfo.RR] < 0) || dist < minContactDistances[MolContactInfo.RR]) {
+                            minContactDistances[MolContactInfo.RR] = dist;
+                            contactAtomNumInResidueA[MolContactInfo.RR] = i;
+                            contactAtomNumInResidueB[MolContactInfo.RR] = j;
+                        }
                     }
                     else {
                         // *************************** unknown contact, wtf? *************************
@@ -6102,7 +6152,7 @@ public class Main {
 
         // Iteration through all atoms of the two residues is done
         if(numPairContacts[MolContactInfo.TT] > 0) {
-            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, numTotalRnaContactsPair);
         }
         else {
             result = null;
@@ -6111,7 +6161,8 @@ public class Main {
         return(result);         // This is null if no contact was detected
         
     }
- 
+    
+    
     /**
      * Checks if a pi effect between the given X-H and aromatic ring occurs.
      * @param x Atom which is has a H.
@@ -6391,7 +6442,7 @@ public class Main {
      * @param b one of the residues of the residue pair
      * @return A MolContactInfo object with information on the pi-effects between 'a' and 'b'.
      */
-    public static MolContactInfo calculatePiEffects(Residue a, Residue b) {
+    public static MolContactInfo calculatePiEffects(Molecule a, Molecule b) {
         
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
@@ -6429,6 +6480,7 @@ public class Main {
         
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
         Integer numTotalLigContactsPair = 0;
+        Integer numTotalRnaContactsPair = 0;
 
         Integer[] minContactDistances = new Integer[numPairContacts.length];
         // Holds the minimal distances of contacts of the appropriate type (see numPairContacts, index 0 is unused)
@@ -8446,7 +8498,7 @@ public class Main {
         
          // Iteration through all atoms of the two residues is done
         if(numPairContacts[MolContactInfo.TT] > 0) {
-            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, numTotalRnaContactsPair);
         }
         else {
             result = null;
@@ -8463,7 +8515,7 @@ public class Main {
      * @param b one of the residues of the residue pair
      * @return A MolContactInfo object with information on the atom contacts between 'a' and 'b'.
      */
-    public static MolContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Residue a, Residue b) {
+    public static MolContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Molecule a, Molecule b) {
 
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
@@ -8529,6 +8581,7 @@ public class Main {
 
         
         Integer numTotalLigContactsPair = 0;
+        Integer numTotalRnaContactsPair = 0;
 
 
 
@@ -9901,6 +9954,10 @@ public class Main {
                         // Nothing to do as we computing ligand contacts is disabled by the config.
                         // We still need to catch ligand molecules here, otherwise "detect" unknown contacts
                     }
+                    else if ((x.isRnaAtom() && y.isProteinAtom()) || (x.isProteinAtom() && y.isRnaAtom())) {
+                        numPairContacts[MolContactInfo.TT]++;
+                        numTotalRnaContactsPair++;
+                    }
                     else {
                         // *************************** unknown contact, wtf? *************************
                         // This branch should never be hit because atoms of type OTHER are ignored while creating the list of Atom objects
@@ -9986,7 +10043,7 @@ public class Main {
                                
         // Iteration through all atoms of the two residues is done
         if(numPairContacts[MolContactInfo.TT] > 0) {
-            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, atomAtomContactType, atomAtomContacts);
+            result = new MolContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair, numTotalRnaContactsPair, atomAtomContactType, atomAtomContacts);
         }
         else {
             result = null;
@@ -10691,17 +10748,19 @@ public class Main {
     
     
     /**
-     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chainName. 
+     * Writes the SSE info file that contains DSSP SSE and PLCC style SSE for each residue and ligand of the given chainName. 
      * @param mapFile the path to the output file
      * @param c the chainName to consider (all residues of this chainName will be used)
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
-        String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PTGLgraphComputation assignment>";
-        ArrayList<Residue> res = c.getResidues();
-                
+
+        String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
+        ArrayList<Molecule> mols = c.getMolecules();
         
-        for (Residue r : res) {
-            s += "" + r.getPdbNum() + "|" + r.getDsspNum() + "|" + r.getSSEStringDssp() + "|" + r.getSSETypePlcc() + "\n";
+        for (Molecule r : mols) {
+            if (r.isAA() || r.isLigand()) {
+                s += "" + r.getPdbNum() + "|" + r.getDsspNum() + "|" + r.getSSEStringDssp() + "|" + r.getSSETypePlcc() + "\n";
+            }
         }
         
         IO.stringToTextFile(mapFile, s);
@@ -10709,7 +10768,7 @@ public class Main {
     
     
     /**
-     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chainName. 
+     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues and ligands of the given chainName. 
      * @param mapFile the path to the output file
      * @param c the chainName to consider (all residues of this chainName will be used)
      */
@@ -10717,7 +10776,7 @@ public class Main {
 
         FileWriter mapFW = null;
         PrintWriter mapFH = null;
-        ArrayList<Residue> res = c.getResidues();
+        ArrayList<Molecule> mol = c.getMolecules();
 
         // open files
         try {
@@ -10732,8 +10791,10 @@ public class Main {
         }
 
 
-        for (Residue r : res) {
-            mapFH.print("PDB|" + r.getPdbNum() + "|DSSP|" + r.getDsspNum() + "\n");
+        for (Molecule m : mol) {
+            if (m.isAA() || m.isLigand()) {
+                mapFH.print("PDB|" + m.getPdbNum() + "|DSSP|" + m.getDsspNum() + "\n");
+            }
         }
         
         //chainFH.printf("%d\n", chains.size());
@@ -10761,11 +10822,11 @@ public class Main {
      * @param pdbid the PDB ID of the current protein
      * @param ligands a list of residues which are expected to be ligands
      */
-    public static void writeLigands(String ligFile, String pdbid, List<Residue> ligands) {
+    public static void writeLigands(String ligFile, String pdbid, List<Ligand> ligands) {
 
         FileWriter ligFW = null;
         PrintWriter ligFH = null;
-        Residue r = null;
+        Ligand r = null;
 
         // open files
         try {
@@ -10855,6 +10916,7 @@ public class Main {
      * @param contacts the contacts to consider
      * @param res the residues to consider
      */
+    @Deprecated
     public static Boolean writeDsspLigFile(String dsspFile, String dsspLigFile, ArrayList<MolContactInfo> contacts, ArrayList<Residue> res) {
         
         DP.getInstance().w("writeDsspLigFile(): This function is deprecated, use writeOrderedDsspLigFile() instead.\n");
@@ -10946,7 +11008,7 @@ public class Main {
      * @return true if it worked out. Note though that this is considered critical.
      * 
      */
-    public static Boolean writeOrderedDsspLigFile(String dsspFile, String dsspLigFile, List<Residue> res) {
+    public static Boolean writeOrderedDsspLigFile(String dsspFile, String dsspLigFile, List<Molecule> mols) {
 
         File dFile = new File(dsspFile);
         File dligFile = new File(dsspLigFile);
@@ -10962,20 +11024,20 @@ public class Main {
 
         System.out.println("  DSSP ligand output file set to '" + dsspLigFile + "', file created.");
 
-        Residue r;
+        Molecule m;
 
-        for(Integer i = 0; i < res.size(); i++) {
+        for(Integer i = 0; i < mols.size(); i++) {
 
-            r = res.get(i);
+            m = mols.get(i);
 
-            if(r.isLigand()) {
+            if(m.isLigand()) {
                 
                 dligFile = new File(dsspLigFile);
 
                 try {
-                    insertLigandLineIntoDsspligFile(dligFile, getLastLineOfChain(dligFile, r.getChainID()), r);
+                    insertLigandLineIntoDsspligFile(dligFile, getLastLineOfChain(dligFile, m.getChainID()), (Ligand) m);
                 } catch(Exception cf) {
-                    System.err.println("ERROR: Failed to insert line for ligand residue '" + r.getFancyName() + "' into dssplig file: '" + cf.getMessage() + "'.");
+                    System.err.println("ERROR: Failed to insert line for ligand residue '" + m.getFancyName() + "' into dssplig file: '" + cf.getMessage() + "'.");
                     cf.printStackTrace();
                     System.exit(1);
                 }
@@ -11040,7 +11102,7 @@ public class Main {
      * @param lineno the line number
      * @param r the residue that should be added at the specified line number
      */
-    public static void insertLigandLineIntoDsspligFile(File inFile, int lineno, Residue r)
+    public static void insertLigandLineIntoDsspligFile(File inFile, int lineno, Ligand l)
        throws Exception {
      // temp file
      File outFile = new File("dssplig.tmp");
@@ -11071,7 +11133,8 @@ public class Main {
 
             // Print DSSP residue number, PDB residue number, chainName, AA name in 1 letter code and SSE summary letter for ligand
             //      '   47   47 A E  E'
-            out.printf(loc, "  %3d  %3d %1s %1s  %1s", r.getDsspNum(), r.getPdbNum(), r.getChainID(), r.getAAName1(), Settings.get("PTGLgraphComputation_S_ligSSECode"));
+
+            out.printf(loc, "  %3d  %3d %1s %1s  %1s", l.getDsspNum(), l.getPdbNum(), l.getChainID(), l.getAAName1(), Settings.get("plcc_S_ligSSECode"));
 
             // Print structure detail block (empty for ligand), beta bridge 1 partner residue number (always 0 for ligands), beta bridge 2 partner residue number (always 0 for ligands),
             //  bet sheet label (empty (" ") for ligands) and solvent accessible surface (SAS) of this residue (not required by PTGL, just set to some value)
@@ -11084,7 +11147,7 @@ public class Main {
             out.printf(loc, "   %4d,%4.1f  %4d,%4.1f  %4d,%4.1f  %4d,%4.1f", 0, 0.0, 0, 0.0, 0, 0.0, 0, 0.0);
 
             // Print the TCO, KAPPA, ALPHA, PHI and PSI angles. Then the center atom coordinates. That's it.
-            out.printf(loc, "  %6.3f%6.1f%6.1f%6.1f%6.1f %6.1f %6.1f %6.1f\n", -0.5, 55.5, 55.5, 55.5, 55.5, (r.getCenterAtom().getCoordX() / 10.0f), (r.getCenterAtom().getCoordY() / 10.0f), (r.getCenterAtom().getCoordZ() / 10.0f));
+            out.printf(loc, "  %6.3f%6.1f%6.1f%6.1f%6.1f %6.1f %6.1f %6.1f\n", -0.5, 55.5, 55.5, 55.5, 55.5, (l.getCenterAtom().getCoordX() / 10.0f), (l.getCenterAtom().getCoordY() / 10.0f), (l.getCenterAtom().getCoordZ() / 10.0f));
        }
        
        i++;
@@ -11251,6 +11314,7 @@ public class Main {
      * @param contacts the contacts to consider for the script.
      * @return the script as a single string. note that the string may consist of multiple lines.
      */
+    @Deprecated
     public static String getPymolSelectionScript(ArrayList<MolContactInfo> contacts) {
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
@@ -11343,7 +11407,7 @@ public class Main {
      * @param protRes the protein residues
      * @return the script as a single string. note that the string may consist of multiple lines.
      */
-    public static String getPymolSelectionScriptForResidues(List<Residue> protRes) {
+    public static String getPymolSelectionScriptForResidues(List<Molecule> protRes) {
 
 
         StringBuilder scriptProt = new StringBuilder();
@@ -11380,14 +11444,14 @@ public class Main {
         //so we always have to query which variables belong to which instance and do a typecast.
 
         ArrayList<Residue> protRes = new ArrayList<Residue>();
-        ArrayList<Residue> ligRes = new ArrayList<Residue>();
-        ArrayList<Residue> ligCont = new ArrayList<Residue>();
+        ArrayList<Ligand> ligRes = new ArrayList<Ligand>();
+        ArrayList<Ligand> ligCont = new ArrayList<Ligand>();
      
         String scriptLig = "";
         String scriptThisLigCont = "";
 
         MolContactInfo c = null;
-        Residue r = null;
+        Molecule r = null;
         // Select all residues of the protein that have ligand contacts
 
         for (Integer i = 0; i < contacts.size(); i++) {
@@ -11406,7 +11470,7 @@ public class Main {
                 }
                 if(c.getMolA().isLigand()) {
                     if( ! ligRes.contains(c.getMolA())) {
-                        ligRes.add((Residue)c.getMolA());
+                        ligRes.add((Ligand)c.getMolA());
                     }
                  
                 }
@@ -11419,7 +11483,7 @@ public class Main {
                 }
                 if(c.getMolB().isLigand()) {
                     if( ! ligRes.contains(c.getMolB())) {
-                        ligRes.add((Residue)c.getMolB());
+                        ligRes.add((Ligand)c.getMolB());
                     }
                 }
 
@@ -11446,7 +11510,7 @@ public class Main {
                 scriptLig += "select lig_" + r.getName3().trim() + r.getPdbNum() + ", chain " + r.getChainID() + " and resi " + r.getPdbNum() + "\n";
 
                 // create the list of contact residues for this ligand
-                ligCont = new ArrayList<Residue>();
+                ligCont = new ArrayList<Ligand>();
                 for(Integer j = 0; j < contacts.size(); j++) {
 
                     c = contacts.get(j);
@@ -11459,11 +11523,11 @@ public class Main {
                         
                         
                         // first residue A is this ligand, so the other one is the contact residue
-                        ligCont.add((Residue)c.getMolB());
+                        ligCont.add((Ligand)c.getMolB());
                     }
                     else if(c.getDsspNumB().equals(r.getDsspNum())) {
                         // second residue B is this ligand, so the other one is the contact residue
-                        ligCont.add((Residue)c.getMolA());
+                        ligCont.add((Ligand)c.getMolA());
                     }
                     else {
                         // The current ligand is not involved in this contact
@@ -11509,14 +11573,14 @@ public class Main {
      * @return true if python file could be written, otherwise false.
      */
     public static Boolean getPymolSelectionScriptPPI (ArrayList<MolContactInfo> contacts, String pdbid) {
-        ArrayList<Residue> protRes = new ArrayList<Residue>();  // all residues of interchain protein contacts
-        ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
-        ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
-        ArrayList<Residue> issRes = new ArrayList<Residue>();   // all residues of interchain sulfur bridge contacts
-        ArrayList<Residue> bbRes = new ArrayList<Residue>();    // all residues of interchain backbone-backbone h-bridge contacts
-        ArrayList<Residue> bcRes = new ArrayList<Residue>();    // all residues of interchain backbone-sidechain h-bridge contacts
-        ArrayList<Residue> cbRes = new ArrayList<Residue>();      // all residues of interchain sidechain-backbone h-bridge contacts
-        ArrayList<Residue> ccRes = new ArrayList<Residue>();    // all residues of interchain sidechain-sidechain h-bridge contacts
+        ArrayList<Molecule> protRes = new ArrayList<Molecule>();  // all residues of interchain protein contacts
+        ArrayList<Molecule> ligRes = new ArrayList<Molecule>();   // all residues of ligand contacts
+        ArrayList<Molecule> ivdwRes = new ArrayList<Molecule>();  // all residues of interchain van der Waals contacts
+        ArrayList<Molecule> issRes = new ArrayList<Molecule>();   // all residues of interchain sulfur bridge contacts
+        ArrayList<Molecule> bbRes = new ArrayList<Molecule>();    // all residues of interchain backbone-backbone h-bridge contacts
+        ArrayList<Molecule> bcRes = new ArrayList<Molecule>();    // all residues of interchain backbone-sidechain h-bridge contacts
+        ArrayList<Molecule> cbRes = new ArrayList<Molecule>();      // all residues of interchain sidechain-backbone h-bridge contacts
+        ArrayList<Molecule> ccRes = new ArrayList<Molecule>();    // all residues of interchain sidechain-sidechain h-bridge contacts
         
         String script = "";
         String scriptProt = "";
@@ -11581,7 +11645,7 @@ public class Main {
                 }
                 if(c.getMolA().isLigand()) {
                     if( ! ligRes.contains(c.getMolA())) {
-                        ligRes.add((Residue)c.getMolA());
+                        ligRes.add((Ligand)c.getMolA());
                     }
                 }
                 
@@ -11593,7 +11657,7 @@ public class Main {
                 }
                 if(c.getMolB().isLigand()) {
                     if( ! ligRes.contains(c.getMolB())) {
-                        ligRes.add((Residue)c.getMolB());
+                        ligRes.add((Ligand)c.getMolB());
                     }
                 }
                 }
@@ -12364,7 +12428,7 @@ public class Main {
                     //System.out.println("      Created new SSE.");
 
                     // set SSE properties
-                    curSSE.addResidue(curResidue);
+                    curSSE.addMolecule(curResidue);
                     curSSE.setSeqSseNumDssp(dsspSSElist.size() + 1);
                     curSSE.setSseType(curResidue.getSSEString());
 
@@ -12398,7 +12462,7 @@ public class Main {
                     // This is a valid SSE according to DSSP
                     curResidue.setSSE(curSSE);
                     curResidue.setDsspSseState(true);
-                    curSSE.addResidue(curResidue);
+                    curSSE.addMolecule(curResidue);
                     //System.out.println("      Residue " + curResidue.getFancyName() + " added to an existing SSE.");
                 }
                 else {
@@ -12425,14 +12489,15 @@ public class Main {
      * @param cID the chainName ID
      * @return the filtered list of residues
      */
-    public static ArrayList<Residue> filterResidueListByChain(ArrayList<Residue> resList, String cID) {
+    @Deprecated
+    public static ArrayList<Residue> filterResidueListByChain(ArrayList<Residue> molList, String cID) {
         ArrayList<Residue> filteredList = new ArrayList<Residue>();
-        Residue r;
+        Residue m;
 
-        for(Integer i = 0; i < resList.size(); i++) {
-            r = resList.get(i);
-            if(r.getChainID().equals(cID)) {
-                filteredList.add(r);
+        for(Integer i = 0; i < molList.size(); i++) {
+            m = molList.get(i);
+            if(m.getChainID().equals(cID)) {
+                filteredList.add(m);
             }
         }
         
@@ -12447,10 +12512,10 @@ public class Main {
      * @param dsspSSElist the list of all SSEs according to DSSP definition
      * @return a list of all ligand SSEs that are created from the ligand residues in the residue list.
      */
-    private static List<SSE> createAllLigandSSEsFromResidueList(List<Residue> resList, List<SSE> dsspSSElist) {
+    private static List<SSE> createAllLigandSSEsFromResidueList(List<Ligand> resList, List<SSE> dsspSSElist) {
         
         List<SSE> ligSSElist = new ArrayList<SSE>();
-        Residue r;
+        Ligand r;
         SSE s;
         Integer ligSSECount = 1;
         
@@ -12496,7 +12561,7 @@ public class Main {
                 s = new SSE(SSE.SSECLASS_STRING_LIGAND);
 
                 // set SSE properties
-                s.addResidue(r);
+                s.addMolecule(r);
                 s.setSeqSseNumDssp(dsspSSElist.size() + ligSSECount);
                 s.setSseType(SSE.SSECLASS_STRING_LIGAND);
                 s.setChain(r.getChain());
@@ -12606,7 +12671,7 @@ public class Main {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
                                 //curSSE.addResidues(nextSSE.getResidues());
-                                nextSSE.addResiduesAtStart(curSSE.getResidues());
+                                nextSSE.addMoleculesAtStart(curSSE.getMolecules());
                                 currentSSEmergedIntoNext = true;
                                 //i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
                             }                                                                                    
@@ -12687,8 +12752,8 @@ public class Main {
                     }
                     
                     //add residues
-                    newSSE.addResiduesAtStart(curSSE.getResidues());
-                    newSSE.addResiduesAtStart(nextSSE.getResidues());
+                    newSSE.addMoleculesAtStart(curSSE.getMolecules());
+                    newSSE.addMoleculesAtStart(nextSSE.getMolecules());
                     
                     //set new sequential number of the SSE
                     newSSE.setSeqSseNumDssp(newList.size() + 1);
@@ -13038,13 +13103,12 @@ public class Main {
     /**
      * Calculates complex graph types which are configured in the config file for all given chains.
      * @param allChains a list of chains, each chainName will be handled separately
-     * @param resList a list of residues
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      * @param graphType the graph type, one of the constants like SSEGraph.GRAPHTYPE_ALBE 
      */
-    public static void calculateComplexGraph(List<Chain> allChains, List<Residue> resList, List<MolContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
+    public static void calculateComplexGraph(List<Chain> allChains, List<MolContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
         
         Boolean silent = Settings.getBoolean("PTGLgraphComputation_B_silent");
         
@@ -13146,11 +13210,11 @@ public class Main {
 
             // determine SSEs for this chainName
             //System.out.println("    Creating all SSEs for chainName '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
-            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
+            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getAllAAResidues());
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
             
-            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
+            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getAllLigandResidues(), chainDsspSSEs);
             oneChainSSEs = mergeSSEs(oneChainSSEs, chainLigSSEs);
 
             /*
@@ -13539,7 +13603,7 @@ public class Main {
                 // OK, now we handle the ligands
                 Chain lc = ligandSSE.getChain();
                 String ligChainName = ligandSSE.getChain().getPdbChainID();
-                Integer ligRes = ligandSSE.getStartResidue().getPdbNum();
+                Integer ligRes = ligandSSE.getStartMolecule().getPdbNum();
                 String lign3 = ligandSSE.getTrimmedLigandName3();
                 ligName = ligChainName + "-" + ligRes + "-" + lign3;  // something like "A-234-ICT", meaning isocitric acid, PDB residue 234 of chainName A
                 
@@ -13695,6 +13759,28 @@ public class Main {
             }
         }
         return residues;
+    }
+    
+    
+        /**
+     * Retrieves a list of all ligands from a list of molecules.
+     * @param molecules ArrayList of Molecule
+     * @return ArrayList of Ligands
+     */
+    private static ArrayList<Ligand> ligandsFromMolecules(ArrayList<Molecule> molecules) {
+        if (ligands == null) {
+            ligands = new ArrayList<>();
+            for (Molecule m : molecules) {
+                if (m instanceof Ligand) {
+                    ligands.add((Ligand) m);
+                }
+            }
+            // check if empty
+            if (ligands.isEmpty()) {
+                System.out.println("Detected no ligands within molecules when first called resFromMolecules. Program will rely on that from now on.");
+            }
+        }
+        return ligands;
     }
     
     

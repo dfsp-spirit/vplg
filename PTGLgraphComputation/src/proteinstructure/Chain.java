@@ -26,7 +26,7 @@ public class Chain implements java.io.Serializable {
     // declare class vars
     private String pdbChainID = null;                // author chain ID from PDB file
     private String altChainID = null;               // alternative chain ID from DSSP file
-    private ArrayList<Molecule> molecules = null;      // a list of all Molecules of the Chain
+    private ArrayList<Molecule> molecules = new ArrayList<>();      // a list of all Molecules of the Chain
     private String macromolID = null;                // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
     private String macromolName = null;              // the macromol name from the PDB file
     private String modelID = null;
@@ -77,7 +77,29 @@ public class Chain implements java.io.Serializable {
         return(radiusFromCentroid);
     }
     
-    public ArrayList<Residue> getResidues() {
+        
+    /**
+     * Returns a list of all ligand residues in this chain.
+     * @return a list of all ligand residues in this chain
+     * For this method we need to convert the molecule object into a ligand object 
+     */
+    public ArrayList<Ligand> getAllLigandResidues() {
+        ArrayList<Ligand> ligands = new ArrayList<>();     
+        Ligand l = new Ligand();
+        for(Molecule m : this.molecules) 
+            if(m.isLigand()) {
+                l = (Ligand) m;
+                ligands.add(l);
+            }
+        return ligands;
+    }
+    
+    
+    /**
+     * Returns all molecules of class Residue belonging to this chain.
+     * @return ArrayList of residues
+     */
+    public ArrayList<Residue> getAllAAResidues() {
         ArrayList<Residue> thisResidues = new ArrayList<>();
         for (Molecule m : this.molecules) {
             if (m instanceof Residue) {
@@ -87,41 +109,35 @@ public class Chain implements java.io.Serializable {
         return thisResidues;
     }
     
-    /**
-     * Returns a list of all ligand residues in this chain.
-     * @return a list of all ligand residues in this chain
-     * First checks if this molecule is empty and if this molecule is an Instance of RNA 
-     * For this method we need to convert the molecule object into a residue object 
+    
+       /**
+     * Returns all molecules of class Residue belonging to this chain as output type Molecule.
+     * @return ArrayList of residues which are type Molecule
      */
-    
-    
-    public ArrayList<Residue> getAllLigandResidues() {
-        ArrayList<Residue> ligands = new ArrayList<>();     
-        Residue r;
-        for(Molecule m : this.molecules) 
-            if(m.isLigand() && m instanceof Residue) {
-                r = (Residue) m;    // Ligand has to stay an instance of Residue for handling in Main
-                ligands.add(r);
-            }
-        return ligands;
-    }
-    
-    /**
-     * Returns a list of all amino acid residues in this chain.
-     * @return a list of all amino acid residues in this chain
-     */
-    public ArrayList<Residue> getAllAAResidues() {
-        ArrayList<Residue> AAResidues = new ArrayList<>();
-        Residue r;
-        for(Molecule m : this.molecules) {
+    public ArrayList<Molecule> getAllAAResiduesAsTypeMolecule() {
+        ArrayList<Molecule> thisResidues = new ArrayList<>();
+        for (Molecule m : this.molecules) {
             if (m instanceof Residue) {
-                r = (Residue) m;
-                if (r.isAA()) {
-                    AAResidues.add(r);
-                }
+                thisResidues.add(m);
             }
         }
-        return AAResidues;
+        return thisResidues;
+    }
+      
+    
+    /**
+     * Returns a list of all RNA residues in this chain.
+     * 
+     */
+    public ArrayList<RNA> getAllRnaResidues() {
+        ArrayList<RNA> allRna = new ArrayList<>();     
+        RNA r = new RNA();
+        for(Molecule m : this.molecules) 
+            if(m.isRNA()) {
+                r = (RNA) m;
+                allRna.add(r);
+            }
+        return allRna;
     }
     
     
@@ -162,7 +178,7 @@ public class Chain implements java.io.Serializable {
     public String getChainChemProps5StringAllResidues() {
         StringBuilder sb = new StringBuilder();   
         if (this.molecules.size() > 0) {
-            if ((this.molecules.get(0)) instanceof RNA) {
+            if ((this.molecules.get(0)) instanceof RNA || this.molecules.get(0) instanceof Ligand) {
                 return null;
             }
         }
@@ -181,7 +197,7 @@ public class Chain implements java.io.Serializable {
     public String getChainChemProps3StringAllResidues() {
         StringBuilder sb = new StringBuilder();  
         if (this.molecules.size() > 0) {
-            if ((this.molecules.get(0)) instanceof RNA) {
+            if ((this.molecules.get(0)) instanceof RNA || this.molecules.get(0) instanceof Ligand) {
                 return null;
             }
         }
@@ -267,6 +283,8 @@ public class Chain implements java.io.Serializable {
         //System.out.println("Added " + numSeps + " separators.");
         return new String[] { sbChemProp.toString(), sbSSE.toString() };
     }
+    
+    
     /**
      * Computes the geometrical center of all atoms and the largest distance from center to an atom (=radius).
      */
@@ -323,7 +341,7 @@ public class Chain implements java.io.Serializable {
     }
     
     /**
-     * This function determines whether we need to look at the residues to check for contacts betweens
+     * This function determines whether we need to look at the residues to check for contacts between
      * this chain and another one. If the center spheres don't overlap, there cannot exist any atom contacts.
      * @param c Chain: the other chain
      * @return Bool: if spheres overlap

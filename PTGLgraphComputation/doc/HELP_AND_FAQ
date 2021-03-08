@@ -46,8 +46,3 @@ A: If the file contains only DNA/RNA or has very few protein residues (<30), DSS
 
 Q: How can I tell which version of PTGLgraphComputation I am running? 
 A: The version is always printed when you run PTGLgraphComputation, so running the software without any command line arguments will do.
-
-
-
---
-ts
