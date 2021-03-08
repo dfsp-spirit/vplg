@@ -457,6 +457,14 @@ public class Settings {
     }
     
     
+    /**
+     * Returns the line for images containing program name and version.
+     * @return line containing program name and version
+     */
+    public static String getImagesCreatorVersionLine() {
+        return "Created with " + getProgramName() + " version " + getVersion();
+    }
+    
     
     // ### simple getter and setter
     public static int getNumLoadedSettings() { return numLoadedSettings; }
