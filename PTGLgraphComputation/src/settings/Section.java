@@ -161,7 +161,7 @@ class Section {
                 break;
                 
             case "Parser":
-                settings.add(new Setting("PTGLgraphComputation_B_include_rna", 'B', "false", "Whether RNA should be parsed and included in graph formalism and visualisation (WIP)."));
+                settings.add(new Setting("PTGLgraphComputation_B_include_rna", 'B', "true", "Whether RNA should be parsed and included in graph formalism and visualisation (WIP)."));
                 settings.add(new Setting("PTGLgraphComputation_B_convert_models_to_chains", 'B', "false", "Whether the PDB file should be checked for multiple models and if so convert those models to chains."));
                 settings.add(new Setting("PTGLgraphComputation_I_defaultModel", 'I', "1", "The model to use if multiple models exist in the PDB file."));
                 settings.add(new Setting("PTGLgraphComputation_S_ligAACode", 'S', "J", "The amino acid code used to mark a ligand residue."));

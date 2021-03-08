@@ -26,6 +26,7 @@ import proteinstructure.Molecule;
 import proteinstructure.ProtMetaInfo;
 import proteinstructure.Residue;
 import proteinstructure.RNA; 
+import proteinstructure.Ligand;
 import tools.DP;
 
 
@@ -78,7 +79,7 @@ class CifParser {
     private static Molecule tmpMol = null;      // used to save lastMol if getResidue returns null
     private static Chain tmpChain = null;
     private static Residue res = null;
-    private static Residue lig = null;
+    private static Ligand lig = null;
     private static RNA rna = null;
 
     // - variables per (atom) line -
@@ -344,24 +345,22 @@ class CifParser {
         ArrayList<Atom> deletedAtoms;
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
-        Residue r;
+        Molecule m;
         for(int i = 0; i < FileParser.s_molecules.size(); i++) {
-            if (FileParser.s_molecules.get(i) instanceof Residue) {
-                r = (Residue) FileParser.s_molecules.get(i);
-                deletedAtoms = r.chooseYourAltLoc();
+            m = FileParser.s_molecules.get(i);
+            deletedAtoms = m.chooseYourAltLoc();
 
 
-                if(deletedAtoms.size() > 0) {
-                    numResiduesAffected++;
-                }
+            if(deletedAtoms.size() > 0) {
+                numResiduesAffected++;
+            }
 
-                //delete atoms from global atom list as well
-                for(Atom a : deletedAtoms) {
-                    if(FileParser.s_atoms.remove(a)) {
-                        numAtomsDeletedAltLoc++;
-                    } else {
-                        DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
-                    }
+            //delete atoms from global atom list as well
+            for(Atom a : deletedAtoms) {
+                if(FileParser.s_atoms.remove(a)) {
+                    numAtomsDeletedAltLoc++;
+                } else {
+                    DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
                 }
             }
         }
@@ -805,12 +804,17 @@ class CifParser {
                 if (! silent) {
                     // print note only once
                     if (! molNumPDB.equals(lastLigandNumPDB))
+
                         if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
-                            System.out.println("   PDB: Found a free (modified) amino acid at PDB# " + molNumPDB + ", treating it as ligand or RNA.");
+                            System.out.println("   PDB: Found a ligand, RNA or free (modified) amino acid at PDB# " + molNumPDB + ". Free amino acids are treated as ligands.");
                         }
                 }
 
             } else {
+                
+                if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
+                    System.out.println("    [DEBUG LV 2] Found an amino acid at PDB# " + molNumPDB + " that is not listed in the DSSP file (might be at a chain break). Parsing it as part of a chain.");
+                }
                 
                 // sometimes residues are missing from the dssp file if they are incomplete (mostly at chain breaks)
                 // in this case, they have to be parsed here
@@ -870,7 +874,7 @@ class CifParser {
             a.setDsspResNum(lastMol.getDsspNum());
         }
         
-        if (checkType(Molecule.RESIDUE_TYPE_RNA)){
+        if ((checkType(Molecule.RESIDUE_TYPE_RNA) && entityInformation.get(String.valueOf(entityID)).get("type").equals("polymer"))) {  // Nucleotides are only parsed as RNA if they are polymers, not if they act as single ligands.
             // >> RNA <<
             // if the line we are currently in belongs to the same molecule as the previous one, we only create a new atom for this line.
             // otherwise, a new RNA molecule is created
@@ -915,14 +919,19 @@ class CifParser {
 
                     FileParser.getChainByPdbChainID(chainID).addMolecule(rna);
                     
-                    DP.getInstance().d("New RNA molecule named " + molNamePDB + " added in PDB line " + molNumPDB + " to chain " + chainID + ".");
+                    if(Settings.getInteger("PTGLgraphComputation_I_debug_level") > 0) {
+                        if(! silent) {
+                            DP.getInstance().d("New RNA molecule named " + molNamePDB + ", DSSPNumber " + rna.getDsspNum() + ", added in PDB line " + molNumPDB + " to chain " + chainID + ".");
+                        }
+                    }
                 }
             }       
         }
         
         // If a molecule is not parsed at this point, it has to be a ligand
-        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) ||                                                                                       // if the molecule is categorized as a ligand through chem_comp map
-                (entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer") && ! checkType(Molecule.RESIDUE_TYPE_RNA)) )   // if entity is defined as 'non-polymer' while not being RNA
+        else if (checkType(Molecule.RESIDUE_TYPE_LIGAND) ||                                          // if the molecule is categorized as a ligand through chem_comp map
+                (entityInformation.get(String.valueOf(entityID)).get("type").equals("non-polymer"))) // if entity is defined as 'non-polymer' (e.g. free AA/RNA)
+            
         {
             // >> LIG <<
                      
@@ -932,7 +941,7 @@ class CifParser {
             if( ! ( molNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
 
                 // create new Residue from info, we'll have to see whether we really add it below though
-                lig = new Residue();
+                lig = new Ligand();
 
                 lig.setPdbNum(molNumPDB);
                 lig.setType(Molecule.RESIDUE_TYPE_LIGAND);
@@ -981,7 +990,7 @@ class CifParser {
                     //resIndexDSSP[resNumDSSP] = resIndex;
                     //resIndexPDB[molNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                     if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                        System.out.println("   PDB: Added ligand '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspNum() + ").");
+                        System.out.println("   PDB: Added ligand monomer '" +  molNamePDB + "-" + molNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspNum() + ").");
                         System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                     }
 
@@ -1036,7 +1045,7 @@ class CifParser {
         
             if (lastMol.getType() == Molecule.RESIDUE_TYPE_AA || lastMol.getType() == Molecule.RESIDUE_TYPE_RNA){
                 if (lastMol == null) {
-                    DP.getInstance().w("Residue with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                    DP.getInstance().w("Molecule with PDB # " + molNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in CIF data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                     return;
                 } else {
                     if(Settings.getBoolean("PTGLgraphComputation_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
@@ -1046,10 +1055,16 @@ class CifParser {
                         // add Atom to list of atoms of current molecule as well as list of all atoms
                         FileParser.s_atoms.add(a);
                         if (checkType(Molecule.RESIDUE_TYPE_AA)){
+                            if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
+                                System.out.println("    [DEBUG LV 2] New AA atom added: " + a.toString());
+                            }
                             a.setAtomtype(Atom.ATOMTYPE_AA);
                             lastMol.addAtom(a);
                         }
                         if (checkType(Molecule.RESIDUE_TYPE_RNA)){
+                            if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
+                                System.out.println("    [DEBUG LV 2] New RNA atom added: " + a.toString());
+                            }
                             a.setAtomtype(Atom.ATOMTYPE_RNA);
                             a.setMolecule(rna);
                             rna.addAtom(a);
@@ -1059,6 +1074,9 @@ class CifParser {
             }
             else {
                 if (! (lig == null)){
+                    if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 2) {
+                       System.out.println("    [DEBUG LV 2] New ligand atom added: " + a.toString());
+                    }
                     lig.addAtom(a);
                     a.setMolecule(lig);
                     FileParser.s_atoms.add(a);
@@ -1184,7 +1202,7 @@ class CifParser {
                     element = stringList.get(i).substring(1, stringList.get(i).length() - 1);
                     if (element.endsWith("\n")){
                         // Secondly, check if there is still a newline char at the end of the line
-                        element = String.valueOf(element.replaceAll("\n", ""));
+                        element = String.valueOf(element).replaceAll("\n", "");
                     }
                 }
             }

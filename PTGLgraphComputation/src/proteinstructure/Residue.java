@@ -221,11 +221,6 @@ public class Residue extends Molecule implements java.io.Serializable {
     private Float psi = null;       // psi backbone angle
     private Integer acc = null;     // solvent accessible surface, from DSSP file
 
-    // see http://www.wwpdb.org/documentation/format32/sect4.html for the format of the heterogen section of PDB files
-    private String ligName = null;                          // HETNAM record of PDB file (name of this hetero group)
-    private String ligFormula = null;                       // FORMUL record of PDB file (chemical formula of this hetero group)
-    private String ligSynonyms = null;                      // HETSYN record of PDB file (synonyms for this hetero group)
-
     
     /**
      * Determines the chemical properties of this AA, according to the 5 types system.
@@ -407,42 +402,8 @@ public class Residue extends Molecule implements java.io.Serializable {
         }
         return(this.acc >= 15);
     }
-    
-    public String getLigName() {
-        if(this.isLigand()) {
-            return(this.ligName);
-        }
-        else {
-            DP.getInstance().w("getLigName() Called for non-ligand residue '" + this.getFancyName() + "'.");
-            return("NOT_A_LIGAND");
-        }
-    }
-
-    public String getLigFormula() {
-        if(this.isLigand()) {
-            return(this.ligFormula);
-        }
-        else {
-            DP.getInstance().w("getLigFormula() Called for non-ligand residue '" + this.getFancyName() + "'.");
-            return("NOT_A_LIGAND_SO_NO_HET_FORMULA");
-        }
-    }
-
-    public String getLigSynonyms() {
-        if(this.isLigand()) {
-            return(this.ligSynonyms);
-        }
-        else {
-            DP.getInstance().w("getLigSynonyms() Called for non-ligand residue '" + this.getFancyName() + "'.");
-            return("NOT_A_LIGAND_SO_NO_HET_SYNONYMS");
-        }
-    }
-    
-   
+  
     //setters
-    public void setLigName(String s) { ligName = s; }
-    public void setLigFormula(String s) { ligFormula = s; }
-    public void setLigSynonyms(String s) { ligSynonyms = s; }
     public void setPhi(Float f) { phi = f; }
     public void setPsi(Float f) { psi = f; }
     public void setAcc(Integer f) { acc = f; }
