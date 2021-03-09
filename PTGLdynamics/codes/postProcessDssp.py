@@ -93,7 +93,7 @@ logging.basicConfig(format = "[%(levelname)s] %(message)s")
 However, in the command line call the hyphen is used: --input-dir <path> """
 
 ## create the parser
-cl_parser = argparse.ArgumentParser(description="Post processing of old dssp files to adjust them to plcc. As an input a folder that contains .dssp files is given. The modified .dssp files are written to an output folder.",
+cl_parser = argparse.ArgumentParser(description="Post processing of old dssp files to adjust them to PTGLgraphComputation. As an input a folder that contains .dssp files is given. The modified .dssp files are written to an output folder.",
                                     fromfile_prefix_chars="@")
 
 ## add arguments

@@ -1,4 +1,4 @@
-The program files for step 1 - 3 are located in the "codes" directory and can be executed with the script ptglDynamics.py or on their own.
+The program files for step 1 - 3 are located in the "codes" directory and can be executed with the script PTGLdynamics.py or on their own.
 
 1.) Pre-processing of file in PDB file format
 The python script toLegacyPDB.py converts files in legacy PDB file format.

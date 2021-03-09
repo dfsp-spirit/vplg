@@ -313,7 +313,7 @@ log("Version " + version, "i")
 _start_time = time.time()
 
 ptglDynamics_path = os.path.dirname(__file__)
-PTGLgraphComputation_path = os.path.dirname(ptglDynamics_path) + '/plcc/dist/plcc.jar'
+PTGLgraphComputation_path = os.path.dirname(ptglDynamics_path) + '/PTGLgraphComputation/dist/PTGLgraphComputation.jar'
 
 cmd_start = 'python3 ' + ptglDynamics_path + '/codes/'
 
