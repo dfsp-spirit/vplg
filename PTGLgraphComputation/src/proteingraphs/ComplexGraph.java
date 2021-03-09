@@ -11,6 +11,7 @@ package proteingraphs;
 import graphdrawing.PageLayout;
 import graphdrawing.DrawTools;
 import graphdrawing.DrawResult;
+import java.awt.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -1036,7 +1037,7 @@ public class ComplexGraph extends UAdjListGraph {
      */
     private static DrawResult drawChainLevelComplexGraphG2D(Boolean nonProteinGraph, ComplexGraph cg, Map<String, String> molInfoForChains) {
         
-        
+        Boolean hasRna = false;
         Integer numVerts = cg.getVertices().size();
 
         Boolean bw = nonProteinGraph;
@@ -1316,11 +1317,22 @@ public class ComplexGraph extends UAdjListGraph {
         // pick color depending on SSE type
 
             // draw a shape based on SSE type
-            rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2, pl.getVertDiameter(), pl.getVertDiameter());
-            AffineTransform rot_45deg = new AffineTransform();
-            rot_45deg.rotate(0.785, vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2); // rotation around center of vertex
-            ig2.fill(rot_45deg.createTransformedShape(rect));
-
+            
+            Chain curChain = Chain.getChainByMacromolId(molID);
+            if (curChain.isRnaChain()) {
+                hasRna = true;
+                // create triangle shape for RNA nodes
+                int [] xpoints = {vertStart.x + (i * pl.vertDist) + 10, vertStart.x + (i * pl.vertDist) - 4, vertStart.x + (i * pl.vertDist) + 24};
+                int [] ypoints = {vertStart.y - pl.getVertDiameter() + 12, vertStart.y - pl.getVertDiameter() + 36, vertStart.y - pl.getVertDiameter() + 36};
+                int nPoints = 3;
+                ig2.fillPolygon(xpoints, ypoints, nPoints);
+            } else {
+                // create rectangular shape for residue nodes
+                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2, pl.getVertDiameter(), pl.getVertDiameter());
+                AffineTransform rot_45deg = new AffineTransform();
+                rot_45deg.rotate(0.785, vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2); // rotation around center of vertex
+                ig2.fill(rot_45deg.createTransformedShape(rect));
+            }
         }
         
         
@@ -1427,9 +1439,13 @@ public class ComplexGraph extends UAdjListGraph {
             
             
             //key for the footer
+            String rnaAddOn = "";
+            if (hasRna) {
+                rnaAddOn = "\nPeptide chains are represented as rectangles, RNA is represented as triangles.";
+            }
             
-            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologue chains have the same color. Non-homologue chains are gray.", ig2);
-            ig2.drawString("Homologue chains have the same color. Non-homologue chains are gray.", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
+            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologue chains have the same color. Non-homologue chains are gray." + rnaAddOn, ig2);
+            ig2.drawString("Homologue chains have the same color. Non-homologue chains are gray." + rnaAddOn, pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
             int border = 10;
             //ig2.draw(key);
             ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) key.getWidth() + 2 * border, (int) key.getHeight() + 2 * border);
