@@ -50,8 +50,10 @@ public class DBManager {
     static DatabaseMetaData dbmd;
     static String dbDriver;
     static Connection dbc;
+    
     // table names
-        
+    /** Name of the table storing meta information on the whole DB each per row as key-value pair. */
+    static String tbl_meta = "plcc_metainfo_db";
     
     /** Name of the table which stores info on a PDB protein, identified by the PDB ID. */
     static String tbl_protein = "plcc_protein";
@@ -1160,6 +1162,7 @@ public class DBManager {
         Boolean res = false;
 
         try {
+            doDeleteQuery("DROP TABLE " + tbl_meta + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_protein + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_macromolecule + " CASCADE;");            
             doDeleteQuery("DROP TABLE " + tbl_chain + " CASCADE;");
@@ -1251,6 +1254,13 @@ public class DBManager {
 
         try {
             // create tables
+            
+            doInsertQuery("CREATE TABLE " + tbl_meta + " (key text not null primary key, value text not null);");
+            if(fillTypetables) {
+                doInsertQuery("INSERT INTO " + tbl_meta + "(key, value) VALUES ('creator', '" + Settings.getProgramName() + "');");
+                doInsertQuery("INSERT INTO " + tbl_meta + "(key, value) VALUES ('version', '" + Settings.getVersion() + "');");
+            }
+            doInsertQuery("COMMENT ON TABLE " + tbl_meta + " IS 'Contains meta information about this database.';");
             
             // various types encoded by integers. these tables should be removed in the future and the values stored as string directly instead.
             doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
