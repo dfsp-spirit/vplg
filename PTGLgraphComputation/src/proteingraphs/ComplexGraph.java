@@ -691,8 +691,6 @@ public class ComplexGraph extends UAdjListGraph {
                 if(numAllInteractionsMap.get(getEdge(chainA, chainB)) == 0) {
                     removeEdge(getEdge(chainA, chainB));
                 }
-            } else {
-                neglectedEdges++; // TODO: so wrong...
             }
         } // end of loop over all res contacts
         computeNormalizedEdgeWeights();  // do this here instead of in loop, so we need to compute it only once
@@ -746,10 +744,19 @@ public class ComplexGraph extends UAdjListGraph {
 
     public Boolean chainsHaveEnoughContacts(Integer A, Integer B) {
         if (this.numChainInteractions[A][B] != null) {
-            return this.numChainInteractions[A][B] >= Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold");
+            if (this.numChainInteractions[A][B] >= Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold"))
+                return true;
+            else {
+                if (this.numChainInteractions[A][B] > 0) {
+                    // just to be sure we do not count anything wrong
+                    neglectedEdges++;  // this is WRONG b/c chainsHaveEnoughContacts is called for every mol contact
+                    return false;
+                }
+            }
         } else {
             return false;
         }
+        return false;
     }
 
 
@@ -1021,15 +1028,24 @@ public class ComplexGraph extends UAdjListGraph {
 
     // ------------------------- Draw header -------------------------
         // check width of header string
-        String proteinHeader = "The chain complex graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges().size() + "].";
-        String addInfo = "(Interchain contact threshold is set to " + Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold") + ". Neglected edges: " + cg.neglectedEdges + ")";
+        String proteinHeader = "Chain Complex Graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges().size() + "]";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        if (Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold") > 1) {
+            proteinHeader += "\n(Interchain contact threshold is set to " + Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold") + ")"; // could include neglected edges if they were correctly computed
+        }
+        
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
+        // above line should be:
+             // Integer stringHeight = fontMetrics.getAscent() * proteinHeader.split("\n").length;
+        //   but vertices and edges do not react to it and so labels would not fit. PageLayout.getVertStart would need to respect stringHeight of header
+        
         String chainName;    // the SSE number in the primary structure, N to C terminus
         String chainNumber;  // the SSE number in this graph, 1..(this.size)
 
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            //ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
             //i2.drawString(addInfo, pl.headerStart.x, pl.headerStart.y + pl.textLineHeight);((1f/x*(molID-2)) - (int)(1f/x*(molID-2)))
         }
 
@@ -1570,6 +1586,8 @@ public class ComplexGraph extends UAdjListGraph {
         String lastLine = "";
         
         LinkedHashMap<String, String> graphAttributes = new LinkedHashMap<>();
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("creator"), snakeCase), "\"PTGLgraphComputation\"");
+        graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("version"), snakeCase), "\"" + Settings.getVersion() + "\"");
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("ignore", "ligands"), snakeCase), (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands") ? "1" : "0"));  // whether ligands were ignored
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("min", "contacts", "for", "edge"), snakeCase), Settings.getInteger("PTGLgraphComputation_I_CG_contact_threshold").toString());  // contact threshold
         graphAttributes.put(TextTools.formatAsCaseStyle(Arrays.asList("factor", "lucid", "normalized", "weight"), snakeCase), minimumNormalizedEdgeWeight.toString());  // factor to reconstruct normalized edge weight

@@ -2903,7 +2903,8 @@ E	3	3	3
         String endEdge   = "  ]";
         
         gmlf.append("graph [\n");
-        gmlf.append("  id ").append(1).append("\n");
+        gmlf.append("  creator \"").append(Settings.getProgramName()).append("\"\n");
+        gmlf.append("  version \"").append(Settings.getVersion()).append("\"\n");
         gmlf.append("  label \"" + "PTGLtools Protein Graph ").append(shortStr).append("\"\n");
         gmlf.append("  comment \"").append(this.getOneLineMetadataString()).append("\"\n");
         gmlf.append("  directed 0\n");

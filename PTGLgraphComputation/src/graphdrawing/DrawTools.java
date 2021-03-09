@@ -1243,4 +1243,18 @@ public class DrawTools {
         return outfilesByFormat;
     }
     
+    /**
+     * Draws a string to the image and treats line breaks. Extends org.apache.batik.svggen.SVGGraphics2D.drawString .
+     * @param image to draw to
+     * @param text to draw
+     * @param x where to start
+     * @param y where to start
+     */
+    public static void drawStringLineBreaks(SVGGraphics2D image, String text, int x, int y) {
+        for (String line : text.split("\n")) {
+            image.drawString(line, x, y);
+            y += image.getFontMetrics().getHeight();
+        }
+    }
+    
 }

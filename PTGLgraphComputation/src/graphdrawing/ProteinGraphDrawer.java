@@ -166,14 +166,17 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
+        
         String proteinHeader = "ADJ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        
         String notation = "ADJ notation: '" + pnfr.adjNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
             if (Settings.getBoolean("PTGLgraphComputation_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
@@ -535,6 +538,7 @@ public class ProteinGraphDrawer {
      * @param pnfr a folding graph notation result
      * @return the DrawResult. You can write this to a file or whatever.
      */
+    @Deprecated
     private static DrawResult drawFoldingGraphKEYG2DOld(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
         SSEGraph pg = fg.getParent();
@@ -958,14 +962,17 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
+        
         String proteinHeader = "RED " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        
         String notation = "RED notation: '" + pnfr.redNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
             if (Settings.getBoolean("PTGLgraphComputation_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
@@ -1160,13 +1167,16 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
+        
         String proteinHeader = "DEF " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Integer k;
         Integer l;
@@ -1512,13 +1522,16 @@ public class ProteinGraphDrawer {
         ig2.setPaint(Color.BLACK);
         Font font = pl.getStandardFont();
         ig2.setFont(font);
-        FontMetrics fontMetrics = ig2.getFontMetrics();        
-        String proteinHeader = "" + pg.getGraphType() + " protein graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        FontMetrics fontMetrics = ig2.getFontMetrics();
+        
+        String proteinHeader = "" + pg.getGraphType() + " Protein Graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Shape shape;
         Arc2D.Double arc;
@@ -2430,14 +2443,17 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
+        
         String proteinHeader = "SEQ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        
         String notation = "SEQ notation: '" + pnfr.seqNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
             if (Settings.getBoolean("PTGLgraphComputation_B_print_notations_on_fg_images")) {
                 ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
             }
@@ -2711,7 +2727,10 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
+        
         String proteinHeader = "KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
+        proteinHeader += "\n" + Settings.getImagesCreatorVersionLine();
+        
         String notation = "KEY notation: '" + pnfr.keyNotation + "'";
         if (debug) {
             DP.getInstance().d("Notation from PNFR: " + notation);
@@ -2721,7 +2740,7 @@ public class ProteinGraphDrawer {
         String sseNumberFoldingGraph;
         String sseNumberProteinGraph;
         if (Settings.getBoolean("PTGLgraphComputation_B_graphimg_header")) {
-            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            DrawTools.drawStringLineBreaks(ig2, proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
         Integer[] shiftBack = new Integer[pg.getSize()];
         Integer shift = 0;
