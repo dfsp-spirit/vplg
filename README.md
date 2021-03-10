@@ -9,7 +9,7 @@ The software is used to fill the Protein Topology Graph Library (PTGL).
 
 Each top-level directory contains one software part of this package.
 
-- 'PTGLgraphComputation' (formerly labeled PLCC) is the main part of PTGLtools computing topology graphs of three-dimensional protein structures
+- 'PTGLgraphComputation' (formerly labeled PLCC) is the main part of PTGLtools computing graphs representing the topology of three-dimensional protein structures
 - 'web': files for the PTGL web server
 - 'splitpdb': splits a multi-model legacy PDB file into single PDB files of one model
 - 'graphletAnalyzer': finds graphlets in graph modeling language (GML) files
