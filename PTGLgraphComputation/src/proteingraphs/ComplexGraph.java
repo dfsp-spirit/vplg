@@ -240,7 +240,8 @@ public class ComplexGraph extends UAdjListGraph {
             Chain tmpChain = chains.get(i);
             for (Integer j = 0; j < allChains.size(); j++) {    // loop through chains to find matches
                 if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {     // if the chains match, check their molecule type
-                    if (allChains.get(j).getMoleculeType().equals("polyribonucleotide") && ! includeRna) {
+                    if (allChains.get(j).getMoleculeType().contains("polyribonucleotide") && ! includeRna) {  // hint: if including of RNA is turned off, RNA/DNA hybrids are not included either
+                        System.out.println("continue");
                         continue;
                     }
                     else {
@@ -1438,17 +1439,27 @@ public class ComplexGraph extends UAdjListGraph {
             }
             
             
-            //key for the footer
-            String rnaAddOn = "";
+            // footer
+            final Rectangle2D key;
+            String footer = "Homologue chains have the same color. Non-homologue chains are gray.";
+            
             if (hasRna) {
-                rnaAddOn = "\nPeptide chains are represented as rectangles, RNA is represented as triangles.";
+                String footerAddon = "\nPeptide chains are represented as rectangles, RNA chains are represented as triangles.";
+                footer += footerAddon;
+                key = ig2.getFontMetrics().getStringBounds(footerAddon, ig2);
+            } else {
+                key = ig2.getFontMetrics().getStringBounds(footer, ig2);
             }
             
-            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologue chains have the same color. Non-homologue chains are gray." + rnaAddOn, ig2);
-            ig2.drawString("Homologue chains have the same color. Non-homologue chains are gray." + rnaAddOn, pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
             int border = 10;
-            //ig2.draw(key);
-            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) key.getWidth() + 2 * border, (int) key.getHeight() + 2 * border);
+            
+            // draw footer
+            DrawTools.drawStringLineBreaks(ig2, footer, pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border);
+            
+            int numberOfLines = 1 + footer.length() - footer.replace("\n", "").length();
+            
+            // draw the rectangle around the footer
+            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border - 5, pl.getFooterStart().y + (pl.footerHeight - 55 ) - border, (int) key.getWidth() + border, (int) key.getHeight() + numberOfLines * border);
             
             
             /*
