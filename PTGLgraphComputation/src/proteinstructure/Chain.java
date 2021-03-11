@@ -54,18 +54,7 @@ public class Chain implements java.io.Serializable {
     public ArrayList<Molecule> getMolecules() { return(molecules); }
     public ArrayList<String> getHomologues() { return(homologues); }
     
-    public Boolean isRnaChain() { return(this.getMoleculeType().contains("polyribonucleotide") ? true : false); }
-
-    public static Chain getChainByMacromolId(String inputId) {
-        ArrayList<Chain> allChains = FileParser.getChains();
-        for (Integer i = 0; i < allChains.size(); i++) {
-            Chain curChain = allChains.get(i);
-             if (curChain.getMacromolID().equals(inputId)) {
-                return(curChain);
-            }
-        }
-        return null;
-    }
+    public Boolean isRnaChain() { return(this.getMoleculeType().contains("polyribonucleotide")); }
     
     /**
      * Retrieves (and computes if called 1st time) the coordinates of the chain centroid.

@@ -11,7 +11,6 @@ package proteingraphs;
 import graphdrawing.PageLayout;
 import graphdrawing.DrawTools;
 import graphdrawing.DrawResult;
-import java.awt.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -67,6 +66,7 @@ import tools.TextTools;
 public class ComplexGraph extends UAdjListGraph {
 
     private final int numberChains;  // Number of chains
+    private static List<Chain> allChains; // list of all chains
     public Map<Edge, String[]> chainNamesInEdge;
     public Map<Edge, Integer> numHelixHelixInteractionsMap;
     public Map<Edge, Integer> numHelixStrandInteractionsMap;
@@ -118,6 +118,7 @@ public class ComplexGraph extends UAdjListGraph {
      */
     public ComplexGraph(String pdbid, List<Chain> chains, List<MolContactInfo> resContacts, Boolean createConInfo) {
         this.pdbid = pdbid;
+        allChains = chains;
         numberChains = chains.size();
         createContactInfo = createConInfo;
         
@@ -154,7 +155,7 @@ public class ComplexGraph extends UAdjListGraph {
         // preprocess chains if required
         List<Chain> preprocessedChains = new ArrayList<>();
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
-            for (Chain tmpChain : chains) {
+            for (Chain tmpChain : allChains) {
                 Chain newChain = new Chain(tmpChain.getPdbChainID());
                 if (tmpChain.getMoleculeType().equals("polyribonucleotide") && includeRna) {
                     for (Molecule tmpMol : tmpChain.getAllRnaResidues()) {
@@ -171,9 +172,9 @@ public class ComplexGraph extends UAdjListGraph {
         } else {
             if (includeRna) {
                 // lig on, rna on
-                preprocessedChains = chains;
+                preprocessedChains = allChains;
             } else {
-                for (Chain tmpChain : chains) {
+                for (Chain tmpChain : allChains) {
                     Chain newChain = new Chain(tmpChain.getPdbChainID());
                     if (tmpChain.getMoleculeType().equals("polyribonucleotide")) {
                         // lig on, rna off
@@ -231,17 +232,15 @@ public class ComplexGraph extends UAdjListGraph {
     
     /**
      * Creates the vertices, fills corresponding maps and fills amino acid sequence.
-     * @param chains All chains of this complex graph. Hint: these chains are not the same objects as the ones that are parsed
+     * @param chains All chains of this complex graph.
      */
     private void createVertices(List<Chain> chains) {
-        ArrayList<Chain> allChains = FileParser.getChains();    // since the input chains are not the same objects as the parsed chains and therefore do not have all their attributes,
-        Vertex v;                                               // we need to compare the input chains to the parsed chains to find out if they are RNA
+        Vertex v;
         for(Integer i = 0; i < chains.size(); i++) {
             Chain tmpChain = chains.get(i);
             for (Integer j = 0; j < allChains.size(); j++) {    // loop through chains to find matches
                 if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {     // if the chains match, check their molecule type
-                    if (allChains.get(j).getMoleculeType().contains("polyribonucleotide") && ! includeRna) {  // hint: if including of RNA is turned off, RNA/DNA hybrids are not included either
-                        System.out.println("continue");
+                    if (allChains.get(j).getMoleculeType().contains("polyribonucleotide") && ! includeRna) {  // hint: if inclusion of RNA is turned off, RNA/DNA hybrids are not included either
                         continue;
                     }
                     else {
@@ -317,7 +316,6 @@ public class ComplexGraph extends UAdjListGraph {
             ComplexGraph.Vertex chainB = getVertexFromChain(resContacts.get(i).getMolB().getChainID());
                       
             Integer chainAint = Integer.parseInt(chainA.toString());
-            //System.out.println("chaina " + chainA); //TODELETE
             Integer chainBint = Integer.parseInt(chainB.toString());
                        
             // We only want interchain contacts
@@ -1319,7 +1317,7 @@ public class ComplexGraph extends UAdjListGraph {
 
             // draw a shape based on SSE type
             
-            Chain curChain = Chain.getChainByMacromolId(molID);
+            Chain curChain = getChainByMacromolId(molID);
             if (curChain.isRnaChain()) {
                 hasRna = true;
                 // create triangle shape for RNA nodes
@@ -1697,5 +1695,16 @@ public class ComplexGraph extends UAdjListGraph {
             DP.getInstance().w("Tried to get CG's contact info despite setting PTGLgraphComputation_B_writeComplexContactCSV was off. Returning null.");
             return null;
         }
+    }
+     
+     
+    public static Chain getChainByMacromolId(String inputId) {;
+        for (Integer i = 0; i < allChains.size(); i++) {
+            Chain curChain = allChains.get(i);
+             if (curChain.getMacromolID().equals(inputId)) {
+                return(curChain);
+            }
+        }
+        return null;
     }
 }
