@@ -39,6 +39,7 @@ import org.w3c.dom.Document;
 import io.DBManager;
 import io.FileParser;
 import io.IO;
+import io.FileParser;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -65,6 +66,7 @@ import tools.TextTools;
 public class ComplexGraph extends UAdjListGraph {
 
     private final int numberChains;  // Number of chains
+    private static List<Chain> allChains; // list of all chains
     public Map<Edge, String[]> chainNamesInEdge;
     public Map<Edge, Integer> numHelixHelixInteractionsMap;
     public Map<Edge, Integer> numHelixStrandInteractionsMap;
@@ -96,6 +98,7 @@ public class ComplexGraph extends UAdjListGraph {
     private final Set<String> molIDs;  // Contains the mol IDs for all chains. Used to get number of mol IDs (= size)
     private final String[] chainResAASeq;
     public Integer neglectedEdges;
+    public Boolean includeRna = Settings.getBoolean("PTGLgraphComputation_B_include_rna");
     
 
     /**
@@ -115,6 +118,7 @@ public class ComplexGraph extends UAdjListGraph {
      */
     public ComplexGraph(String pdbid, List<Chain> chains, List<MolContactInfo> resContacts, Boolean createConInfo) {
         this.pdbid = pdbid;
+        allChains = chains;
         numberChains = chains.size();
         createContactInfo = createConInfo;
         
@@ -149,19 +153,41 @@ public class ComplexGraph extends UAdjListGraph {
         chainResAASeq = new String[numberChains];
         
         // preprocess chains if required
-        List<Chain> preprocessedChains;
+        List<Chain> preprocessedChains = new ArrayList<>();
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
-            preprocessedChains = new ArrayList<>();
-            for (Chain tmpChain : chains) {
-                    Chain newChain = new Chain(tmpChain.getPdbChainID());
-                    // only get AAResidues
-                    for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
+            for (Chain tmpChain : allChains) {
+                Chain newChain = new Chain(tmpChain.getPdbChainID());
+                if (tmpChain.getMoleculeType().equals("polyribonucleotide") && includeRna) {
+                    for (Molecule tmpMol : tmpChain.getAllRnaResidues()) {
+                        // lig off, rna on
                         newChain.addMolecule(tmpMol);
+                    }
+                }
+                for (Molecule tmpMol : tmpChain.getAllAAResidues()) {
+                    // lig off, rna off/on
+                    newChain.addMolecule(tmpMol);
+                }
+                preprocessedChains.add(newChain);
+            }
+        } else {
+            if (includeRna) {
+                // lig on, rna on
+                preprocessedChains = allChains;
+            } else {
+                for (Chain tmpChain : allChains) {
+                    Chain newChain = new Chain(tmpChain.getPdbChainID());
+                    if (tmpChain.getMoleculeType().equals("polyribonucleotide")) {
+                        // lig on, rna off
+                        continue;
+                    } else {
+                        for (Molecule tmpMol : tmpChain.getMolecules()) {
+                            // lig on, rna off
+                            newChain.addMolecule(tmpMol);
+                        }
                     }
                     preprocessedChains.add(newChain);
                 }
-        } else {
-            preprocessedChains = chains;
+            }
         }
         
         createVertices(preprocessedChains);
@@ -172,12 +198,31 @@ public class ComplexGraph extends UAdjListGraph {
         if (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands")) {
             preprocessedResContacts = new ArrayList<>();
             for (MolContactInfo tmpMci : resContacts) {
-                if (! tmpMci.isLigandContact()) {
-                    preprocessedResContacts.add(tmpMci);
-                }
+                if (tmpMci.isRnaContact() && ! includeRna) {
+                    // lig off, rna off
+                    continue;
+                } else {
+                    if (! tmpMci.isLigandContact()) {
+                        // lig off, rna on
+                        preprocessedResContacts.add(tmpMci);
+                    }
+                }  
             }
         } else {
-            preprocessedResContacts = resContacts;
+            if (includeRna) {
+                // lig on, rna on
+                preprocessedResContacts = resContacts;
+            } else {
+                preprocessedResContacts = new ArrayList<>();
+                for (MolContactInfo tmpMci : resContacts) {
+                    if (tmpMci.isRnaContact()) {
+                        // lig on, rna off
+                        continue;
+                    } else {
+                        preprocessedResContacts.add(tmpMci);
+                    }
+                }
+            }
         }
         
         calculateNumChainInteractions(preprocessedResContacts);
@@ -187,31 +232,41 @@ public class ComplexGraph extends UAdjListGraph {
     
     /**
      * Creates the vertices, fills corresponding maps and fills amino acid sequence.
-     * @param chains All chains of this complex graph
+     * @param chains All chains of this complex graph.
      */
     private void createVertices(List<Chain> chains) {
+        Vertex v;
         for(Integer i = 0; i < chains.size(); i++) {
             Chain tmpChain = chains.get(i);
-            Vertex v = createVertex();
+            for (Integer j = 0; j < allChains.size(); j++) {    // loop through chains to find matches
+                if (tmpChain.getPdbChainID() == allChains.get(j).getPdbChainID()) {     // if the chains match, check their molecule type
+                    if (allChains.get(j).getMoleculeType().contains("polyribonucleotide") && ! includeRna) {  // hint: if inclusion of RNA is turned off, RNA/DNA hybrids are not included either
+                        continue;
+                    }
+                    else {
+                        v = createVertex();
              
-            proteinNodeMap.put(v, tmpChain.getPdbChainID());
-            molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
-            chainLengthMap.put(v, tmpChain.getAllAAResidues().size());
-            
-            molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
-            mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getAllAAResidues().size());
+                        proteinNodeMap.put(v, tmpChain.getPdbChainID());
+                        molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
+                        chainLengthMap.put(v, tmpChain.getAllAAResidues().size());
 
-            // get AA sequence string for each chainName
-            for(Residue resi : tmpChain.getAllAAResidues()) {
-                
-                if ( ! Settings.get("PTGLgraphComputation_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
-                    if (chainResAASeq[i] != null) {
-                        chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
-                    } else {
-                        chainResAASeq[i] = resi.getAAName1();
+                        molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
+                        mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getAllAAResidues().size());
+
+                        // get AA sequence string for each chainName
+                        for(Residue resi : tmpChain.getAllAAResidues()) {
+
+                            if ( ! Settings.get("PTGLgraphComputation_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
+                                if (chainResAASeq[i] != null) {
+                                    chainResAASeq[i] = chainResAASeq[i] + resi.getAAName1();
+                                } else {
+                                    chainResAASeq[i] = resi.getAAName1();
+                                }
+                            }
+                        }
                     }
                 }
-            }
+            } 
         }
     }
     
@@ -981,7 +1036,7 @@ public class ComplexGraph extends UAdjListGraph {
      */
     private static DrawResult drawChainLevelComplexGraphG2D(Boolean nonProteinGraph, ComplexGraph cg, Map<String, String> molInfoForChains) {
         
-        
+        Boolean hasRna = false;
         Integer numVerts = cg.getVertices().size();
 
         Boolean bw = nonProteinGraph;
@@ -1261,11 +1316,22 @@ public class ComplexGraph extends UAdjListGraph {
         // pick color depending on SSE type
 
             // draw a shape based on SSE type
-            rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2, pl.getVertDiameter(), pl.getVertDiameter());
-            AffineTransform rot_45deg = new AffineTransform();
-            rot_45deg.rotate(0.785, vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2); // rotation around center of vertex
-            ig2.fill(rot_45deg.createTransformedShape(rect));
-
+            
+            Chain curChain = getChainByMacromolId(molID);
+            if (curChain.isRnaChain()) {
+                hasRna = true;
+                // create triangle shape for RNA nodes
+                int [] xpoints = {vertStart.x + (i * pl.vertDist) + 10, vertStart.x + (i * pl.vertDist) - 4, vertStart.x + (i * pl.vertDist) + 24};
+                int [] ypoints = {vertStart.y - pl.getVertDiameter() + 12, vertStart.y - pl.getVertDiameter() + 36, vertStart.y - pl.getVertDiameter() + 36};
+                int nPoints = 3;
+                ig2.fillPolygon(xpoints, ypoints, nPoints);
+            } else {
+                // create rectangular shape for residue nodes
+                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2, pl.getVertDiameter(), pl.getVertDiameter());
+                AffineTransform rot_45deg = new AffineTransform();
+                rot_45deg.rotate(0.785, vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2); // rotation around center of vertex
+                ig2.fill(rot_45deg.createTransformedShape(rect));
+            }
         }
         
         
@@ -1371,13 +1437,27 @@ public class ComplexGraph extends UAdjListGraph {
             }
             
             
-            //key for the footer
+            // footer
+            final Rectangle2D key;
+            String footer = "Homologue chains have the same color. Non-homologue chains are gray.";
             
-            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologue chains have the same color. Non-homologue chains are gray.", ig2);
-            ig2.drawString("Homologue chains have the same color. Non-homologue chains are gray.", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
+            if (hasRna) {
+                String footerAddon = "\nPeptide chains are represented as rectangles, RNA chains are represented as triangles.";
+                footer += footerAddon;
+                key = ig2.getFontMetrics().getStringBounds(footerAddon, ig2);
+            } else {
+                key = ig2.getFontMetrics().getStringBounds(footer, ig2);
+            }
+            
             int border = 10;
-            //ig2.draw(key);
-            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border, (int) key.getWidth() + 2 * border, (int) key.getHeight() + 2 * border);
+            
+            // draw footer
+            DrawTools.drawStringLineBreaks(ig2, footer, pl.getFooterStart().x - pl.vertDist - border, pl.getFooterStart().y + (pl.footerHeight - 40) - border);
+            
+            int numberOfLines = 1 + footer.length() - footer.replace("\n", "").length();
+            
+            // draw the rectangle around the footer
+            ig2.drawRect(pl.getFooterStart().x - pl.vertDist - border - 5, pl.getFooterStart().y + (pl.footerHeight - 55 ) - border, (int) key.getWidth() + border, (int) key.getHeight() + numberOfLines * border);
             
             
             /*
@@ -1615,5 +1695,16 @@ public class ComplexGraph extends UAdjListGraph {
             DP.getInstance().w("Tried to get CG's contact info despite setting PTGLgraphComputation_B_writeComplexContactCSV was off. Returning null.");
             return null;
         }
+    }
+     
+     
+    public static Chain getChainByMacromolId(String inputId) {;
+        for (Integer i = 0; i < allChains.size(); i++) {
+            Chain curChain = allChains.get(i);
+             if (curChain.getMacromolID().equals(inputId)) {
+                return(curChain);
+            }
+        }
+        return null;
     }
 }

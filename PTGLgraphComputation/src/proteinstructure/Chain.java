@@ -10,6 +10,7 @@ package proteinstructure;
 
 // imports
 import proteinstructure.SSE;
+import io.FileParser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import io.IO;
@@ -53,6 +54,7 @@ public class Chain implements java.io.Serializable {
     public ArrayList<Molecule> getMolecules() { return(molecules); }
     public ArrayList<String> getHomologues() { return(homologues); }
     
+    public Boolean isRnaChain() { return(this.getMoleculeType().contains("polyribonucleotide")); }
     
     /**
      * Retrieves (and computes if called 1st time) the coordinates of the chain centroid.
