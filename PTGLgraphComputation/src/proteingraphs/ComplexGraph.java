@@ -1373,7 +1373,7 @@ public class ComplexGraph extends UAdjListGraph {
             
             //key for the footer
             
-            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologue chains have the same color. Non-homologue chains are gray.", ig2);
+            final Rectangle2D key = ig2.getFontMetrics().getStringBounds("Homologous chains have the same color. Non-homologous chains are gray.", ig2);
             ig2.drawString("Homologue chains have the same color. Non-homologue chains are gray.", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (pl.footerHeight -40) + (int) key.getHeight());
             int border = 10;
             //ig2.draw(key);
