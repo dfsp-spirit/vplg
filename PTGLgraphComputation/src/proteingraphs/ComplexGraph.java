@@ -1448,7 +1448,7 @@ public class ComplexGraph extends UAdjListGraph {
             } else {
                 key = ig2.getFontMetrics().getStringBounds(footer, ig2);
             }
-            
+
             int border = 10;
             
             // draw footer
