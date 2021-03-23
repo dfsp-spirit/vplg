@@ -86,6 +86,7 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Vertex, String> proteinNodeMap;
     public Map<Vertex, String> molMap;  // contains for each vertex (= protein chain) the corresponding molecule name
     public Map<Vertex, Integer> chainLengthMap;  // used for the GML file output
+    public Map<Vertex, String> chainTypeMap;
     public Map<List<Integer>, Integer> numSSEContacts;
     public Map<List<Integer>, List<String>> numSSEContactChainNames;
     
@@ -141,6 +142,7 @@ public class ComplexGraph extends UAdjListGraph {
         proteinNodeMap = createVertexMap();
         molMap = createVertexMap();
         chainLengthMap = createVertexMap();
+        chainTypeMap = createVertexMap();
         
         molIDs = new HashSet<>();
         numSSEContacts = new HashMap<>();
@@ -249,6 +251,7 @@ public class ComplexGraph extends UAdjListGraph {
                         proteinNodeMap.put(v, tmpChain.getPdbChainID());
                         molMap.put(v, FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());  // get the mol name from the ProtMetaInfo
                         chainLengthMap.put(v, tmpChain.getAllAAResidues().size());
+                        chainTypeMap.put(v, allChains.get(j).getMoleculeType());
 
                         molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
                         mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getAllAAResidues().size());
@@ -1601,6 +1604,24 @@ public class ComplexGraph extends UAdjListGraph {
             @Override
             public String write(Vertex o) {
                 return chainLengthMap.get(o).toString();
+            }
+        });
+        
+        // add a new line per node holding the chain's chemical type (RNA/peptide/non-polymer)
+        gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
+            @Override
+            public String getAttribute() {
+                return TextTools.formatAsCaseStyle(Arrays.asList("chain", "type"), snakeCase);
+            }
+
+            @Override
+            public boolean hasValue(Vertex o) {
+                return chainTypeMap.containsKey(o);
+            }
+
+            @Override
+            public String write(Vertex o) {
+                return chainTypeMap.get(o).toString();
             }
         });
         
