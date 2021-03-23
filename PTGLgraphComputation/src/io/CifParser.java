@@ -1479,7 +1479,11 @@ class CifParser {
         c.setModel(m);
         c.setModelID(m.getModelID());
         m.addChain(c);
-        c.setMoleculeType(chainIdentity.get(cID));
+        if (chainIdentity.get(cID) == null) {
+            c.setMoleculeType("non-polymer");
+        } else {
+            c.setMoleculeType(chainIdentity.get(cID));
+        }
         c.setAltChainID(altChainID);
                 
         c.setHomologues(FileParser.homologuesMap.get(cID));
