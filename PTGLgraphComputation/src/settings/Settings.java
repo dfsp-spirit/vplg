@@ -30,7 +30,8 @@ public class Settings {
     //   patch: (hot-)fixes, small changes
     //   no version change: fix typos, changes to comments, debug prints, small changes to non-result output, changes within git branch
     // -> only increment with commit / push / merge not while programming
-    static final private String VERSION = "3.3.1";
+    // -> when incrementing, reset lower levels to zero, e.g., 3.2.1 -> 3.3.0
+    static final private String VERSION = "3.3.0";
     
     static final private String PROGRAM_NAME = "PTGLgraphComputation";
     
