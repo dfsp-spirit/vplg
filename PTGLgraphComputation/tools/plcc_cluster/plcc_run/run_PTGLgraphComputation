@@ -1,8 +1,8 @@
 #!/bin/bash
-## PTGLgraphComputation startup script by Tim Schaefer
+## PTGLgraphComputation startup script by Tim Schaefer and updated by JNW
 
 
-APPTAG="[PTGLgraphComputation_STARTSCRIPT]"
+APPTAG="[graCom_STARTSCRIPT]"
 
 ## check for java in PATH
 which java > /dev/null
@@ -24,4 +24,4 @@ fi
 echo "$APPTAG Using java binary from '$JAVABIN'."
 
 ## k, run
-$JAVABIN -jar PTGLgraphComputation.jar $@
+$JAVABIN -Xmx124G -jar PTGLgraphComputation.jar $@

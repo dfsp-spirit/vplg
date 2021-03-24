@@ -231,7 +231,7 @@ ERROR_LOG_GET_PDB_FILE="${LOGDIR}/log_getpdb_${PDBID}.log"
 ERROR_LOG_CREATE_DSSP_FILE="${LOGDIR}/log_createdssp_${PDBID}.log"
 
 DBINSERT_LOG="/dev/null"
-ERROR_LOG_PLCC="/dev/null"
+#ERROR_LOG_PLCC="/dev/null"
 ERROR_LOG_GET_PDB_FILE="/dev/null"
 ERROR_LOG_CREATE_DSSP_FILE="/dev/null"
 
@@ -357,17 +357,17 @@ if [ -r $FLN ]; then
 
 
 	## Ok, now call plcc to do the real work.
-	PLCC_COMMAND="./plcc $PDBID $PLCC_OPTIONS"
+	PLCC_COMMAND="./run_PTGLgraphComputation $PDBID $PLCC_OPTIONS"
 	
 	if [ "$SILENT" = "NO" ]; then
 	    echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
 	fi
 	#echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
-	 
-	$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
-        # DEBUG	
-        #$PLCC_COMMAND &> /home/niclas/software/plcc_cluster_cif/plcc_run/plcc$PDBID.log
+	
+	# DEBUG 
+	#$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
+	$PLCC_COMMAND &> /home/niclas/software/plcc_cluster_cif/plcc_run/plcc$PDBID.log
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
