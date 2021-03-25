@@ -144,7 +144,7 @@ if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
     exit 1
 fi
 
-PLCC_JAR="$PLCC_CLUSTER_RUN_DIR/plcc.jar"
+PLCC_JAR="$PLCC_CLUSTER_RUN_DIR/PTGLgraphComputation.jar"
 if [ ! -f "$PLCC_JAR" ]; then
     echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over."
     echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over." >> $ERRORLOG
