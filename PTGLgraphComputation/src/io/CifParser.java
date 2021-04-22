@@ -637,13 +637,14 @@ class CifParser {
             } else {
                 // same model as before?
                 if (! m.getModelID().equals(tmpModelID)) {
-                    if (! furtherModelWarningPrinted) {
-                        System.out.println("   PDB: Found further models. Ignoring them.");
-                        furtherModelWarningPrinted = true;
+                    if (metaData.get("experiment").contains("NMR")) {
+                        if (! furtherModelWarningPrinted) {
+                            System.out.println("   PDB: Found further models. Ignoring them.");
+                            furtherModelWarningPrinted = true;
+                        }
+                        // skip this line if the structure is NMR
+                        return;
                     }
-
-                    // skip this line
-                    return;
                 }
             }
         } else {
