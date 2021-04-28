@@ -188,6 +188,10 @@ cl_parser.add_argument('-u',
                        action='store_true',
                        help='display the results in sub directories in the output directory.')
 
+cl_parser.add_argument('--PTGLgraphComputation-path',
+                       default = (os.path.dirname(__file__) + '/PTGLgraphComputation/dist/PTGLgraphComputation.jar'),
+                       help = 'Absolute path to a custom PTGLgraphComputation JAR file. Otherwise assuming built version of PTGLtools.')
+
 cl_parser.add_argument('-k',
                        '--PTGLgraphComputation-args',
                        metavar = 'PTGLgraphComputation-args',
@@ -313,7 +317,7 @@ log("Version " + version, "i")
 _start_time = time.time()
 
 ptglDynamics_path = os.path.dirname(__file__)
-PTGLgraphComputation_path = ptglDynamics_path + '/codes/PTGLgraphComputation_57d87d1/plcc.jar'
+PTGLgraphComputation_path = args.PTGLgraphComputation_path
 
 cmd_start = 'python3 ' + ptglDynamics_path + '/codes/'
 
