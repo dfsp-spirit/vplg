@@ -175,7 +175,7 @@ cl_parser.add_argument('-a',
                        nargs = "*",
                        type = str,
                        default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py'],
-                       help = 'to execute only the specified scripts.')
+                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py'")
 
 cl_parser.add_argument('-m',
                        '--dssp-input-dir',
@@ -313,7 +313,7 @@ log("Version " + version, "i")
 _start_time = time.time()
 
 ptglDynamics_path = os.path.dirname(__file__)
-PTGLgraphComputation_path = os.path.dirname(ptglDynamics_path) + '/PTGLgraphComputation/dist/PTGLgraphComputation.jar'
+PTGLgraphComputation_path = ptglDynamics_path + '/codes/PTGLgraphComputation_57d87d1/plcc.jar'
 
 cmd_start = 'python3 ' + ptglDynamics_path + '/codes/'
 
@@ -489,7 +489,7 @@ for elem in programm_list:
                     if prevGml != '':
                         os.chdir(gml_dir)
                         gml_comparison = cmd_start + elem +' ' + add_gml_comparison_args + ' -a ' + prevGml + ' -b ' + entry + ' -p ' + out_dir
-                        log(gmlComparison,'d')
+                        log(gml_comparison,'d')
                         os.system(gml_comparison)
                         os.chdir(work_dir)
                     prevGml = entry
