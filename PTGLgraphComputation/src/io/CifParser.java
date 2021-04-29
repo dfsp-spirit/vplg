@@ -257,7 +257,6 @@ class CifParser {
                     lineData = lineToArray(line);
                 } else {
                     lineData = trimSpecialChars(currentLineValues);
-                    //System.out.println(currentLineValues); //TODELETE
                 }
                 
                 // check for minimum length of lineData (2 for non-loop and #header for loop) and merge with coming line if not
@@ -839,7 +838,6 @@ class CifParser {
                     
                     lastChainID = chainID;
                     FileParser.s_molecules.add(res);
-                    FileParser.getChainByPdbChainID(chainID).addMolecule(res);
                     lastMol = res;
                 } else {
                     lastMol = tmpMol;
