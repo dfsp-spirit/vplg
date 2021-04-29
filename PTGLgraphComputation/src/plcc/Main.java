@@ -5151,7 +5151,7 @@ public class Main {
                     mol2 = AAResiduesA.get(j);
 
                     if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
-                        System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 1.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                        System.out.println("  [DEBUG LV 1] Checking DSSP pair (within chain loop 1.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                     }
                     
                     numResContactsChecked++;
@@ -5189,7 +5189,7 @@ public class Main {
                         mol2 = AAResiduesA.get(j);
 
                         if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
-                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (loop 2.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (within chain loop 2.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
                         numResContactsChecked++;
@@ -5219,7 +5219,7 @@ public class Main {
 
                         if(Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                             
-                            System.out.println("  [DEBUG LV 1] Checking DSSP (loop 2.2) pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                            System.out.println("  [DEBUG LV 1] Checking DSSP pair (within chain loop 2.2) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                         }
 
                         numResContactsChecked++;
@@ -5308,7 +5308,7 @@ public class Main {
 
                             if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                 if(! silent) {
-                                    System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                                    System.out.println("  Checking DSSP pair (between chain loop 1.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                 }
                             }                
 
@@ -5350,7 +5350,7 @@ public class Main {
 
                                 if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair (between chain loop 2.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
@@ -5383,7 +5383,7 @@ public class Main {
 
                                 if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair (between chain loop 2.2) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
@@ -5422,7 +5422,7 @@ public class Main {
 
                                 if (Settings.getInteger("PTGLgraphComputation_I_debug_level") >= 1) {
                                     if(! silent) {
-                                        System.out.println("  Checking DSSP pair " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
+                                        System.out.println("  Checking DSSP pair (between chain loop 3.1) " + mol1.getDsspNum() + "/" + mol2.getDsspNum() + "...");
                                     }
                                 }                
 
