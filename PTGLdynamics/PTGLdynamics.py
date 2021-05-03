@@ -174,8 +174,8 @@ cl_parser.add_argument('-a',
                        metavar = 'applications',
                        nargs = "*",
                        type = str,
-                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py'],
-                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py'")
+                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py'],
+                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py'")
 
 cl_parser.add_argument('-m',
                        '--dssp-input-dir',
@@ -192,7 +192,7 @@ cl_parser.add_argument('--PTGLgraphComputation-path',
                        default = (os.path.dirname(__file__) + '/PTGLgraphComputation/dist/PTGLgraphComputation.jar'),
                        help = 'Absolute path to a custom PTGLgraphComputation JAR file. Otherwise assuming built version of PTGLtools.')
 
-cl_parser.add_argument('-k',
+cl_parser.add_argument('-k', 
                        '--PTGLgraphComputation-args',
                        metavar = 'PTGLgraphComputation-args',
                        type = str,
@@ -231,6 +231,25 @@ cl_parser.add_argument('-j',
                        '--different-dssp-folders',
                        action = 'store_true',
                        help = 'saves the dssp from dsspcmbi and the post processed dssp in different folders if the sub directory structure is activated.')
+
+cl_parser.add_argument('-t',
+                       '--getAttributeDataFromGml-args',
+                       metavar = 'getAttributeDataFromGml-args',
+                       type = str,
+                       default = '',
+                       help = 'a string with the arguments for getAttributeDataFromGml you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -t="<arguments and their inputs>" ')
+
+cl_parser.add_argument('--getAttributeDataFromGml-attribute',
+                       type = str,
+                       default = 'numAllResResContacts',
+                       help = 'attribute-data that should be extracted from the gml files, attribute name given as a string.')
+
+cl_parser.add_argument('--getAttributeDataFromGml-inputfile',
+                       type = str,
+                       default = '',
+                       help = 'Path to gml-inputfile for a single execution of getAttributeDataFromGml.')
+
+
 
 args = cl_parser.parse_args()
 
@@ -277,12 +296,12 @@ else:
 programm_list = []
 if (args.applications != []):
     for programm in args.applications:
-        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py']:
+        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py']:
             programm_list.append(programm)
         else:
             logging.error("Specified programm '%s' is not part of the ptglDynamics pipeline. Continuing without it.", programm)
 else:
-    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py']
+    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py']
 
 # dssp directory
 dssp_input_dir = check_dir_args(args.dssp_input_dir)
@@ -301,12 +320,15 @@ add_gml_comparison_args = check_arguments_args(args.gmlCompareEdgeWeightsAndSubs
 
 # dsspcmbi arguments
 add_dsspcmbi_args = check_arguments_args(args.dsspcmbi_args)
+
+# getAttributeDataFromGml arguments
+add_getAttributeDataFromGml_args = check_arguments_args(args.getAttributeDataFromGml_args)
     
 # different dssp folders
 if (args.different_dssp_folders):
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml', 'getAttributeDataFromGml.py': 'csv'}
 else:
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv', 'getAttributeDataFromGml.py': 'csv'}
 
 ########### vamos ###########
 
@@ -325,6 +347,11 @@ input_dir = os.path.abspath(input_dir) + '/'
 original_output_dir = os.path.abspath(original_output_dir) + '/'
 
 pdb_dir = input_dir
+plotting_dir = ptglDynamics_path + '/codes/plotting-scripts/'
+
+attribute = args.getAttributeDataFromGml_attribute
+getAttribute_def_inputfile = args.getAttributeDataFromGml_inputfile
+
 
 # define dssp_dir considering that it can be specified via command line
 if(dssp_input_dir == os.getcwd()):
@@ -500,6 +527,60 @@ for elem in programm_list:
         
         log('gmlCompareEdgeWeightsAndSubsets computations are done.', 'i')
 
+
+    elif (elem == 'getAttributeDataFromGml.py'):
+        ending_of_files = 'complex_chains_albelig_CG.gml'
+
+        # path of the given inputfile.
+        if (getAttribute_def_inputfile != ''):
+            filename_gml = os.path.basename(getAttribute_def_inputfile)
+            filename_csv = filename_gml[:filename_gml.index(ending_of_files)] + attribute + '.csv'
+            get_attribute = 'python3 ' + plotting_dir + elem + ' ' + getAttribute_def_inputfile + ' ' + attribute + ' ' + add_getAttributeDataFromGml_args + ' -o ' + out_dir + filename_csv
+            log(get_attribute, 'd')
+
+            os.chdir(out_dir)
+            os.system(get_attribute)
+            os.chdir(work_dir)
+     
+        # use gml-files computed by plcc. 
+        else:     
+            work_dir = get_working_dir(PTGLgraphComputation_dir)  # output dir plcc        
+            list_work_dir = os.listdir(work_dir)
+            list_work_dir = sorted_nicely(list_work_dir)  
+
+            for data in list_work_dir:
+
+                if (os.path.isdir(data)):   # check files in subfolder
+                    temp_work_dir = get_working_dir(data)
+                    list_temp_work_dir = os.listdir(temp_work_dir)
+                    list_temp_work_dir = sorted_nicely(list_temp_work_dir)
+ 
+                    for file in list_temp_work_dir:
+                        if file.endswith(ending_of_files):
+                            filename_gml = os.path.basename(file)
+                            filename_csv = filename_gml[:filename_gml.index(ending_of_files)] + attribute + '.csv'
+                            get_attribute = 'python3 ' + plotting_dir + elem + ' ' + ' ' + temp_work_dir + filename_gml + ' ' + attribute + ' ' + add_getAttributeDataFromGml_args + ' -o ' + out_dir + filename_csv
+                            log(get_attribute, 'd')
+
+                            os.chdir(out_dir)
+                            os.system(get_attribute)
+                            os.chdir(temp_work_dir)
+
+                    os.chdir('../')
+
+                elif (data.endswith(ending_of_files)):   #file in folder
+                    filename_gml = os.path.basename(data)
+                    filename_csv = filename_gml[:filename_gml.index(ending_of_files)] + attribute + '.csv'
+                    get_attribute = 'python3 ' + plotting_dir + elem + ' ' + work_dir + filename_gml + ' ' + attribute + ' ' + add_getAttributeDataFromGml_args + ' -o ' + out_dir + filename_csv
+                    log(get_attribute, 'd')
+
+                    os.chdir(out_dir)
+                    os.system(get_attribute)
+                    os.chdir(work_dir)
+    
+        getAttributeDataFromGml_dir = os.path.abspath(out_dir) + '/'
+        log('getAttributeDataFromGml computations are done.', 'i')
+    
 
 log("-- %s seconds ---"% (time.time()- _start_time), 'i')
 log("All done, exiting ptglDynamics.", 'i')
