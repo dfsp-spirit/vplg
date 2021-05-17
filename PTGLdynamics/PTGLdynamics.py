@@ -185,8 +185,8 @@ cl_parser.add_argument('-a',
                        metavar = 'applications',
                        nargs = "*",
                        type = str,
-                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py'],
-                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py'")
+                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py'],
+                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py'")
 
 cl_parser.add_argument('-m',
                        '--dssp-input-dir',
@@ -253,19 +253,26 @@ cl_parser.add_argument('-z',
                        '--evalEdgesWeights-args',
                        metavar = 'evalEdgesWeights-args',
                        default = '',   
-                       help = 'a string with the arguments for evalEdgesWeights you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -t="<arguments and their inputs>". For default are two csv files in your output folder created, all_edge_values.csv and edges_weights.csv. If the second file name is altered, changeEdgeNames.py has to be executed manually on that file.')
+                       help = 'a string with the arguments for evalEdgesWeights you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -z="<arguments and their inputs>". For default are two csv files in your output folder created, all_edge_values.csv and edges_weights.csv. If the second file name is altered, changeEdgeNames.py has to be executed manually on that file.')
                        
 cl_parser.add_argument('-y',
                        '--changeEdgeNames-args',
                        metavar = 'changeEdgeNames-args',
                        default = '',   
-                       help = 'a string with the arguments for changeEdgeNames you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -t="<arguments and their inputs>". Using the files from the inputfolder as default. Executing the script alone needs at least all positional arguments, only one csv at a time can be executed.')
+                       help = 'a string with the arguments for changeEdgeNames you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -y="<arguments and their inputs>". Using the files from the inputfolder as default. Executing the script alone needs at least all positional arguments, only one csv at a time can be executed.')
                        
 cl_parser.add_argument('-x',
                        '--sumEdgeWeights-args',
                        metavar = 'sumEdgeWeights-args',
                        default = '',   
-                       help = 'a string with the arguments for sumEdgeWeights you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -t="<arguments and their inputs>".')
+                       help = 'a string with the arguments for sumEdgeWeights you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -x="<arguments and their inputs>".')
+
+cl_parser.add_argument('-n',
+                       '--plotSnapshots-args',
+                       metavar = 'plotSnapshots-args',
+                       default = '',   
+                       help = 'a string with the arguments for plotSnapshots you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -n="<arguments and their inputs>".')
+
 
 args = cl_parser.parse_args()
 
@@ -311,12 +318,12 @@ else:
 programm_list = []
 if (args.applications != []):
     for programm in args.applications:
-        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py']:
+        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py']:
             programm_list.append(programm)
         else:
             logging.error("Specified programm '%s' is not part of the ptglDynamics pipeline. Continuing without it.", programm)
 else:
-    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py']
+    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py']
 
 # dssp directory
 dssp_input_dir = check_dir_args(args.dssp_input_dir)
@@ -346,14 +353,17 @@ add_evalEdgesWeights_args = check_arguments_args(args.evalEdgesWeights_args)
 add_changeEdgeNames_args = check_arguments_args(args.changeEdgeNames_args) 
 
 # sumEdgeWeights arguments
-add_sumEdgeWeights_args = check_arguments_args(args.sumEdgeWeights_args) 
+add_sumEdgeWeights_args = check_arguments_args(args.sumEdgeWeights_args)
+
+# plotSnapshots arguments
+add_plotSnapshots_args = check_arguments_args(args.plotSnapshots_args)
 
     
 # different dssp folders
 if (args.different_dssp_folders):
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf', 'plotSnapshots.py':'pdf'}
 else:
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf', 'plotSnapshots.py':'pdf'}
 
 ########### vamos ###########
 
@@ -621,21 +631,23 @@ for elem in programm_list:
         if (add_changeEdgeNames_args ==''):  
             if (dataset == 'noQ'):
                 key = 'f'
+                name = 'noU'
             elif (dataset == 'Qox'):
                 key = 't'
+                name = 'withU'
             work_dir = get_working_dir(evalEdgesWeights_dir)
             log(work_dir, 'd')
             list_work_dir = os.listdir(work_dir)
             list_work_dir = sorted_nicely(list_work_dir) 
             for file in list_work_dir: 
                 if (file == 'all_edge_values.csv'):
-                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -a -o ' + work_dir + 'all_edge_values_biological_names.csv'  
+                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -a -o ' + work_dir + 'all_edge_values_' + name + '_biological_names.csv'  
                     log(changeEdgeNames, 'd') 
                     os.chdir(out_dir) 
                     os.system(changeEdgeNames)
                     os.chdir(work_dir)
                 elif (file.endswith('edges_weights.csv')):
-                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -e -o ' + work_dir + 'edges_weights_biological_names.csv'
+                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -e -o ' + work_dir + 'edges_weights_' + name + '_biological_names.csv'
                     log(changeEdgeNames, 'd')
                     os.chdir(out_dir) 
                     os.system(changeEdgeNames)
@@ -660,8 +672,8 @@ for elem in programm_list:
             list_work_dir = os.listdir(work_dir)
             list_work_dir = sorted_nicely(list_work_dir)     
             for file in list_work_dir:      
-                if (file == 'all_edge_values_biological_names.csv'):
-                    sumEdgeWeights = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' -n ' + out_dir + 'edge_sum.pdf -o ' +  out_dir + 'edge_sum.csv'
+                if ('all_edge_values'in file) and ('biological_names.csv' in file):
+                    sumEdgeWeights = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' -n ' + out_dir + 'edge_sum.pdf'
                     log(sumEdgeWeights, 'd')
                     os.chdir(out_dir) 
                     os.system(sumEdgeWeights)
@@ -675,6 +687,33 @@ for elem in programm_list:
             os.chdir(work_dir)
                         
         log('sumEdgeWeights computations are done.', 'i')
+
+
+    elif (elem == 'plotSnapshots.py'):
+        work_dir = get_working_dir(changeEdgeNames_dir)
+        log(work_dir, 'd')
+
+        if (add_plotSnapshots_args == ''):
+            list_work_dir = os.listdir(work_dir)
+            list_work_dir = sorted_nicely(list_work_dir)     
+            for file in list_work_dir:      
+                if ('all_edge_values'in file) and ('biological_names.csv' in file):
+                    plotSnapshots = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' -n ' + out_dir + 'edge_plots.pdf'
+                    log(plotSnapshots, 'd')
+                    os.chdir(out_dir) 
+                    os.system(plotSnapshots)
+                    os.chdir(work_dir)
+                    
+        elif (add_plotSnapshots_args != ''):
+            plotSnapshots = 'python3 ' + plotting_dir + elem + ' ' + add_plotSnapshots_args
+            log(plotSnapshots, 'd')
+            os.chdir(out_dir) 
+            os.system(plotSnapshots)
+            os.chdir(work_dir)
+
+        log('plotSnapshots computations are done.', 'i')
+            
+        
            
 
 log("-- %s seconds ---"% (time.time()- _start_time), 'i')
