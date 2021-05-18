@@ -295,8 +295,7 @@ if (args.outputfile != ""):
         sys.exit(1)
 
 # input directory
-input_dir = check_dir_args(args.input_dir)
-    
+input_dir = check_dir_args(args.input_dir)    
 
 # output directory
 original_output_dir = check_dir_args(args.output_dir)
@@ -611,15 +610,17 @@ for elem in programm_list:
                     shutil.copy(file, input_dir_evalEdges + file)
                 except shutil.SameFileError:
                         log("Source and destination represents the same file.", 'i')
+                        
+        if (len(os.listdir(input_dir_evalEdges)) != 0):
              
-        if (add_evalEdgesWeights_args == ''): 
-            add_evalEdgesWeights_args = '-e -o ' + out_dir + file_beginning + '_edges_weights.csv'
+            if (add_evalEdgesWeights_args == ''): 
+                add_evalEdgesWeights_args = '-e -o ' + out_dir + file_beginning + '_edges_weights.csv'
                 
-        evalEdgesWeights = 'python3 ' + plotting_dir + elem + ' ' + input_dir_evalEdges + ' ' + add_evalEdgesWeights_args  
-        log(evalEdgesWeights, 'd')
-        os.chdir(out_dir) 
-        os.system(evalEdgesWeights)
-        os.chdir(work_dir)
+            evalEdgesWeights = 'python3 ' + plotting_dir + elem + ' ' + input_dir_evalEdges + ' ' + add_evalEdgesWeights_args  
+            log(evalEdgesWeights, 'd')
+            os.chdir(out_dir) 
+            os.system(evalEdgesWeights)
+            os.chdir(work_dir)
         
         evalEdgesWeights_dir = os.path.abspath(out_dir) + '/'
         dataset = file_beginning
@@ -627,7 +628,9 @@ for elem in programm_list:
         log('evalEdgesWeights computations are done.', 'i')
     
     
-    elif (elem == 'changeEdgeNames.py'):
+    elif (elem == 'changeEdgeNames.py'): 
+        key = 't'
+        name = ''
         if (add_changeEdgeNames_args ==''):  
             if (dataset == 'noQ'):
                 key = 'f'
