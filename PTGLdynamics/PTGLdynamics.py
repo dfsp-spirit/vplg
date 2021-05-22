@@ -344,6 +344,8 @@ add_dsspcmbi_args = check_arguments_args(args.dsspcmbi_args)
 
 # getAttributeDataFromGml arguments
 add_getAttributeDataFromGml_args = check_arguments_args(args.getAttributeDataFromGml_args)
+if ('-c' not in add_getAttributeDataFromGml_args):
+    log('Not using -c as an argument for getAttributeDataFromGml may cause errors in later scripts.', 'w')
 
 # evalEdgesWeights arguments
 add_evalEdgesWeights_args = check_arguments_args(args.evalEdgesWeights_args)
@@ -621,6 +623,9 @@ for elem in programm_list:
             os.chdir(out_dir) 
             os.system(evalEdgesWeights)
             os.chdir(work_dir)
+            
+        else:
+            os.rmdir(input_dir_evalEdges)
         
         evalEdgesWeights_dir = os.path.abspath(out_dir) + '/'
         dataset = file_beginning

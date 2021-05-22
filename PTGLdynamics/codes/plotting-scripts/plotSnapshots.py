@@ -20,6 +20,8 @@ import time
 import matplotlib.pyplot as plt
 import decimal
 from matplotlib.backends.backend_pdf import PdfPages
+import platform
+import subprocess
 
 
 ########### functions ###########
@@ -288,6 +290,7 @@ for i in range(len(csv)): # [file]
     plt.legend()
     #plt.show()
     pp.savefig()
+    plt.close('all')
     
 
 ########### get edges #############
@@ -351,10 +354,14 @@ for i in range(len(all_keys)):
     if(y_axis_range !=[]):
         plt.ylim(y_axis_range)
     pp.savefig()
+    plt.close('all')
 
 pp.close()
-log("Finished calculating. Showing plots.",'i')
-plt.show()
+#log("Finished calculating. Showing plots.",'i')
+#plt.show()
+log("Finished calculating. Opening the pdf with the plots.", 'i')
+if platform.system() == 'Linux':
+   subprocess.call(('xdg-open', name_pdf_plots))
 
 
 

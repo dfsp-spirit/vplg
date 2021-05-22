@@ -128,7 +128,6 @@ cl_parser_group_header_configuration.add_argument('--omit-header',
 
 args = cl_parser.parse_args()
 
-
 ########### check arguments ###########
 
 # assign log level

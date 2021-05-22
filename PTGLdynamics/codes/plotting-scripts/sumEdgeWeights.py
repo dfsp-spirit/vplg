@@ -235,10 +235,11 @@ plt.legend(fontsize = 'small')
 if(y_axis_range !=[]):
     plt.ylim(y_axis_range)
 pp.savefig()
+plt.close('all')
 
 pp.close()
-log("Finished calculating. Showing plots.",'i')
-plt.show()
+#log("Finished calculating. Showing plots.",'i')
+#plt.show()
 
 # write result to output file
 for elem in edge_weights:

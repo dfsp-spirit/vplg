@@ -184,8 +184,13 @@ if(args.all_edges_input):
     edge_names = edge_names.replace('}','')
     edge_names = edge_names.replace('|','')
     
-    edge_names = edge_names.split(',')
+    edge_names = edge_names.split(',') 
     new_line = ""
+    
+    if (edge_names == ['']):
+        log('File contains no edge names. Exiting the script.', 'w')
+        exit() 
+        
     for j in range(len(edge_names)):
         #new_line += "{"
         edge_names[j] = edge_names[j].split('  ')
