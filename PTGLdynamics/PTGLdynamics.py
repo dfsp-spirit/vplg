@@ -639,23 +639,23 @@ for elem in programm_list:
         if (add_changeEdgeNames_args ==''):  
             if (dataset == 'noQ'):
                 key = 'f'
-                name = 'noU'
+                name = 'noU_'
             elif (dataset == 'Qox'):
                 key = 't'
-                name = 'withU'
+                name = 'withU_'
             work_dir = get_working_dir(evalEdgesWeights_dir)
             log(work_dir, 'd')
             list_work_dir = os.listdir(work_dir)
             list_work_dir = sorted_nicely(list_work_dir) 
             for file in list_work_dir: 
                 if (file == 'all_edge_values.csv'):
-                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -a -o ' + work_dir + 'all_edge_values_' + name + '_biological_names.csv'  
+                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -a -o ' + work_dir + 'all_edge_values_' + name + 'biological_names.csv'  
                     log(changeEdgeNames, 'd') 
                     os.chdir(out_dir) 
                     os.system(changeEdgeNames)
                     os.chdir(work_dir)
                 elif (file.endswith('edges_weights.csv')):
-                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -e -o ' + work_dir + 'edges_weights_' + name + '_biological_names.csv'
+                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -e -o ' + work_dir + 'edges_weights_' + name + 'biological_names.csv'
                     log(changeEdgeNames, 'd')
                     os.chdir(out_dir) 
                     os.system(changeEdgeNames)

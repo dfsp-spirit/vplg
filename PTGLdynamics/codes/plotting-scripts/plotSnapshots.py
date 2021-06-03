@@ -63,11 +63,11 @@ def log(message, level=""):
 def check_for_U(name):
     """checks the file name wether it belongs to the dataset with or without U"""
     if('withU' in name):
-        ending = 'with_U'
+        ending = '-with_U'
     elif('noU' in name):
-        ending = 'noU'
+        ending = '-noU'
     else:
-        ending = name
+        ending = ''
     return ending
 
 ########### configure logger ###########
@@ -147,9 +147,12 @@ cl_parser.add_argument('-r',
                        nargs = 2,
                        default = [],
                        help = 'specify the range of the y-axis in floats.')
+                       
+cl_parser.add_argument('--show-plots',
+                       action='store_true',
+                       help = 'open the matplot plots.')                       
 
 args = cl_parser.parse_args()
-
 
 ########### check arguments ###########
 
@@ -175,7 +178,8 @@ for elem in args.inputfiles:
     if(os.access(elem, os.R_OK) == True):
         csv.append(elem)
     else:
-        logging.error("Specified file '%s' is not readable. Continuing without it.", elem)
+        logging.error("Specified file '%s' is not readable. Exiting.", elem)
+        exit()
 if(csv == []):
     logging.error("No readable files found. Exiting now.", args.inputfiles)
     sys.exit(1)
@@ -265,7 +269,7 @@ for i in range(len(csv)): # [file]
         y = [decimal.Decimal(edges[-1][j][y]) for y in x]
 
         dataset = check_for_U(csv[i])
-        plt.plot(x,y, label=str(edge_keys[-1][j])+ '-'+dataset , alpha=0.5)
+        plt.plot(x,y, label=str(edge_keys[-1][j]) + dataset , alpha=0.5)
         
     
     for j in range(len(edges[-1])):
@@ -273,7 +277,7 @@ for i in range(len(csv)): # [file]
         z =  [decimal.Decimal(mean[-1][j][z-int(interval/2)]/interval) for z in w] #calculate mean for this point
 
         dataset = check_for_U(csv[i])
-        plt.plot(w,z, label=str(edge_keys[-1][j])+'-'+dataset+'-mean' , alpha=0.5)
+        plt.plot(w,z, label=str(edge_keys[-1][j]) + dataset + '-mean' , alpha=0.25)
 
     """
     ############# DOES NOT WORK ##############
@@ -287,10 +291,11 @@ for i in range(len(csv)): # [file]
     if(y_axis_range !=[]):
         plt.ylim(y_axis_range)
     #plt.set_title(csv)
-    plt.legend()
+    plt.legend(loc="upper left", fontsize=2)
     #plt.show()
     pp.savefig()
-    plt.close('all')
+    if (args.show_plots == False):
+        plt.close('all')
     
 
 ########### get edges #############
@@ -327,7 +332,7 @@ for i in range(len(all_keys)):
             y = [decimal.Decimal(edges[j][k][y]) for y in x]
 
             dataset = check_for_U(csv[j])
-            plt.plot(x,y, label=str(all_keys[i])+ '-'+dataset , alpha=0.5)
+            plt.plot(x,y, label=str(all_keys[i]) + dataset , alpha=0.25)
             #if(args.log_scale):
             #    plt.yscale('log')
             
@@ -342,7 +347,7 @@ for i in range(len(all_keys)):
             z = [decimal.Decimal(mean[j][k][z-int(interval/2)]/interval) for z in w] #calculate mean for this point
 
             dataset = check_for_U(csv[j])
-            plt.plot(w,z, label=str(all_keys[i])+'-'+dataset+'-mean' , alpha=0.5)
+            plt.plot(w,z, label=str(all_keys[i])+ dataset + '-mean' , alpha=0.25)
 
 
     """
@@ -350,18 +355,21 @@ for i in range(len(all_keys)):
     if(args.log_scale):
         plt.yscale('log')
     """
-    plt.legend()
+    plt.legend(loc="upper left", fontsize=8)
     if(y_axis_range !=[]):
         plt.ylim(y_axis_range)
     pp.savefig()
-    plt.close('all')
+    if (args.show_plots == False):
+        plt.close('all')
 
 pp.close()
-#log("Finished calculating. Showing plots.",'i')
-#plt.show()
-log("Finished calculating. Opening the pdf with the plots.", 'i')
-if platform.system() == 'Linux':
-   subprocess.call(('xdg-open', name_pdf_plots))
+if (args.show_plots):
+    log("Finished calculating. Showing plots.",'i')
+    plt.show()
+else:
+    log("Finished calculating. Opening the pdf with the plots.", 'i')
+    if platform.system() == 'Linux':
+        subprocess.call(('xdg-open', name_pdf_plots))
 
 
 
