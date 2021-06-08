@@ -2,7 +2,7 @@
 
 This package includes software for the analysis of protein structure topologies.
 The main part of this package is the computation of topology graphs based on three-dimensional structures from the Protein Data Bank (PDB) and the secondary structure assignment from Define Secondary Structure of Proteins (DSSP).
-This software is able to read in legacy PDB files and macromolecular Crystallographic Information Files (mmCIFs) and therefore able to process large structures of > 62 chains or >99,999 atoms.
+This software is able to read in legacy PDB files and macromolecular Crystallographic Information Files (mmCIFs) and therefore able to process large structures of > 62 chains or > 99,999 atoms.
 The software is used to fill the Protein Topology Graph Library (PTGL).
 
 ## Included software
@@ -10,19 +10,22 @@ The software is used to fill the Protein Topology Graph Library (PTGL).
 Each top-level directory contains one software part of this package.
 
 - 'PTGLgraphComputation' (formerly labeled PLCC) is the main part of PTGLtools computing graphs representing the topology of three-dimensional protein structures
-- 'PTGLdynamics': Pipeline to analyze snapshots of MD simulation with PTGLgraphComputation
+- 'PTGLdynamics' [unpublished & WIP]: Pipeline to analyze snapshots of MD simulation with PTGLgraphComputation
 - 'splitpdb': splits a multi-model legacy PDB file into single PDB files of one model
 - 'graphletAnalyzer': finds graphlets in graph modeling language (GML) files
 - 'bk': implementation of the Bron_Kerbosch algorithm to find cliques
-- 'vpg': [closed] graphical user interface for PTGLgraphComputation
+- 'vpg' [closed]: graphical user interface for PTGLgraphComputation
 
 This is just the README for the code repository, see the doc/ subdirectory for help with the software in this repo.
 For example, find the documentation of PTGLgraphComputation in [/PTGLgraphComputation/doc](https://github.com/MolBIFFM/PTGLtools/tree/main/PTGLgraphComputation/doc).
 
 ## Installing
 
-Both the 'splitpdb' and the 'PTGLgraphComputation' directories contain not only the source code but the full Netbeans projects, so you should be able to open them directly if you use the Netbeans IDE.
-To use the software, simply build & compile the project.
+Both the 'splitpdb' and the 'PTGLgraphComputation' directories contain not only the source code but the full Netbeans projects.
+You can directly open the project using the Netbeans IDE.
+Simply build the project: button in the Netbeans taskbar or [F11] by default.
+The ready to use JAR file and lib folder can be found in the newly created dist folder by default.
+You can test the program and access the help by running `java -jar PTGLgraphComputation.jar --help`
 
 ## Websites
 
