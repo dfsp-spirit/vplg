@@ -6,7 +6,7 @@ I: Download
 1.1) Download XAMPP from http://www.apachefriends.org/en/xampp.html
 1.2) Download PostgreSQL from http://www.postgresql.org/
 1.3) Download Symfony2 from http://symfony.com/download
-1.4) Download VPLG from http://vplg.sourceforge.net
+1.4) Download VPLG from https://github.com/MolBIFFM/PTGLtools
 
 II: Install and Setup
 ======================
