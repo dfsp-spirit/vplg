@@ -29,8 +29,8 @@ You can test the program and access the help by running `java -jar PTGLgraphComp
 
 ## Websites
 
-- [PTGLtools website](http://www.bioinformatik.uni-frankfurt.de/tools/vplg/)
 - [PTGL website](http://ptgl.uni-frankfurt.de/): the website PTGLgraphComputation fills with data
+- [PTGLgraphComputation website](http://www.bioinformatik.uni-frankfurt.de/tools/PTGLgraphComputation/index.html)
 - [Molbi group](https://www.uni-frankfurt.de/57211826/People)
 
 ## License
