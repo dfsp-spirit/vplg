@@ -210,7 +210,7 @@ public class Main {
         }
         
         // Check library dir, warn if not there        
-        // NOTE: This is not necessary anymore, because we can store the libs inside the JAR using the jar-for-store target added in the build.xml file. Run 'ant ci' to generate the file, it will then be in store/plcc.jar.
+        // NOTE: This is not necessary anymore, because we can store the libs inside the JAR using the jar-for-store target added in the build.xml file. Run 'ant ci' to generate the file, it will then be in store/PTGLgraphComputation.jar.
         /*
         File libDir = new File("lib");
         if( ! libDir.exists()) {
@@ -11192,10 +11192,10 @@ public class Main {
      * Prints a short note on how to use this program to STDOUT. Called if the user runs the program without command line arguments (most likely because he does not know about them).
      */
     public static void usage_short() {
-        System.out.println("This program is part of PTGLtools, http://vplg.sourceforge.net. Copyright MolBI Group 2012 - 2014.");
-        System.out.println("PTGLtools is free software and comes without any warranty. See LICENSE for details.");        
-        System.out.println("USAGE:         java -jar plcc.jar <pdbid> [OPTIONS]");
-        System.out.println("DETAILED HELP: java -jar plcc.jar --help");
+        System.out.println("This program is part of PTGLtools (https://github.com/MolBIFFM/PTGLtools). Copyright MolBI Group 2012 - 2021.");
+        System.out.println("PTGLgraphComputation is free software and comes without any warranty. See LICENSE for details.");        
+        System.out.println("USAGE:         java -jar PTGLgraphComputation.jar <pdbid> [OPTIONS]");
+        System.out.println("DETAILED HELP: java -jar PTGLgraphComputation.jar --help");
     }
     
     
@@ -11213,8 +11213,8 @@ public class Main {
      * Prints detailed usage info to STDOUT.
      */
     public static void usage() {
-        System.out.println("USAGE: java -jar plcc.jar <pdbid> [OPTIONS]");
-        System.out.println("       java -jar plcc.jar --help");
+        System.out.println("USAGE: java -jar PTGLgraphComputation.jar <pdbid> [OPTIONS]");
+        System.out.println("       java -jar PTGLgraphComputation.jar --help");
         System.out.println("valid OPTIONS are: ");
         System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs (may split other SSEs)");
         System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)*");
@@ -11288,15 +11288,16 @@ public class Main {
         System.out.println("--convert-models-to-chains <infile> <outfile>: Rewrite the input PDB file, transforming models into chains. Useful when treating PDB files which contain biological assemblies and you want all parts of a protein complex at once, e.g., to analyze the interactions between the chains.");
         System.out.println("");
         
-        System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
-        System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
-        System.out.println("          java -jar plcc.jar 8icd -o /tmp");
-        System.out.println("          java -jar plcc.jar 1o1d -E");
-        System.out.println("          java -jar plcc.jar none -l prot_graph_3kmf_A.plg");
-        System.out.println("          java -jar plcc.jar none -m PNG -ddb 8icd A albelig ~/img/protein_graph");
-        System.out.println("          java -jar plcc.jar 6cbe -I --cg-threshold 2");
+        System.out.println("EXAMPLES: java -jar PTGLgraphComputation.jar 8icd");
+        System.out.println("          java -jar PTGLgraphComputation.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
+        System.out.println("          java -jar PTGLgraphComputation.jar 8icd -o /tmp");
+        System.out.println("          java -jar PTGLgraphComputation.jar 1o1d -E");
+        System.out.println("          java -jar PTGLgraphComputation.jar none -l prot_graph_3kmf_A.plg");
+        System.out.println("          java -jar PTGLgraphComputation.jar none -m PNG -ddb 8icd A albelig ~/img/protein_graph");
+        System.out.println("          java -jar PTGLgraphComputation.jar 6cbe -I --cg-threshold 2");
         System.out.println("");
         System.out.println("REQUIRED INPUT FILES: This program requires the PDB file and the DSSP file of a protein.");
+        System.out.println("                      You can find PDB files at https://rcsb.org and the DSSP program as well as dowload options at https://swift.cmbi.umcn.nl/gv/dssp/.");
         System.out.println("                      This does not apply to options that don't use it (marked with * above), of course.");
         System.out.println("                      A PDBID still has to be given as first argument, it will be ignored though (use 'NONE').");
         System.out.println("");
@@ -11305,7 +11306,7 @@ public class Main {
         System.out.println("        You have to split PDB files with multiple models up BEFORE running DSSP (use the 'splitpdb' tool).");
         System.out.println("        If you don't do this, the broken DSSP file will get this program into trouble.");
         System.out.println("       -See the config file '" + Settings.getDefaultConfigFilePath() + "' in your userhome to set advanced options.");
-        System.out.println("       -Try 'java -jar plcc.jar <PDBID>' for a start.");
+        System.out.println("       -Try 'java -jar PTGLgraphComputation.jar <PDBID>' for a start.");
     }
 
     /**
