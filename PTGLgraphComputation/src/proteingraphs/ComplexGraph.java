@@ -1621,7 +1621,7 @@ public class ComplexGraph extends UAdjListGraph {
 
             @Override
             public String write(Vertex o) {
-                return chainTypeMap.get(o).toString();
+                return '"' + chainTypeMap.get(o).toString() + '"';
             }
         });
         

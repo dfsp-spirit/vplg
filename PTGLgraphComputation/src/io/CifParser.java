@@ -257,7 +257,6 @@ class CifParser {
                     lineData = lineToArray(line);
                 } else {
                     lineData = trimSpecialChars(currentLineValues);
-                    //System.out.println(currentLineValues); //TODELETE
                 }
                 
                 // check for minimum length of lineData (2 for non-loop and #header for loop) and merge with coming line if not
@@ -637,13 +636,14 @@ class CifParser {
             } else {
                 // same model as before?
                 if (! m.getModelID().equals(tmpModelID)) {
-                    if (! furtherModelWarningPrinted) {
-                        System.out.println("   PDB: Found further models. Ignoring them.");
-                        furtherModelWarningPrinted = true;
+                    if (metaData.get("experiment").contains("NMR")) {
+                        if (! furtherModelWarningPrinted) {
+                            System.out.println("   PDB: Found further models. Ignoring them.");
+                            furtherModelWarningPrinted = true;
+                        }
+                        // skip this line if the structure is NMR
+                        return;
                     }
-
-                    // skip this line
-                    return;
                 }
             }
         } else {
@@ -838,7 +838,6 @@ class CifParser {
                     
                     lastChainID = chainID;
                     FileParser.s_molecules.add(res);
-                    FileParser.getChainByPdbChainID(chainID).addMolecule(res);
                     lastMol = res;
                 } else {
                     lastMol = tmpMol;

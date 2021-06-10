@@ -76,6 +76,20 @@ fi
 
 PDBFILE_FINAL="${PDBID}${PDBFILE_DL_SUFFIX:0:4}"
 
+## biological assembly cif file generation and postprocessing for non-NMR structures
+
+if ! grep -q '_exptl.method.*NMR.*' $PDBFILE_FINAL
+then
+	if [ $USE_BIOLOGICAL_ASSEMBLY_CIFFILE == "YES" ]; then
+    		python2 create_biological_assembly_ciffile.py $PDBFILE_FINAL
+    		BA_TAG="-1.cif"
+    		python3 biological_assembly_postprocessing.py ${PDBID}${BA_TAG} ${PDBFILE_DL_SUFFIX:0:4}
+    		if [ ! -f ${PDBID}${BA_TAG}]; then
+	   		echo "$APPTAG ERROR: Biological Assembly file '${PDBID}${BA_TAG}' does not exist. Trying to move on with original Cif file." >> $ERRORLOG
+    		fi 
+	fi
+fi
+
 if [ ! -f $PDBFILE_EXTRACTED ]; then
     echo "$APPTAG ERROR: Expected extracted PDB file '${PDBFILE_EXTRACTED}' does not exist." >> $ERRORLOG
     exit 1
