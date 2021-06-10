@@ -33,7 +33,7 @@ ending = sys.argv[2]
 
 
 def nextLetter(currentLetter):
-# checks if current letter is Z or something else and returns next letter
+    """checks if current letter is Z or something else and returns next letter"""
     if currentLetter != "Z":
         return (chr(ord(currentLetter) + 1))
     else:
@@ -41,7 +41,7 @@ def nextLetter(currentLetter):
                      
 
 def createNewChain():
-# creates new chain ID, adds it to existingChains
+    """creates new chain ID, adds it to existingChains"""
     lastAddedChain = existingChains[-1]
     newChain = lastAddedChain
     
@@ -61,7 +61,7 @@ def createNewChain():
     
 
 def exchangeChainId(newChainId):
-# exchanges the lines' chain ID with the input ID and saves the line in allLines
+    """exchanges the lines' chain ID with the input ID and saves the line in allLines"""
     currentLineString = str(singleLine)
         
     itemCount = 0
@@ -99,37 +99,37 @@ allLines = []               # all lines including corrected chains
 with open(ba, "r") as f:
     for singleLine in f.read().split("\n"):
         
-        if inAtomSiteLine == True and singleLine.startswith("#"):
-        # end of atom list
+        if inAtomSiteLine and singleLine.startswith("#"):
+            # end of atom list
             inAtomSiteLine = False
             allLines.append(singleLine)
         
         elif singleLine.startswith("_atom_site."):
-        # atom site line categories
+            # atom site line categories
             inAtomSiteLine = True
             allLines.append(singleLine)
         
-        elif inAtomSiteLine == True and not singleLine.startswith("_atom_site."):
-        # list of atoms
+        elif inAtomSiteLine and not singleLine.startswith("_atom_site."):
+            # list of atoms
             currentLineArray = singleLine.split()
             currentModel = currentLineArray[20]
             currentChain = currentLineArray[18]
             
             if ((currentChain != chainPlaceholder) or (not currentModel in existingModels)):
-            # new chain and/or new unit
+                # new chain and/or new unit
                             
                 if not currentModel in existingModels:
-                # new unit
+                    # new unit
                     existingModels.append(currentModel)
                     if len(existingModels) == 1:
-                    # first unit
+                        # first unit
                         allLines.append(singleLine)
                         lastChain = currentChain
                         existingChains.append(lastChain)
                         chainDict[currentChain] = lastChain
                         
                     else:
-                    # new duplicated unit
+                        # new duplicated unit
                         chainDict.clear()
                         chainPlaceholder = currentChain
                         lastChain = createNewChain()
@@ -137,15 +137,15 @@ with open(ba, "r") as f:
                         chainDict[currentChain] = lastChain
                     
                 else:
-                # same unit as last line, but new chain
+                    # same unit as last line, but new chain
                     if len(existingModels) == 1:
-                    # first unit
+                        # first unit
                         allLines.append(singleLine)
                         lastChain = currentChain
                         existingChains.append(lastChain)
                         
                     else:
-                    # duplicated unit
+                        # duplicated unit
                         chainPlaceholder = currentChain
                         if currentChain in chainDict:
                             lastChain = chainDict[currentChain]
@@ -155,11 +155,11 @@ with open(ba, "r") as f:
                         exchangeChainId(lastChain)
             
             else:
-            # same unit and chain as last line
+                # same unit and chain as last line
                 exchangeChainId(lastChain)
                     
         else:
-        # everything outside atom site lines
+            # everything outside atom site lines
             allLines.append(singleLine)
 
     
