@@ -397,8 +397,6 @@ getAttributeDataFromGml_dir = input_dir
 evalEdgesWeights_dir = input_dir
 changeEdgeNames_dir = input_dir
 
-dataset = ''
-
 work_dir = get_working_dir(input_dir)
 list_work_dir = []
 
@@ -597,7 +595,6 @@ for elem in programm_list:
         
     elif (elem == 'evalEdgesWeights.py'):
         ending_of_files = 'attribute_extracted.csv'
-        file_beginning = ''
         work_dir = get_working_dir(getAttributeDataFromGml_dir)
         os.chdir(getAttributeDataFromGml_dir)
         input_dir_evalEdges = new_directory('attribute_csv_files') + '/' 
@@ -607,7 +604,6 @@ for elem in programm_list:
          
         for file in list_work_dir:
             if file.endswith(ending_of_files):
-                file_beginning = file[0:3]
                 try:
                     shutil.copy(file, input_dir_evalEdges + file)
                 except shutil.SameFileError:
@@ -616,7 +612,7 @@ for elem in programm_list:
         if (len(os.listdir(input_dir_evalEdges)) != 0):
              
             if (add_evalEdgesWeights_args == ''): 
-                add_evalEdgesWeights_args = '-e -o ' + out_dir + file_beginning + '_edges_weights.csv'
+                add_evalEdgesWeights_args = '-e -o ' + out_dir + 'edges_weights.csv'
                 
             evalEdgesWeights = 'python3 ' + plotting_dir + elem + ' ' + input_dir_evalEdges + ' ' + add_evalEdgesWeights_args  
             log(evalEdgesWeights, 'd')
@@ -628,34 +624,34 @@ for elem in programm_list:
             os.rmdir(input_dir_evalEdges)
         
         evalEdgesWeights_dir = os.path.abspath(out_dir) + '/'
-        dataset = file_beginning
         
         log('evalEdgesWeights computations are done.', 'i')
     
     
     elif (elem == 'changeEdgeNames.py'): 
-        key = 't'
-        name = ''
-        if (add_changeEdgeNames_args ==''):  
-            if (dataset == 'noQ'):
-                key = 'f'
-                name = 'noU_'
-            elif (dataset == 'Qox'):
-                key = 't'
-                name = 'withU_'
+        if (add_changeEdgeNames_args == ''):  
+            # get gml-file
+            gml_path = get_working_dir(gml_dir)
+            gml_files = os.listdir(gml_dir)
+            gml_files = sorted_nicely(gml_files)
+            gml_file = ''
+            for gml in gml_files:
+                    if gml.endswith("complex_chains_albelig_CG.gml"):
+                        gml_file = os.path.abspath(gml)
+                        break
             work_dir = get_working_dir(evalEdgesWeights_dir)
             log(work_dir, 'd')
             list_work_dir = os.listdir(work_dir)
             list_work_dir = sorted_nicely(list_work_dir) 
             for file in list_work_dir: 
                 if (file == 'all_edge_values.csv'):
-                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -a -o ' + work_dir + 'all_edge_values_' + name + 'biological_names.csv'  
+                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + gml_file + ' -a -o ' + work_dir + 'all_edges_values_biological_names.csv'  
                     log(changeEdgeNames, 'd') 
                     os.chdir(out_dir) 
                     os.system(changeEdgeNames)
                     os.chdir(work_dir)
                 elif (file.endswith('edges_weights.csv')):
-                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + key + ' -e -o ' + work_dir + 'edges_weights_' + name + 'biological_names.csv'
+                    changeEdgeNames = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' ' + gml_file + ' -e -o ' + work_dir + 'edges_weights_biological_names.csv'
                     log(changeEdgeNames, 'd')
                     os.chdir(out_dir) 
                     os.system(changeEdgeNames)
@@ -674,13 +670,15 @@ for elem in programm_list:
         
     elif (elem == 'sumEdgeWeights.py'):
         work_dir = get_working_dir(changeEdgeNames_dir)
+        print(work_dir)
         log(work_dir, 'd')
         
         if (add_sumEdgeWeights_args == ''):  
             list_work_dir = os.listdir(work_dir)
             list_work_dir = sorted_nicely(list_work_dir)     
             for file in list_work_dir:      
-                if ('all_edge_values'in file) and ('biological_names.csv' in file):
+                if ('all_edges_values_biological_names.csv' in file):
+                    print(file)
                     sumEdgeWeights = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' -n ' + out_dir + 'edge_sum.pdf'
                     log(sumEdgeWeights, 'd')
                     os.chdir(out_dir) 
@@ -705,7 +703,7 @@ for elem in programm_list:
             list_work_dir = os.listdir(work_dir)
             list_work_dir = sorted_nicely(list_work_dir)     
             for file in list_work_dir:      
-                if ('all_edge_values'in file) and ('biological_names.csv' in file):
+                if ('all_edges_values_biological_names.csv' in file):
                     plotSnapshots = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' -n ' + out_dir + 'edge_plots.pdf'
                     log(plotSnapshots, 'd')
                     os.chdir(out_dir) 
