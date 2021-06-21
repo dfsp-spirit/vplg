@@ -5,7 +5,7 @@ I: Download
 ============
 1) Install apache2, apache2_mod_php5, postgresql-server and php5-pgsql from the package system
 1.2) Download Symfony2 from http://symfony.com/download
-1.3) Download PTGLtools from http://vplg.sourceforge.net
+1.3) Download PTGLtools from https://github.com/MolBIFFM/PTGLtools
 
 II: Install and Setup
 ======================

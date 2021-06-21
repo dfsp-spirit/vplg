@@ -254,7 +254,12 @@ public class ComplexGraph extends UAdjListGraph {
                         chainTypeMap.put(v, allChains.get(j).getMoleculeType());
 
                         molIDs.add(FileParser.getMetaInfo(pdbid, tmpChain.getPdbChainID()).getMolName());
-                        mapChainIdToLength.put(tmpChain.getPdbChainID(), tmpChain.getAllAAResidues().size());
+                        
+                        int chainLength = (Settings.getBoolean("PTGLgraphComputation_B_CG_ignore_ligands") ? 
+                                tmpChain.getAllAAResidues().size() : 
+                                tmpChain.getAllAAResidues().size() + tmpChain.getAllLigandResidues().size());
+                        
+                        mapChainIdToLength.put(tmpChain.getPdbChainID(), chainLength);
 
                         // get AA sequence string for each chainName
                         for(Residue resi : tmpChain.getAllAAResidues()) {
@@ -1621,7 +1626,7 @@ public class ComplexGraph extends UAdjListGraph {
 
             @Override
             public String write(Vertex o) {
-                return chainTypeMap.get(o).toString();
+                return '"' + chainTypeMap.get(o).toString() + '"';
             }
         });
         

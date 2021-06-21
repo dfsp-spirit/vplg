@@ -6,3 +6,7 @@
 
 .directory
 
+/splitpdb/.gradle/
+/splitpdb/src/splitpdb_new/nbproject/private/
+/splitpdb/src/splitpdb_new/build/
+/splitpdb/src/splitpdb_new/dist/
