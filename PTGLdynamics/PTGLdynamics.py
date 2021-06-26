@@ -185,8 +185,8 @@ cl_parser.add_argument('-a',
                        metavar = 'applications',
                        nargs = "*",
                        type = str,
-                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py'],
-                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py'")
+                       default = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py', 'createPymolScript.py'],
+                       help = "to execute only the specified scripts. The scripts must be part of the PTGLdynamics set which contains: 'toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py', 'createPymolScript.py'")
 
 cl_parser.add_argument('-m',
                        '--dssp-input-dir',
@@ -272,7 +272,12 @@ cl_parser.add_argument('-n',
                        metavar = 'plotSnapshots-args',
                        default = '',   
                        help = 'a string with the arguments for plotSnapshots you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: -n="<arguments and their inputs>".')
-
+                       
+cl_parser.add_argument('--createPymolScript-args',
+                       metavar = 'createPymolScript-arguments',
+                       type = str,
+                       default = '',
+                       help = 'a string with the arguments for createPymolScript you want to use and its values to execute the script in different ways using your command line arguments. Insert arguments like this: --createPymolScript-args="<arguments and their inputs>", including the positional arguments.')                       
 
 args = cl_parser.parse_args()
 
@@ -317,12 +322,12 @@ else:
 programm_list = []
 if (args.applications != []):
     for programm in args.applications:
-        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py']:
+        if programm in ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py', 'createPymolScript.py']:
             programm_list.append(programm)
         else:
             logging.error("Specified programm '%s' is not part of the ptglDynamics pipeline. Continuing without it.", programm)
 else:
-    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py']
+    programm_list = ['toLegacyPDB.py', 'dsspcmbi', 'postProcessDssp.py', 'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py', 'getAttributeDataFromGml.py', 'evalEdgesWeights.py', 'changeEdgeNames.py', 'sumEdgeWeights.py', 'plotSnapshots.py', 'createPymolScript.py']
 
 # dssp directory
 dssp_input_dir = check_dir_args(args.dssp_input_dir)
@@ -359,12 +364,14 @@ add_sumEdgeWeights_args = check_arguments_args(args.sumEdgeWeights_args)
 # plotSnapshots arguments
 add_plotSnapshots_args = check_arguments_args(args.plotSnapshots_args)
 
+# createPymolScript arguments
+add_createPymolScript_args = check_arguments_args(args.createPymolScript_args)
     
 # different dssp folders
 if (args.different_dssp_folders):
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf', 'plotSnapshots.py':'pdf'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'oldDssp', 'postProcessDssp.py':'newDssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'gml', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf', 'plotSnapshots.py':'pdf', 'createPymolScript.py':'PyMOL'}
 else:
-    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf', 'plotSnapshots.py':'pdf'}
+    dir_names = {'toLegacyPDB.py':'legacyPDB', 'dsspcmbi':'dssp', 'postProcessDssp.py':'dssp', 'PTGLgraphComputation':'PTGLgraphComputation', 'gmlCompareEdgeWeightsAndSubsets.py': 'csv', 'getAttributeDataFromGml.py': 'csv', 'evalEdgesWeights.py':'csv', 'changeEdgeNames.py':'csv', 'sumEdgeWeights.py':'pdf', 'plotSnapshots.py':'pdf', 'createPymolScript.py': 'PyMOL'}
 
 ########### vamos ###########
 
@@ -396,6 +403,7 @@ gml_dir = input_dir
 getAttributeDataFromGml_dir = input_dir
 evalEdgesWeights_dir = input_dir
 changeEdgeNames_dir = input_dir
+compareSubsets_dir = input_dir
 
 work_dir = get_working_dir(input_dir)
 list_work_dir = []
@@ -559,6 +567,8 @@ for elem in programm_list:
                         os.system(gml_comparison)
                         os.chdir(work_dir)
                     prevGml = entry
+                    
+        compareSubsets_dir = os.path.abspath(out_dir) + '/'
         
         log('gmlCompareEdgeWeightsAndSubsets computations are done.', 'i')
 
@@ -670,7 +680,6 @@ for elem in programm_list:
         
     elif (elem == 'sumEdgeWeights.py'):
         work_dir = get_working_dir(changeEdgeNames_dir)
-        print(work_dir)
         log(work_dir, 'd')
         
         if (add_sumEdgeWeights_args == ''):  
@@ -678,7 +687,6 @@ for elem in programm_list:
             list_work_dir = sorted_nicely(list_work_dir)     
             for file in list_work_dir:      
                 if ('all_edges_values_biological_names.csv' in file):
-                    print(file)
                     sumEdgeWeights = 'python3 ' + plotting_dir + elem + ' ' + work_dir + file + ' -n ' + out_dir + 'edge_sum.pdf'
                     log(sumEdgeWeights, 'd')
                     os.chdir(out_dir) 
@@ -718,6 +726,32 @@ for elem in programm_list:
             os.chdir(work_dir)
 
         log('plotSnapshots computations are done.', 'i')
+        
+
+    elif (elem == 'createPymolScript.py'):
+        if (add_createPymolScript_args == ''):
+            file_dir = get_working_dir(pdb_dir)
+            list_file_dir = os.listdir(file_dir)
+            list_file_dir = sorted_nicely(list_file_dir) 
+            file = pdb_dir + list_file_dir[0]
+            
+            work_dir = get_working_dir(compareSubsets_dir)
+            log(work_dir, 'd')
+            
+            createPymolScript = 'python3 ' + plotting_dir + elem + ' ' + work_dir + ' ' + file + ' -p ' + out_dir 
+            log(createPymolScript, 'd')
+            os.chdir(out_dir) 
+            os.system(createPymolScript)
+            os.chdir(work_dir)
+                    
+        elif (add_createPymolScript_args != ''):
+            createPymolScript = 'python3 ' + plotting_dir + elem + ' ' + add_createPymolScript_args
+            log(createPymolScript, 'd')
+            os.chdir(out_dir) 
+            os.system(createPymolScript)
+            os.chdir(work_dir)
+
+        log('createPymolScript computations are done.', 'i')
             
         
            
