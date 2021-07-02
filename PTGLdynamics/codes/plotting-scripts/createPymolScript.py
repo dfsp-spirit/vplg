@@ -6,7 +6,7 @@
 #   patch: fixes, small changes
 #   no version change: fix typos, changes to comments, debug prints, small changes to non-result output, changes within git branch
 # -> only increment with commit / push / merge not while programming
-version = "1.0.0"  # TODO version of this template, change this to 1.0.0 for a new script or 2.0.0 if you upgrade another script to this template's architecture
+version = "1.0.1"  # TODO version of this template, change this to 1.0.0 for a new script or 2.0.0 if you upgrade another script to this template's architecture
 
 
 ########### built-in imports ###########
@@ -272,6 +272,15 @@ if (exclude_calculation_edges != ''):
 
 log(changes_edges, 'i')
 
+# Output changes_edges as a csv file
+change_each_edge = open(output_dir + '/' + 'change_each_edge_frame' + str(args.first_timestep) + '_to_frame' + str(args.last_timestep) + '.csv','w')
+change_each_edge.write("edge" + "," +  "change" + '\n')
+
+for key in changes_edges:
+    change_each_edge.write(key + ',' + str(changes_edges[key]) + '\n')
+
+change_each_edge.close()
+
 # for each node: sum of changes
 changes_nodes = {}
 for key in changes_edges:
@@ -306,7 +315,7 @@ for key in changes_edges:
 log(changes_nodes, 'i')
 
 # Save dictionary as a csv file.
-change_each_chain = open(output_dir + '/' + 'change_each_chain.csv','w')
+change_each_chain = open(output_dir + '/' + 'change_each_chain_frame' + str(args.first_timestep) + '_to_frame' + str(args.last_timestep) + '.csv','w')
 change_each_chain.write("chain" + "," +  "change" + '\n')
 
 for key in changes_nodes:
@@ -315,8 +324,8 @@ for key in changes_nodes:
 change_each_chain.close()
 
 # Create PyMol script.
-pymol_script = open(output_dir + '/' + 'PyMol_script.py', 'w')
-pymol_script.write('"""' + '\n' + 'This script shows the given molecule in a heatmap visualisation in PyMOL. Chains colored in blue have lower edge weight changes than chains colored in red. Run this script in PyMOL using the command line with the following command:' + '\n' + 'run ' + output_dir + 'PyMol_script.py' + '\n' + '"""' + '\n')
+pymol_script = open(output_dir + '/' + 'PyMol_script_frame' + str(args.first_timestep) + '_to_frame' + str(args.last_timestep) + '.py', 'w')
+pymol_script.write('"""' + '\n' + 'This script shows the given molecule in a heatmap visualisation in PyMOL. Chains colored in blue have lower edge weight changes than chains colored in red. Run this script in PyMOL using the command line with the following command:' + '\n' + 'run ' + output_dir + 'PyMol_script_frame' + str(args.first_timestep) + '_to_frame' + str(args.last_timestep) + '.py' + '\n' + '"""' + '\n')
 pymol_script.write("cmd.load('" + inputfile + "')" + "\n")
 
 
@@ -341,7 +350,7 @@ for key in changes_nodes:
     percent = (value - value_min) / change
     percent = round(percent, 2)
     if percent == 0.5:
-        pymol_script.write("cmd.color('white', chain " + chain + "')" + "\n")       
+        pymol_script.write("cmd.color('white', 'chain " + chain + "')" + "\n")       
 
     #left, blue part of gradient
     elif percent < 0.5:
@@ -370,7 +379,7 @@ for chain in chains:
 pymol_script.close()
 
 # Run the script in PyMOL.
-run_script = 'pymol -q ' + output_dir + '/' + 'PyMol_script.py'
+run_script = 'pymol -q ' + output_dir + '/' + 'PyMol_script_frame' + str(args.first_timestep) + '_to_frame' + str(args.last_timestep) + '.py'
 os.system(run_script)
 
 
