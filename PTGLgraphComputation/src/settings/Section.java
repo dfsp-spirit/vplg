@@ -326,6 +326,7 @@ class Section {
                 settings.add(new Setting("PTGLgraphComputation_B_gml_snake_case", 'B', "false", "Whether keys in all GML files should be written in snake case, i.e., with under scores instead of camel case. HINT: Originally, GML does not support snake case and so may some parsers for GML files."));
                 settings.add(new Setting("PTGLgraphComputation_B_ptgl_geodat_output", 'B', "false", "Whether the PTGL text files geo.dat for SSE level contacts are written to a text file."));
                 settings.add(new Setting("PTGLgraphComputation_B_ramachandran_plot", 'B', "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower)."));
+                settings.add(new Setting("PTGLgraphComputation_B_csv_residues_in_chains", 'B', "false", "Whether a csv file with the number of residues in each chain is created."));
                 break;
                 
             case "Image settings":

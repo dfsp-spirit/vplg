@@ -595,7 +595,7 @@ public class FileParser {
         }
     }
     
-    public static void initData(String pdbFile, String dsspFile) {
+    public static void initData(String pdbFile, String dsspFile, String outputDir) {
         DsspParser.initVariables(dsspFile);
         FileParser.initVariables(pdbFile);
         
@@ -605,7 +605,29 @@ public class FileParser {
             DP.getInstance().w("Legacy-Parser chosen: This parser is no longer kept up to date, results might not be correct anymore. If possible, use Cif-Parser in the future.");
             LegacyParser.initData(pdbFile);
         }
-    }
+        
+        // if (Setting write csv) then write csv
+        if (Settings.getBoolean("PTGLgraphComputation_B_csv_residues_in_chains")) {
+            File numberResInChains = null;
+            numberResInChains = new File(outputDir +  "number_of_residues_in_each_chain.csv");
+            if (!numberResInChains.exists()) {
+            try {
+                numberResInChains.createNewFile();
+            } catch (IOException ex) {
+                System.err.println("ERROR: Could not create file '" + numberResInChains.getAbsolutePath() + "': " + ex.getMessage() + ".");
+            }
+            }
+            String resInChain = "";
+            FileParser.getChains();
+            for(Chain c: s_chains){               
+                resInChain += c.getPdbChainID() + "," + c.getChainLength() + "\n";
+            }
+            IO.writeStringToFile(resInChain, numberResInChains.getAbsolutePath(), true);  
+            System.out.println("Csv file with the number of residues in each chain created.");
+            System.exit(0);
+            }
+        }
+    
     
     public static void compareResContactsWithPdbidDotGeoFile(String compareResContactsFile, boolean b, ArrayList<MolContactInfo> cInfo) {
         LegacyParser.compareResContactsWithPdbidDotGeoFile(compareResContactsFile, b, cInfo);
